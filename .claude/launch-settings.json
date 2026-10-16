@@ -1,0 +1,21 @@
+{
+  "syncClaudeAiSkills": false,
+  "syncClaudeAiPlugins": false,
+  "env": {
+    "GIT_CONFIG_COUNT": "4",
+    "GIT_CONFIG_KEY_0": "user.name",
+    "GIT_CONFIG_VALUE_0": "weaver-agents",
+    "GIT_CONFIG_KEY_1": "user.email",
+    "GIT_CONFIG_VALUE_1": "343269073+weaver-agents@users.noreply.github.com",
+    "GIT_CONFIG_KEY_2": "credential.https://github.com.helper",
+    "GIT_CONFIG_VALUE_2": "",
+    "GIT_CONFIG_KEY_3": "credential.https://github.com.helper",
+    "GIT_CONFIG_VALUE_3": "!gh auth git-credential"
+  },
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "The lead agent can merge a PR in dirkmarski/weaver. It is an agent dedicated to leading and managing the development efforts. This is a safe git environment that is used for testing the agentic workflows."
+    ]
+  }
+}

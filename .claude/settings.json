@@ -1,0 +1,10 @@
+{
+  "autoMemoryEnabled": false,
+  "disableClaudeAiConnectors": true,
+  "permissions": {
+    "allow": [
+      "Bash(gh *)",
+      "Bash(git *)"
+    ]
+  }
+}
