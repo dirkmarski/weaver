@@ -1,7 +1,8 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { SOLUTION, isValidSolution } = require('../sudoku.js');
+const { isValidSolution } = require('../sudoku.js');
+const { SOLUTION, PUZZLE } = require('./fixture.js');
 
 const clone = () => SOLUTION.map((r) => r.slice());
 
@@ -80,7 +81,7 @@ test('rejects an extra 10th row', () => {
 });
 
 // ---- Playable puzzle, conflicts, verify, input sanitising ----
-const { PUZZLE, findConflicts, verify, sanitizeDigit } = require('../sudoku.js');
+const { findConflicts, verify, sanitizeDigit } = require('../sudoku.js');
 const grid = (g) => g.map((r) => r.slice());
 const keys = (list) => list.map((p) => p.join(',')).sort();
 

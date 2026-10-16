@@ -1,19 +1,6 @@
 (function () {
   'use strict';
 
-  // A known-valid completed sudoku (widely published example solution).
-  var SOLUTION = [
-    [5, 3, 4, 6, 7, 8, 9, 1, 2],
-    [6, 7, 2, 1, 9, 5, 3, 4, 8],
-    [1, 9, 8, 3, 4, 2, 5, 6, 7],
-    [8, 5, 9, 7, 6, 1, 4, 2, 3],
-    [4, 2, 6, 8, 5, 3, 7, 9, 1],
-    [7, 1, 3, 9, 2, 4, 8, 5, 6],
-    [9, 6, 1, 5, 3, 7, 2, 8, 4],
-    [2, 8, 7, 4, 1, 9, 6, 3, 5],
-    [3, 4, 5, 2, 8, 6, 1, 7, 9]
-  ];
-
   function isValidSolution(grid) {
     if (!Array.isArray(grid) || grid.length !== 9) return false;
     for (var r = 0; r < 9; r++) {
@@ -39,19 +26,6 @@
     }
     return true;
   }
-
-  // Puzzle: the givens of SOLUTION (0 = empty). 30 givens, solvable by singles.
-  var PUZZLE = [
-    [5, 3, 0, 0, 7, 0, 0, 0, 0],
-    [6, 0, 0, 1, 9, 5, 0, 0, 0],
-    [0, 9, 8, 0, 0, 0, 0, 6, 0],
-    [8, 0, 0, 0, 6, 0, 0, 0, 3],
-    [4, 0, 0, 8, 0, 3, 0, 0, 1],
-    [7, 0, 0, 0, 2, 0, 0, 0, 6],
-    [0, 6, 0, 0, 0, 0, 2, 8, 0],
-    [0, 0, 0, 4, 1, 9, 0, 0, 5],
-    [0, 0, 0, 0, 8, 0, 0, 7, 9]
-  ];
 
   // Returns a list of [row, col] for every non-empty cell sharing its digit
   // with another cell in the same row, column or 3x3 box. Empty = 0.
@@ -98,12 +72,195 @@
     return d === null ? (prev || '') : d;
   }
 
+  // ---- Generator -------------------------------------------------------
+  // Internally a grid is a flat array of 81 digits (0 = empty).
+
+  var LEVELS = {
+    easy:   { min: 36, max: 40, technique: 'naked' },   // naked singles only
+    medium: { min: 30, max: 35, technique: 'singles' }, // naked + hidden singles
+    hard:   { min: 22, max: 29, technique: null }       // unique solution only
+  };
+  var TIME_CAP_MS = 1000; // generation never runs past this (click-to-render must stay < 2 s)
+
+  var UNITS = (function () {
+    var u = [], i, j;
+    for (i = 0; i < 9; i++) {
+      var row = [], col = [], box = [];
+      for (j = 0; j < 9; j++) {
+        row.push(i * 9 + j);
+        col.push(j * 9 + i);
+        box.push((3 * Math.floor(i / 3) + Math.floor(j / 3)) * 9 + 3 * (i % 3) + (j % 3));
+      }
+      u.push(row, col, box);
+    }
+    return u;
+  })();
+  var PEERS_MASK_UNITS = (function () { // per cell: indices of its row, column and box in UNITS
+    var m = [];
+    for (var p = 0; p < 81; p++) {
+      var r = Math.floor(p / 9), c = p % 9;
+      m.push([r * 3, c * 3 + 1, (3 * Math.floor(r / 3) + Math.floor(c / 3)) * 3 + 2]);
+    }
+    return m;
+  })();
+
+  function toFlat(grid) { return [].concat.apply([], grid); }
+  function toGrid(flat) {
+    var g = [];
+    for (var r = 0; r < 9; r++) g.push(flat.slice(r * 9, r * 9 + 9));
+    return g;
+  }
+
+  // Bitmask of digits already used by the peers of cell p (bit d = digit d).
+  function usedMask(cells, p) {
+    var used = 0, us = PEERS_MASK_UNITS[p];
+    for (var k = 0; k < 3; k++) {
+      var unit = UNITS[us[k]];
+      for (var i = 0; i < 9; i++) used |= 1 << cells[unit[i]];
+    }
+    return used;
+  }
+
+  function bitCount(x) { var n = 0; while (x) { x &= x - 1; n++; } return n; }
+
+  function shuffle(arr, rng) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  // Backtracking search (most-constrained cell first). Counts solutions up to
+  // `limit`. If rng is given, digits are tried in random order. If `out` is an
+  // array, the first solution found is copied into it.
+  function search(cells, limit, rng, out) {
+    var count = 0;
+    function go() {
+      var best = -1, bestMask = 0, bestN = 10;
+      for (var p = 0; p < 81; p++) {
+        if (cells[p]) continue;
+        var mask = ~usedMask(cells, p) & 0x3FE; // candidate digits 1-9
+        var n = bitCount(mask);
+        if (n < bestN) { best = p; bestMask = mask; bestN = n; if (n <= 1) break; }
+      }
+      if (best < 0) {
+        if (count === 0 && out) for (var i = 0; i < 81; i++) out[i] = cells[i];
+        count++;
+        return;
+      }
+      var digits = [];
+      for (var d = 1; d <= 9; d++) if (bestMask & (1 << d)) digits.push(d);
+      if (rng) shuffle(digits, rng);
+      for (var k = 0; k < digits.length && count < limit; k++) {
+        cells[best] = digits[k];
+        go();
+      }
+      cells[best] = 0;
+    }
+    go();
+    return count;
+  }
+
+  // Can the puzzle be completed using only the given technique?
+  // 'naked': cells with a single candidate. 'singles': also digits with only
+  // one possible cell in a row, column or box (hidden singles).
+  function solvableBy(cells, technique) {
+    var g = cells.slice(), progress = true, p, i, d;
+    while (progress) {
+      progress = false;
+      for (p = 0; p < 81; p++) {
+        if (g[p]) continue;
+        var mask = ~usedMask(g, p) & 0x3FE;
+        if (mask === 0) return false;
+        if (bitCount(mask) === 1) { g[p] = Math.log2(mask); progress = true; }
+      }
+      if (technique === 'singles') {
+        for (var u = 0; u < 27; u++) {
+          var unit = UNITS[u];
+          for (d = 1; d <= 9; d++) {
+            var spot = -1, n = 0, placed = false;
+            for (i = 0; i < 9; i++) {
+              var q = unit[i];
+              if (g[q] === d) { placed = true; break; }
+              if (!g[q] && !(usedMask(g, q) & (1 << d))) { spot = q; n++; }
+            }
+            if (!placed && n === 1) { g[spot] = d; progress = true; }
+          }
+        }
+      }
+    }
+    return g.indexOf(0) < 0;
+  }
+
+  function defaultRng() { return Math.random(); }
+
+  // Small seedable PRNG (mulberry32) for reproducible puzzles in tests.
+  function seededRng(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function generateSolution(rng) {
+    var cells = [];
+    for (var i = 0; i < 81; i++) cells.push(0);
+    var out = [];
+    search(cells, 1, rng || defaultRng, out);
+    return toGrid(out);
+  }
+
+  // Generate a puzzle for 'easy' | 'medium' | 'hard'.
+  // options: { rng: () => [0,1), maxMs: time cap }.
+  // Returns { level, puzzle, solution, givens } (9x9 arrays, 0 = empty).
+  // The puzzle always has exactly one solution. Normally it also meets the
+  // level's givens band and technique; if the time cap is hit first, the best
+  // valid puzzle found so far is returned (it may have more givens).
+  function generatePuzzle(level, options) {
+    var def = LEVELS[level];
+    if (!def) throw new Error('Unknown difficulty: ' + level);
+    options = options || {};
+    var rng = options.rng || defaultRng;
+    var deadline = Date.now() + (options.maxMs || TIME_CAP_MS);
+    var result = null;
+
+    while (true) {
+      var solution = toFlat(generateSolution(rng));
+      var cells = solution.slice();
+      var target = def.min + Math.floor(rng() * (def.max - def.min + 1));
+      var givens = 81;
+      var order = shuffle(Array.apply(null, Array(81)).map(function (_, i) { return i; }), rng);
+      for (var k = 0; k < 81 && givens > target; k++) {
+        if (Date.now() > deadline) break;
+        var p = order[k], keep = cells[p];
+        cells[p] = 0;
+        var ok = def.technique
+          ? solvableBy(cells, def.technique) // implies a unique solution
+          : search(cells.slice(), 2) === 1;
+        if (ok) givens--; else cells[p] = keep;
+      }
+      var inBand = givens >= def.min && givens <= def.max;
+      if (!result || givens < result.givens) {
+        result = { level: level, puzzle: toGrid(cells), solution: toGrid(solution), givens: givens };
+      }
+      if (inBand || Date.now() > deadline) return result;
+    }
+  }
+
   function render() {
     var table = document.getElementById('sudoku');
     var status = document.getElementById('status');
     var button = document.getElementById('verify');
-    var inputs = []; // [r][c] -> input element or null for givens
-    var tbody = document.createElement('tbody');
+    var picker = document.getElementById('picker');
+    var game = document.getElementById('game');
+    var levelLabel = document.getElementById('level');
+    var puzzle = null;  // current puzzle (9x9, 0 = empty)
+    var inputs = [];    // [r][c] -> input element or null for givens
 
     function clearResults() {
       status.textContent = '';
@@ -122,53 +279,88 @@
       if (changed) clearResults();
     }
 
-    PUZZLE.forEach(function (rowVals, r) {
-      var tr = document.createElement('tr');
-      inputs.push([]);
-      rowVals.forEach(function (v, c) {
-        var td = document.createElement('td');
-        td.className = 'box-' + (3 * Math.floor(r / 3) + Math.floor(c / 3));
-        if (c % 3 === 0) td.classList.add('left');
-        if (r % 3 === 0) td.classList.add('top');
-        if (c === 8) td.classList.add('right');
-        if (r === 8) td.classList.add('bottom');
-        if (v) {
-          td.classList.add('given');
-          td.textContent = v;
-          inputs[r].push(null);
-        } else {
-          var inp = document.createElement('input');
-          inp.type = 'text';
-          inp.inputMode = 'numeric';
-          inp.autocomplete = 'off';
-          inp.setAttribute('aria-label', 'Row ' + (r + 1) + ', column ' + (c + 1));
-          inp.addEventListener('keydown', function (e) {
-            if (!e.key) return;
-            if (e.ctrlKey || e.metaKey || e.altKey) return;
-            if (e.key === 'Backspace' || e.key === 'Delete') {
-              e.preventDefault();
-              setCell(inp, '');
-            } else if (e.key.length === 1) { // printable character
-              e.preventDefault();
-              if (sanitizeDigit(e.key)) setCell(inp, e.key);
-            }
-          });
-          // Fallback for paste, drop, IME: accept a single digit, else restore.
-          inp.addEventListener('input', function () {
-            setCell(inp, nextValue(inp.dataset.prev || '', inp.value));
-          });
-          td.appendChild(inp);
-          inputs[r].push(inp);
-        }
-        tr.appendChild(td);
+    function buildTable() {
+      var tbody = document.createElement('tbody');
+      inputs = [];
+      puzzle.forEach(function (rowVals, r) {
+        var tr = document.createElement('tr');
+        inputs.push([]);
+        rowVals.forEach(function (v, c) {
+          var td = document.createElement('td');
+          td.className = 'box-' + (3 * Math.floor(r / 3) + Math.floor(c / 3));
+          if (c % 3 === 0) td.classList.add('left');
+          if (r % 3 === 0) td.classList.add('top');
+          if (c === 8) td.classList.add('right');
+          if (r === 8) td.classList.add('bottom');
+          if (v) {
+            td.classList.add('given');
+            td.textContent = v;
+            inputs[r].push(null);
+          } else {
+            var inp = document.createElement('input');
+            inp.type = 'text';
+            inp.inputMode = 'numeric';
+            inp.autocomplete = 'off';
+            inp.setAttribute('aria-label', 'Row ' + (r + 1) + ', column ' + (c + 1));
+            inp.addEventListener('keydown', function (e) {
+              if (!e.key) return;
+              if (e.ctrlKey || e.metaKey || e.altKey) return;
+              if (e.key === 'Backspace' || e.key === 'Delete') {
+                e.preventDefault();
+                setCell(inp, '');
+              } else if (e.key.length === 1) { // printable character
+                e.preventDefault();
+                if (sanitizeDigit(e.key)) setCell(inp, e.key);
+              }
+            });
+            // Fallback for paste, drop, IME: accept a single digit, else restore.
+            inp.addEventListener('input', function () {
+              setCell(inp, nextValue(inp.dataset.prev || '', inp.value));
+            });
+            td.appendChild(inp);
+            inputs[r].push(inp);
+          }
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
       });
-      tbody.appendChild(tr);
+      var old = table.querySelector('tbody');
+      if (old) table.removeChild(old);
+      table.appendChild(tbody);
+    }
+
+    function choose(level) {
+      var res = generatePuzzle(level);
+      puzzle = res.puzzle;
+      clearResults();
+      buildTable();
+      levelLabel.textContent = 'Difficulty: ' + level.charAt(0).toUpperCase() + level.slice(1);
+      picker.hidden = true;
+      game.hidden = false;
+      var first = table.querySelector('input');
+      if (first) first.focus();
+    }
+
+    function newPuzzle() {
+      var old = table.querySelector('tbody');
+      if (old) table.removeChild(old);
+      puzzle = null;
+      inputs = [];
+      clearResults();
+      game.hidden = true;
+      picker.hidden = false;
+      var b = picker.querySelector('button');
+      if (b) b.focus();
+    }
+
+    Array.prototype.forEach.call(picker.querySelectorAll('button[data-level]'), function (b) {
+      b.addEventListener('click', function () { choose(b.getAttribute('data-level')); });
     });
-    table.appendChild(tbody);
+    document.getElementById('new-puzzle').addEventListener('click', newPuzzle);
 
     button.addEventListener('click', function () {
       clearResults();
-      var grid = PUZZLE.map(function (row, r) {
+      var grid = puzzle.map(function (row, r) {
         return row.map(function (v, c) {
           return v || (inputs[r][c].value ? parseInt(inputs[r][c].value, 10) : 0);
         });
@@ -192,7 +384,10 @@
   }
 
   var api = {
-    PUZZLE: PUZZLE, SOLUTION: SOLUTION, isValidSolution: isValidSolution,
+    generatePuzzle: generatePuzzle, generateSolution: generateSolution, seededRng: seededRng,
+    countSolutions: function (grid, limit) { return search(toFlat(grid), limit || 2); },
+    solvableBy: function (grid, technique) { return solvableBy(toFlat(grid), technique); },
+    LEVELS: LEVELS, isValidSolution: isValidSolution,
     findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, nextValue: nextValue
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

@@ -10,8 +10,19 @@
 <body>
   <main>
     <h1>Sudoku</h1>
-    <table id="sudoku"><caption>Fill in the empty cells so every row, column and box holds 1-9</caption></table>
-    <p><button id="verify" type="button">Verify</button></p>
+    <section id="picker" aria-labelledby="picker-title">
+      <h2 id="picker-title">Choose a difficulty</h2>
+      <p>
+        <button type="button" data-level="easy">Easy</button>
+        <button type="button" data-level="medium">Medium</button>
+        <button type="button" data-level="hard">Hard</button>
+      </p>
+    </section>
+    <section id="game" hidden>
+      <p id="level"></p>
+      <table id="sudoku"><caption>Fill in the empty cells so every row, column and box holds 1-9</caption></table>
+      <p><button id="verify" type="button">Verify</button> <button id="new-puzzle" type="button">New puzzle</button></p>
+    </section>
     <p id="status" role="status"></p>
   </main>
   <script src="sudoku.js"></script>
