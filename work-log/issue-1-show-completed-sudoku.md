@@ -79,4 +79,4 @@
   - mobile overflow (the issue targets desktop);
   - duplicate window globals (harmless).
 - Open ambiguity: A1 (shading interpretation) was resolved with the stricter reading, 9 distinct shades.
-- PR #2 merged into main. Issue #1 closed by the PR.
+- PR #2 is ready to merge. The lead's merge attempt was blocked by the permission system ("Merge Without Review"), so the merge is waiting on Dirk Marski. Issue #1 will close automatically when PR #2 is merged ("Closes #1").
