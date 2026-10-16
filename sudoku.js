@@ -91,6 +91,13 @@
     return typeof text === 'string' && /^[1-9]$/.test(text) ? text : null;
   }
 
+  // Pure input-layer transition: the value a cell should show after its raw
+  // text changed from prev. Invalid or multi-character raw text keeps prev.
+  function nextValue(prev, raw) {
+    var d = sanitizeDigit(raw);
+    return d === null ? (prev || '') : d;
+  }
+
   function render() {
     var table = document.getElementById('sudoku');
     var status = document.getElementById('status');
@@ -105,6 +112,14 @@
         el.classList.remove('conflict');
         el.removeAttribute('aria-invalid');
       });
+    }
+
+    // Single write path for a cell's value: keeps the remembered value in sync.
+    function setCell(inp, v) {
+      var changed = inp.value !== v || (inp.dataset.prev || '') !== v;
+      inp.value = v;
+      inp.dataset.prev = v;
+      if (changed) clearResults();
     }
 
     PUZZLE.forEach(function (rowVals, r) {
@@ -126,24 +141,21 @@
           inp.type = 'text';
           inp.inputMode = 'numeric';
           inp.autocomplete = 'off';
-          inp.maxLength = 1;
           inp.setAttribute('aria-label', 'Row ' + (r + 1) + ', column ' + (c + 1));
           inp.addEventListener('keydown', function (e) {
+            if (!e.key) return;
             if (e.ctrlKey || e.metaKey || e.altKey) return;
             if (e.key === 'Backspace' || e.key === 'Delete') {
               e.preventDefault();
-              if (inp.value !== '') { inp.value = ''; clearResults(); }
+              setCell(inp, '');
             } else if (e.key.length === 1) { // printable character
               e.preventDefault();
-              if (sanitizeDigit(e.key)) { inp.value = e.key; clearResults(); }
+              if (sanitizeDigit(e.key)) setCell(inp, e.key);
             }
           });
           // Fallback for paste, drop, IME: accept a single digit, else restore.
           inp.addEventListener('input', function () {
-            var d = sanitizeDigit(inp.value);
-            inp.value = d === null ? (inp.dataset.prev || '') : d;
-            inp.dataset.prev = inp.value;
-            clearResults();
+            setCell(inp, nextValue(inp.dataset.prev || '', inp.value));
           });
           td.appendChild(inp);
           inputs[r].push(inp);
@@ -181,7 +193,7 @@
 
   var api = {
     PUZZLE: PUZZLE, SOLUTION: SOLUTION, isValidSolution: isValidSolution,
-    findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit
+    findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, nextValue: nextValue
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (typeof window !== 'undefined') {

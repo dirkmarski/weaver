@@ -9,7 +9,7 @@ Open `index.html` in a browser, or serve the folder:
 
 ## How to play
 - Bold dark numbers are givens and cannot be changed.
-- Click an empty cell and type a digit 1-9. Other characters (letters, 0, pasted multi-digit text) are ignored. Backspace or Delete clears the cell.
+- Click an empty cell and type a digit 1-9. Other input (letters, 0, pasted or dropped multi-character text) is rejected and the cell keeps its previous value. Backspace or Delete clears the cell.
 - Click **Verify** to check the grid. Checking is by the sudoku rules only (no stored answer is compared), so any valid solution is accepted.
   - Complete grid: tells you whether it is solved.
   - Incomplete grid: tells you whether the numbers so far break any rule, and how many cells are empty.
@@ -23,5 +23,5 @@ Requires Node 18+ (no packages needed):
 
 ## Files
 - `index.html`, `style.css` - page and styling
-- `sudoku.js` - `PUZZLE`, `SOLUTION` (reference fixture only), `isValidSolution`, `findConflicts`, `verify`, `sanitizeDigit` (pure, exported for Node), plus the browser UI
+- `sudoku.js` - `PUZZLE`, `SOLUTION` (reference fixture only), `isValidSolution`, `findConflicts`, `verify`, `sanitizeDigit`, `nextValue` (pure, exported for Node), plus the browser UI
 - `tests/sudoku.test.js` - unit tests

@@ -148,3 +148,28 @@ test('sanitizeDigit accepts one digit 1-9 or empty, rejects the rest', () => {
     assert.strictEqual(sanitizeDigit(bad), null, String(bad));
   }
 });
+
+// ---- Input-layer transition (regression for stale-prev / maxLength bugs) ----
+const { nextValue } = require('../sudoku.js');
+
+test('nextValue: typed 4 then "4x" is rejected', () => assert.strictEqual(nextValue('4', '4x'), '4'));
+test('nextValue: selection replaced by "x" keeps 4', () => assert.strictEqual(nextValue('4', 'x'), '4'));
+test('nextValue: multi-digit "12" keeps 4', () => assert.strictEqual(nextValue('4', '12'), '4'));
+test('nextValue: "7" into empty gives 7', () => assert.strictEqual(nextValue('', '7'), '7'));
+test('nextValue: "7" replacing 4 gives 7', () => assert.strictEqual(nextValue('4', '7'), '7'));
+test('nextValue: cleared gives empty', () => assert.strictEqual(nextValue('4', ''), ''));
+test('nextValue: invalid with no prev gives empty', () => assert.strictEqual(nextValue('', 'x'), ''));
+
+test('two user-entered clashing digits are both reported', () => {
+  const g = PUZZLE.map((r) => r.slice());
+  g[0][2] = 2; g[0][3] = 2; // both user cells, same row, different boxes
+  assert.deepStrictEqual(findConflicts(g).map((p) => p.join(',')), ['0,2', '0,3']);
+});
+
+test('cell in conflict in both row and box is reported once', () => {
+  const g = PUZZLE.map((r) => r.slice());
+  g[0][2] = 3; // clashes with given 3 at (0,1): same row and same box
+  const res = findConflicts(g).map((p) => p.join(','));
+  assert.deepStrictEqual(res, ['0,1', '0,2']);
+  assert.strictEqual(res.filter((k) => k === '0,2').length, 1);
+});
