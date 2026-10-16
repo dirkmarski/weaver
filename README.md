@@ -1,6 +1,6 @@
 # Weaver
 
-A dependency-free static page where you complete an easy sudoku (the widely published Wikipedia example, 30 givens) in a 9x9 grid with each 3x3 box shaded differently.
+A dependency-free static page where you complete an easy sudoku (the widely published Wikipedia example, 30 givens) in a 9x9 grid with the 3x3 boxes shaded in two alternating light colours (blue and cream, checkerboard style).
 
 ## View
 Open `index.html` in a browser, or serve the folder:
