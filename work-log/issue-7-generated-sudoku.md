@@ -68,3 +68,9 @@
   - Hard: 22-29 givens, unique, and NOT solvable by naked + hidden singles.
   - Within the 1000 ms cap; fallback behaviour stays documented. Nits 3 and 4 also fixed (cheap); nits 2 and 5 won't-fix (internal option, generous margin is intentional against flakiness).
 - Rework launched with the developer; reviewer and tester re-run afterwards.
+- Developer agent (Claude Sonnet 5.5, session 21813484) delivered rework commit c177c1c:
+  - `LEVELS` gain `beyond` (medium: 'naked', hard: 'singles'); in-band puzzles still solvable by `beyond` are discarded and regenerated until the 1000 ms cap.
+  - Result carries `capped` and `attempts`; `maxMs: 0` honoured; cap test asserts `capped === true`. `PEERS_MASK_UNITS` → `CELL_UNITS`. README updated.
+  - Tests 53/53. Node, 200 seeded puzzles/level: easy max 1 ms; medium max 7 ms (avg 2.13 attempts); hard max 35 ms (avg 2.27 attempts); cap never hit.
+  - Fallback on cap is only guaranteed unique (may be out of band / easier); documented.
+- Lead check: diff reviewed (logic correct), `node --test` 53/53 locally. Second-round reviewer and tester launched on c177c1c.
