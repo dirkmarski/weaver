@@ -66,6 +66,18 @@ test('medium is solvable by naked + hidden singles', () => {
   for (const r of batches.medium) assert.ok(S.solvableBy(r.puzzle, 'singles'));
 });
 
+test('medium is NOT solvable by naked singles alone', () => {
+  for (const r of batches.medium) assert.strictEqual(S.solvableBy(r.puzzle, 'naked'), false);
+});
+
+test('hard is NOT solvable by naked + hidden singles', () => {
+  for (const r of batches.hard) assert.strictEqual(S.solvableBy(r.puzzle, 'singles'), false);
+});
+
+test('normal generation is not capped', () => {
+  for (const level of LEVELS) for (const r of batches[level]) assert.strictEqual(r.capped, false);
+});
+
 test('solvableBy: fixture puzzle needs only singles; an empty grid needs more', () => {
   const { PUZZLE } = require('./fixture.js');
   assert.ok(S.solvableBy(PUZZLE, 'singles'));
@@ -99,9 +111,10 @@ test('default RNG (Math.random) works and gives varying puzzles', () => {
   assert.notDeepStrictEqual(a.puzzle, b.puzzle);
 });
 
-test('time cap: tiny maxMs still returns a valid unique puzzle', () => {
+test('time cap: maxMs 0 takes the fallback path (capped) and still returns a valid unique puzzle', () => {
   for (const level of LEVELS) {
-    const r = S.generatePuzzle(level, { rng: S.seededRng(7), maxMs: 1 });
+    const r = S.generatePuzzle(level, { rng: S.seededRng(7), maxMs: 0 });
+    assert.strictEqual(r.capped, true);
     assert.strictEqual(S.countSolutions(r.puzzle, 2), 1);
     r.puzzle.forEach((row, i) => row.forEach((v, j) => { if (v) assert.strictEqual(v, r.solution[i][j]); }));
   }

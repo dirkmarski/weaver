@@ -76,9 +76,10 @@
   // Internally a grid is a flat array of 81 digits (0 = empty).
 
   var LEVELS = {
-    easy:   { min: 36, max: 40, technique: 'naked' },   // naked singles only
-    medium: { min: 30, max: 35, technique: 'singles' }, // naked + hidden singles
-    hard:   { min: 22, max: 29, technique: null }       // unique solution only
+    // technique: what removal keeps solvable; beyond: technique the puzzle must NOT be solvable by
+    easy:   { min: 36, max: 40, technique: 'naked',   beyond: null },     // naked singles only
+    medium: { min: 30, max: 35, technique: 'singles', beyond: 'naked' },  // needs hidden singles
+    hard:   { min: 22, max: 29, technique: null,      beyond: 'singles' } // unique, needs more than singles
   };
   var TIME_CAP_MS = 1000; // generation never runs past this (click-to-render must stay < 2 s)
 
@@ -95,7 +96,7 @@
     }
     return u;
   })();
-  var PEERS_MASK_UNITS = (function () { // per cell: indices of its row, column and box in UNITS
+  var CELL_UNITS = (function () { // per cell: indices of its row, column and box in UNITS
     var m = [];
     for (var p = 0; p < 81; p++) {
       var r = Math.floor(p / 9), c = p % 9;
@@ -113,7 +114,7 @@
 
   // Bitmask of digits already used by the peers of cell p (bit d = digit d).
   function usedMask(cells, p) {
-    var used = 0, us = PEERS_MASK_UNITS[p];
+    var used = 0, us = CELL_UNITS[p];
     for (var k = 0; k < 3; k++) {
       var unit = UNITS[us[k]];
       for (var i = 0; i < 9; i++) used |= 1 << cells[unit[i]];
@@ -217,26 +218,28 @@
 
   // Generate a puzzle for 'easy' | 'medium' | 'hard'.
   // options: { rng: () => [0,1), maxMs: time cap }.
-  // Returns { level, puzzle, solution, givens } (9x9 arrays, 0 = empty).
+  // Returns { level, puzzle, solution, givens, capped, attempts } (9x9 arrays, 0 = empty).
   // The puzzle always has exactly one solution. Normally it also meets the
   // level's givens band and technique; if the time cap is hit first, the best
-  // valid puzzle found so far is returned (it may have more givens).
+  // valid puzzle found so far is returned (it may have more givens and may not
+  // meet the technique rule) and result.capped is true.
   function generatePuzzle(level, options) {
     var def = LEVELS[level];
     if (!def) throw new Error('Unknown difficulty: ' + level);
     options = options || {};
     var rng = options.rng || defaultRng;
-    var deadline = Date.now() + (options.maxMs || TIME_CAP_MS);
-    var result = null;
+    var deadline = Date.now() + (options.maxMs !== undefined ? options.maxMs : TIME_CAP_MS);
+    var result = null, attempts = 0;
 
     while (true) {
+      attempts++;
       var solution = toFlat(generateSolution(rng));
       var cells = solution.slice();
       var target = def.min + Math.floor(rng() * (def.max - def.min + 1));
       var givens = 81;
       var order = shuffle(Array.apply(null, Array(81)).map(function (_, i) { return i; }), rng);
       for (var k = 0; k < 81 && givens > target; k++) {
-        if (Date.now() > deadline) break;
+        if (Date.now() >= deadline) break;
         var p = order[k], keep = cells[p];
         cells[p] = 0;
         var ok = def.technique
@@ -245,10 +248,13 @@
         if (ok) givens--; else cells[p] = keep;
       }
       var inBand = givens >= def.min && givens <= def.max;
+      // Must also need a technique the level below does not offer; else retry.
+      var graded = inBand && (!def.beyond || !solvableBy(cells, def.beyond));
       if (!result || givens < result.givens) {
-        result = { level: level, puzzle: toGrid(cells), solution: toGrid(solution), givens: givens };
+        result = { level: level, puzzle: toGrid(cells), solution: toGrid(solution), givens: givens, capped: false };
       }
-      if (inBand || Date.now() > deadline) return result;
+      if (graded) { result.attempts = attempts; result.puzzle = toGrid(cells); result.solution = toGrid(solution); result.givens = givens; result.capped = false; return result; }
+      if (Date.now() >= deadline) { result.capped = true; result.attempts = attempts; return result; }
     }
   }
 

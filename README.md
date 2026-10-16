@@ -18,15 +18,15 @@ Open `index.html` in a browser, or serve the folder:
 - Any edit clears the red flags and the message. There is no live checking and no hints.
 
 ## Difficulty levels
-Each puzzle is a random complete grid with cells removed in random order; a cell stays removed only if the solution remains unique.
+Each puzzle is a random complete grid with cells removed in random order; a cell stays removed only if the solution remains unique (and, for Easy/Medium, still solvable by the level's technique). After removal the puzzle is graded: Medium and Hard puzzles that are still solvable by the lower level's technique are discarded and a new puzzle is generated, so each level needs something the one below does not.
 
 | Level  | Givens | Solvable using |
 |--------|--------|----------------|
 | Easy   | 36-40  | naked singles only (a cell with just one candidate) |
-| Medium | 30-35  | naked singles and hidden singles (a digit with only one place in a row, column or box) |
-| Hard   | 22-29  | unique solution; may need guessing/advanced techniques |
+| Medium | 30-35  | naked singles and hidden singles (a digit with only one place in a row, column or box); NOT solvable by naked singles alone |
+| Hard   | 22-29  | exactly one solution; NOT solvable by naked + hidden singles (needs advanced techniques or guessing) |
 
-Generation typically takes a few milliseconds. An internal time cap (1000 ms) guarantees click-to-render stays well under 2 seconds; if it were ever hit, the best valid unique puzzle found so far is returned (it could then have more givens than the band).
+Generation typically takes a few milliseconds. An internal time cap (1000 ms) guarantees click-to-render stays well under 2 seconds; if it were ever hit, the best valid unique puzzle found so far (fewest givens) is returned and the result has `capped: true` (it could then have more givens than the band or be easier than the level). `generatePuzzle` results also report `attempts`.
 
 ## Test
 Requires Node 18+ (no packages needed):
