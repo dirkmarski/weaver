@@ -42,6 +42,10 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 }
 #sudoku input:focus { outline: 3px solid #1a4fd0; outline-offset: -3px; background: #fff8; }
 #sudoku input.conflict { color: #c00; background: #ffb3b3; font-weight: 700; box-shadow: inset 0 0 0 3px #c00; }
+#picker h2 { font-size: 1.2rem; font-weight: 500; }
+#picker button, #new-puzzle { font: inherit; padding: 0.4rem 1.4rem; cursor: pointer; }
+#level { font-weight: 500; margin: 0 0 0.5rem; }
+[hidden] { display: none !important; }
 #verify { font: inherit; padding: 0.4rem 1.4rem; cursor: pointer; }
 #sudoku td.left { border-left: 3px solid #1d1d1f; }
 #sudoku td.top { border-top: 3px solid #1d1d1f; }
