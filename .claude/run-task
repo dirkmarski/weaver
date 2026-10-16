@@ -1,0 +1,61 @@
+#!/bin/bash
+# Launch the weaver agent team on one task.
+#
+#   .claude/run-task <issue-number>           start "complete task #<n>"
+#   .claude/run-task --check <issue-number>   run every check, print the launch, start nothing
+#
+# Refuses to start while .claude/ or governance/ has uncommitted changes, so every run
+# is tied to a committed set of definitions. Exports the team's git identity from
+# launch-settings.json before Claude starts, so the session-start git snapshot shows
+# weaver-agents rather than whoever runs the script.
+
+set -euo pipefail
+
+die() { echo "run-task: $*" >&2; exit 1; }
+
+check_only=0
+if [ "${1:-}" = "--check" ]; then check_only=1; shift; fi
+task="${1:-}"
+case "$task" in
+  ''|*[!0-9]*) die "usage: run-task [--check] <issue-number>" ;;
+esac
+
+repo="$(cd -P "$(dirname "$0")/.." && pwd)"
+cd "$repo"
+settings=".claude/launch-settings.json"
+
+command -v claude >/dev/null || die "claude is not on PATH"
+command -v jq >/dev/null || die "jq is not on PATH"
+[ -f "$settings" ] || die "missing $settings"
+
+# 1. Definitions must be committed.
+if [ -n "$(git status --porcelain -- .claude governance)" ]; then
+  echo "run-task: uncommitted changes under .claude/ or governance/ - commit them first:" >&2
+  git status --short -- .claude governance >&2
+  exit 1
+fi
+defs="$(git log -1 --format=%h -- .claude governance)"
+
+# 2. The team's token, from the keychain. Never printed.
+GH_TOKEN="$(security find-generic-password -s weaver-agents-token -w 2>/dev/null)" \
+  || die "no keychain item 'weaver-agents-token'"
+[ -n "$GH_TOKEN" ] || die "keychain item 'weaver-agents-token' is empty"
+export GH_TOKEN
+
+# 3. The team's git identity, exported before Claude starts. Single source: the env
+#    block of launch-settings.json.
+eval "$(jq -r '.env // {} | to_entries[] | "export \(.key)=\(.value | @sh)"' "$settings")"
+
+# 4. Confirm the identity resolves to the team before spending a session on it.
+[ "$(git config user.name)" = "weaver-agents" ] || die "git user is not weaver-agents"
+login="$(gh api user --jq .login 2>/dev/null)" || die "the token was rejected by GitHub"
+[ "$login" = "weaver-agents" ] || die "the token belongs to '$login', not weaver-agents"
+
+echo "run-task: task #$task, definitions at $defs, $(claude --version)"
+
+cmd=(claude --agent lead --settings "$settings" --permission-mode auto "complete task #$task")
+if [ "$check_only" = 1 ]; then
+  echo "run-task: checks passed - would run: ${cmd[*]}"
+  exit 0
+fi
+exec "${cmd[@]}"
