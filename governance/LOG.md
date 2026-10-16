@@ -2,6 +2,21 @@
 
 ## Entries (newest first)
 
+### Missing product decisions are decided by the lead agent
+- **Seen:** 2026-10-16
+- **Means:** Assumptions and decisions are made and recorded. These outline where the requirements were insufficient.
+- **Response:** Pending: implement an agile workflow where there is a product agent in the loop that can make these decisions.
+
+### File system permissions triggered a request
+- **Seen:** 2026-10-16
+- **Means:** The run was paused until the question was answered.
+- **Response:** Pending: out of folder access should be refused, not asked.
+
+### Shared storage was not declared
+- **Seen:** 2026-10-16
+- **Means:** Agents struggled to share output.
+- **Response:** Added clear instruction on where to store output for sharing.
+
 ### Permission mode auto blocked the merge without review
 - **Seen:** 2026-10-16
 - **Means:** It indicates that auto mode requires a human check before a PR merge by default.

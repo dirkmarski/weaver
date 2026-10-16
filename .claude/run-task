@@ -4,10 +4,17 @@
 #   .claude/run-task <issue-number>           start "complete task #<n>"
 #   .claude/run-task --check <issue-number>   run every check, print the launch, start nothing
 #
-# Refuses to start while .claude/ or governance/ has uncommitted changes, so every run
-# is tied to a committed set of definitions. Exports the team's git identity from
-# launch-settings.json before Claude starts, so the session-start git snapshot shows
-# weaver-agents rather than whoever runs the script.
+# Run it from Dirk's clone. The team works in its own clone (WEAVER_TEAM_DIR, default
+# ~/Code/weaver-team), never in his. Before starting, the script:
+#   - refuses while Dirk's .claude/ or governance/ has changes not committed AND pushed,
+#     so every run is tied to a published set of definitions;
+#   - creates the team clone if missing, and fast-forwards it to origin/main when it is
+#     clean and on main (otherwise it leaves the team's unfinished work alone);
+#   - refuses if the team clone's .claude/ or governance/ differ from Dirk's;
+#   - writes the team identity into the team clone's own git config. Claude Code strips
+#     every GIT_CONFIG_* variable from its own git calls, so only repo config reaches the
+#     session-start snapshot. The env block of launch-settings.json stays the single
+#     source of the identity and still covers the agents' own git commands.
 
 set -euo pipefail
 
@@ -21,41 +28,78 @@ case "$task" in
 esac
 
 repo="$(cd -P "$(dirname "$0")/.." && pwd)"
-cd "$repo"
+team="${WEAVER_TEAM_DIR:-$HOME/Code/weaver-team}"
 settings=".claude/launch-settings.json"
+cd "$repo"
 
 command -v claude >/dev/null || die "claude is not on PATH"
 command -v jq >/dev/null || die "jq is not on PATH"
 [ -f "$settings" ] || die "missing $settings"
+[ "$team" != "$repo" ] || die "the team clone cannot be Dirk's clone"
 
-# 1. Definitions must be committed.
+# 1. Definitions must be committed and pushed.
 if [ -n "$(git status --porcelain -- .claude governance)" ]; then
   echo "run-task: uncommitted changes under .claude/ or governance/ - commit them first:" >&2
   git status --short -- .claude governance >&2
   exit 1
 fi
+git fetch -q origin main || die "cannot fetch origin"
+git diff --quiet HEAD origin/main -- .claude governance \
+  || die "your .claude/ or governance/ differs from origin/main - push (or pull) first"
 defs="$(git log -1 --format=%h -- .claude governance)"
 
-# 2. The team's token, from the keychain. Never printed.
+# 2. The team's clone: create it, or reset it to main. GitHub is the team's durable
+#    record, so the clone is disposable - unless it holds work that exists nowhere else
+#    (uncommitted changes, or commits on no remote branch). That is left for the lead.
+if [ ! -d "$team/.git" ]; then
+  [ ! -e "$team" ] || die "$team exists but is not a git clone"
+  git clone -q -b main "$(git remote get-url origin)" "$team" || die "cannot clone into $team"
+fi
+git -C "$team" fetch -q --prune origin || die "cannot fetch origin in $team"
+if [ -z "$(git -C "$team" status --porcelain)" ] \
+   && [ -z "$(git -C "$team" log --branches --not --remotes --format=%h)" ]; then
+  git -C "$team" checkout -q main && git -C "$team" merge -q --ff-only origin/main \
+    || die "cannot bring the team clone's main up to origin/main"
+else
+  echo "run-task: team clone holds unsaved work on '$(git -C "$team" branch --show-current)' - left for the lead to resume"
+fi
+
+# 3. The team must run on Dirk's definitions, unaltered.
+git -C "$team" diff --quiet origin/main -- .claude governance \
+  && [ -z "$(git -C "$team" status --porcelain -- .claude governance)" ] \
+  || die "the team clone's .claude/ or governance/ differs from origin/main - not launching"
+
+# 4. The team's token, from the keychain. Never printed.
 GH_TOKEN="$(security find-generic-password -s weaver-agents-token -w 2>/dev/null)" \
   || die "no keychain item 'weaver-agents-token'"
 [ -n "$GH_TOKEN" ] || die "keychain item 'weaver-agents-token' is empty"
 export GH_TOKEN
 
-# 3. The team's git identity, exported before Claude starts. Single source: the env
-#    block of launch-settings.json.
+# 5. The team's git identity: into the team clone's config for the session-start
+#    snapshot, and exported for everything else. Source: launch-settings.json.
+for key in user.name user.email; do
+  value="$(jq -r --arg k "$key" '(.env // {}) as $e | [$e | to_entries[]
+    | select(.key | startswith("GIT_CONFIG_KEY_")) | select(.value == $k)
+    | $e[.key | sub("KEY"; "VALUE")]] | .[0] // empty' "$settings")"
+  [ -n "$value" ] || die "$settings sets no $key"
+  git -C "$team" config "$key" "$value"
+done
 eval "$(jq -r '.env // {} | to_entries[] | "export \(.key)=\(.value | @sh)"' "$settings")"
 
-# 4. Confirm the identity resolves to the team before spending a session on it.
-[ "$(git config user.name)" = "weaver-agents" ] || die "git user is not weaver-agents"
+# 6. Confirm the identity resolves to the team, both as the snapshot sees it (no
+#    GIT_CONFIG_* variables) and as the agents' commands see it.
+[ "$(env -u GIT_CONFIG_COUNT -u GIT_CONFIG_PARAMETERS git -C "$team" config user.name)" = "weaver-agents" ] \
+  || die "the team clone's own config does not name weaver-agents"
+[ "$(git -C "$team" config user.name)" = "weaver-agents" ] || die "git user is not weaver-agents"
 login="$(gh api user --jq .login 2>/dev/null)" || die "the token was rejected by GitHub"
 [ "$login" = "weaver-agents" ] || die "the token belongs to '$login', not weaver-agents"
 
-echo "run-task: task #$task, definitions at $defs, $(claude --version)"
+echo "run-task: task #$task, definitions at $defs, team clone $team, $(claude --version)"
 
-cmd=(claude --agent lead --settings "$settings" --permission-mode auto "complete task #$task")
+cmd=(claude --agent lead --settings "$team/$settings" --permission-mode auto "complete task #$task")
 if [ "$check_only" = 1 ]; then
-  echo "run-task: checks passed - would run: ${cmd[*]}"
+  echo "run-task: checks passed - would run in $team: ${cmd[*]}"
   exit 0
 fi
+cd "$team"
 exec "${cmd[@]}"
