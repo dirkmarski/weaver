@@ -53,3 +53,18 @@
   - Tests: 50/50 (`tests/generator.test.js` new, 19 tests). Node timing max: easy 1.2 ms, medium 2.3 ms, hard 6.4 ms.
   - Developer notes: cap path only covered by `maxMs: 1` test; hard puzzles may sometimes be solvable by singles (consistent with D3); cosmetic naming nit `PEERS_MASK_UNITS`.
 - Lead check: diff in scope, `node --test` 50/50 locally, generator code reviewed at a glance (sound).
+- Lead opened PR #8: https://github.com/dirkmarski/weaver/pull/8. Reviewer and tester launched in parallel on ffd8ada.
+- Reviewer agent (Claude Sonnet 5.5, session 21813484) verdict: APPROVE (PR comment). No blocking/should-fix.
+  - Independent solver, 400 puzzles/level: all in band, all unique, consistent. Hard max 53 ms.
+  - Soundness of `solvableBy` ⇒ uniqueness confirmed; no infinite loops; fallback always unique, may exceed band max (documented).
+  - Nits: (1) ~56% of Medium puzzles are solvable by naked singles alone and ~56% of Hard by singles alone, so levels can overlap technically; (2) tiny `maxMs` can return the full grid, `maxMs: 0` falls back to default via `||`; (3) `maxMs: 1` test does not prove cap path ran; (4) `PEERS_MASK_UNITS` naming; (5) 1500 ms test threshold lax.
+- Tester agent (Claude Sonnet 5.5, session 21813484) verdict: PASS (PR comment).
+  - Headless Chrome, 90 puzzles/level (loop + fresh loads): all distinct, unique, in band; Math.random not called before choice.
+  - Click-to-render max 33.6 ms (all levels), far below 2 s. Regression (input, Verify, conflicts, Solved, New puzzle, no duplicate handlers, no console errors) OK.
+  - Screenshots in session scratchpad: issue7-prompt.png, issue7-hard.png, issue7-conflict.png. Lead viewed prompt and hard screenshots: correct.
+- Lead decision D9 (amends D3): reviewer nit 1 is accepted as a should-fix. Distinct difficulty levels are the core of the issue, so each level must require something the level below does not:
+  - Easy: 36-40 givens, solvable by naked singles only (unchanged).
+  - Medium: 30-35 givens, solvable by naked + hidden singles, and NOT solvable by naked singles alone.
+  - Hard: 22-29 givens, unique, and NOT solvable by naked + hidden singles.
+  - Within the 1000 ms cap; fallback behaviour stays documented. Nits 3 and 4 also fixed (cheap); nits 2 and 5 won't-fix (internal option, generous margin is intentional against flakiness).
+- Rework launched with the developer; reviewer and tester re-run afterwards.
