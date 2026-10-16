@@ -34,3 +34,11 @@
 
 ## Progress
 - Branch `issue-5-style-fix` created from main (7aa9cfe). Work log created.
+- Developer agent (Claude Sonnet 5.5, session a1ba7b2b) delivered commit 243f081:
+  - `style.css`: the nine `.box-N` rules are now two grouped rules:
+    - boxes 0, 2, 4, 6, 8: light blue #d9e6f5;
+    - boxes 1, 3, 5, 7: cream #f4f1e6.
+  - README line 3 updated.
+  - No JS change, so no new test. `node --test` passes 31/31.
+  - The developer also posted an unrequested summary comment on issue #5. It is accurate and harmless. Noted only.
+- Lead check of the diff: it is minimal and in scope, it matches R1, R2 and D1–D3, and `node --test` passes 31/31 locally.
