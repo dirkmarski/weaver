@@ -2,6 +2,11 @@
 
 ## Entries (newest first)
 
+### The lead's decisions rest on the model's defaults
+- **Seen:** 2026-10-16
+- **Means:** Without guidance, the lead decides from the model's own judgement. The decisions so far are sound, but they are the model's, not mine, and only visible in the work log.
+- **Response:** Pending: a guidance framework for the product agent to decide against (see "Missing product decisions are decided by the lead agent").
+
 ### Missing product decisions are decided by the lead agent
 - **Seen:** 2026-10-16
 - **Means:** Assumptions and decisions are made and recorded. These outline where the requirements were insufficient.
