@@ -10,7 +10,7 @@ Open `index.html` in a browser, or serve the folder:
 ## Test
 Requires Node 18+ (no packages needed):
 
-    node --test            # (on Node 22+ "node --test tests/" is treated as a path and fails)
+    node --test            # (on newer Node versions, observed on Node 24, "node --test tests/" is treated as a path and fails)
 
 ## Files
 - `index.html`, `style.css` - page and styling

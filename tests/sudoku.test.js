@@ -14,8 +14,18 @@ test('shipped solution has 81 cells all 1-9', () => {
 });
 
 test('rejects duplicate in a row', () => {
-  const g = clone(); g[0][1] = g[0][0];
+  // Swap two cells vertically within the same box column: every column and
+  // box keeps the same digits (so stays valid); only rows 0 and 1 gain duplicates.
+  const g = clone(); [g[0][0], g[1][0]] = [g[1][0], g[0][0]];
   assert.strictEqual(isValidSolution(g), false);
+  for (let i = 0; i < 9; i++) {
+    const col = g.map((r) => r[i]);
+    assert.strictEqual(new Set(col).size, 9, 'column ' + i);
+    const box = [];
+    for (let j = 0; j < 9; j++) box.push(g[3 * Math.floor(i / 3) + Math.floor(j / 3)][3 * (i % 3) + (j % 3)]);
+    assert.strictEqual(new Set(box).size, 9, 'box ' + i);
+  }
+  assert.notStrictEqual(new Set(g[0]).size, 9);
 });
 
 test('rejects duplicate in a column only', () => {
@@ -32,7 +42,7 @@ test('rejects duplicate in a box only', () => {
 });
 
 test('rejects zero and out-of-range values', () => {
-  for (const bad of [0, 10, -1, 1.5, '5', null]) {
+  for (const bad of [0, 10, -1, 1.5, '5', null, NaN, true, false]) {
     const g = clone(); g[4][4] = bad;
     assert.strictEqual(isValidSolution(g), false, String(bad));
   }
@@ -44,4 +54,27 @@ test('rejects wrong shape', () => {
   assert.strictEqual(isValidSolution(g), false);
   assert.strictEqual(isValidSolution(null), false);
   assert.strictEqual(isValidSolution([]), false);
+});
+
+test('shipped solution is not a simple pattern', () => {
+  const shifts = (a, b) => a.every((v, i) => v === b[(i + 1) % 9]);
+  for (let r = 0; r < 8; r++) assert.ok(!shifts(SOLUTION[r], SOLUTION[r + 1]));
+  for (const row of SOLUTION) assert.notDeepStrictEqual(row, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+});
+
+test('rejects sparse array (hole)', () => {
+  const g = clone(); delete g[2][2];
+  assert.strictEqual(isValidSolution(g), false);
+  const h = clone(); delete h[5];
+  assert.strictEqual(isValidSolution(h), false);
+});
+
+test('rejects a row given as a string', () => {
+  const g = clone(); g[0] = SOLUTION[0].join('');
+  assert.strictEqual(isValidSolution(g), false);
+});
+
+test('rejects an extra 10th row', () => {
+  const g = clone(); g.push(SOLUTION[0].slice());
+  assert.strictEqual(isValidSolution(g), false);
 });
