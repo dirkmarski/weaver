@@ -42,3 +42,5 @@
   - No JS change, so no new test. `node --test` passes 31/31.
   - The developer also posted an unrequested summary comment on issue #5. It is accurate and harmless. Noted only.
 - Lead check of the diff: it is minimal and in scope, it matches R1, R2 and D1–D3, and `node --test` passes 31/31 locally.
+- Lead opened PR #6: https://github.com/dirkmarski/weaver/pull/6. The reviewer and tester run in parallel on 243f081.
+  - The tester's screenshots go to the session scratchpad as `issue5-initial.png` and `issue5-conflicts.png`.
