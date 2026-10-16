@@ -39,4 +39,12 @@
 - A2: The issue does not ask for a "new game" or "reset" control, so none is built.
 
 ## Progress
-- (pending) Developer brief sent.
+- Developer agent (Claude Sonnet 5.5, session 9f58280f) delivered commit 7fb2280:
+  - pure logic: `PUZZLE`, `findConflicts`, `verify`, `sanitizeDigit`;
+  - input-based UI with a Verify button;
+  - 22/22 tests, including a digit-permuted solution accepted as solved, which proves the check is rules-based;
+  - README updated.
+  - It did not test real typing or paste, only synthetic events.
+- Lead check: `node --test` passes 22/22, and the code matches D2–D7.
+  - Lead-spotted suspect (L1): the `keydown` path sets `inp.value` without updating `dataset.prev`, so a rejected paste after typing restores a stale value. I am holding this to see whether the reviewer and tester find it independently.
+- Next: open the PR, then run the reviewer and tester in parallel.
