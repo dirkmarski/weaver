@@ -74,3 +74,17 @@
   - Tests 53/53. Node, 200 seeded puzzles/level: easy max 1 ms; medium max 7 ms (avg 2.13 attempts); hard max 35 ms (avg 2.27 attempts); cap never hit.
   - Fallback on cap is only guaranteed unique (may be out of band / easier); documented.
 - Lead check: diff reviewed (logic correct), `node --test` 53/53 locally. Second-round reviewer and tester launched on c177c1c.
+- Reviewer agent round 2 (Claude Sonnet 5.5, session 21813484) verdict on c177c1c: APPROVE (PR review comment).
+  - Own solvers, 400 puzzles/level, default RNG: 0 band failures, 0 technique violations, 0 capped; Medium never naked-only solvable, Hard never singles-solvable; all unique and consistent. Max: easy 2 ms, medium 8 ms, hard 49 ms.
+  - Forced cap (`maxMs: 3`, 200 runs): 125 capped, all unique/valid/consistent.
+  - Nits: capped fallback may not meet technique rule (documented, practically never hit); long graded-return line could be tidied. Lead: won't-fix (cosmetic, behaviour correct).
+- Tester agent round 2 (Claude Sonnet 5.5, session 21813484) verdict on c177c1c: PASS (PR comment).
+  - Headless Chrome, 90 puzzles/level: all distinct, unique, in band; grading from DOM: Medium naked-only solvable 0/90, singles-solvable 90/90; Hard singles-solvable 0/90.
+  - Nothing generated before choice (0 Math.random calls). Click-to-render worst case 54.3 ms (hard, fresh load).
+  - Regressions all pass, 0 console errors, `node --test` 53/53.
+- Lead visual check of `issue7-r2-medium.png`: prompt-less game view correct, level label shown, two-shade boxes retained.
+
+## Outcome
+- R1 (choose difficulty before generation), R2 (generated, no bank), R3 (easy/medium/hard, technically distinct per D9) and R4 (< 2 s; measured worst case 54 ms, 1000 ms internal cap) are met, verified independently by reviewer (two rounds), tester (two rounds, browser) and lead.
+- Known, documented limitation: if the 1000 ms cap were ever hit, the fallback puzzle is guaranteed unique but may be outside the band/technique rule; never observed in >2000 generations.
+- Lead merges PR #8 with a merge commit (no squash), which closes #7.
