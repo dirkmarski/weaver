@@ -47,4 +47,35 @@
   - It did not test real typing or paste, only synthetic events.
 - Lead check: `node --test` passes 22/22, and the code matches D2–D7.
   - Lead-spotted suspect (L1): the `keydown` path sets `inp.value` without updating `dataset.prev`, so a rejected paste after typing restores a stale value. I am holding this to see whether the reviewer and tester find it independently.
-- Next: open the PR, then run the reviewer and tester in parallel.
+- Lead opened PR #4: https://github.com/dirkmarski/weaver/pull/4. The reviewer and tester run in parallel on 7fb2280.
+- Reviewer agent (Claude Sonnet 5.5, session 9f58280f) verdict: REQUEST CHANGES.
+  - Independently verified:
+    - The puzzle is the published Wikipedia puzzle, has a unique solution (by backtracking) and is solvable by singles only.
+    - The check is rules-only.
+    - Only user cells are flagged.
+    - Givens cannot be edited.
+    - The conflict tests are isolated.
+  - Triage:
+    - B1 (blocking): stale `dataset.prev`, the same bug as L1, confirmed independently. Fix.
+    - S2: `maxLength=1` truncates a pasted "12" to "1", which is then accepted. This contradicts D7 and the README. Fix by dropping `maxLength` and relying on `sanitizeDigit`.
+    - S3: no tests of the input layer. Fix by extracting the cell-input state transition into a pure function, with a unit regression test for B1. Browser-level coverage comes from the tester.
+    - N4: guard against an undefined `e.key`. Fix, cheap.
+    - N5: tests for two user digits clashing and for a cell reported once across several groups. Fix, cheap.
+    - N6: the `window.isValidSolution` global left over from #1. Won't fix, harmless.
+    - N7: arrow-key navigation. Won't fix, not required by the issue.
+  - Fixes are held until the tester reports, so they go out in one batch.
+- Tester agent (Claude Sonnet 5.5, session 9f58280f) verdict: FAIL on paste handling only. Tested in headless Chrome over file:// with real CDP input events.
+  - PASS:
+    - load: 30 givens, 51 inputs, 0 errors;
+    - givens immutable and not in the tab order;
+    - typing rules;
+    - every Verify scenario: untouched, partial, row/column/box conflicts, two user digits in conflict, solved, wrong complete grid;
+    - clearing on edit, with no live checking;
+    - rules-only acceptance of other valid grids;
+    - 22/22 unit tests;
+    - performance: load about 41 ms, Verify under 1 ms.
+  - D-1 is the same bug as L1 and B1, confirmed by a real repro: type 4, select it, paste "x", and the cell empties.
+  - D-2 is the same as S2: a pasted "12" becomes "1".
+  - Concern: red on box 0 (pink) has lower contrast but is still visible. Decision: ask the developer to make the conflict style more distinct, e.g. a red outline or border, so it does not depend on the box shade. This is cheap and supports R5.
+  - Lead could not view the tester's screenshots: the read outside the working directories was denied. I did not work around this. I will take my own screenshot in the session scratchpad at the final check.
+- Rework round 1 sent to the developer: B1/D-1, S2/D-2, S3, N4, N5, and the conflict-contrast tweak.
