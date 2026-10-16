@@ -79,3 +79,32 @@
   - Concern: red on box 0 (pink) has lower contrast but is still visible. Decision: ask the developer to make the conflict style more distinct, e.g. a red outline or border, so it does not depend on the box shade. This is cheap and supports R5.
   - Lead could not view the tester's screenshots: the read outside the working directories was denied. I did not work around this. I will take my own screenshot in the session scratchpad at the final check.
 - Rework round 1 sent to the developer: B1/D-1, S2/D-2, S3, N4, N5, and the conflict-contrast tweak.
+- Developer round 1 (commit 6dd63af):
+  - `setCell` is now the single write path, so `prev` stays in sync (fixes B1/D-1);
+  - `maxLength` removed (fixes S2/D-2);
+  - the input transition is the pure `nextValue`, with 7 tests (S3);
+  - `e.key` guard (N4);
+  - 2 conflict tests (N5);
+  - an inset red outline on conflict cells.
+  - Tests: 31/31.
+  - Lead review of the diff: it is limited to the agreed items.
+  - Concern (tooling): the developer reported that `gh pr view 4 --comments` fails on the token scopes, so it worked from the lead's brief only. Workaround for future briefs: `gh api repos/dirkmarski/weaver/issues/<n>/comments`.
+- Final reviewer gate (Claude Sonnet 5.5) on 6dd63af: APPROVE. All accepted findings are resolved, with no regressions and no scope creep.
+  - Non-blocking nits, both accepted as is:
+    - a rejected paste also clears the flags (harmless, consistent with D5);
+    - a mid-file `require` in the tests (cosmetic).
+- Final tester gate (Claude Sonnet 5.5) on 6dd63af: PASS on the full suite in headless Chrome with real CDP input events.
+  - The D-1 and D-2 repros and their variants are fixed.
+  - Rules-only acceptance is confirmed with a permuted grid and a row-swapped grid.
+  - `node --test` 31/31.
+  - Performance: load 23 ms, Verify under 1 ms.
+  - The tester's browser (PID 62123) exited, and no stray processes are left.
+- Lead visual check of the tester's screenshots in the session scratchpad:
+  - Conflicts: only user digits are red, each matching a real clash with a given, and the red is clearly visible in pink box 0.
+  - Solved state: the success message shows, and givens (bold black) are distinct from user digits (blue).
+
+## Outcome
+- All acceptance criteria R1–R6 are met and were verified independently by the reviewer (twice), the tester (twice) and the lead.
+- Out-of-scope items were respected: no hints and no live checking.
+- Won't-fix items: N6 (the leftover global) and N7 (arrow-key navigation).
+- The lead merges PR #4 with a merge commit (no squash), which closes #3.
