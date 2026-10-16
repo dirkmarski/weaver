@@ -44,3 +44,12 @@
 ## Progress
 - Branch `issue-7-generated-sudoku` created from main (74bfefa). Work log created.
 - Developer agent launched (session 21813484) to implement D1–D6 with unit tests and README update.
+- Developer agent (Claude Sonnet 5.5, session 21813484) delivered commit ffd8ada:
+  - Generator in `sudoku.js`: bitmask backtracking (most-constrained cell first) for full grid and solution counting; random-order removal to a random target in the level band; easy keeps removals only if solvable by naked singles, medium by naked+hidden singles (both imply uniqueness), hard by solution count = 1. Retries until in band; 1000 ms internal cap with fallback to best valid unique puzzle.
+  - API: `generatePuzzle(level, {rng, maxMs})`, `generateSolution`, `seededRng` (mulberry32), `countSolutions`, `solvableBy`, `LEVELS`.
+  - `PUZZLE`/`SOLUTION` removed from `sudoku.js`; known grid kept only in `tests/fixture.js` (D5).
+  - UI: difficulty prompt on load (no grid), level label, New puzzle button; `[hidden]` CSS rule added.
+  - D3 bands unchanged (no tuning needed); 200 puzzles/level all in band per developer.
+  - Tests: 50/50 (`tests/generator.test.js` new, 19 tests). Node timing max: easy 1.2 ms, medium 2.3 ms, hard 6.4 ms.
+  - Developer notes: cap path only covered by `maxMs: 1` test; hard puzzles may sometimes be solvable by singles (consistent with D3); cosmetic naming nit `PEERS_MASK_UNITS`.
+- Lead check: diff in scope, `node --test` 50/50 locally, generator code reviewed at a glance (sound).
