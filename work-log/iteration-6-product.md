@@ -12,7 +12,8 @@
 - [x] Simulated user sessions (personas A, B, C via assistant fallback; see Deviation).
 - [x] Scope decided: two small issues.
 - [x] Issues raised: #25 and #26 (label enhancement). Bodies: scratchpad/pm-proto6/issue-a.md, issue-b.md.
-- [ ] PM user acceptance of #25 and #26 (when the lead reports delivery).
+- [x] PM user acceptance of #25: ACCEPTED (PR #27, head df7945b). See "Acceptance #25".
+- [ ] PM user acceptance of #26 (after #25 merges; delivery is sequential).
 
 ## Starting point (2026-10-19)
 main = iteration 5 output: Easy/Medium/Hard generated puzzles, Verify, notes, keyboard, Hint teaching naked + hidden singles, "Well spotted!" rewards and a per-puzzle tally. No open issues or PRs.
@@ -85,3 +86,29 @@ Not chosen, and why:
 - 2026-10-19: persona C (lukewarm) report received. Easy seed 303, finished in ~25 commands with 4 hints. Biggest gripe: filling the last cell does nothing, had to guess Verify. Jargon ("naked/hidden single") half understood; the one "Well spotted ... hidden single in its box" taught something but wanted a plain explanation the first time. Wants completion celebration with summary, term explanations, one-click explanation.
 - 2026-10-19: all three persona reports in; findings, prototype, decision recorded. Issues #25 and #26 raised. Next PM step: user acceptance when the lead reports delivery (oracle for completionFor, byte checks of texts, headless replay with play.js, README sentence by sentence, persona re-run optional).
 - 2026-10-19: PM acceptance of #25 (PR #27, head df7945b) started in detached worktree scratchpad/pm-accept-25. Done so far: own oracle (scratchpad/pm-accept-25-checks/pm-oracle.js) 20,000 checks, 0 mismatches; texts byte-equal to the issue; play.js replays (pm25c*, pm25b) as expected; README diff read; screenshots viewed. Persona C and B re-runs (assistant fallback) in progress, sessions pm25-userc and pm25-userb.
+
+## Acceptance #25 (PR #27, head df7945b, 2026-10-19): ACCEPTED
+Detached worktree scratchpad/pm-accept-25. I did not edit the branch. Diff: sudoku.js (+completionFor, setCell hook), README, tests, issue work log. index.html is unchanged.
+- **Independent oracle** (scratchpad/pm-accept-25-checks/pm-oracle.js): my own rule checker. Expected texts are parsed from the issue #25 body, not the code. Result: 20,000 checks (4,965 null, 5,701 solved, 9,334 conflict), 0 mismatches, inputs never mutated. `node --test`: 85 + 22 = 107 pass.
+- **Byte checks**: the conflict text and the issue example "Puzzle solved! Singles applied: 40 on your own, 0 with a hint." are byte-equal to the issue. The E5 mixed tally gives "4 on your own, 6 with a hint".
+- **play.js replays against the PR head** (sessions pm25c*, pm25b in pm-proto6/sessions):
+  - Persona C's iteration-6 Easy game (seed 303) without the final Verify now ends on the green "Puzzle solved! Singles applied: 40 on your own, 4 with a hint.". 39+1 and 4 match the tally, so the last single is counted first.
+  - Wrong last digit gives the red conflict text, with no red cells.
+  - Overwriting to the right digit gives solved, with 39 (an overwrite is not judged).
+  - Clear, then a note gives a blank message. Re-entering gives solved again.
+  - Verify afterwards shows "Solved! Every row, column and box is correct.". Hint on the full grid shows "Every cell is filled. Click Verify to check the grid.".
+  - Persona B's Medium game (seed 202) gives "48 on your own, 1 with a hint" = 44+4 / 0+1.
+- **README** "How to play" and the Files list, read sentence by sentence against the code. All literally true. Checked in particular: rejected input never triggers it (the input handler restores the old value before setCell, so changed is false), notes on a filled cell are no change, and "Apart from that message there is no live checking".
+- **Screenshots as a learner** (test-25b R1, R2; my pm25c-1): the green line sits in the usual message place, directly above the tally, and its sums are visible below. The red conflict line is clear and points to Verify. R5 shows Verify's text because Verify was clicked after the fill. Not a defect.
+- **Persona re-runs** (assistant fallback; user-* agent types are still not available to me):
+  - C (Easy, seed 404, session pm25-userc): got "Puzzle solved! Singles applied: 38 on your own, 1 with a hint." and found it "mildly rewarding". Understood the own/hint split and added up 31+7. Caveat: the persona admitted filling most cells from an offline solver, so this is weak evidence about play. The finish-message part still holds.
+  - B (Medium, seed 505, session pm25-userb, no hints): the wrong last digit gave the red text and no red cells ("a clean 'not done yet' signal, slightly odd"). After the correction: "Puzzle solved! Singles applied: 43 on your own, 0 with a hint." B: "rewarding and clear", 35+8=43 checked.
+- Verdict: the iteration-6 top gripe (3/3: "last cell filled, nothing happened") is fixed as specified. **ACCEPTED, no conditions.** The lead may merge.
+
+### Observations from acceptance (new candidates, not defects)
+- B and C: "Singles applied" is jargon. #26 (definitions under the tally) is the planned answer. Re-check after #26.
+- C: "38 out of what?" B: "why 43 when I typed ~50?" Entries that are not singles are not counted and not explained (this matches candidate 3, feedback clarity). A possible finish line: "N of M cells were singles".
+- B: correcting a wrong last digit by overwriting is not credited, so the tally does not move on the final entry. This is the iteration-5 rule (overwrites are never judged). Watch it, but no change.
+- B: the full-but-wrong case could say how many cells clash, with a softer tone. C: offer "New puzzle / try Medium" on the solved screen. Both are candidates.
+- Process: the persona fallback can cheat (C used a solver). Future persona prompts must forbid helper scripts explicitly.
+- 2026-10-19: #25 ACCEPTED (PR #27, df7945b). Decision posted on PR #27. Next: acceptance of #26 when delivered.
