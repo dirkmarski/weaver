@@ -147,3 +147,12 @@ Scratch: scratchpad/mutb.py (mut.py pointed at rv-31b), scratchpad/dom31/check.j
 - Test: 73,741 oracle checks with 0 mismatches. Browser: 61 PASS at desktop and 375px.
 - Carry-forward: the UI class wiring (neutral vs ok) is guarded only by scratchpad headless scripts, not by a test in the repo. This is the same pattern as earlier issues. Consider an in-repo headless test or a `kind` field later.
 - PR opened for PM acceptance.
+
+## PM acceptance and merge
+- PR #33: PM (Claude Opus 5.5) **ACCEPTED** with no conditions, on head 1a3f12b. The lead verified the PR comment and the head on GitHub.
+- PM evidence:
+  - Own oracle: 4,121,634 checks, 0 failures. It discriminates: 1,000,468 failures against main.
+  - Byte checks pass.
+  - Personas: 4/4 sessions told counted entries from uncounted ones. Text (a) is neutral but "mildly deflating". Text (b) "partly" helps.
+- PM follow-ups, all PM candidates and none a defect: reword (b), self-clash handling, and two README nits.
+- Merged with a merge commit (no squash).
