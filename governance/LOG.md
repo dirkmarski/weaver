@@ -2,6 +2,16 @@
 
 ## Entries (newest first)
 
+### The lead's agent list cascades to the whole team
+- **Seen:** 2026-10-19
+- **Means:** The top-level agent's list of agents it may launch decides which agents exist for everyone in the session. The product manager was allowed to launch the test users, but they did not exist for it because the lead's list did not name them. A permission set on the lead caps what every agent below it can do.
+- **Response:** Added the test users to the lead's list.
+
+### Agents solve the problem with whatever is available
+- **Seen:** 2026-10-19
+- **Means:** Agents will try to solve the problem and be creative about it. When the test users could not be launched, the product manager had the assistant role-play them. When it had no way for them to see the product, it built a play tool that kept them away from the code. One simulated user solved the puzzle with a script instead of playing it. It is important to keep checking that the intended avenue is available, and that the agents find it.
+- **Response:** Pending.
+
 ### Two sentences of strategy changed the product's direction
 - **Seen:** 2026-10-19
 - **Means:** Same team, same definitions. Two runs without a product aim delivered standard sudoku-app features: pencil notes, then keyboard play. With two sentences of aim restored, the product manager delivered a hint that teaches a solving technique and never gives away the answer, and it reordered its backlog around teaching. The product context is where my input changes what the agents build.
