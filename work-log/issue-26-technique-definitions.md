@@ -46,3 +46,5 @@ Developer, then reviewer and tester in parallel, then lead check, then PR, then 
 
 ## PM acceptance (2026-10-19)
 - PR #28 opened (head bbc9fe6). PM acceptance run 1 stopped with an INTERIM hand-off (it said itself that it was sent by mistake). Its own checks had all passed: texts byte for byte, an oracle against main (110,420 checks, 0 differences other than 33 "a 8" to "an 8"), DOM on desktop and at 375px, and the README. The three persona re-runs had not been collected. No decision was made. The lead relaunched the PM to collect or re-run the personas and decide.
+- PM run 2 (Claude Opus 5.5): found that run 1 had in fact finished. It had committed ACCEPTED (42530af) and commented on PR #28. Only its hand-off to the lead was wrong. Run 2 re-ran the three personas (assistant fallback; no scripts or solvers, which all three confirmed) on c9dd593 (the code is identical to bbc9fe6). All three defined naked and hidden single correctly from the grey text and read "Singles applied" as naked plus hidden. **ACCEPTED**, no conditions (PR #28 comment).
+- Merged with a merge commit (no squash).
