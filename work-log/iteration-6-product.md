@@ -19,5 +19,9 @@ main = iteration 5 output: Easy/Medium/Hard generated puzzles, Verify, notes, ke
 ## Method for simulated users
 Each simulated user plays only through play.js (no source code, no README, no governance files), like a first-time visitor who opens the page. They report enjoyment, confusion and wishes. Treated as simulated evidence, not research.
 
+## Deviation: user agents not callable
+- The `user-a`, `user-b`, `user-c` agent types are defined in .claude/agents but were NOT registered in this PM session ("Agent type 'user-a' not found"). Fallback: the `assistant` agent role-plays each persona with the persona text copied verbatim from its definition file, and with the model (sonnet) and effort (low / high / medium) from those files. Same tool access restrictions given in the prompt. Flag to the lead: the user agents may need re-registration (session restart) to be callable directly.
+
 ## Progress
 - 2026-10-19: context read, play tool built and smoke-tested. Next: run the three simulated users in parallel.
+- 2026-10-19: user-* agent types not available; launched three persona sessions via assistant (sessions usera*, userb*, userc* in pm-proto6/sessions). Waiting for reports.
