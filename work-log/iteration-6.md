@@ -32,3 +32,23 @@
 - GitHub Pages was not re-checked this run. Still carried forward for Dirk.
 - #25: developer round 1 (Claude Sonnet 5.5), then review APPROVE (S1, N1-N3) and test PASS. The lead chose to rework before acceptance. Round 2 (6681f24): full re-review APPROVE with no findings, full re-test PASS (oracle 72,736 checks, 0 mismatches; browser 67/67). PR #27: **PM ACCEPTED**, no conditions. Merged with a merge commit (651c2a6). #25 closed. See work-log/issue-25-completion-message.md.
 - #26: passed the gate earlier (still OPEN, weaver-agents). Branch `issue-26-technique-definitions` created from main after the #25 merge. Developer launched.
+- #26: developer round 1 (Claude Sonnet 5.5). Lead check passed (contrast independently computed at 6.43:1). Review APPROVE with nits only (no survivors in the mutation sweep). Test PASS (text oracle 4,506,150 checks against main, 0 mismatches; browser 25/25 on desktop and at 375px). No rework needed. PR #28.
+  - PM acceptance run 1 returned an "interim" hand-off, although it had in fact committed ACCEPTED (42530af). The lead relaunched the PM. Run 2 found this, re-ran the personas (no scripts or solvers) on the final head and re-confirmed **ACCEPTED**, no conditions.
+  - Merged with a merge commit (c7222d5). The first merge attempt failed with "Base branch was modified" right after the lead's log push, and the retry succeeded. #26 closed.
+- main after both merges: `node --test` 109/109. Individual commits are kept (merge commits 651c2a6 and c7222d5).
+- Iteration 6 is complete, as confirmed by the PM.
+
+## Outcome and lessons
+- Delivered:
+  - #25: the puzzle now announces itself when the grid is full: green "Puzzle solved! Singles applied: O on your own, H with a hint." or a red pointer to Verify on a full grid with a conflict.
+  - #26: plain-language definitions under each tally line, and "an 8" in the hidden-single explanation.
+  - Both come from simulated-user findings: all 3 personas hit the silent finish, and 2 of 3 did not know the terms. The persona re-runs confirmed both changes landed: all 3 read the finish line and defined both terms correctly.
+- Lesson 1: the simulated users gave the PM concrete, convergent evidence for the first time. The scope this iteration came from observed pain, not from the PM's own candidate list. Keep running personas at scoping AND at acceptance. Persona prompts must forbid helper scripts and solvers (persona C used one in the #25 re-run).
+- Lesson 2: delivering the two issues one after the other cost little and avoided README and sudoku.js conflicts. Each review stayed clean.
+- Lesson 3: the reviewer's mutation sweep against DOM-only guards exposed a guard with no test (#25 S1, the check outside `if (changed)`). A recorded headless check closed it. For UI wiring, ask for the headless script to be run against mutants, not just against the tip.
+- Lesson 4: an agent's hand-off can be wrong about its own state (the PM's "interim" report after it had already accepted). The lead verifies state in git and on GitHub before acting on a hand-off, and relaunches rather than assuming.
+- Lesson 5: as before, holding rework until both review and test had reported kept #25 to one rework round, and #26 needed none.
+- Concerns carried forward for Dirk:
+  - The `user-a/b/c` agent types are "not found" when the PM is launched as a subagent. The PM used the assistant agent with the persona text verbatim as a fallback. The lead cannot change this (`.claude/` is Dirk's).
+  - GitHub Pages is still not enabled, so there are still no real users.
+- Next-iteration candidates (PM, ordered): 1. hidden-single mastery (Hint teaches hidden singles; the credit precedence no longer hides them); 2. finish-line split and next step; 3. make Hard teachable (next technique plus a level); 4. progress across puzzles; 5. feedback clarity; 6. notes usability.
