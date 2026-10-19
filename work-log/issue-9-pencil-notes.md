@@ -38,3 +38,9 @@
 - Lead viewed the notes-cell and verify screenshots. Layout is correct, but the notes are faint on blue.
 - Lead decision D2 (amends D1's colour nit): the note colour must reach at least 4.5:1 (WCAG AA) on both box shades and plain white. Font size stays as is. This is a legibility fix within P3 ("muted grey", "readable").
 - Rework launched with the developer (D1 + D2). Reviewer and tester re-check afterwards.
+- Developer agent (Claude Sonnet 5.5, session 469a4b87) delivered rework commit cfdb2cf:
+  - `nextValue` removed (code, export, tests, README). Its cases are covered by the `applyEntry` tests.
+  - New pure exported `buildGrid(puzzle, values)`, used by the Verify button. The verify-ignores-notes test now checks the grid built from a notes-only cell and can fail.
+  - Test requires merged at the top. The README notes bullets are split and A1 is documented.
+  - Note colour #777 → #626262: contrast 4.82 (blue box), 5.39 (cream), 6.10 (white), all ≥ 4.5.
+- Lead check: diff read and correct, `node --test` 55/55 (62 − 7 `nextValue` tests), no `nextValue` references left outside the work log. Second-round reviewer and tester launched on cfdb2cf.
