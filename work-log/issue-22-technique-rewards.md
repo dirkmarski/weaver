@@ -61,3 +61,6 @@
   - N2: the README count sentence now has once-per-cell built in, and the Files entry mentions the reward tests.
   - `node --test` 100/100.
 - Lead check: diff read. `used & ~1` keeps bits 1-9 only, which is equivalent to the old loop. Only the in-scope items changed. Passed. Full re-review and full re-test launched in parallel.
+- Round 2 review: APPROVE, with no open findings (https://github.com/dirkmarski/weaver/issues/22#issuecomment-6259008528). S1, N1 and N2 are resolved. The reviewer independently confirmed `used & ~1` is equivalent and re-ran all mutations: filled 1, box/row 6, row/column 2, naked-first 3, all caught. The full diff was re-checked.
+- Round 2 test: PASS, with the full walkthrough repeated on new seeds (https://github.com/dirkmarski/weaver/issues/22#issuecomment-6259016929). 8,958 checks over 682 entries, 0 failures, 0 console errors, 100/100 unit tests. The Hint/Verify regression is byte-identical to main. Screenshots are in scratchpad/test-22b-shots.
+- Lead: satisfied with the delivery against #22. PR opened for PM user acceptance.
