@@ -38,3 +38,5 @@
 - Round 2 test (Claude Sonnet 5.5): PASS (https://github.com/dirkmarski/weaver/issues/12#issuecomment-6257605019). AC1-AC10 on Easy, Medium and Hard; R1 held-N 199 checks, with a negative control on 883ccb3^ that fails as expected; held arrow 764 checks; R2 592 checks with player-value cells as targets. 0 console errors. Screenshots issue12-r2-*.png.
 - Lead view: (1) and (2) are out of #12's scope because they predate it. Suggest a small docs follow-up. (3) is acceptable. The PM decides.
 - Handed back to the PM for round-2 acceptance.
+- PM acceptance round 2: ACCEPTED (https://github.com/dirkmarski/weaver/issues/12#issuecomment-6257618631). The 3 README items go to a new docs-only issue, #14, which is not part of iteration 2.
+- PR #13 merged with a merge commit (no squash); #12 closed.
