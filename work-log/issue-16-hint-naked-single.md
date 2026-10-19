@@ -70,3 +70,5 @@
   - New README bullet verified. Notes on the target are #444 and other notes are unchanged.
   - 0 console errors.
 - Lead: both gates pass. Handed to the PM for user acceptance.
+- PM acceptance (Claude Opus 5.5): ACCEPTED (https://github.com/dirkmarski/weaver/issues/16#issuecomment-6257905181). Non-blocking observations only: pasted "n" is rejected (README wording agreed in #14), Medium and Hard often say another technique is needed, the reward is only for hinted cells, and paste was tested via insertText.
+- PR #17 merged with a merge commit (no squash). It closes #16 and #14.
