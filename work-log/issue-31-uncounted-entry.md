@@ -124,3 +124,19 @@ Tester: Claude Sonnet 5.5 (claude-sonnet-5-5). Head tested: 2775392. Baseline: m
 - Headless Chrome, real index.html, desktop and 375px (`.../scratchpad/browser31b.js`): 61 PASS, 0 FAIL, 0 console errors. Both "Well spotted!" (naked single on own) and "Well done!" (hinted digit) are asserted to have the green `ok` class (already present in browser31.js; "Puzzle solved!" also asserted ok). New case added: with a self-clash on the grid, a digit that is a single in the grid is entered; the status is exactly the (b) text, class empty (neutral, nudge colour), no "Well" text, no red cell, nothing highlighted, tallies 0/0, i.e. nothing rewarded, nothing counted, not unanswered.
 - README Rewards section re-read sentence by sentence: all match, including the new sentence ("If neither applies, or if some numbers in the grid just before the entry break the rules, nothing is rewarded and nothing is counted, but the entry is not left unanswered"), the (a) and (b) texts, the neutral style, the last-cell exception, the hint-showing rules and the "Neither message changes a count, flags a cell red or highlights anything" line.
 - Verdict: PASS, no defects.
+## Review round 2 (reviewer, head eff80bd)
+
+Verdict: APPROVE. No blocking, should-fix or nit findings.
+
+Full review done, not only the delta.
+- Changes since round 1 (74ef8bb..eff80bd): README.md (one sentence), tests/sudoku.test.js (trailing space removed), the work log. sudoku.js is unchanged since round 1; against main 8d92cfd it still only adds notCounted(), the creditEntry fall-through and the status class line.
+- `node --test`: 128/128 pass.
+- Mutations (14, same set, run against this head): all killed by the unit tests, the updated headless check (dom31/check.js, which passes on the unmutated head with 0 page errors), or both. M7b (all status lines neutral, "rewards made neutral") now dies on "Well spotted! has class ok" (S1 closed). M7a/M7c/M8/M10 die in the headless check only (unit tests do not cover the class, as before; acceptable). M3, M4, M6 die in the unit tests only.
+- Diff vs main against rules 1-10, edge cases and E1-E4: no deviation. Only a digit entered into an empty cell is judged; overwrite, clear, Notes on, rejected input and arrow keys are unchanged; tally and credited are untouched on (a)/(b); the completion message wins; (b) tests the grid before the entry and (a) never reveals a clash made by the entry.
+- README, sentence by sentence against the code:
+  - S2 sentence ("or if some numbers in the grid just before the entry break the rules, nothing is rewarded..."): matches classifyEntry returning null on a prior conflict, then notCounted choosing (b). It now reads consistently with the Well spotted bullets (naked, hidden, both) and with the two sub-bullets (a)/(b); "neither applies" stays tied to the two techniques, and (b) says "whatever the digit". S2 closed.
+  - Sub-bullets (a), (b) and the "Neither message changes a count..." line: text, punctuation, neutral class and no tally change match the code and tests.
+  - Hint bullet ("not counted" added), "naked-single order" wording (PM request), credited-cell sentence, "Filling the grid" replacement sentence ("A rewarded entry is still counted"), the "Any change to a value clears..." bullet, and the API line for creditEntry: all match the code.
+- N1 (trailing space): fixed.
+
+Scratch: scratchpad/mutb.py (mut.py pointed at rv-31b), scratchpad/dom31/check.js.
