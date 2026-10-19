@@ -64,3 +64,9 @@
 - Round 2 review: APPROVE, with no open findings (https://github.com/dirkmarski/weaver/issues/22#issuecomment-6259008528). S1, N1 and N2 are resolved. The reviewer independently confirmed `used & ~1` is equivalent and re-ran all mutations: filled 1, box/row 6, row/column 2, naked-first 3, all caught. The full diff was re-checked.
 - Round 2 test: PASS, with the full walkthrough repeated on new seeds (https://github.com/dirkmarski/weaver/issues/22#issuecomment-6259016929). 8,958 checks over 682 entries, 0 failures, 0 console errors, 100/100 unit tests. The Hint/Verify regression is byte-identical to main. Screenshots are in scratchpad/test-22b-shots.
 - Lead: satisfied with the delivery against #22. PR opened for PM user acceptance.
+- PR #23 opened.
+- **PM ACCEPTED**, with no conditions (https://github.com/dirkmarski/weaver/issues/22#issuecomment-6259053689).
+  - The PM's own oracle: 620,841 `classifyEntry` checks and 6,070 credit/tally decisions, 0 mismatches.
+  - 7 entries checked by hand; 5 mutations, all caught; screenshots looked at as a learner; README sentence by sentence.
+  - Note (not a condition): the status-line layout shift is more visible with the tally, so the PM moved it up the candidate list.
+- Merging PR #23 with a merge commit (individual commits kept).
