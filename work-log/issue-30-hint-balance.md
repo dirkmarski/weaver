@@ -100,3 +100,6 @@ Verdict: APPROVE (no Blocking, no Should-fix; four nits).
 - N4 is accepted. The issue asked for a recorded headless check, and it is recorded in this log.
 - Q1 and Q2 are answered. Hint is unreachable while `#game` is hidden, so `currentLevel` cannot be stale or null when Hint is clicked.
 - After round 2: full re-review and full re-test, as the carried rule requires.
+
+## Developer round 2 (Claude Sonnet 5.5)
+- README only. N1: the Order bullet now says the "on your own" and "with a hint" numbers on each technique's line in the tally block are added together. N2: the hidden-preference bullet now ends "If there is none, it teaches a naked single as above." Checked against `preferredTechnique` and `hintFor` in sudoku.js. No code changes.
