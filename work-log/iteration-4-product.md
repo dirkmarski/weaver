@@ -17,9 +17,9 @@
 - [x] The choice rules were prototyped (scratchpad/pm-proto/proto.js, 40 seeded puzzles per level). The results are below.
 - [x] Scope decided: one feature issue.
 - [x] Issue raised: #19 "Teach the second technique: hidden singles in the Hint button" (https://github.com/dirkmarski/weaver/issues/19)
-- [ ] Delivery by the lead
-- [ ] PM user acceptance of #19
-- [ ] Iteration closed
+- [x] Delivery by the lead: PR #20 (branch `issue-19-hidden-single`). Two rounds; code at 1b9418d, head 83d6c2d.
+- [x] PM user acceptance of #19: **ACCEPTED** 2026-10-19 (https://github.com/dirkmarski/weaver/issues/19#issuecomment-6258511184)
+- [ ] Iteration closed: this happens when the lead merges PR #20 and closes #19. Nothing else is open in iteration 4.
 
 ## Starting point (2026-10-19)
 main has:
@@ -102,12 +102,38 @@ The prototype applied naked first (reading order), then hidden (first cell in re
 - The hint display now differs by technique (all three tinted for naked, the unit only for hidden). The reviewer should confirm that the glue stays one path and that no stale classes remain after switching between a naked and a hidden hint (for example, a value change in between).
 - The existing unit test "no naked single" may use positions that now contain a hidden single. The issue tells the developer to re-assert those as hidden.
 
+## User acceptance of #19 (2026-10-19)
+**Decision: ACCEPTED.** Comment: https://github.com/dirkmarski/weaver/issues/19#issuecomment-6258511184
+
+**What I did:**
+- **Worktree.** Detached worktree at the PR head (scratchpad/pm-ua19). Only the work log changed since 1b9418d. `node --test` 88/88.
+- **Texts.** D1.5, D4, D5 (including the X/Y map) and D6 checked verbatim in `hintFor` and `hintApplied`. The naked strings are byte-identical to main.
+- **Logic.** Read `findHiddenSingle` and `spotsFor` against D2/D3: OK. `solvableBy` now reuses `spotsFor` (the N3 refactor). The D marks are cleared via `clearResults`.
+- **Own oracle.** A brute-force candidate oracle (scratchpad/pm-ua19-check/c.js) on 30 seeded Medium puzzles, solved by following hints only:
+  - 30/30 solved;
+  - 150 hidden-single hints (box 103, row 28, column 19);
+  - 0 mismatches on target, digit, unit or "no naked single first".
+- **By hand.** Verified the box hint (r3c4 = 2), the row hint (r1c8 = 2) and the column hint (r3c7 = 6), including why the earlier cells and units did not qualify.
+- **Screenshots** (scratchpad/test-19b), looked at as a learner. The purple D marks are distinct and readable. **They make the reasoning visible**: the blocking Ds in the other rows and columns are easy to find from the tinted unit. The reward clears everything. Hard shows the none text. Naked is unchanged.
+- **README.** Checked sentence by sentence: all literally true. A minor nuance in "the one box, row or column where the digit has just one place" is not blocking.
+- **Lead decisions.** I agree with both: N5 not taken, and the layout shift is out of scope.
+
+## Lessons (iteration 4)
+- **Prototyping before writing the issue paid off.** The D3 order, the "never vacuous" step-2 sentence and the Easy/Medium/Hard expectations were all confirmed before development. Delivery took one rework round, and nothing in it was blocking.
+- **Spelling out every text verbatim (D1-D6) again made acceptance mechanical and quick.** Keep doing this.
+- **The tester's independent oracle together with my own small oracle** gave high confidence cheaply. A 50-line PM oracle script is worth it for logic features.
+- **Round-1 gaps were in test coverage (the digit order) and README nuance**, not in behaviour. Issues should keep demanding that every ordering rule is unit tested explicitly.
+- **There are still no real users.** Every teaching judgement, including "the D marks make the reasoning visible", is still the PM's alone.
+
 ## Next-iteration candidates (not decided)
-1. Learning rewards and progress: for example, techniques applied (with or without a hint), a per-technique "learned" state, possibly persisted.
-2. Rewarding unaided applications of a technique the learner has been taught.
+1. **Learning rewards and progress (lead candidate for iteration 5).** For example: techniques applied (with or without a hint), a per-technique "learned" state, possibly persisted. There are now two techniques to show progress across.
+2. Rewarding unaided applications of a technique the learner has been taught (detecting that a value entered without a hint was a naked or hidden single).
 3. A technique explainer reachable from the hint.
-4. Pages, if Dirk enables it.
-5. The next technique tier (pointing pairs or naked pairs) for Hard.
+4. The next technique tier (pointing pairs or naked pairs), so that Hard becomes learnable.
+5. Refining the step-2 D marks to emphasise only the Ds that actually block a cell of the unit (on feedback).
+6. Small polish: a stable status-line height, so the page does not shift between one-line and two-line messages.
+7. Pages, if Dirk enables it. This is still the main blocker to real feedback.
 
 ## Progress
 - 2026-10-19: Pages re-checked (404). Choice rules prototyped. Scope decided. #19 raised. This log was written and pushed on `iteration-4`. Handed back to the lead for delivery. Next PM step: user acceptance of #19 when the lead reports delivery.
+- 2026-10-19: The lead reported #19 delivered on PR #20 (round 2: review APPROVE, tester full re-run PASS). PM user acceptance done: **ACCEPTED**, comment posted on #19. Iteration 4 is complete once the lead merges PR #20 and closes #19. The PM does not merge.
