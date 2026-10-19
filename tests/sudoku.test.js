@@ -628,6 +628,9 @@ test('classifyEntry agrees with Hint at every step of 6 seeded Medium puzzles', 
 });
 
 const T0 = emptyTally();
+// Issue 31: the two "not counted" texts, byte for byte (R, C 1-based).
+const NOT_SINGLE = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d + '. It was not a naked or hidden single at this point, so it is not counted.';
+const BROKEN = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d + '. Some numbers break the rules, so it is not counted. Click Verify to see which.';
 
 test('creditEntry: with a hint, right cell and digit', () => {
   const hint = hintFor(H_BOX, 1);
@@ -662,7 +665,7 @@ test('creditEntry: on your own (naked and hidden texts)', () => {
 test('creditEntry: wrong digit in the hinted cell is judged on its own', () => {
   const hint = hintFor(H_BOX, 1); // (4,5) is 5
   const no = creditEntry(T0, {}, hint, H_BOX, 4, 5, '4');
-  assert.deepStrictEqual(no, { tally: T0, credited: {}, text: '' });
+  assert.deepStrictEqual(no, { tally: T0, credited: {}, text: NOT_SINGLE(5, 6, 4) });
   const fake = { kind: 'nudge', technique: 'naked', r: 4, c: 5, digit: 4, text: '' }; // hint for another digit
   const own = creditEntry(T0, {}, fake, H_BOX, 4, 5, '5');
   assert.strictEqual(own.text, 'Well spotted! You found a hidden single in its box on your own: row 5, column 6 is 5.');
@@ -677,15 +680,12 @@ test('creditEntry: a single in another cell while a hint shows counts on your ow
   assert.deepStrictEqual(res.tally.hidden, { own: 1, hint: 0 });
 });
 
-test('creditEntry: no credit for overwrite, clearing, a conflict or non-digits', () => {
+test('creditEntry: no judgement for overwrite, clearing or non-digits', () => {
   const none = (r) => assert.deepStrictEqual(r, { tally: T0, credited: {}, text: '' });
   none(creditEntry(T0, {}, null, H_BOX, 0, 0, '3')); // cell already holds a value
   none(creditEntry(T0, {}, hintFor(H_BOX, 1), H_BOX, 4, 5, '')); // clearing
   none(creditEntry(T0, {}, null, H_BOX, 4, 5, '0'));
   none(creditEntry(T0, {}, null, H_BOX, 4, 5, 'x'));
-  const bad = cl(H_BOX);
-  bad[0][3] = 8;
-  none(creditEntry(T0, {}, null, bad, 4, 5, '5'));
   const withValue = cl(H_BOX);
   withValue[4][5] = 5;
   none(creditEntry(T0, {}, hintFor(H_BOX, 1), withValue, 4, 5, '5'));
@@ -1003,4 +1003,123 @@ test('hintFor does not mutate its input for any prefer', () => {
   const g = PUZZLE.map((r) => r.slice()), copy = JSON.stringify(g);
   for (const prefer of [undefined, 'naked', 'hidden']) for (const step of [1, 2]) hintFor(g, step, prefer);
   assert.strictEqual(JSON.stringify(g), copy);
+});
+
+// ---- Issue 31: an entry that is not counted says so ----
+
+test('creditEntry (a): not a single, text byte for byte, nothing counted', () => {
+  const res = creditEntry(T0, {}, null, H_BOX, 4, 5, '4'); // 4 fits the cell but is no single
+  assert.strictEqual(res.text, 'Entered: row 5, column 6 is 4. It was not a naked or hidden single at this point, so it is not counted.');
+  assert.strictEqual(res.tally, T0);
+  assert.deepStrictEqual(res.credited, {});
+  assert.strictEqual(creditEntry(T0, {}, null, H_BOX, 4, 5, '6').text, NOT_SINGLE(5, 6, 6));
+  assert.strictEqual(creditEntry(T0, {}, null, H_BOX, 4, 5, '4').text.indexOf('Entered: row 5, column 6 is 4. '), 0);
+});
+
+test('creditEntry (a): a digit already in the row, column or box; digit 8, row and column 9', () => {
+  const g = clone(); g[8][8] = 0; // 8 is in row 9, so this entry clashes
+  const res = creditEntry(T0, {}, null, g, 8, 8, '8');
+  assert.strictEqual(res.text, 'Entered: row 9, column 9 is 8. It was not a naked or hidden single at this point, so it is not counted.');
+  assert.deepStrictEqual(res.tally, emptyTally());
+  assert.deepStrictEqual(res.credited, {});
+  // The clash is not revealed: the same text as any other non-single, and no grid had a conflict before.
+  assert.strictEqual(findConflicts(g).length, 0);
+  for (const d of [1, 2, 3, 4, 5, 6, 7]) assert.strictEqual(creditEntry(T0, {}, null, g, 8, 8, String(d)).text, NOT_SINGLE(9, 9, d));
+  assert.strictEqual(creditEntry(T0, {}, null, g, 8, 8, '9').text.indexOf('Well spotted!'), 0); // the true digit is a naked single
+});
+
+test('creditEntry (b): the grid before the entry already breaks the rules', () => {
+  const g = clone(); g[8][8] = 0;
+  g[0][0] = g[0][1]; // a clash elsewhere
+  assert.ok(findConflicts(g).length > 0);
+  // 9 would be a naked single without the clash
+  const res = creditEntry(T0, {}, null, g, 8, 8, '9');
+  assert.strictEqual(res.text, 'Entered: row 9, column 9 is 9. Some numbers break the rules, so it is not counted. Click Verify to see which.');
+  assert.strictEqual(res.tally, T0);
+  assert.deepStrictEqual(res.credited, {});
+  assert.strictEqual(creditEntry(T0, {}, null, g, 8, 8, '8').text, BROKEN(9, 9, 8));
+  assert.strictEqual(creditEntry(T0, {}, null, H_BOX, 4, 5, '5').text.indexOf('Well spotted!'), 0); // control: no clash, rewarded
+  // the hint's digit in the hinted cell is still "Well done!" (never (a) or (b))
+  const clean = clone(); clean[4][4] = 0;
+  const hint = hintFor(clean, 1);
+  assert.strictEqual(creditEntry(T0, {}, hint, clean, hint.r, hint.c, String(hint.digit)).text.indexOf('Well done!'), 0);
+});
+
+test('creditEntry (a)/(b): inputs are not mutated; an entry on a filled cell or an empty value is still not judged', () => {
+  const g = clone(); g[8][8] = 0; g[0][0] = g[0][1];
+  const tally = { naked: { own: 1, hint: 2 }, hidden: { own: 0, hint: 1 } }, credited = { 3: true };
+  const snap = JSON.stringify([g, tally, credited]);
+  const b = creditEntry(tally, credited, null, g, 8, 8, '9');
+  assert.strictEqual(JSON.stringify([g, tally, credited]), snap);
+  assert.deepStrictEqual(b.tally, tally);
+  assert.deepStrictEqual(b.credited, credited);
+  const a = creditEntry(tally, credited, null, H_BOX, 4, 5, '4');
+  assert.deepStrictEqual(a.tally, tally);
+  assert.deepStrictEqual(a.credited, credited);
+  assert.strictEqual(creditEntry(tally, credited, null, g, 8, 8, '').text, '');
+  assert.strictEqual(creditEntry(tally, credited, null, g, 0, 0, '3').text, '');
+});
+
+test('creditEntry: a credited cell re-entered with a non-single shows (a), counts unchanged (rule 7)', () => {
+  const first = creditEntry(T0, {}, null, H_BOX, 4, 5, '5');
+  const again = creditEntry(first.tally, first.credited, null, H_BOX, 4, 5, '4');
+  assert.strictEqual(again.text, NOT_SINGLE(5, 6, 4));
+  assert.deepStrictEqual(again.tally, first.tally);
+  assert.deepStrictEqual(again.credited, first.credited);
+  // a different digit in the hinted cell, or any digit in another cell while a hint shows
+  const hint = hintFor(H_BOX, 1);
+  assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '6').text, NOT_SINGLE(5, 6, 6));
+  assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '1').text, NOT_SINGLE(5, 6, 1)); 
+});
+
+// E2: walk generated puzzles against the frozen pre-#31 creditEntry (frozen-sudoku-e81999c.js; its
+// creditEntry is byte-identical to main's before this issue).
+test('creditEntry vs the frozen creditEntry over 220 generated puzzles (E2)', () => {
+  // independent rule check, written without classifyEntry or findConflicts
+  const clashes = (g) => {
+    for (let a = 0; a < 81; a++) for (let b = a + 1; b < 81; b++) {
+      const ra = Math.floor(a / 9), ca = a % 9, rb = Math.floor(b / 9), cb = b % 9;
+      if (!g[ra][ca] || g[ra][ca] !== g[rb][cb]) continue;
+      if (ra === rb || ca === cb || (Math.floor(ra / 3) === Math.floor(rb / 3) && Math.floor(ca / 3) === Math.floor(cb / 3))) return true;
+    }
+    return false;
+  };
+  const counts = { same: 0, a: 0, b: 0, skipped: 0, puzzles: 0 };
+  for (const level of ['easy', 'medium']) {
+    for (let seed = 1; seed <= 110; seed++) {
+      const { puzzle, solution } = generatePuzzle(level, { rng: seededRng(seed * 7 + (level === 'easy' ? 1 : 2)), maxMs: 400 });
+      counts.puzzles++;
+      const rng = seededRng(seed);
+      const g = puzzle.map((r) => r.slice());
+      let tN = emptyTally(), crN = {}, tF = emptyTally(), crF = {};
+      const cells = [];
+      for (let p = 0; p < 81; p++) if (!g[Math.floor(p / 9)][p % 9]) cells.push(p);
+      for (let step = 0; step < 90 && cells.length; step++) {
+        const p = cells[Math.floor(rng() * cells.length)], r = Math.floor(p / 9), c = p % 9;
+        const kind = rng();
+        // mix: the solution digit, a random (often wrong) digit, and now and then a clear / bad value
+        const value = kind < 0.45 ? String(solution[r][c]) : kind < 0.9 ? String(1 + Math.floor(rng() * 9)) : ['', '0', 'x', '12'][Math.floor(rng() * 4)];
+        const h = rng() < 0.4 ? hintFor(g, 1 + Math.floor(rng() * 2)) : null;
+        const hint = h && h.kind !== 'conflict' && h.kind !== 'full' && h.kind !== 'none' ? h : null;
+        const before = JSON.stringify([g, tN, crN]);
+        const want = frozen.creditEntry(tF, crF, hint, g, r, c, value);
+        const got = creditEntry(tN, crN, hint, g, r, c, value);
+        assert.strictEqual(JSON.stringify([g, tN, crN]), before, 'inputs not mutated');
+        assert.deepStrictEqual(got.tally, want.tally);
+        assert.deepStrictEqual(got.credited, want.credited);
+        if (want.text !== '') { assert.strictEqual(got.text, want.text); counts.same++; }
+        else if (!/^[1-9]$/.test(value)) { assert.strictEqual(got.text, ''); counts.skipped++; }
+        else if (clashes(g)) { assert.strictEqual(got.text, BROKEN(r + 1, c + 1, value)); counts.b++; }
+        else { assert.strictEqual(got.text, NOT_SINGLE(r + 1, c + 1, value)); counts.a++; }
+        tN = got.tally; crN = got.credited; tF = want.tally; crF = want.credited;
+        // enter the value like the page does (judged entries are digits into empty cells)
+        // (a wrong digit is mostly not kept, so most of the walk stays free of clashes; sometimes it is, to reach (b))
+        if (/^[1-9]$/.test(value) && (+value === solution[r][c] || rng() < 0.08)) { g[r][c] = +value; cells.splice(cells.indexOf(p), 1); }
+        // and now and then clear it again so the credited-cell path is exercised
+        if (g[r][c] && rng() < 0.15) { g[r][c] = 0; cells.push(p); }
+      }
+    }
+  }
+  assert.ok(counts.puzzles >= 200);
+  assert.ok(counts.same > 300 && counts.a > 500 && counts.b > 100 && counts.skipped > 50, JSON.stringify(counts));
 });
