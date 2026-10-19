@@ -302,6 +302,21 @@
   }
 
   // The heading and the two lines shown for a tally.
+  // Decides what to announce once a value change has been made.
+  // grid: givens plus entered values (0 = empty); tally: as from creditEntry,
+  // already including the entry that was just made. Inputs are not changed.
+  // Returns {kind: 'solved'|'conflict', text} or null while any cell is empty.
+  function completionFor(grid, tally) {
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) if (!grid[r][c]) return null;
+    }
+    if (findConflicts(grid).length) {
+      return { kind: 'conflict', text: 'Every cell is filled, but some numbers break the rules. Click Verify to see which.' };
+    }
+    var own = tally.naked.own + tally.hidden.own, hint = tally.naked.hint + tally.hidden.hint;
+    return { kind: 'solved', text: 'Puzzle solved! Singles applied: ' + own + ' on your own, ' + hint + ' with a hint.' };
+  }
+
   function tallyLines(tally) {
     function line(name, t) { return name + ' single: ' + t.own + ' on your own, ' + t.hint + ' with a hint'; }
     return ['Techniques applied in this puzzle', line('Naked', tally.naked), line('Hidden', tally.hidden)];
@@ -526,6 +541,9 @@
           showTally();
           if (credit.text) { status.textContent = credit.text; status.className = 'ok'; }
         }
+        // A value change that leaves a digit: announce a filled grid (grid and tally are after the change).
+        var done = cell.value ? completionFor(currentGrid(), tally) : null;
+        if (done) { status.textContent = done.text; status.className = done.kind === 'solved' ? 'ok' : 'fail'; }
       }
     }
 
@@ -712,7 +730,7 @@
     findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
     findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, hintFor: hintFor, hintApplied: hintApplied,
-    classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, tallyLines: tallyLines
+    classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, completionFor: completionFor, tallyLines: tallyLines
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (typeof window !== 'undefined') {
