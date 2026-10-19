@@ -11,6 +11,11 @@ Open `index.html` in a browser, or serve the folder:
 - On load, pick **Easy**, **Medium** or **Hard**. The chosen level is shown above the grid. **New puzzle** clears the grid and returns to the difficulty prompt.
 - Bold dark numbers are givens and cannot be changed.
 - Click an empty cell and type a digit 1-9. Other input (letters, 0, pasted or dropped multi-character text) is rejected and the cell keeps its previous value. Backspace or Delete clears the cell.
+- Keyboard: with a cell focused:
+  - Arrow keys move to the nearest cell that is not a given in that direction, in the same row or column. Cells holding your own value are valid targets. Givens are skipped and there is no wrapping (at the edge, or with only givens beyond, the focus stays put). Holding an arrow key auto-repeats.
+  - Arrow keys never change a value, a note, the Verify results or Notes mode.
+  - Press **N** (or `n`) to toggle Notes without leaving the cell; nothing is typed. Holding N toggles once (key auto-repeat is ignored).
+  - Ctrl/Cmd/Alt combinations keep their browser behaviour.
 - Click **Notes** to switch pencil-mark notes on (`Notes: On`) or off (`Notes: Off`). It starts Off for every puzzle.
   - Notes on, digit 1-9 in an empty cell: adds a small grey note in a fixed spot of a 3x3 mini-grid (1 top-left ... 9 bottom-right); typing it again removes it.
   - Notes on, Backspace or Delete: on an empty cell removes all its notes; on a cell holding your value, clears the value.
@@ -45,7 +50,8 @@ Requires Node 18+ (no packages needed):
 - `sudoku.js` - pure logic, exported for Node (and as `window.Sudoku`), plus the browser UI:
   - `generatePuzzle(level, {rng, maxMs})` -> `{level, puzzle, solution, givens}` (9x9 arrays, 0 = empty); `generateSolution(rng)`; `seededRng(seed)` for reproducible output; `countSolutions(grid, limit)`; `solvableBy(grid, 'naked'|'singles')`; `LEVELS`
   - `isValidSolution`, `findConflicts`, `verify`, `sanitizeDigit`, `buildGrid(puzzle, values)` (grid passed to verify; notes excluded)
+  - keyboard: `nextCell(puzzle, r, c, 'up'|'down'|'left'|'right')` -> `[r, c]` of the next editable cell (givens skipped, no wrap) or `null`
   - notes: `applyEntry(cell, key, notesMode)` (pure transition of `{value, notes}`, notes a bitmask with bit d = digit d), `noteDigits(mask)`
-- `tests/sudoku.test.js` - validation/verify/input/notes unit tests
+- `tests/sudoku.test.js` - validation/verify/input/notes/next-cell unit tests
 - `tests/generator.test.js` - generator tests (validity, uniqueness, givens bands, technique, determinism, timing; prints max/avg ms per level)
 - `tests/fixture.js` - a known-valid grid and puzzle used only as a test fixture
