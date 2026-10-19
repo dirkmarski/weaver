@@ -22,3 +22,17 @@
 
 ## Progress
 - Branch and work log created. Developer launched.
+- Developer (Claude Sonnet 5.5) delivered 3fd3739 (logic, refactor, tests), fd98421 (style) and 4a7aa93 (README). `node --test` 87/87 (12 new).
+  - Design: `findHiddenSingle` built on the shared `spotsFor`, `UNITS`/`CELL_UNITS`/`usedMask` and the new `UNIT_NAMES`. `hintFor` results carry `technique` and `unit`. `hintApplied` is technique-aware. The hint-digit marks are cleared in `clearResults`. The marks are a purple ring with a bold digit.
+  - Developer smoke test: 4 Medium puzzles solved by hints only (box and column units seen, no row), Easy solved with naked singles only, Hard reached the D1.5 text. 0 console errors.
+- Lead check: read the diff in full. Passed.
+  - `findHiddenSingle` matches D2/D3. "Can take D" via `usedMask` implies D is not in the unit. A single spot that includes p means p is the only spot.
+  - The `solvableBy` refactor is equivalent: `spotsFor` is empty when D is already in the unit, because every other empty cell of that unit then sees D.
+  - The naked-single texts are unchanged, and `findNakedSingle` is equivalent via `usedMask`.
+  - Step 2 recomputes from the same grid (notes excluded), so it lands on the same target.
+  - The reward is captured before `clearResults`.
+  - Flagged for the reviewer and tester:
+    - (a) The ascending-digit order has no unit test. A wrong but non-conflicting entry can make one cell the only spot for two digits, so it is testable.
+    - (b) Generator time under the 1 s cap after the refactor (`spotsFor` allocates arrays).
+    - (c) The README, sentence by sentence.
+- Reviewer and tester launched in parallel on 4a7aa93.
