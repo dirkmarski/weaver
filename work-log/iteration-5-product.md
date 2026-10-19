@@ -12,8 +12,8 @@
 - [x] Prototype: entry classifier with an independent brute-force candidate oracle (scratchpad/pm-proto5/proto.js) and a UI mock (scratchpad/pm-proto5/mock.png).
 - [x] Scope decided: one feature issue (below).
 - [x] Issue raised: #22 "Reward applying techniques: recognise naked and hidden singles you enter, with a per-puzzle tally" (https://github.com/dirkmarski/weaver/issues/22), label enhancement.
-- [ ] Delivery by the lead.
-- [ ] PM user acceptance.
+- [x] Delivery by the lead: PR #23 (branch issue-22-technique-rewards), 2 rounds; review APPROVE, test PASS (8,958 checks).
+- [x] PM user acceptance: **ACCEPTED** 2026-10-19 (https://github.com/dirkmarski/weaver/issues/22#issuecomment-6259053689). Merge is the lead's.
 
 ## Starting point (2026-10-19)
 main has generated Easy/Medium/Hard puzzles, Verify, notes, keyboard play and a Hint button that teaches naked singles (#16) and hidden singles (#19) with a nudge, an explanation and a "Well done!" message when the hinted digit is entered. No open issues or PRs.
@@ -68,3 +68,32 @@ Persistence, "learned" states, scores, streaks, badges; penalties for wrong entr
 ## Progress
 - 2026-10-19: context read, Pages re-checked, prototype and mock done, scope decided. Next: raise the issue, record the number here, commit and push, hand back to the lead.
 - 2026-10-19: #22 raised (body source: scratchpad/pm-proto5/issue.md). Handed back to the lead for delivery. Next PM step: user acceptance of #22 when the lead reports delivery (re-run scratchpad/pm-proto5/proto.js style oracle against the delivered `classifyEntry`, check texts verbatim, look at the screenshots as a learner, README sentence by sentence).
+
+## User acceptance of #22 (2026-10-19)
+Checked at PR #23 head 591dbf5 (code a89675a) in a detached worktree (scratchpad/pm-accept-22). `node --test` 100/100.
+
+- Code read against E1-E3, E5, E6. The paste/drop fallback restores the old value before `enter`, so `currentGrid()` is the grid before the entry on every path. Notes mode never sets a value. The tally resets on level choice and is hidden on New puzzle.
+- Independent oracle (scratchpad/pm-proto5/accept22.js and accept22b.js; brute-force candidates and own conflict check):
+  - `classifyEntry`: 620,841 checks (36 puzzles, every cell x digits 0-10 at every step, plus conflict grids), 0 mismatches.
+  - `creditEntry`/`tallyLines`: 6,070 session decisions with hints, wrong digits, overwrites, clears and re-entries, 0 mismatches. Inputs were never changed.
+  - The texts are compared byte for byte with strings built from the E3/E4/E5 wording.
+- By hand: 4 entries on Medium seed 42 (naked, box, row, column; the row and column cases needed the earlier units to have 2 spots), and 3 tester screenshots (hidden box, naked, hinted naked). All correct.
+- Own mutations: box/row swap, row/column swap, naked precedence, repeat credit, filled-cell rule. All caught by the tests.
+- Screenshots as a learner: clear, calm, and the reward names the technique and unit (it teaches as well as rewards). The block is absent on the prompt.
+- README sentence by sentence: all literally true.
+- Decision: **ACCEPTED**, no conditions. Note: the status-line layout shift is more visible now that the tally sits below it.
+
+## Lessons
+- Specifying the pure decision function's signature in the issue (E6) made independent oracle checking cheap; I will keep doing this.
+- "Every ordering rule must be pinned" plus reviewer mutation checks worked again. Round 1 still found a vacuous assertion (S1), so the reviewer mutation step remains essential.
+- A random noisy session simulation stalls in conflict states. Oracle sessions need low noise to exercise the credit paths (my first run gave only 4 hint credits).
+
+## Next-iteration candidates (ordered)
+1. **Persistent progress / "learned" state per technique** across puzzles (localStorage, with a reset). This is the next reward step now that per-puzzle recognition exists. Needs a definition of "learned" (e.g. N on-your-own applications across M puzzles).
+2. **Next technique tier** (pointing pairs, then naked pairs) so Hard becomes teachable. The hint step currently says "needs another technique" on Hard.
+3. **Stable status-line height** (layout shift), more visible now with the tally below. Small polish; it could be bundled with 1.
+4. Technique explainer page. Later, after feedback.
+5. Pages: still 404, needs Dirk (admin). Real user feedback remains the biggest gap after five iterations.
+
+## Iteration status
+From the PM side, iteration 5 is complete once the lead merges PR #23 and closes #22.
