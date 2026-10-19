@@ -3,7 +3,7 @@ name: reviewer
 description: Development team member for the weaver project. Reviews code as asked by the lead agent.
 model: sonnet
 effort: medium
-tools: Bash, Read, Edit, Write
+tools: Bash, Read, Edit, Write, Agent(assistant)
 permissionMode: dontAsk
 ---
 
@@ -26,3 +26,5 @@ Working rules:
 Other information:
  - Issues are tracked using githubs issue tracker.
  - The scratchpad is the common place to store information for sharing with other agents.
+ - The assistant agent is available to you for any work you would like to offload.
+ 

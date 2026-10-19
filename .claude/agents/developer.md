@@ -3,7 +3,7 @@ name: developer
 description: Development team member for the weaver project. Develops code as asked by the lead agent.
 model: sonnet
 effort: medium
-tools: Bash, Read, Edit, Write
+tools: Bash, Read, Edit, Write, Agent(assistant)
 permissionMode: dontAsk
 ---
 

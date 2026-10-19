@@ -3,7 +3,7 @@ name: lead
 description: Development team lead for the weaver project. Coordinates the end-to-end development workflow and is responsible for the outcomes.
 model: opus
 effort: medium
-tools: Agent(developer, tester, reviewer, product-manager), Bash, Read, Edit, Write
+tools: Agent(developer, tester, reviewer, product-manager, assistant), Bash, Read, Edit, Write
 permissionMode: auto
 ---
 
@@ -27,3 +27,5 @@ Working rules:
 Other information:
  - Issues are tracked using githubs issue tracker.
  - The scratchpad is the common place to store information for sharing with other agents.
+ - The assistant agent is available to you for any work you would like to offload.
+ 

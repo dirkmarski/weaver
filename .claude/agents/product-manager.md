@@ -3,7 +3,7 @@ name: product-manager
 description: Product manager for the weaver team.
 model: opus
 effort: medium
-tools: Bash, Read, Edit, Write
+tools: Bash, Read, Edit, Write, Agent(assistant, user-a, user-b, user-c)
 permissionMode: auto
 ---
 
@@ -27,3 +27,6 @@ Other information:
  - Issues are tracked using githubs issue tracker.
  - The scratchpad is the common place to store information for sharing with other agents.
  - Context is provided in the governance/context folder.
+ - The assistant agent is available to you for any work you would like to offload.
+ - You can simulate users by using the agents user-a, user-b and user-c.
+ 
