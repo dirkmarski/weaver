@@ -20,3 +20,19 @@
 
 ## Progress
 - Branch and work log created. Developer launched.
+- Developer (Claude Sonnet 5.5) delivered c38a10a, with 75/75 tests (13 new):
+  - Pure functions `findNakedSingle`, `hintFor(grid, step)` and `hintApplied(hint, value)`.
+  - `clearResults` now also clears the hint state and its classes, so every H8 path is covered through one function.
+  - `setCell` captures the reward before it clears.
+  - A shared `currentGrid()` is used by both Verify and Hint.
+  - Styles: amber target with an inset ring, amber tint over the row, column and box.
+  - README: Hint section plus the 3 fixes from #14.
+  - Developer smoke test: the Easy puzzle was solved using hints only (43 cells) and then showed "Solved!", with 0 console errors.
+- Lead check: read the diff in full.
+  - The H8 paths are all covered: a value change in setCell (including Backspace clearing a value), Verify, choose and newPuzzle all call clearResults.
+  - `hint` is scoped to render.
+  - Step 2 recomputes from the current grid. Notes do not change that grid, so the same target is chosen.
+  - The digit, Backspace, paste, arrow and N paths are unchanged.
+  - Tests: 75/75. Passed.
+  - Flagged for the reviewer: the README line "Any change to a value clears the red flags and the message" against the H7 reward, which is a message shown after a value change.
+- Reviewer and tester launched in parallel on c38a10a.
