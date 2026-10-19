@@ -22,3 +22,12 @@ developer -> lead check -> reviewer + tester in parallel -> rework if needed (fu
 - Test counts: `node --test` 128 tests, 128 pass, 0 fail (was 122 before this issue; 6 new tests, 2 existing ones updated).
 - E3 (headless Chrome via CDP; script kept in the scratchpad, not in the repo): `node /private/tmp/claude-502/-Users-dirk-Code-weaver-team/246ca1dd-69c1-44b3-80a4-65e176ec6193/scratchpad/dom31/check.js /private/tmp/claude-502/-Users-dirk-Code-weaver-team/246ca1dd-69c1-44b3-80a4-65e176ec6193/scratchpad/wt-31` (Easy seed 3; page Math.random seeded like the #30 check). Result: 25 PASS, 0 FAIL, no page errors. Checked: a non-single entry shows (a) byte for byte with status class `''` and 0 cells with the `conflict` class, tallies 0/0, nothing highlighted; a notes change keeps the line; clearing a value clears it; a self-clash entry is (a) with no red cell; the next entry elsewhere (even with the solution digit) shows (b), class `''`, no `conflict` class, tally unchanged; Verify then replaces it and flags red; filling the last cell with the solution digit shows "Puzzle solved! ..." (class `ok`), with a wrong digit shows "Every cell is filled, but some numbers break the rules. ..." (class `fail`, no `conflict` class); Hint, New puzzle and choosing a level clear the line.
 - README: the "neither applies" bullet (now with both quoted texts), the "Any change to a value clears..." sentence, the `creditEntry` Files entry, the "Any other value change removes the hint" sentence, the "This message replaces ..." sentence (now also "not counted", and "A rewarded entry is still counted"), the counts paragraph (re-entry of a non-single), and the PM's Hint wording fix ("it follows the naked-single order above"). Each sentence re-read against the code.
+
+## Lead check after developer round 1 (head 1180dca)
+- The developer is Claude Sonnet 5.5. It made commits d86861e, 50b52e1 and 1180dca.
+- `node --test` passes 128/128 (lead re-ran it).
+- The diff is minimal: a `notCounted` helper and a neutral class in setCell.
+- Questions for the review:
+  - (Q1) The status class is chosen by the regex `/^Entered: /` on the text. That couples the UI to the wording. Is it acceptable, or should creditEntry expose a kind? The existing deep-equal tests are the developer's reason not to add a field.
+  - (Q2) Can a hint be showing while the grid has a conflict? If so, "Well done!" would win over (b). Is that consistent with rule 1?
+- Reviewer and tester launched in parallel.
