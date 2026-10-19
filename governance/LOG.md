@@ -2,6 +2,11 @@
 
 ## Entries (newest first)
 
+### Testing grows out of proportion to the product
+- **Seen:** 2026-10-19
+- **Means:** Testing is getting out of control. Each iteration's lessons become the next iteration's quality gates, and nothing ever removes one. By iteration 7 the product manager's acceptance of one small hint change ran 168,872 automated checks, which is off the charts for an app like this. Cost per iteration went from about $3.60 to $13.55 over seven iterations. Nothing in the definitions or the context mentions cost or proportion, so the team has no reason to stop.
+- **Response:** Pending: set a proportion or cost lever before the next iteration.
+
 ### The lead's agent list cascades to the whole team
 - **Seen:** 2026-10-19
 - **Means:** The top-level agent's list of agents it may launch decides which agents exist for everyone in the session. The product manager was allowed to launch the test users, but they did not exist for it because the lead's list did not name them. A permission set on the lead caps what every agent below it can do.
