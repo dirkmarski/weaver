@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, tallyLines, generatePuzzle, seededRng } = require('../sudoku.js');
+const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, seededRng } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
 const clone = () => SOLUTION.map((r) => r.slice());
@@ -518,6 +518,15 @@ test('hintFor: hidden single explain text for box, row and column', () => {
   assert.strictEqual(hintFor(H_COL, 2).text, 'Hidden single: row 1, column 6 must be 4, because every other empty cell in its column already has a 4 in its row or box.');
 });
 
+test('hintFor: hidden single explain text uses "an" before 8 and "a" before 7 and 9', () => {
+  const relabel = (d) => H_BOX.map((row) => row.map((v) => (v === 5 ? d : v === d ? 5 : v)));
+  const text = (d, a) => 'Hidden single: row 5, column 6 must be ' + d + ', because every other empty cell in its box already has ' + a + ' ' + d + ' in its row or column.';
+  assert.strictEqual(hintFor(relabel(8), 2).text, text(8, 'an'));
+  assert.strictEqual(hintFor(relabel(8), 2).text, 'Hidden single: row 5, column 6 must be 8, because every other empty cell in its box already has an 8 in its row or column.');
+  assert.strictEqual(hintFor(relabel(7), 2).text, text(7, 'a'));
+  assert.strictEqual(hintFor(relabel(9), 2).text, text(9, 'a'));
+});
+
 test('hintApplied: hidden single reward text for box, row and column', () => {
   assert.strictEqual(hintApplied(hintFor(H_BOX, 1), '5'), 'Well done! You applied a hidden single: row 5, column 6 is 5.');
   assert.strictEqual(hintApplied(hintFor(H_ROW, 2), '6'), 'Well done! You applied a hidden single: row 4, column 7 is 6.');
@@ -705,4 +714,86 @@ test('tallyLines: heading and two lines, including zeros', () => {
     'Naked single: 3 on your own, 12 with a hint',
     'Hidden single: 1 on your own, 0 with a hint'
   ]);
+});
+
+// ---- completionFor (issue #25) ----
+const SOLVED_0 = 'Puzzle solved! Singles applied: 0 on your own, 0 with a hint.';
+const CONFLICT_TEXT = 'Every cell is filled, but some numbers break the rules. Click Verify to see which.';
+const MIXED = { naked: { own: 3, hint: 2 }, hidden: { own: 1, hint: 4 } };
+
+test('completionFor: any empty cell gives null, wherever it is', () => {
+  const t = emptyTally();
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      const g = clone();
+      g[r][c] = 0;
+      assert.strictEqual(completionFor(g, t), null, 'empty at ' + r + ',' + c);
+    }
+  }
+  assert.strictEqual(completionFor(PUZZLE, t), null);
+  assert.strictEqual(completionFor(emptyGrid(), t), null);
+});
+
+test('completionFor: an empty cell wins over a conflict (null, never conflict or solved)', () => {
+  const g = clone();
+  g[0][1] = g[0][0]; // clash in row 0 and box 0
+  g[8][8] = 0;
+  assert.ok(findConflicts(g).length > 0);
+  assert.strictEqual(completionFor(g, MIXED), null);
+});
+
+test('completionFor: full valid grid says solved with exact text', () => {
+  assert.deepStrictEqual(completionFor(clone(), emptyTally()), { kind: 'solved', text: SOLVED_0 });
+  assert.strictEqual(completionFor(clone(), MIXED).kind, 'solved');
+  assert.strictEqual(completionFor(clone(), MIXED).text, 'Puzzle solved! Singles applied: 4 on your own, 6 with a hint.');
+});
+
+test('completionFor: own and hint sums are kept apart; same wording for 0, 1 and many', () => {
+  const t = (nO, nH, hO, hH) => ({ naked: { own: nO, hint: nH }, hidden: { own: hO, hint: hH } });
+  assert.strictEqual(completionFor(clone(), t(1, 0, 0, 0)).text, 'Puzzle solved! Singles applied: 1 on your own, 0 with a hint.');
+  assert.strictEqual(completionFor(clone(), t(0, 1, 0, 0)).text, 'Puzzle solved! Singles applied: 0 on your own, 1 with a hint.');
+  assert.strictEqual(completionFor(clone(), t(0, 0, 1, 0)).text, 'Puzzle solved! Singles applied: 1 on your own, 0 with a hint.');
+  assert.strictEqual(completionFor(clone(), t(0, 0, 0, 1)).text, 'Puzzle solved! Singles applied: 0 on your own, 1 with a hint.');
+  assert.strictEqual(completionFor(clone(), t(30, 0, 10, 0)).text, 'Puzzle solved! Singles applied: 40 on your own, 0 with a hint.');
+  assert.strictEqual(completionFor(clone(), t(12, 13, 14, 15)).text, 'Puzzle solved! Singles applied: 26 on your own, 28 with a hint.');
+});
+
+test('completionFor: a full grid with a conflict says conflict, never solved, whatever the tally', () => {
+  const row = clone(); row[0][1] = row[0][0];  // clash in a row
+  const col = clone(); col[0][0] = col[1][0];  // clash in a column
+  for (const g of [row, col]) {
+    assert.ok(findConflicts(g).length > 0);
+    for (const t of [emptyTally(), MIXED]) {
+      assert.deepStrictEqual(completionFor(g, t), { kind: 'conflict', text: CONFLICT_TEXT });
+    }
+  }
+});
+
+test('completionFor: does not change grid or tally', () => {
+  const t = JSON.parse(JSON.stringify(MIXED)), tj = JSON.stringify(t);
+  const bad = clone(); bad[0][1] = bad[0][0];
+  const part = clone(); part[4][4] = 0;
+  for (const g of [clone(), bad, part]) {
+    const gj = JSON.stringify(g);
+    completionFor(g, t);
+    assert.strictEqual(JSON.stringify(g), gj);
+    assert.strictEqual(JSON.stringify(t), tj);
+  }
+});
+
+test('completionFor: the last entry is counted first, so the final single is in O', () => {
+  const g = clone(); g[4][4] = 0; // the last empty cell: a naked single
+  const before = emptyTally();
+  const res = creditEntry(before, {}, null, g, 4, 4, String(SOLUTION[4][4]));
+  assert.strictEqual(res.tally.naked.own + res.tally.hidden.own, 1);
+  assert.strictEqual(completionFor(clone(), res.tally).text, 'Puzzle solved! Singles applied: 1 on your own, 0 with a hint.');
+  // With the tally from before the entry the final single would be missing.
+  assert.strictEqual(completionFor(clone(), before).text, SOLVED_0);
+});
+
+test('TECHNIQUE_DEFINITIONS: the two texts, byte for byte', () => {
+  assert.deepStrictEqual(TECHNIQUE_DEFINITIONS, {
+    naked: 'Only one digit fits this cell: its row, column and box already hold the other eight.',
+    hidden: 'This digit fits in only one cell of a row, column or box, even if that cell could take other digits.'
+  });
 });

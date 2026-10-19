@@ -225,7 +225,7 @@
     } else if (step === 2) {
       var others = { box: 'row or column', row: 'column or box', column: 'row or box' }[s.unit];
       text = 'Hidden single: ' + where + ' must be ' + s.digit + ', because every other empty cell in its ' + s.unit
-        + ' already has a ' + s.digit + ' in its ' + others + '.';
+        + ' already has ' + (s.digit === 8 ? 'an ' : 'a ') + s.digit + ' in its ' + others + '.';
     } else {
       text = 'Hint: ' + where + ' is a hidden single: in its ' + s.unit + ', one of the missing digits fits only in this cell. '
         + 'Check where each missing digit can go in the ' + s.unit + '. Click Hint again to see why.';
@@ -300,6 +300,27 @@
     cr[p] = true;
     return { tally: t, credited: cr, text: text };
   }
+
+  // Decides what to announce once a value change has been made.
+  // grid: givens plus entered values (0 = empty); tally: as from creditEntry,
+  // already including the entry that was just made. Inputs are not changed.
+  // Returns {kind: 'solved'|'conflict', text} or null while any cell is empty.
+  function completionFor(grid, tally) {
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) if (!grid[r][c]) return null;
+    }
+    if (findConflicts(grid).length) {
+      return { kind: 'conflict', text: 'Every cell is filled, but some numbers break the rules. Click Verify to see which.' };
+    }
+    var own = tally.naked.own + tally.hidden.own, hint = tally.naked.hint + tally.hidden.hint;
+    return { kind: 'solved', text: 'Puzzle solved! Singles applied: ' + own + ' on your own, ' + hint + ' with a hint.' };
+  }
+
+  // Plain-language definitions shown under the tally lines (they never change during a puzzle).
+  var TECHNIQUE_DEFINITIONS = {
+    naked: 'Only one digit fits this cell: its row, column and box already hold the other eight.',
+    hidden: 'This digit fits in only one cell of a row, column or box, even if that cell could take other digits.'
+  };
 
   // The heading and the two lines shown for a tally.
   function tallyLines(tally) {
@@ -482,7 +503,10 @@
     function showTally() {
       var lines = tallyLines(tally);
       tallyBox.querySelector('h2').textContent = lines[0];
-      tallyBox.querySelectorAll('p').forEach(function (el, i) { el.textContent = lines[i + 1]; });
+      document.getElementById('tally-naked').textContent = lines[1];
+      document.getElementById('tally-hidden').textContent = lines[2];
+      document.getElementById('definition-naked').textContent = TECHNIQUE_DEFINITIONS.naked;
+      document.getElementById('definition-hidden').textContent = TECHNIQUE_DEFINITIONS.hidden;
     }
 
     // Clears the status line, the Verify flags and any showing hint.
@@ -526,6 +550,10 @@
           showTally();
           if (credit.text) { status.textContent = credit.text; status.className = 'ok'; }
         }
+        // A value change that leaves a digit: announce a filled grid (grid and tally are after the change).
+        // (the cell.value guard is defensive: an empty cell leaves a 0 in the grid, so completionFor is null anyway)
+        var done = cell.value ? completionFor(currentGrid(), tally) : null;
+        if (done) { status.textContent = done.text; status.className = done.kind === 'solved' ? 'ok' : 'fail'; }
       }
     }
 
@@ -712,7 +740,8 @@
     findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
     findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, hintFor: hintFor, hintApplied: hintApplied,
-    classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, tallyLines: tallyLines
+    classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, completionFor: completionFor, tallyLines: tallyLines,
+    TECHNIQUE_DEFINITIONS: TECHNIQUE_DEFINITIONS
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (typeof window !== 'undefined') {
