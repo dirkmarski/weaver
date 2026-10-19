@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid } = require('../sudoku.js');
+const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
 const clone = () => SOLUTION.map((r) => r.slice());
@@ -239,4 +239,53 @@ test('buildGrid accepts the UI shape: given cells have no input and yield "" in 
     if (v) assert.strictEqual(grid[i][j], v);
     else assert.strictEqual(grid[i][j], i === r && j === c ? 7 : 0);
   }));
+});
+
+// nextCell: 0 = editable, nonzero = given.
+const NC = [
+  [0, 5, 0, 6, 7, 8, 9, 1, 2],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [3, 0, 0, 0, 0, 0, 0, 0, 0],
+  [4, 0, 0, 0, 0, 0, 0, 0, 0],
+  [5, 0, 0, 0, 0, 0, 0, 0, 0],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0],
+  [2, 0, 0, 0, 0, 0, 0, 0, 0],
+  [6, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0]
+];
+
+test('nextCell moves one step in every direction', () => {
+  assert.deepStrictEqual(nextCell(NC, 4, 4, 'up'), [3, 4]);
+  assert.deepStrictEqual(nextCell(NC, 4, 4, 'down'), [5, 4]);
+  assert.deepStrictEqual(nextCell(NC, 4, 4, 'left'), [4, 3]);
+  assert.deepStrictEqual(nextCell(NC, 4, 4, 'right'), [4, 5]);
+});
+
+test('nextCell skips one given', () => {
+  assert.deepStrictEqual(nextCell(NC, 0, 0, 'right'), [0, 2]);
+  assert.deepStrictEqual(nextCell(NC, 0, 2, 'left'), [0, 0]);
+});
+
+test('nextCell skips several givens', () => {
+  assert.deepStrictEqual(nextCell(NC, 1, 0, 'down'), [8, 0]);
+  assert.deepStrictEqual(nextCell(NC, 8, 0, 'up'), [1, 0]);
+  assert.deepStrictEqual(nextCell(NC, 0, 0, 'down'), [1, 0]);
+});
+
+test('nextCell does not wrap at the edges', () => {
+  assert.strictEqual(nextCell(NC, 8, 4, 'down'), null);
+  assert.strictEqual(nextCell(NC, 1, 0, 'left'), null);
+  assert.strictEqual(nextCell(NC, 1, 8, 'right'), null);
+  assert.strictEqual(nextCell(NC, 0, 2, 'up'), null);
+});
+
+test('nextCell returns null when only givens are left in that direction', () => {
+  assert.strictEqual(nextCell(NC, 0, 2, 'right'), null);
+  assert.strictEqual(nextCell(NC, 0, 0, 'left'), null);
+});
+
+test('nextCell from a cell surrounded by givens finds nothing', () => {
+  const g = NC.map(row => row.map(() => 1));
+  g[4][4] = 0;
+  for (const d of ['up', 'down', 'left', 'right']) assert.strictEqual(nextCell(g, 4, 4, d), null);
 });
