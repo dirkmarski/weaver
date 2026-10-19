@@ -43,3 +43,56 @@ Tester: Claude Sonnet 5.5 (claude-sonnet-5-5). Head tested: 2775392. Baseline: m
 - Screenshots (`/private/tmp/claude-502/-Users-dirk-Code-weaver-team/246ca1dd-69c1-44b3-80a4-65e176ec6193/scratchpad/shots31/branch-*.png`: a, b, welldone, solved, fullconflict; desktop and mobile). As a learner: the line is plain dark body text, not green and not red, nothing lit on the grid, and it reads as information ("Entered: ... not counted"), not praise or blame. (b) tells me to click Verify. Observation only, not a defect: at 375x800 the status line sits just under the buttons, partly below the fold (the same place as Hint messages), and wraps to 3 lines.
 - README, checked by hand against observed behaviour: the "neither applies" bullet and both quoted texts match the runtime byte for byte; "does not say whether the digit is right / does not point out a clash" true (self-clash gives (a), no red); "Neither message changes a count, flags a cell red or highlights anything" true; "Filling the grid ... replaces ... 'not counted'" true; re-entry sentence true (non-single re-entry shows (a)/(b), counts unchanged); "Any change to a value clears ..." sentence true, including overwrite, clear and Notes on showing nothing new; "Any other value change removes the hint (and may show ...)" true; `creditEntry` Files entry true (text '' only when not judged). PM's wording fix present: "If there is none, it follows the naked-single order above." No leftover "Nothing is said about why" or blank-message claims.
 - Concerns (not defects): the UI picks the neutral class with a regex on "Entered: " (the developer flagged this); it works, and any future message starting with that prefix would be neutral. A hint cannot be showing together with a conflict (Hint then reports the conflict), so (b) never competes with "Well done!".
+
+## Review round 1
+- Reviewer: Claude Sonnet 5.5, session `246ca1dd-69c1-44b3-80a4-65e176ec6193`. Reviewed head 2775392 against base 8d92cfd.
+- Verdict: **APPROVE** (no Blocking findings; two Should-fix items that can be done in this round or accepted as follow-up at the lead's choice).
+
+### Checked
+- Rules 1-9 and edge cases line by line against `creditEntry`, `notCounted`, `setCell`: correct. Texts (a)/(b) byte-equal to the issue. (b) is tested on the grid before the entry (`findConflicts(grid)` before any write); a self-clash with a clean grid gives (a). Order in `creditEntry`: not-judged guard, hint match ("Well done!"), classify, (a)/(b). `none` is returned for value `''`, non-digit and a filled cell. Tally and `credited` are returned as the same objects (not mutated). Completion message is written after the credit line, so rule 5 holds. `clearResults` unchanged, so rule 6 holds.
+- `node --test`: 128/128 pass.
+- Frozen baseline: `creditEntry` and `classifyEntry` in `tests/frozen-sudoku-e81999c.js` are byte-identical to main 8d92cfd (diffed), so the E2 baseline is valid even though the file name predates #30.
+- Mutation check (copy of the repo with one change each; unit = `node --test`, dom = developer's `check.js`):
+
+| Mutant | unit | dom |
+| --- | --- | --- |
+| conflict tested on grid after the entry | killed | killed |
+| (a)/(b) swapped | killed | killed |
+| `grid[r][c] !== 0` guard removed | killed | n/a (UI never calls it) |
+| `!digit` guard removed (value `''`/non-digit judged) | killed | n/a |
+| hint match ignored (no "Well done!" precedence) | killed | n/a |
+| credited cell re-entry silent | killed | n/a |
+| (a) text loses its full stop | killed | killed |
+| (a) changes the tally | killed | killed |
+| classifyEntry ignores a prior conflict | killed | killed |
+| status class `ok` / `fail` for the neutral line | survived | killed |
+| regex anchor broken (always `ok`) | survived | killed |
+| completion no longer overrides the line | survived | killed |
+| **neutral class applied to rewards too (`'' : ''`)** | **survived** | **survived** |
+
+### Findings
+- Blocking: none.
+- Should-fix 1 (test gap, UI wiring): a mutant that makes the status class `''` for every message, i.e. rewards ("Well spotted!"/"Well done!") lose their green `ok` class, survives both the unit tests and `check.js`. The UI wiring (class choice, completion override) has no test in the repo at all; it is only covered by the headless script, which is outside the repo and does not assert that a rewarded entry still has class `ok`. Add one assertion to the E3 headless check (a single entered on its own shows "Well spotted!" with class `ok`) and re-record. No repo change is required for that; if the lead wants repo coverage, the class choice would need to move into a testable function.
+- Should-fix 2 (README, rule 10 literal truth): README lines 43-44 say that an entry that is the only digit that fits (or the only place in a unit) shows "Well spotted! ..."; line 46 then starts "If neither applies, ...", and its (b) bullet says "(whatever the digit)". Read literally, a single entered while the grid before already has a conflict "applies" in lines 43-44 but shows (b) in the code. The old text covered this with "or if some numbers elsewhere in the grid break the rules". Suggest adding to lines 43 and 44 "(and no numbers in the grid just before the entry break the rules)", or starting line 46 with "If neither applies, or if some numbers in the grid just before the entry break the rules, ...".
+- Nit 1: trailing space after `assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '1').text, NOT_SINGLE(5, 6, 1)); ` in `tests/sudoku.test.js` (rule 5 test, last line).
+- Nit 2: the Files entry in README for `creditEntry` is a very long single line; unchanged style, fine.
+
+### Lead questions
+- Q1 (regex `/^Entered: /`): acceptable for the MVP. It is private to `setCell`, both texts are pinned byte for byte by unit tests, and a `kind` field would force changes to the existing `deepStrictEqual({tally, credited, text})` tests. The failure mode of a future reward/neutral text with another prefix is a green neutral line, a visible, low-risk error. A `kind` field is the cleaner design if more neutral texts arrive; not needed now. Do add the Should-fix 1 assertion so the wiring is guarded.
+- Q2 (hint showing with a conflict): no. Traced in `sudoku.js`: `hint` is assigned only at the Hint click handler and only when `hintFor` returns `nudge` or `explain`, and `hintFor` returns `conflict` for any conflicting grid. Values change only through `setCell`, and every changed value calls `clearResults()` which sets `hint = null` before the next judgement. Givens cannot change; notes changes do not alter the grid. So a showing hint always matches the current grid, which has no conflict; "Well done!" can never mask (b) in the UI. Only a direct `creditEntry` call with a hand-made hint on a conflicting grid could, which is a test-only path. Rule 1/8 are consistent.
+
+### README: sentence by sentence
+- "follows the naked-single order above" (PM fix): true (falls back to the naked-single order, then hidden, then the no-single message).
+- "(and may show a "Well spotted!" message or a "not counted" message, see below)": true.
+- "If neither applies, nothing is rewarded and nothing is counted ... plain style of a Hint message (not green, not red)": true for nudge/explain (class `''`); see Should-fix 2 for the structure.
+- (a) bullet: text byte-equal; "does not say whether the digit is right", "does not point out a clash the entry itself creates": true.
+- (b) bullet: text byte-equal; "whatever the digit": true.
+- "Neither message changes a count, flags a cell red or highlights anything": true.
+- "This message replaces any ... 'not counted' text ... A rewarded entry is still counted": true.
+- Counts paragraph re-entry parenthesis: true (credited cell + non-single gives (a)/(b), no count change).
+- "Any change to a value clears ... " sentence: true, including overwrite, clear and Notes on showing no new message.
+- Files entry for `creditEntry`: true (reward, (a)/(b) with tally and credited unchanged, `''` when value `''`/non-digit or cell holds a value).
+- Search of the whole README for "blank", "silent", "Nothing is said", "no message", "nothing is shown": no remaining sentence implies a blank message after a judged entry.
+
+### Test quality (E2)
+- Independent: baseline is the frozen module (verified identical), the clash check in the test is a pairwise row/column/box check not using `findConflicts` or `classifyEntry`. 220 puzzles (110 Easy, 110 Medium), seeded; mix of solution digits, random digits, `''`/`0`/`x`/`12`, hint present or not, cells cleared again. The asserts require counts same > 300, (a) > 500, (b) > 100, non-judged > 50; developer reports 2399 / 4359 / 10817 / 1989, so (a) is exercised thoroughly and not only (b). Inputs not mutated is asserted per call.
