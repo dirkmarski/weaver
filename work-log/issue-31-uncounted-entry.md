@@ -115,3 +115,12 @@ Tester: Claude Sonnet 5.5 (claude-sonnet-5-5). Head tested: 2775392. Baseline: m
 - S2: README "neither applies" bullet now starts "If neither applies, or if some numbers in the grid just before the entry break the rules, nothing is rewarded and nothing is counted, ...". The Well spotted bullets are unchanged. The two sub-bullets that follow (no conflict gives (a); conflict gives (b), whatever the digit) still hold.
 - N1: trailing space removed from the last assert line of the rule 7 test.
 - `node --test`: 128/128 pass.
+
+## Test round 2
+- Tester: Claude Sonnet 5.5, session `246ca1dd-69c1-44b3-80a4-65e176ec6193`. Head tested: eff80bd, fresh detached worktree of origin/issue-31-uncounted-entry.
+- Change since round 1 (1b04c45..eff80bd) outside the work log: README.md (1 line, the "If neither applies, or if some numbers ... break the rules" sentence) and tests/sudoku.test.js (trailing space only). No code change in sudoku.js or index.html, so behaviour is as in round 1.
+- `node --test`: 128/128 pass.
+- Independent oracle (`.../scratchpad/oracle31b.js`, same as oracle31.js pointed at the new worktree): 330 seeded puzzles (Easy, Medium, Hard), 73,741 checks, 0 mismatches.
+- Headless Chrome, real index.html, desktop and 375px (`.../scratchpad/browser31b.js`): 61 PASS, 0 FAIL, 0 console errors. Both "Well spotted!" (naked single on own) and "Well done!" (hinted digit) are asserted to have the green `ok` class (already present in browser31.js; "Puzzle solved!" also asserted ok). New case added: with a self-clash on the grid, a digit that is a single in the grid is entered; the status is exactly the (b) text, class empty (neutral, nudge colour), no "Well" text, no red cell, nothing highlighted, tallies 0/0, i.e. nothing rewarded, nothing counted, not unanswered.
+- README Rewards section re-read sentence by sentence: all match, including the new sentence ("If neither applies, or if some numbers in the grid just before the entry break the rules, nothing is rewarded and nothing is counted, but the entry is not left unanswered"), the (a) and (b) texts, the neutral style, the last-cell exception, the hint-showing rules and the "Neither message changes a count, flags a cell red or highlights anything" line.
+- Verdict: PASS, no defects.
