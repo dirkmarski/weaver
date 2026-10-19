@@ -33,7 +33,7 @@ Open `index.html` in a browser, or serve the folder:
   - Enter the hinted digit in that cell (Notes off) and the highlight goes away and "Well done!" is shown. Any other value change just removes the hint.
   - If some numbers break the rules, Hint says so and asks you to click Verify; if every cell is filled, it says so; if no naked single exists, it says another technique is needed. In these cases nothing is highlighted.
   - The hint (highlight and message) is removed by any change to a value, by **Verify**, by **New puzzle** and by choosing a level. Changing notes keeps it. Clicking Hint also clears any red flags and message before showing its own.
-- Any change to a value clears the red flags and the message. There is no live checking.
+- Any change to a value clears the red flags and the message (entering the hinted digit shows "Well done!" instead of a blank message). There is no live checking.
 
 ## Difficulty levels
 Each puzzle is a random complete grid with cells removed in random order; a cell stays removed only if the solution remains unique (and, for Easy/Medium, still solvable by the level's technique). After removal the puzzle is graded: Medium and Hard puzzles that are still solvable by the lower level's technique are discarded and a new puzzle is generated, so each level needs something the one below does not.

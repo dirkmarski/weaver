@@ -321,6 +321,9 @@ test('findNakedSingle: picks the first in reading order among several', () => {
 test('findNakedSingle: PUZZLE fixture first naked single in reading order', () => {
   const s = findNakedSingle(PUZZLE);
   assert.ok(s);
+  assert.strictEqual(s.r, 4);
+  assert.strictEqual(s.c, 4);
+  assert.strictEqual(s.digit, 5);
   assert.strictEqual(s.digit, SOLUTION[s.r][s.c]);
   assert.strictEqual(s.seen.length, 8);
 });

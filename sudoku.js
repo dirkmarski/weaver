@@ -125,7 +125,6 @@
   // a naked single is found). Returns { kind, r, c, digit, text } where kind is
   // 'conflict' | 'full' | 'none' | 'nudge' | 'explain' (r/c 0-based, set for the last two).
   function hintFor(grid, step) {
-    var text;
     if (findConflicts(grid).length) {
       return { kind: 'conflict', text: 'Some numbers break the rules. Fix them first: click Verify to see which.' };
     }
@@ -135,6 +134,7 @@
       return { kind: 'none', text: 'No naked single right now. At this point the puzzle needs another technique.' };
     }
     var where = 'row ' + (s.r + 1) + ', column ' + (s.c + 1);
+    var text;
     if (step === 2) {
       text = 'Naked single: ' + where + ' must be ' + s.digit + ', because its row, column and box already contain '
         + s.seen.slice(0, -1).join(', ') + ' and ' + s.seen[7] + '.';
