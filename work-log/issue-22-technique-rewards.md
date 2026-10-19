@@ -55,3 +55,9 @@
   - Scope: S1 (pin the filled-cell rule with a test), N1 (`bitCount`), N2 (README count sentence literally true, plus the Files entry for the tests).
   - Not taken: the tester's notes observation (existing behaviour, out of scope).
   - Gates: full re-review and full re-test.
+- Round 2 delivery (developer, Claude Sonnet 5.5): a89675a.
+  - S1: new assertion `classifyEntry(H_BOX, 0, 3, 3) === null`. Mutation check: removing the filled check fails exactly that test.
+  - N1: `bitCount(used & ~1) === 8`. `usedMask` sets bit 0 for empty cells, so a plain `bitCount(used)` would be wrong. The developer caught this through failing tests.
+  - N2: the README count sentence now has once-per-cell built in, and the Files entry mentions the reward tests.
+  - `node --test` 100/100.
+- Lead check: diff read. `used & ~1` keeps bits 1-9 only, which is equivalent to the old loop. Only the in-scope items changed. Passed. Full re-review and full re-test launched in parallel.
