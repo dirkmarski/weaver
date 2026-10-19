@@ -65,3 +65,6 @@
   - N4: API wording.
   - `node --test` 88/88.
 - Lead check: diff read. Only the in-scope items changed. Passed. Full re-review and full re-test launched in parallel.
+- Round 2 review: APPROVE (https://github.com/dirkmarski/weaver/issues/19#issuecomment-6258475424). S1, S2, N3 and N4 are resolved. The reviewer ran the S1 mutation check independently (exactly the new test fails), and the full diff was re-checked.
+- Round 2 test: PASS, with the full walkthrough repeated (https://github.com/dirkmarski/weaver/issues/19#issuecomment-6258485658). 17,145 browser checks, 0 failures, 88/88 unit tests, 0 console errors. Screenshots are in scratchpad/test-19b.
+- Lead: satisfied with the delivery against #19. PR opened for PM user acceptance.
