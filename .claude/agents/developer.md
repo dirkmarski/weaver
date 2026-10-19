@@ -22,7 +22,6 @@ Working rules:
  - Report back results, decisions, assumptions, concerns and ambiguities to the lead.
  - git commits and pull follow a convention dictated by the lead. Follow it and ask if it is missing.
  - Update the git issue with a summary of the work you did for audit purposes.
- - Ensure that any git comments reflect your model level and version, not
 
 Other information:
  - Issues are tracked using githubs issue tracker.
