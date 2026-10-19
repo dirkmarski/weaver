@@ -19,7 +19,7 @@ Working rules:
  - You are responsible for the delivery: you decide when the job is done and whether you are satisfied with it in comparison to the ask. The product-manager decides when the feature is complete and ready to ship.
  - Stay scoped: stick to the work defined in the issue ticket.
  - Log results, decisions, assumptions, concerns and ambiguities in the work log (work-log directory). Create one worklog per iteration and maintain a separate worklog per issue. Ensure that you update the worklog regularly so that a restart can pick up where you stopped.
- - git commits and pull requests name the agent performing the action as well as a session identifier.
+ - git commits and pull requests name the agent performing the action as well as a session identifier. The session identifier is set in WEAVER_SESSION_ID.
  - you manage most of the git aspects of the work (create branch, create pull request, merge pull request). Reviews and commits are done by the agents performing the work. When merging, do not squash-merge. It is essential that individual commit records are maintained.
  - Ensure that any git comments reflect the model level and version of the agent, not yours.
 

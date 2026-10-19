@@ -13,6 +13,8 @@
 #   - creates the team clone if missing, and fast-forwards it to origin/main when it is
 #     clean and on main (otherwise it leaves the team's unfinished work alone);
 #   - refuses if the team clone's .claude/ or governance/ differ from Dirk's;
+#   - gives the session a fixed id: launched with --session-id and exported as
+#     WEAVER_SESSION_ID, so agents tag their work with the id of the real transcript;
 #   - writes the team identity into the team clone's own git config. Claude Code strips
 #     every GIT_CONFIG_* variable from its own git calls, so only repo config reaches the
 #     session-start snapshot. The env block of launch-settings.json stays the single
@@ -104,9 +106,14 @@ eval "$(jq -r '.env // {} | to_entries[] | "export \(.key)=\(.value | @sh)"' "$s
 login="$(gh api user --jq .login 2>/dev/null)" || die "the token was rejected by GitHub"
 [ "$login" = "weaver-agents" ] || die "the token belongs to '$login', not weaver-agents"
 
-echo "run-task: $label, definitions at $defs, team clone $team, $(claude --version)"
+# 7. The session id: one UUID, used by Claude Code for the transcript and exported for
+#    the agents' commands, so commits and pull requests trace back to the transcript.
+WEAVER_SESSION_ID="$(uuidgen | tr '[:upper:]' '[:lower:]')"
+export WEAVER_SESSION_ID
 
-cmd=(claude --agent lead --settings "$team/$settings" --permission-mode auto "$prompt")
+echo "run-task: $label, definitions at $defs, session $WEAVER_SESSION_ID, team clone $team, $(claude --version)"
+
+cmd=(claude --agent lead --settings "$team/$settings" --permission-mode auto --session-id "$WEAVER_SESSION_ID" "$prompt")
 if [ "$check_only" = 1 ]; then
   echo "run-task: checks passed - would run in $team: ${cmd[*]}"
   exit 0
