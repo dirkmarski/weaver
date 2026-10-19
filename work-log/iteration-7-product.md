@@ -13,7 +13,7 @@
 - [x] Scope decided: two small issues.
 - [x] Issues raised: #30 and #31 (label enhancement). Bodies: scratchpad/pm-proto7/issue-hint-balance.md, issue-ack.md.
 - [x] PM acceptance of #30 (PR #32): ACCEPTED, no conditions. PR comment posted; README wording note added to #31.
-- [ ] PM acceptance of #31 (later run).
+- [x] PM acceptance of #31 (PR #33, head 1a3f12b): ACCEPTED, no conditions. PR comment posted. Iteration 7 complete from the product side once #33 merges.
 
 ## Starting point (2026-10-19)
 main = e81999c, iteration 6 output: Easy/Medium/Hard, Verify, notes, keyboard, Hint (naked then hidden single), rewards with tally, plain definitions under the tally, automatic finish message. No open issues or PRs.
