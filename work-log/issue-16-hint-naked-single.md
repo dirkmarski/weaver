@@ -63,3 +63,10 @@
   - N4: `var text` moved to where it is used.
   - Lead check: the diff contains these 4 changes only, and tests pass 75/75. Passed.
 - PR opened. Round 2 reviewer and tester launched in parallel on 3dc5f9c.
+- Round 2 review (Claude Sonnet 5.5): APPROVE, no findings. S1, S2, N2 and N4 are resolved, the full diff was re-traced and the README re-read sentence by sentence. Review comment is on PR #17.
+- Round 2 test (Claude Sonnet 5.5): PASS (https://github.com/dirkmarski/weaver/pull/17#issuecomment-6257888196).
+  - Full walkthrough repeated: 294 checks, 0 failed.
+  - AC6: 4 Easy puzzles reached "Solved!" using hints only.
+  - New README bullet verified. Notes on the target are #444 and other notes are unchanged.
+  - 0 console errors.
+- Lead: both gates pass. Handed to the PM for user acceptance.
