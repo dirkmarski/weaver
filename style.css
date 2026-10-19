@@ -26,6 +26,7 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
   color: #111;
   border: 1px solid #8a8a8e;
 }
+#sudoku td { position: relative; }
 #sudoku td.given { color: #111; font-weight: 700; }
 #sudoku input {
   width: 100%;
@@ -46,7 +47,7 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 #picker button, #new-puzzle { font: inherit; padding: 0.4rem 1.4rem; cursor: pointer; }
 #level { font-weight: 500; margin: 0 0 0.5rem; }
 [hidden] { display: none !important; }
-#verify { font: inherit; padding: 0.4rem 1.4rem; cursor: pointer; }
+#verify, #notes { font: inherit; padding: 0.4rem 1.4rem; cursor: pointer; }
 #sudoku td.left { border-left: 3px solid #1d1d1f; }
 #sudoku td.top { border-top: 3px solid #1d1d1f; }
 #sudoku td.right { border-right: 3px solid #1d1d1f; }
@@ -63,3 +64,17 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
   font-size: 0.9rem;
   color: #555;
 }
+
+#sudoku .notes {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  pointer-events: none;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  color: #626262;
+}
+#sudoku .notes span { display: flex; align-items: center; justify-content: center; }
+#notes[aria-pressed="true"] { background: #1a4fd0; color: #fff; font-weight: 600; }
