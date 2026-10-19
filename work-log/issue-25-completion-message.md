@@ -61,3 +61,9 @@ I did not read governance/LOG.md.
 - Optional: kept the `cell.value ?` guard in `setCell`, with a comment that it is defensive (an empty cell leaves a 0 in the grid, so `completionFor` returns null anyway).
 - S1 headless Chrome procedure (script scratchpad `wt25-check.js`, not committed): solve the Easy puzzle by typing every cell, click Verify (`Solved! Every row, column and box is correct.`, class ok); then (a) with Notes off, retype the identical digit into a filled cell, and into a second filled cell; status text and class unchanged each time; (b) press N (Notes: On), type a different digit on a filled cell: status text and class unchanged; press N again: text unchanged. All PASS. Full script rerun: all checks PASS, no page errors.
 - `node --test`: all pass (107).
+
+## Round 2 (2026-10-19)
+- Developer (Claude Sonnet 5.5) 6681f24: N1 comment moved; N2 README qualifiers; N3 Files list; S1 headless checks added (retyping the identical digit after Verify, and Notes on over a filled cell, neither changes the status). The `cell.value ?` guard is kept and commented as defensive.
+- Full re-review (Claude Sonnet 5.5): **APPROVE**, no findings. S1 confirmed: the "check outside `if (changed)`" mutation is now caught by the headless script. Every other mutation was killed. The only survivor is an equivalent mutant.
+- Full re-test (Claude Sonnet 5.5): **PASS**. Oracle on new seeds: 72,736 checks, 0 mismatches. Browser: 67/67 on Easy, Medium and Hard (seeds 511-955), including two final hinted entries, with 0 console errors. README checked sentence by sentence.
+- Lead: satisfied. PR opened for PM acceptance.
