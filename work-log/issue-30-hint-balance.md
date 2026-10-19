@@ -42,3 +42,12 @@ Commits: d6d1ba7 (code and wiring), c5acfeb (tests), 0a4a99e (README), plus this
 - Wiring is a module-level variable `currentLevel` in `render()` next to `tally`; it is set only in `choose()`. After "New puzzle" it keeps the old value until the next `choose()`, which always sets it before any Hint is possible.
 - README: besides the Order bullet and Files list, one sentence of the hidden-single first-click bullet ("The first cell in reading order that is a hidden single is used") would have become untrue, so a parenthesis was added to it. The test-file description line was extended. This is in line with rule 5 ("every changed sentence literally true").
 - No deviation from the issue found.
+
+## Lead check after developer round 1 (head cdf7d7a)
+- The developer is Claude Sonnet 5.5. It made commits d6d1ba7, c5acfeb, 0a4a99e and cdf7d7a.
+- `node --test` passes 122/122 (lead re-ran it).
+- Diff read in full. It stays in scope: sudoku.js, README, tests, and a new frozen test oracle file.
+- Questions for the review:
+  - (Q1) The frozen 750-line copy of the old sudoku.js is committed under tests/. Is that an acceptable oracle, or a maintenance hazard?
+  - (Q2) After "New puzzle", `currentLevel` keeps the old value. Can Hint be clicked then, or before any level is chosen (null gives 'hidden' on a tie)?
+- Reviewer and tester launched in parallel.
