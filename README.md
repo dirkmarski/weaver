@@ -77,6 +77,6 @@ Requires Node 18+ (no packages needed):
   - rewards: `classifyEntry(grid, r, c, digit)` (grid just before the entry, 0-based r/c) -> `{technique: 'naked'}`, `{technique: 'hidden', unit}` or `null`; `emptyTally()` -> `{naked: {own, hint}, hidden: {own, hint}}`; `creditEntry(tally, credited, hint, grid, r, c, value)` -> `{tally, credited, text}` (`credited` maps cell index 9 * r + c to `true`; `hint` is the showing `hintFor` result or `null`; inputs are not changed; `text` is `''` when there is no reward); `tallyLines(tally)` -> the heading and the two tally lines; `TECHNIQUE_DEFINITIONS` -> `{naked, hidden}`, the plain-language definition shown under each tally line
   - completion: `completionFor(grid, tally)` (grid after the change, tally after `creditEntry`; inputs are not changed) -> `{kind: 'solved', text}` when every cell is filled and nothing breaks the rules, `{kind: 'conflict', text}` when every cell is filled and something does, or `null` while any cell is empty
   - notes: `applyEntry(cell, key, notesMode)` (pure transition of `{value, notes}`, notes a bitmask with bit d = digit d), `noteDigits(mask)`
-- `tests/sudoku.test.js` - validation/verify/input/notes/next-cell/hint/reward/completion unit tests
+- `tests/sudoku.test.js` - validation/verify/input/notes/next-cell/hint/reward/completion/technique-definition unit tests
 - `tests/generator.test.js` - generator tests (validity, uniqueness, givens bands, technique, determinism, timing; prints max/avg ms per level)
 - `tests/fixture.js` - a known-valid grid and puzzle used only as a test fixture
