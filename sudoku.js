@@ -283,12 +283,21 @@
     return { naked: { own: 0, hint: 0 }, hidden: { own: 0, hint: 0 } };
   }
 
+  // The line for a judged entry that is not credited: (a) not a single, or (b) the grid
+  // just before the entry already breaks the rules. Never says whether the digit is right.
+  function notCounted(grid, r, c, digit) {
+    var where = 'Entered: row ' + (r + 1) + ', column ' + (c + 1) + ' is ' + digit + '. ';
+    if (findConflicts(grid).length) return where + 'Some numbers break the rules, so it is not counted. Click Verify to see which.';
+    return where + 'It was not a naked or hidden single at this point, so it is not counted.';
+  }
+
   // Decide the reward for `value` ('' or '1'-'9') entered in cell (r, c).
   //  tally: as emptyTally(); credited: { cellIndex: true } for cells already credited
   //  hint: the hintFor result showing now (nudge/explain) or null
   //  grid: the grid just before the entry
   // Only a digit entered in an empty cell is judged. Returns the new
-  // { tally, credited, text } (inputs are not changed); text is '' when there is no credit.
+  // { tally, credited, text } (inputs are not changed); text is '' when the entry is not judged.
+  // A judged entry that earns no credit gets the "not counted" text (notCounted) and no count changes.
   // A cell already credited shows the text again but changes no count.
   function creditEntry(tally, credited, hint, grid, r, c, value) {
     var none = { tally: tally, credited: credited, text: '' };
@@ -301,7 +310,7 @@
       text = hintApplied(hint, value);
     } else {
       var res = classifyEntry(grid, r, c, digit);
-      if (!res) return none;
+      if (!res) return { tally: tally, credited: credited, text: notCounted(grid, r, c, digit) };
       technique = res.technique;
       how = 'own';
       text = 'Well spotted! You found a ' + technique + ' single'
@@ -566,7 +575,8 @@
           tally = credit.tally;
           credited = credit.credited;
           showTally();
-          if (credit.text) { status.textContent = credit.text; status.className = 'ok'; }
+          // A reward is green; the "not counted" line (starts with "Entered:") keeps the neutral style.
+          if (credit.text) { status.textContent = credit.text; status.className = /^Entered: /.test(credit.text) ? '' : 'ok'; }
         }
         // A value change that leaves a digit: announce a filled grid (grid and tally are after the change).
         // (the cell.value guard is defensive: an empty cell leaves a 0 in the grid, so completionFor is null anyway)
