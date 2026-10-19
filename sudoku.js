@@ -142,7 +142,7 @@
 
   function bitCount(x) { var n = 0; while (x) { x &= x - 1; n++; } return n; }
 
-  // ---- Hints: the naked single ----
+  // ---- Hints: naked and hidden singles ----
 
   // First empty cell (reading order) whose row, column and box already hold 8
   // different digits, so exactly one digit fits. Returns { r, c, digit, seen }

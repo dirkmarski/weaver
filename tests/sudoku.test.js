@@ -415,6 +415,17 @@ test('findHiddenSingle: the target is the first cell in reading order, whatever 
   assert.deepStrictEqual(findHiddenSingle(H_ORDER), { r: 0, c: 7, digit: 2, unit: 'row' });
 });
 
+test('findHiddenSingle: when a cell is the only spot for two digits of a unit, the lower digit is used', () => {
+  const g = emptyGrid();
+  g[0][2] = 3;
+  [[4, 5, 6], [7, 8, 9]].forEach((vals, i) => vals.forEach((v, c) => { g[i + 1][c] = v; }));
+  g[3][1] = 1;
+  g[4][1] = 2;
+  assert.deepStrictEqual(findConflicts(g), []);
+  assert.strictEqual(findNakedSingle(g), null);
+  assert.deepStrictEqual(findHiddenSingle(g), { r: 0, c: 0, digit: 1, unit: 'box' });
+});
+
 test('findHiddenSingle: for one cell, box before row before column', () => {
   assert.deepStrictEqual(findHiddenSingle(H_ALL), { r: 2, c: 3, digit: 2, unit: 'box' });
   assert.deepStrictEqual(findHiddenSingle(H_ROWCOL), { r: 0, c: 4, digit: 7, unit: 'row' });
