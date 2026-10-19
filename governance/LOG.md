@@ -2,6 +2,16 @@
 
 ## Entries (newest first)
 
+### Agents go for discovery by default
+- **Seen:** 2026-10-19
+- **Means:** Agents go for discovery by default, not just the items their definition raises. Pointed at the context folder, the product manager read it first, then everything else in the repository: the charter, this log, every issue and work log, its own definition and the settings. Whatever is in the repository is part of every agent's context, whether a definition points at it or not.
+- **Response:** Pending.
+
+### The product manager decides from training knowledge, not research
+- **Seen:** 2026-10-19
+- **Means:** Its discovery stayed inside the repository. It did no research on players, other sudoku apps or solving practice, and it has no web tools to do so. The options it weighed, and its claim that its choices "follow common minimal sudoku apps", are the model's recollection stated as fact.
+- **Response:** Pending: whether the product manager researches before deciding is a definition change (tools and an instruction). Held until the strategy comparison is done, so it doesn't add a second variable.
+
 ### The lead's decisions rest on the model's defaults
 - **Seen:** 2026-10-16
 - **Means:** Without guidance, the lead decides from the model's own judgement. The decisions so far are sound, but they are the model's, not mine, and only visible in the work log.
