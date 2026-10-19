@@ -15,3 +15,7 @@
 
 ## Progress
 - Branch and work log created. Developer launched.
+- Developer (Claude Sonnet 5.5) delivered 4813e5a: pure `nextCell(puzzle, r, c, direction)` exported, arrow and N handling in keydown after the Ctrl/Meta/Alt return, a shared `toggleNotes()` for the button and N, title "Toggle notes (N)", README, and 6 new unit tests. `node --test` 62/62. The developer did a puppeteer-core smoke run on Easy and Hard with no console errors.
+- Developer assumptions: Shift+arrow still moves (the issue only excludes Ctrl/Meta/Alt). `nextCell` sits above render() but is exported next to applyEntry.
+- Lead check: diff read in full. Arrows return before the digit path, so values and Verify results are untouched. `puzzle` and `inputs` are render-scope and reset per puzzle, and the old tbody is removed, so there are no stale handlers. Digit, Backspace and paste paths are unchanged. Tests run locally: 62/62. Passed.
+- Reviewer and tester launched in parallel on 4813e5a.
