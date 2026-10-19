@@ -68,3 +68,9 @@
 - Round 2 review: APPROVE (https://github.com/dirkmarski/weaver/issues/19#issuecomment-6258475424). S1, S2, N3 and N4 are resolved. The reviewer ran the S1 mutation check independently (exactly the new test fails), and the full diff was re-checked.
 - Round 2 test: PASS, with the full walkthrough repeated (https://github.com/dirkmarski/weaver/issues/19#issuecomment-6258485658). 17,145 browser checks, 0 failures, 88/88 unit tests, 0 console errors. Screenshots are in scratchpad/test-19b.
 - Lead: satisfied with the delivery against #19. PR opened for PM user acceptance.
+- PR #20 opened.
+- **PM ACCEPTED** (https://github.com/dirkmarski/weaver/issues/19#issuecomment-6258511184).
+  - The PM's checks: texts verbatim against D1-D6, an independent brute-force oracle (30/30 Medium solves, 150 hidden hints, 0 mismatches), 3 hints checked by hand, the screenshots as a learner, and the README sentence by sentence.
+  - The PM agreed with the lead's N5 and layout-shift decisions.
+  - Notes for later (not conditions): mark only the blocking digits, and fix the status-line height.
+- Merging PR #20 with a merge commit (individual commits kept).
