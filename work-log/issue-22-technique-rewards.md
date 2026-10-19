@@ -45,3 +45,13 @@
   - N1: use `bitCount(used) === 8` instead of the hand loop.
   - N2: the README sentence "Each rewarded entry adds 1 to the matching count." is false on its own. The Files entry for the tests does not mention the reward tests.
   - Lead: waiting for the tester before scoping the rework.
+- Round 1 test (tester agent): PASS (https://github.com/dirkmarski/weaver/issues/22#issuecomment-6258981054).
+  - 8,848 checks, 0 failures, 0 defects, 0 console errors, with 674 DOM entries driven through the page.
+  - Independent oracle: 9 random-order puzzles across all levels, matching after every entry; 3 Medium hint-only solves (naked and hidden both seen); every edge case listed in the issue, including (b).
+  - Hint/Verify regression recordings are byte-identical to main. Swapping the unit order in the harness gives 51 failures, so the oracle is sensitive.
+  - Observation: note edits do not clear the status line or the hint. This is unchanged from main and out of scope.
+- Lead checked two screenshots by hand. r8c5=5 is a hidden single in its box: columns 4 and 6 hold a 5, and the candidates are {5,8}, so it is not naked. r7c4=6 is a naked single: the peers hold 1-5 and 7-9. Both are correct, and the layout is clear.
+- Lead decision: rework round 2 before PM acceptance.
+  - Scope: S1 (pin the filled-cell rule with a test), N1 (`bitCount`), N2 (README count sentence literally true, plus the Files entry for the tests).
+  - Not taken: the tester's notes observation (existing behaviour, out of scope).
+  - Gates: full re-review and full re-test.
