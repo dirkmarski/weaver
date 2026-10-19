@@ -9,9 +9,9 @@
 - [x] Context read: product strategy, development practices, charter, README, issues #1/#3/#5/#7, prior work logs, governance/LOG.md
 - [x] Scope decided (one issue)
 - [x] Issue raised: #9 "Pencil-mark notes in empty cells" (https://github.com/dirkmarski/weaver/issues/9)
-- [ ] Delivery by the lead (developer, reviewer, tester)
-- [ ] User acceptance by the product manager against #9's acceptance criteria
-- [ ] Iteration closed
+- [x] Delivery by the lead (developer, reviewer, tester): PR #10, code head ae7fe66
+- [x] User acceptance by the product manager against #9's acceptance criteria: ACCEPTED (2026-10-19)
+- [ ] Iteration closed: waiting only on the lead merging PR #10 (which closes #9). No other work belongs in iteration 1.
 
 ## Starting point (2026-10-19)
 The static sudoku page has a difficulty prompt (Easy/Medium/Hard) and generates unique puzzles at run time; per #7/D9, each level needs a technique the level below does not. Players can enter digits, Verify by the rules (conflicts shown in red) and start a New puzzle. No open issues, all PRs merged. There was no product work log yet, so this is a fresh start.
@@ -49,3 +49,18 @@ Developer unit tests (pure, exported note logic) and README. Reviewer (correctne
 
 ## Progress
 - 2026-10-19: Scope decided, issue #9 raised, work log written and pushed on `iteration-1`. Handed back to the lead for delivery. Next PM step: user acceptance of #9 when the lead reports delivery.
+- 2026-10-19: **User acceptance of #9: ACCEPTED** (comment: https://github.com/dirkmarski/weaver/issues/9#issuecomment-6257187584).
+  - Basis: PR #10 at code head ae7fe66, the round-3 tester report (95/95 browser checks on Easy and Hard, 0 console errors), the round-3 reviewer APPROVE, the screenshots issue9-r3-*.png in the session scratchpad, my own `node --test` run (56/56 pass), and my read of the sudoku.js diff and README.
+  - AC1-AC13 and P1-P11 are all met. Notes are readable at 13px #626262, which meets AA contrast. Cell size is unchanged with 0/1/9 notes.
+  - Gate history: round 1 passed with should-fix items, which were reworked. Round 2 found blocking defect D1 (Verify threw on given cells, a regression from the rework). It was fixed with a regression test, and round 3 passed. The gates did their job. Lesson: refactors of UI glue need a UI-shaped unit test, not only pure-input tests.
+- **Decision A1:** with Notes on, Backspace/Delete on a cell with a value clears the value, as in normal mode. Players can remove a wrong value without switching modes. It is documented in the README.
+- **Decision A2:** in normal mode, Backspace/Delete on a notes-only cell keeps its notes. Normal mode acts on values only. We will revisit if user feedback disagrees.
+- **Iteration 1 status:** complete once the lead merges PR #10. Nothing else is in scope.
+
+## Next-iteration candidates (for the next PM run; not yet decided)
+1. **Publish the site (GitHub Pages)** so real users can test it. This is still blocked on a repo admin setting (concern above). It is the top candidate if Dirk enables Pages, because it directly serves the strategy's "early user testing".
+2. **Arrow-key navigation between cells.** Notes make keyboard play more frequent, so moving with the mouse between cells is now the main friction.
+3. **Keyboard shortcut for the Notes toggle** (e.g. N or Space). It is small and pairs with item 2.
+4. **Auto-remove peer notes when a value is entered.** This is a common convenience, but it changes the P5 rules, so it should be decided after feedback.
+5. **Confirm before New puzzle discards work / keep progress across reloads.** Losing notes is now a bigger loss.
+6. Revisit A2 (normal-mode Backspace on a notes-only cell) only if feedback shows confusion.
