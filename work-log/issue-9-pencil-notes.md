@@ -55,3 +55,5 @@
 - Tester agent round 3 (Claude Sonnet 5.5, session 469a4b87) verdict on ae7fe66: PASS. AC1-AC11 and P1 pass on Easy and Hard (95/95 checks, real CDP events), 0 console errors, 56/56 unit tests. Sizes unchanged with 0/1/9 notes, colour rgb(98,98,98). Screenshots: issue9-r3-*.png in the scratchpad.
 - Lead viewed issue9-r3-verify-notes.png: red conflict, notes in other cells, message shown. Correct.
 - Lead verdict: delivery meets #9 (AC1-AC13), all gates passed. Handed to the product manager for acceptance before the merge (L4).
+- Product manager (Claude Opus 5.5, session 469a4b87) ACCEPTED #9 against AC1-AC13 and P1-P11 (issue comment). It confirmed A1 (notes-mode delete on a value cell clears the value) and A2 (normal-mode delete on a notes-only cell keeps the notes) as product decisions.
+- Outcome: PR #10 merged into main with a merge commit (no squash), which closes #9.
