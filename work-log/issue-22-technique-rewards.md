@@ -24,3 +24,17 @@
 
 ## Progress
 - Branch and work log created. Developer launched.
+- Developer (Claude Sonnet 5.5) delivered 9eba5d6 (logic, tests, glue, style) and 6474e31 (README). `node --test` 100/100 (12 new).
+  - Design: `classifyEntry`, `emptyTally`, `creditEntry(tally, credited, hint, grid, r, c, value)` returning `{tally, credited, text}` (pure, no mutation) and `tallyLines`. `hintApplied` is reused unchanged.
+  - The glue sits in `setCell`, using the new `dataset.pos`. A `#tally` section holds an h2 and two p elements.
+  - Developer mutation checks: each swapped order fails its targeted test, though other tests overlap.
+  - Smoke test (Easy, headless Chrome): messages verbatim, tally correct, 0 console errors.
+- Lead check: read the diff in full. Passed.
+  - `classifyEntry` matches E2: conflict and filled cell give null, then naked via `usedMask`, then box, row, column via `spotsFor`, with the cell required to be the only spot.
+  - Grid before the entry: the keydown path calls `currentGrid()` before `inp.value` is written. The input/paste path resets `inp.value` to `dataset.prev` before `enter`, so it holds too.
+  - Credit happens before `clearResults`, which still clears the hint, rings and flags as before. The tally resets in `choose` and is hidden in `newPuzzle`.
+  - Flagged for the reviewer and tester:
+    - (a) The README sentences the developer changed, checked for literal truth.
+    - (b) The developer did not check in the browser that a re-entered credited cell leaves the tally unchanged, or that unjudged entries leave the status line blank. The tester must cover both.
+    - (c) The with-a-hint path skips the conflict check. It is unreachable because any value change clears the hint, but the reviewer should confirm.
+- Reviewer and tester launched in parallel on 6474e31.
