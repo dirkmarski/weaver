@@ -112,3 +112,4 @@ Detached worktree scratchpad/pm-accept-25. I did not edit the branch. Diff: sudo
 - B: the full-but-wrong case could say how many cells clash, with a softer tone. C: offer "New puzzle / try Medium" on the solved screen. Both are candidates.
 - Process: the persona fallback can cheat (C used a solver). Future persona prompts must forbid helper scripts explicitly.
 - 2026-10-19: #25 ACCEPTED (PR #27, df7945b). Decision posted on PR #27. Next: acceptance of #26 when delivered.
+- 2026-10-19: PM acceptance of #26 (PR #28, head bbc9fe6) started in detached worktree scratchpad/pm-accept-26. main is an ancestor of the head, so the head is the merged-equivalent state. Done so far: byte checks, own oracle vs main, `node --test` 109/109, own headless DOM run on desktop and 375px (scratchpad/pm-accept-26-checks), README read. Persona re-runs (assistant fallback, sessions pm26-user{a,b,c}) in progress.
