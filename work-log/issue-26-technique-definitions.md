@@ -26,3 +26,9 @@ Developer, then reviewer and tester in parallel, then lead check, then PR, then 
   - After New puzzle: `#tally` hidden again. No page errors.
   - Not exercised in the DOM: a rewarded hidden-single entry (the hidden line is updated by the same code path by id; covered only by reading).
 - E5: README tally sentence rewritten (heading, naked line, definition, hidden line, definition; quotes both texts), `TECHNIQUE_DEFINITIONS` added to the Files list and the test-file description. Re-read "How to play" and Files: other tally-block sentences remain literally true.
+
+## Lead check, round 1 (2026-10-19)
+- Developer (Claude Sonnet 5.5) round 1: b00e34e, 081d03f, 2fb07da, 2753354. `node --test` 109/109.
+- Code read: count lines are set by id (no "all p"). TECHNIQUE_DEFINITIONS is byte-identical to the issue. The article change is limited to the step-2 hidden text. `#tally .definition` (specificity 1,1,0) overrides `#tally p` (1,0,1). The lead independently computed the contrast of #595959 on #f5f5f7 as 6.43:1 (at least 4.5 required).
+- Passed to the reviewer: (a) the `max-width: 28rem; margin: 0 auto` on `.definition` goes beyond the issue wording. Check how it lines up visually with the count lines. (b) b00e34e alone would not work in a browser (showTally uses ids that only arrive in 081d03f). The branch tip is fine. Lead view: acceptable, since the commits are kept, but noted. (c) The DOM check did not cover a rewarded hidden-single entry.
+- Passed. Reviewer and tester launched in parallel.
