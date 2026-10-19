@@ -186,3 +186,49 @@ I worked in the detached worktree scratchpad/pm-accept-26 and did not edit the b
 5. Feedback clarity: a neutral acknowledgement for non-single placements, and a gentler Hint when there is a conflict.
 6. Notes usability.
 - 2026-10-19: Relaunched to re-run the #26 personas. The earlier run had already logged an acceptance (42530af) and commented on PR #28, but its reports never reached the lead. The PR head then moved to c9dd593. That commit only adds a work-log entry, and the code is identical to bbc9fe6. Re-running with the real user-a/b/c agents (available now) on worktree scratchpad/pm-accept-26b at c9dd593, sessions pm26r-user{a,b,c}. Helper scripts and solvers are forbidden.
+
+## Acceptance #26, re-confirmation on head c9dd593 (2026-10-19): ACCEPTED, no conditions
+I did not read governance/LOG.md.
+
+**Why a re-confirmation.** The section above (run 1) already decided ACCEPTED and posted it on PR #28 at 04:38Z, but the hand-off did not reach the lead. The lead relaunched me to re-run the personas and decide. The head has moved from bbc9fe6 to c9dd593. That commit adds only the lead's work-log entry, so the code is identical (non-work-log diff empty). Run 1's objective checks therefore still hold. I re-ran `node --test` at c9dd593 (109/109) and a smoke run, which shows both definitions in the tally block.
+
+**Persona re-runs** (assistant fallback, sonnet; the user-a/b/c agent types still fail with "not found")
+- Each persona played on worktree scratchpad/pm-accept-26b (c9dd593) through `WEAVER_APP=... play.js`. Sessions are pm26r-user{a,b,c}.
+- Prompts forbade scripts, solvers and source files. All three confirmed they used none.
+- I replayed each session, and the final MESSAGE and BELOW match each report.
+- A (Easy, seed 7171, 47 actions, 1 hint): solved, "Singles applied: 44 on your own, 1 with a hint", naked 44+1, hidden 0+0.
+  - Defined both terms correctly. Naked about 85% sure (from the hint and the grey text). Hidden about 50% sure (from the grey text alone, no example).
+  - Grey texts "clear and not wrong", but abstract. The hidden one was "easy to skim past".
+  - Hidden stayed at 0 although A reasoned by digit. A concluded that "the app only recognises naked singles".
+  - The finish line "read like a receipt". The "Well spotted!" messages felt better.
+- B (Medium, seed 7272, 49 actions, 1 hint clicked twice): solved, 44/1, naked 39+1, hidden 5+0.
+  - Defined both terms correctly. Naked about 90%, hidden about 75%.
+  - The definitions were "clear and accurate". Nit: "the other eight" is correct but dense next to the hint's digit list.
+  - "Singles applied" means naked plus hidden, and B checked the sums (39+5=44, 44+1=45).
+  - "Mildly rewarding, a statistics line." B wants Hint to offer a hidden single sometimes.
+- C (Easy, seed 7373, 43 entries, 4 hints): solved, 39/4, naked 37+4, hidden 2+0.
+  - Defined both terms correctly. Naked about 85%, hidden about 55%. The grey sentences taught the definitions.
+  - Main confusion: C placed many cells by "this digit can only go here", but the tally called them naked. "I'm not sure the app and I classify the same way."
+  - C thought 43 was more than they typed. The session has exactly 43 entries and all were credited, so this is a miscount, but the total is not self-explanatory.
+  - "Singles" is jargon for a non-fan. C wants the finish line to say "37 naked, 2 hidden".
+
+**Assessment against #26's goal (make the tally and finish line understandable)**
+- Met. 3/3 personas defined naked and hidden single correctly, and named the grey text as a source. 0/3 found any definition wrong, and the only wording comment is the "the other eight" nit already noted in run 1. 3/3 read "Singles applied" as naked plus hidden. This replicates run 1 (3/3, 3/3).
+- The remaining confusion is not caused by #26. `classifyEntry` credits naked first when a cell is both. On Easy almost every placement is also a naked single, so the hidden count barely moves even when the learner reasons by digit (A: 0, C: 2). The definitions make this mismatch visible. That is a teaching-design follow-up, not a defect.
+
+**Verdict:** ACCEPTED, no conditions. Same as run 1, now on head c9dd593. The lead may merge PR #28. Iteration 6 is complete from the product side once #28 merges.
+
+### New observations (feed the candidates below)
+- Hidden singles are hidden by credit precedence as well as by Hint (A, B and C). Learners who reason by digit see their move called "naked". Candidate 1 should cover both sides: Hint teaches hidden singles, and credit names the hidden single when a move is both. Two possible fixes: "naked and hidden", or credit hidden when its unit was the obvious one. The design is open.
+- Finish line: 3/3 call it a receipt or a statistics line. 2/3 ask for the split ("37 naked, 2 hidden") in the message. This confirms candidate 3.
+- The hidden-single definition needs an example (A and C both called it abstract). It could be shown in a hidden-single hint, which is candidate 1 again.
+- "Well spotted!" repeats on every move (A) and names only the last cell after a batch (B, a tool artefact of chained actions).
+
+## Next-iteration candidates (ordered, re-confirmed 2026-10-19 after the persona re-run)
+1. Hidden-single mastery: Hint teaches a hidden single when one exists and the learner has applied it least, and the credit precedence no longer hides hidden singles a learner found by digit. Small, and every persona hit this gap in both runs.
+2. Finish-line clarity and next step: name the split in the solved message ("N naked, M hidden"), make it more of a celebration, and offer the next level.
+3. Make Hard teachable: introduce the next technique (pointing pairs or claiming) with a level that needs it.
+4. Progress across puzzles: a per-technique "learned" state with persistence, and possibly a daily puzzle.
+5. Feedback clarity: a neutral acknowledgement for non-single placements, a gentler Hint when there is a conflict, and less repetition in "Well spotted!".
+6. Notes usability.
+- 2026-10-19: #26 re-confirmed ACCEPTED on c9dd593. Decision commented on PR #28.
