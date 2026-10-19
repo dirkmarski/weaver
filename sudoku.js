@@ -301,7 +301,6 @@
     return { tally: t, credited: cr, text: text };
   }
 
-  // The heading and the two lines shown for a tally.
   // Decides what to announce once a value change has been made.
   // grid: givens plus entered values (0 = empty); tally: as from creditEntry,
   // already including the entry that was just made. Inputs are not changed.
@@ -317,6 +316,7 @@
     return { kind: 'solved', text: 'Puzzle solved! Singles applied: ' + own + ' on your own, ' + hint + ' with a hint.' };
   }
 
+  // The heading and the two lines shown for a tally.
   function tallyLines(tally) {
     function line(name, t) { return name + ' single: ' + t.own + ' on your own, ' + t.hint + ' with a hint'; }
     return ['Techniques applied in this puzzle', line('Naked', tally.naked), line('Hidden', tally.hidden)];
@@ -542,6 +542,7 @@
           if (credit.text) { status.textContent = credit.text; status.className = 'ok'; }
         }
         // A value change that leaves a digit: announce a filled grid (grid and tally are after the change).
+        // (the cell.value guard is defensive: an empty cell leaves a 0 in the grid, so completionFor is null anyway)
         var done = cell.value ? completionFor(currentGrid(), tally) : null;
         if (done) { status.textContent = done.text; status.className = done.kind === 'solved' ? 'ok' : 'fail'; }
       }

@@ -52,3 +52,12 @@ Script: scratchpad `wt25-check.js` (not committed; Chrome via DevTools protocol,
   - N3: the Files list test description does not mention the completion tests.
 - Test (Claude Sonnet 5.5): **PASS**. Independent oracle: 72,736 checks, 0 mismatches. Browser: 50 checks on Medium 101/303 and Hard 202/404, including a hinted final entry and a paste final entry, with 0 console errors. Point (f) already shows no trigger for a notes toggle on a full grid or for retyping the identical digit. The same two README notes as N2 and N3.
 - Lead decision: rework round 2 before PM acceptance for S1, N1, N2 and N3 (all small). The full review and full test are then repeated, as per the carried lessons.
+
+## Developer round 2 (Claude Sonnet 5.5, 2026-10-19)
+I did not read governance/LOG.md.
+- N1: moved the comment "The heading and the two lines shown for a tally." back directly above `tallyLines` in sudoku.js.
+- N2: README now qualifies the two sentences with "(unless that entry fills the last empty cell, see "Filling the grid" below)": the hint-digit "Well done!" message sentence (the "If a hint ... is showing" bullet) and the tally bullet saying the message is shown again after re-entering a counted single. The other mentions (hint bullet, "Any change to a value", "Applying a technique") already had the qualifier. I re-read the whole "How to play" section and the Files list sentence by sentence and found no further literal inaccuracy.
+- N3: Files list now describes `tests/sudoku.test.js` as "validation/verify/input/notes/next-cell/hint/reward/completion unit tests".
+- Optional: kept the `cell.value ?` guard in `setCell`, with a comment that it is defensive (an empty cell leaves a 0 in the grid, so `completionFor` returns null anyway).
+- S1 headless Chrome procedure (script scratchpad `wt25-check.js`, not committed): solve the Easy puzzle by typing every cell, click Verify (`Solved! Every row, column and box is correct.`, class ok); then (a) with Notes off, retype the identical digit into a filled cell, and into a second filled cell; status text and class unchanged each time; (b) press N (Notes: On), type a different digit on a filled cell: status text and class unchanged; press N again: text unchanged. All PASS. Full script rerun: all checks PASS, no page errors.
+- `node --test`: all pass (107).
