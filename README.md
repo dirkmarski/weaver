@@ -11,11 +11,12 @@ Open `index.html` in a browser, or serve the folder:
 - On load, pick **Easy**, **Medium** or **Hard**. The chosen level is shown above the grid. **New puzzle** clears the grid and returns to the difficulty prompt.
 - Bold dark numbers are givens and cannot be changed.
 - Click an empty cell and type a digit 1-9. Other input (letters, 0, pasted or dropped multi-character text) is rejected and the cell keeps its previous value. Backspace or Delete clears the cell.
+- Click **Notes** to switch pencil-mark notes on (`Notes: On`) or off (`Notes: Off`); it starts Off for every puzzle. With notes on, typing 1-9 in an empty cell adds that digit as a small grey note in a fixed spot of a 3x3 mini-grid (1 top-left ... 9 bottom-right); typing it again removes it. Backspace or Delete on an empty cell removes all its notes. Typing a digit into a cell that already holds your value does nothing in notes mode. With notes off, typing a digit into a cell with notes enters the value and removes its notes. Verify ignores notes (a notes-only cell counts as empty), and changing a note keeps the Verify flags and message. **New puzzle** discards all notes.
 - Click **Verify** to check the grid. Checking is by the sudoku rules only (no stored answer is compared), so any valid solution is accepted.
   - Complete grid: tells you whether it is solved.
   - Incomplete grid: tells you whether the numbers so far break any rule, and how many cells are empty.
   - Numbers you entered that repeat a digit in their row, column or 3x3 box are shown in red (both digits if two of yours clash). Givens are never flagged.
-- Any edit clears the red flags and the message. There is no live checking and no hints.
+- Any change to a value clears the red flags and the message. There is no live checking and no hints.
 
 ## Difficulty levels
 Each puzzle is a random complete grid with cells removed in random order; a cell stays removed only if the solution remains unique (and, for Easy/Medium, still solvable by the level's technique). After removal the puzzle is graded: Medium and Hard puzzles that are still solvable by the lower level's technique are discarded and a new puzzle is generated, so each level needs something the one below does not.
@@ -38,6 +39,7 @@ Requires Node 18+ (no packages needed):
 - `sudoku.js` - pure logic, exported for Node (and as `window.Sudoku`), plus the browser UI:
   - `generatePuzzle(level, {rng, maxMs})` -> `{level, puzzle, solution, givens}` (9x9 arrays, 0 = empty); `generateSolution(rng)`; `seededRng(seed)` for reproducible output; `countSolutions(grid, limit)`; `solvableBy(grid, 'naked'|'singles')`; `LEVELS`
   - `isValidSolution`, `findConflicts`, `verify`, `sanitizeDigit`, `nextValue`
-- `tests/sudoku.test.js` - validation/verify/input unit tests
+  - notes: `applyEntry(cell, key, notesMode)` (pure transition of `{value, notes}`, notes a bitmask with bit d = digit d), `noteDigits(mask)`
+- `tests/sudoku.test.js` - validation/verify/input/notes unit tests
 - `tests/generator.test.js` - generator tests (validity, uniqueness, givens bands, technique, determinism, timing; prints max/avg ms per level)
 - `tests/fixture.js` - a known-valid grid and puzzle used only as a test fixture

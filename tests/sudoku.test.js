@@ -174,3 +174,63 @@ test('cell in conflict in both row and box is reported once', () => {
   assert.deepStrictEqual(res, ['0,1', '0,2']);
   assert.strictEqual(res.filter((k) => k === '0,2').length, 1);
 });
+
+// ---- Pencil-mark notes ----
+const { applyEntry, noteDigits } = require('../sudoku.js');
+const empty = { value: '', notes: 0 };
+const bit = (...ds) => ds.reduce((m, d) => m | (1 << d), 0);
+
+test('noteDigits lists noted digits in order', () => {
+  assert.deepStrictEqual(noteDigits(0), []);
+  assert.deepStrictEqual(noteDigits(bit(7, 1, 4)), [1, 4, 7]);
+  assert.deepStrictEqual(noteDigits(bit(1, 2, 3, 4, 5, 6, 7, 8, 9)), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+});
+
+test('notes mode: digits toggle notes on an empty cell', () => {
+  let c = applyEntry(applyEntry(empty, '3', true), '7', true);
+  assert.deepStrictEqual(c, { value: '', notes: bit(3, 7) });
+  c = applyEntry(c, '3', true);
+  assert.deepStrictEqual(c, { value: '', notes: bit(7) });
+});
+
+test('notes mode: a cell with a value ignores digits', () => {
+  const c = { value: '5', notes: 0 };
+  assert.deepStrictEqual(applyEntry(c, '3', true), c);
+  assert.deepStrictEqual(applyEntry(c, '5', true), c);
+});
+
+test('notes mode: Backspace/Delete removes all notes of an empty cell', () => {
+  const c = { value: '', notes: bit(1, 9) };
+  assert.deepStrictEqual(applyEntry(c, 'Backspace', true), empty);
+  assert.deepStrictEqual(applyEntry(c, 'Delete', true), empty);
+});
+
+test('notes mode: Backspace on a cell with a value clears the value', () => {
+  assert.deepStrictEqual(applyEntry({ value: '5', notes: 0 }, 'Backspace', true), empty);
+});
+
+test('normal mode: a digit sets the value and removes the notes', () => {
+  assert.deepStrictEqual(applyEntry({ value: '', notes: bit(2, 4) }, '6', false), { value: '6', notes: 0 });
+  assert.deepStrictEqual(applyEntry({ value: '1', notes: 0 }, '6', false), { value: '6', notes: 0 });
+});
+
+test('normal mode: clearing the value leaves no notes, Delete keeps existing notes', () => {
+  assert.deepStrictEqual(applyEntry({ value: '6', notes: 0 }, 'Delete', false), empty);
+  assert.deepStrictEqual(applyEntry({ value: '', notes: bit(2) }, 'Delete', false), { value: '', notes: bit(2) });
+});
+
+test('letters, 0 and multi-character text change nothing in either mode', () => {
+  const c = { value: '', notes: bit(2) };
+  ['a', '0', '12', '4x', ' '].forEach((k) => {
+    assert.deepStrictEqual(applyEntry(c, k, true), c);
+    assert.deepStrictEqual(applyEntry(c, k, false), c);
+  });
+});
+
+test('verify ignores notes: a notes-only cell is empty and never a value', () => {
+  const g = PUZZLE.map((r) => r.slice());
+  const before = verify(g);
+  const cell = applyEntry(empty, '1', true);
+  assert.strictEqual(cell.value, '');
+  assert.deepStrictEqual(verify(g), before);
+});

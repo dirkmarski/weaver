@@ -72,6 +72,31 @@
     return d === null ? (prev || '') : d;
   }
 
+  // ---- Pencil-mark notes ----
+  // A cell is { value: '' | '1'-'9', notes: bitmask } where bit d is set when
+  // digit d is noted (bits 1-9).
+
+  function noteDigits(mask) {
+    var out = [];
+    for (var d = 1; d <= 9; d++) if (mask & (1 << d)) out.push(d);
+    return out;
+  }
+
+  // Pure transition for one key press (or text entered) in a cell. `key` is a
+  // digit text, 'Backspace' or 'Delete'; anything else changes nothing.
+  //  - normal mode: a digit becomes the value and drops the notes; delete clears the value.
+  //  - notes mode: a digit toggles a note, but only in a cell with no value;
+  //    delete removes all notes of an empty cell (and clears the value otherwise).
+  function applyEntry(cell, key, notesMode) {
+    if (key === 'Backspace' || key === 'Delete') {
+      return { value: '', notes: cell.value || !notesMode ? cell.notes : 0 };
+    }
+    var d = sanitizeDigit(key);
+    if (!d) return cell;
+    if (!notesMode) return { value: d, notes: 0 };
+    return cell.value ? cell : { value: '', notes: cell.notes ^ (1 << d) };
+  }
+
   // ---- Generator -------------------------------------------------------
   // Internally a grid is a flat array of 81 digits (0 = empty).
 
@@ -267,6 +292,9 @@
     var levelLabel = document.getElementById('level');
     var puzzle = null;  // current puzzle (9x9, 0 = empty)
     var inputs = [];    // [r][c] -> input element or null for givens
+    var notesMode = false;
+    var lastCell = null; // cell input that last had focus
+    var notesButton = document.getElementById('notes');
 
     function clearResults() {
       status.textContent = '';
@@ -277,17 +305,35 @@
       });
     }
 
-    // Single write path for a cell's value: keeps the remembered value in sync.
-    function setCell(inp, v) {
-      var changed = inp.value !== v || (inp.dataset.prev || '') !== v;
-      inp.value = v;
-      inp.dataset.prev = v;
+    // Single write path for a cell: keeps the remembered value, notes and
+    // their display in sync. Only a changed value clears the Verify results.
+    function setCell(inp, cell) {
+      var changed = inp.value !== cell.value || (inp.dataset.prev || '') !== cell.value;
+      inp.value = cell.value;
+      inp.dataset.prev = cell.value;
+      inp.dataset.notes = cell.notes;
+      var digits = noteDigits(cell.notes);
+      inp.parentNode.querySelectorAll('.notes span').forEach(function (s, i) {
+        s.textContent = digits.indexOf(i + 1) < 0 ? '' : i + 1;
+      });
+      inp.setAttribute('aria-label', inp.dataset.label + (digits.length ? ', notes ' + digits.join(' ') : ''));
       if (changed) clearResults();
+    }
+
+    function enter(inp, key) {
+      setCell(inp, applyEntry({ value: inp.dataset.prev || '', notes: +inp.dataset.notes || 0 }, key, notesMode));
+    }
+
+    function setNotesMode(on) {
+      notesMode = on;
+      notesButton.textContent = 'Notes: ' + (on ? 'On' : 'Off');
+      notesButton.setAttribute('aria-pressed', on);
     }
 
     function buildTable() {
       var tbody = document.createElement('tbody');
       inputs = [];
+      lastCell = null;
       puzzle.forEach(function (rowVals, r) {
         var tr = document.createElement('tr');
         inputs.push([]);
@@ -307,23 +353,30 @@
             inp.type = 'text';
             inp.inputMode = 'numeric';
             inp.autocomplete = 'off';
-            inp.setAttribute('aria-label', 'Row ' + (r + 1) + ', column ' + (c + 1));
+            inp.dataset.label = 'Row ' + (r + 1) + ', column ' + (c + 1);
+            inp.setAttribute('aria-label', inp.dataset.label);
+            inp.addEventListener('focus', function () { lastCell = inp; });
             inp.addEventListener('keydown', function (e) {
               if (!e.key) return;
               if (e.ctrlKey || e.metaKey || e.altKey) return;
-              if (e.key === 'Backspace' || e.key === 'Delete') {
+              if (e.key === 'Backspace' || e.key === 'Delete' || e.key.length === 1) {
                 e.preventDefault();
-                setCell(inp, '');
-              } else if (e.key.length === 1) { // printable character
-                e.preventDefault();
-                if (sanitizeDigit(e.key)) setCell(inp, e.key);
+                enter(inp, e.key);
               }
             });
-            // Fallback for paste, drop, IME: accept a single digit, else restore.
+            // Fallback for paste, drop, IME: treat as typed text (a single digit
+            // is accepted, anything else is rejected and the cell is restored).
             inp.addEventListener('input', function () {
-              setCell(inp, nextValue(inp.dataset.prev || '', inp.value));
+              var raw = inp.value;
+              inp.value = inp.dataset.prev || '';
+              enter(inp, raw || 'Backspace');
             });
             td.appendChild(inp);
+            var notes = document.createElement('div');
+            notes.className = 'notes';
+            notes.setAttribute('aria-hidden', 'true');
+            for (var d = 0; d < 9; d++) notes.appendChild(document.createElement('span'));
+            td.appendChild(notes);
             inputs[r].push(inp);
           }
           tr.appendChild(td);
@@ -339,6 +392,7 @@
       var res = generatePuzzle(level);
       puzzle = res.puzzle;
       clearResults();
+      setNotesMode(false);
       buildTable();
       levelLabel.textContent = 'Difficulty: ' + level.charAt(0).toUpperCase() + level.slice(1);
       picker.hidden = true;
@@ -361,6 +415,10 @@
 
     Array.prototype.forEach.call(picker.querySelectorAll('button[data-level]'), function (b) {
       b.addEventListener('click', function () { choose(b.getAttribute('data-level')); });
+    });
+    notesButton.addEventListener('click', function () {
+      setNotesMode(!notesMode);
+      if (lastCell) lastCell.focus();
     });
     document.getElementById('new-puzzle').addEventListener('click', newPuzzle);
 
@@ -394,7 +452,8 @@
     countSolutions: function (grid, limit) { return search(toFlat(grid), limit || 2); },
     solvableBy: function (grid, technique) { return solvableBy(toFlat(grid), technique); },
     LEVELS: LEVELS, isValidSolution: isValidSolution,
-    findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, nextValue: nextValue
+    findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, nextValue: nextValue,
+    noteDigits: noteDigits, applyEntry: applyEntry
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (typeof window !== 'undefined') {
