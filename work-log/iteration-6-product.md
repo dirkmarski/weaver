@@ -185,3 +185,4 @@ I worked in the detached worktree scratchpad/pm-accept-26 and did not edit the b
 4. Progress across puzzles: a per-technique "learned" state with persistence, and possibly a daily puzzle.
 5. Feedback clarity: a neutral acknowledgement for non-single placements, and a gentler Hint when there is a conflict.
 6. Notes usability.
+- 2026-10-19: Relaunched to re-run the #26 personas. The earlier run had already logged an acceptance (42530af) and commented on PR #28, but its reports never reached the lead. The PR head then moved to c9dd593. That commit only adds a work-log entry, and the code is identical to bbc9fe6. Re-running with the real user-a/b/c agents (available now) on worktree scratchpad/pm-accept-26b at c9dd593, sessions pm26r-user{a,b,c}. Helper scripts and solvers are forbidden.
