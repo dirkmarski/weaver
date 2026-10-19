@@ -10,8 +10,8 @@
 - [x] Pages re-checked: still not enabled (API 404), weaver-agents still WRITE only
 - [x] Scope decided (one issue)
 - [x] Issue raised: #12 "Keyboard play: arrow-key movement and N shortcut for Notes" (https://github.com/dirkmarski/weaver/issues/12)
-- [ ] Delivery by the lead (developer, reviewer, tester)
-- [ ] User acceptance by the product manager against #12's acceptance criteria
+- [x] Delivery round 1 by the lead: PR #13, code head 4813e5a (test PASS, review APPROVE)
+- [ ] User acceptance by the product manager: round 1 NOT ACCEPTED (2 small changes). Waiting on round 2
 - [ ] Iteration closed
 
 ## Starting point (2026-10-19)
@@ -50,6 +50,16 @@ Developer: unit tests (next-cell helper: all directions, skipping givens, edges,
 
 ## Progress
 - 2026-10-19: Scope decided, issue #12 raised, work log written and pushed on `iteration-2`. Handed back to the lead for delivery. Next PM step: user acceptance of #12 when the lead reports delivery.
+
+- 2026-10-19: User acceptance round 1 of #12 (PR #13, code head 4813e5a): **NOT ACCEPTED**. Comment: https://github.com/dirkmarski/weaver/issues/12#issuecomment-6257570750
+  - Evidence checked: tester report test-12-r1.md (PASS on Easy/Medium/Hard, real key events, 329 arrow-target checks, 0 console errors), review review-12-r1.md (APPROVE, nits only), and the diff (sudoku.js nextCell + keydown branches, index.html title, README, tests). `node --test` run by the PM in a detached worktree on bfb11ff: 62/62 pass. Screenshots looked at (easy focus after skip, hard Notes On) and they match.
+  - AC1-AC9 met. AC10 is partly met (see R2).
+  - **Decision on N auto-repeat (lead's open question): fix it in #12.** If N is held, Notes flips with every repeat, and the mode it ends in depends on how long the key was held. That goes against K5 ("exactly like clicking the button": one press, one toggle) and can quietly break the AC6 keyboard loop. The fix is a one-condition change on the N path only. The cost is one rework round, which is acceptable for a defect in the core interaction this iteration exists to deliver. Arrow auto-repeat stays (holding an arrow to travel is wanted).
+  - R1: ignore repeated keydown for N (`e.repeat`). Still preventDefault and type nothing, but do not toggle.
+  - R2: README says arrows move to the "nearest empty cell". That is wrong, because cells that hold a player value are also targets. Reword it to "nearest cell that is not a given".
+  - Other review nits (1, 3, 4, 6) accepted as they are. Nit 5 (split the long README bullet) is optional.
+  - Rework gates: developer makes only R1 and R2. The reviewer checks that the repeat check is on the N path only. The tester repeats the full walkthrough, adds a held-N check (toggles once, nothing typed, focus kept) and a held-arrow check (still moves), and checks the README.
+  - Iteration status: **not complete**. Iteration 2 is complete when round 2 is accepted by the PM and PR #13 is merged.
 
 ## Next-iteration candidates (not yet decided)
 1. Publish the site (GitHub Pages), if Dirk enables it. A small deploy issue.
