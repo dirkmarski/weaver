@@ -11,7 +11,9 @@
 - [x] Scope decided (one issue)
 - [x] Issue raised: #12 "Keyboard play: arrow-key movement and N shortcut for Notes" (https://github.com/dirkmarski/weaver/issues/12)
 - [x] Delivery round 1 by the lead: PR #13, code head 4813e5a (test PASS, review APPROVE)
-- [ ] User acceptance by the product manager: round 1 NOT ACCEPTED (2 small changes). Waiting on round 2
+- [x] User acceptance by the product manager: round 1 NOT ACCEPTED (2 small changes), round 2 ACCEPTED (code head 883ccb3)
+- [x] Follow-up raised: #14 (README "How to play" accuracy, docs only)
+- [ ] PR #13 merged and #12 closed (lead)
 - [ ] Iteration closed
 
 ## Starting point (2026-10-19)
@@ -61,9 +63,18 @@ Developer: unit tests (next-cell helper: all directions, skipping givens, edges,
   - Rework gates: developer makes only R1 and R2. The reviewer checks that the repeat check is on the N path only. The tester repeats the full walkthrough, adds a held-N check (toggles once, nothing typed, focus kept) and a held-arrow check (still moves), and checks the README.
   - Iteration status: **not complete**. Iteration 2 is complete when round 2 is accepted by the PM and PR #13 is merged.
 
+- 2026-10-19: User acceptance round 2 of #12 (PR #13, code head 883ccb3, branch head ac108a5): **ACCEPTED**. Comment: https://github.com/dirkmarski/weaver/issues/12#issuecomment-6257618631
+  - Evidence checked: diff 883ccb3 (the `e.repeat` check is on the N branch only, and preventDefault is kept), README sub-bullets, tester test-12-r2.md (PASS AC1-AC10 on all three levels; held N 199 checks with a negative control; held arrows 764; own-value targets 592; 0 console errors), review review-12-r2.md (APPROVE). Screenshot issue12-r2-hard-after-holding-N.png looked at. `node --test` run by the PM in a detached worktree on ac108a5: 62/62 pass.
+  - **Decision on the README audit items: none of them blocks #12. All three go to follow-up #14** (https://github.com/dirkmarski/weaver/issues/14, docs only).
+    - Item 1 (Verify empty count shown only without mistakes) and item 2 (Notes-Off Backspace keeps notes on a notes-only cell, A2) predate #12 and are out of its scope.
+    - Item 3 ("letters ... rejected" vs N) was introduced by #12, but it is cosmetic. The same section documents N explicitly, so a user is not misled. One more full rework and test round is not worth that cost. It is bundled into #14 so the section gets fixed in one pass.
+  - Assumption: a README-only issue is still worth a full reviewer and tester pass, because the README is the only user guide and the earlier errors came from text that nobody checked against behaviour. The gates in #14 are kept light (check each changed claim).
+  - Iteration status: **iteration 2 is complete once PR #13 is merged** (and #12 closed). #14 is not part of iteration 2. It is a candidate for iteration 3 and can be bundled with the next feature issue.
+
 ## Next-iteration candidates (not yet decided)
 1. Publish the site (GitHub Pages), if Dirk enables it. A small deploy issue.
 2. Keep progress across reloads and/or confirm before New puzzle discards work.
 3. Auto-remove peer notes when a value is entered (after feedback).
 4. Highlight the focused cell's row/column/box or same digits.
 5. Revisit A2 (normal-mode Backspace on a notes-only cell) only on feedback.
+6. #14: README "How to play" accuracy (docs only, small). Already raised; schedule it in iteration 3.
