@@ -36,3 +36,12 @@
   - Tests: 75/75. Passed.
   - Flagged for the reviewer: the README line "Any change to a value clears the red flags and the message" against the H7 reward, which is a message shown after a value change.
 - Reviewer and tester launched in parallel on c38a10a.
+- Round 1 review (Claude Sonnet 5.5): CHANGES REQUESTED, nothing blocking (https://github.com/dirkmarski/weaver/issues/16#issuecomment-6257833546). Every H8 path and the H7 reward check were traced and are correct. The existing paths are unchanged.
+  - S1: the README line "Any change to a value clears ... the message" is no longer literally true, because of the "Well done!" message.
+  - S2: the fixture test's name promises a reading-order check that it does not assert.
+  - Nits:
+    - N1: a pasted "n" is still rejected. Fine.
+    - N2: notes text on the amber target is about 3.9:1 contrast.
+    - N3: box arithmetic is duplicated.
+    - N4: `var text` is declared too early.
+    - N5: there is no DOM test harness.
