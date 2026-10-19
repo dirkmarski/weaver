@@ -174,11 +174,14 @@
   // The first empty cell (reading order) that is the only place for some digit
   // in one of its units. Units are tried box, row, column; digits ascending.
   // Returns { r, c, digit, unit } (0-based r/c, unit 'box' | 'row' | 'column') or null.
-  function findHiddenSingle(grid) {
+  // options.notNaked: true skips cells that are also naked singles.
+  function findHiddenSingle(grid, options) {
+    var notNaked = !!(options && options.notNaked);
     var cells = toFlat(grid), order = [2, 0, 1]; // kinds: box, row, column
     for (var p = 0; p < 81; p++) {
       if (cells[p]) continue;
       var used = usedMask(cells, p);
+      if (notNaked && bitCount(used >> 1) === 8) continue;
       for (var k = 0; k < 3; k++) {
         var unit = UNITS[CELL_UNITS[p][order[k]]];
         for (var d = 1; d <= 9; d++) {
@@ -193,18 +196,32 @@
     return null;
   }
 
+  // Which technique Hint should teach next: the one applied less so far (own and
+  // hint counts together). On a tie: 'naked' on easy, 'hidden' on medium and hard.
+  function preferredTechnique(tally, level) {
+    var n = tally.naked.own + tally.naked.hint, h = tally.hidden.own + tally.hidden.hint;
+    if (h < n) return 'hidden';
+    if (n < h) return 'naked';
+    return level === 'easy' ? 'naked' : 'hidden';
+  }
+
   // What Hint says for a grid. step 1 = nudge, step 2 = explain (only used when
-  // a single is found). A naked single is taught before a hidden single. Returns
+  // a single is found). A naked single is taught before a hidden single, unless
+  // prefer === 'hidden' and a hidden single that is not a naked single exists. Returns
   // { kind, technique, unit, r, c, digit, text } where kind is
   // 'conflict' | 'full' | 'none' | 'nudge' | 'explain'. For the last two, r/c are
   // 0-based, technique is 'naked' | 'hidden' and unit ('box' | 'row' | 'column') is set for hidden.
-  function hintFor(grid, step) {
+  function hintFor(grid, step, prefer) {
     if (findConflicts(grid).length) {
       return { kind: 'conflict', text: 'Some numbers break the rules. Fix them first: click Verify to see which.' };
     }
     if (verify(grid).complete) return { kind: 'full', text: 'Every cell is filled. Click Verify to check the grid.' };
-    var s = findNakedSingle(grid);
-    var technique = 'naked';
+    var s = prefer === 'hidden' ? findHiddenSingle(grid, { notNaked: true }) : null;
+    var technique = 'hidden';
+    if (!s) {
+      s = findNakedSingle(grid);
+      technique = 'naked';
+    }
     if (!s) {
       s = findHiddenSingle(grid);
       technique = 'hidden';
@@ -497,6 +514,7 @@
     var notesButton = document.getElementById('notes');
     var hint = null;     // hint showing now (result of hintFor), or null
     var tally = emptyTally(); // techniques applied in this puzzle
+    var currentLevel = null; // level chosen for the current puzzle
     var credited = {};   // cells already credited in this puzzle
     var tallyBox = document.getElementById('tally');
 
@@ -644,6 +662,7 @@
     }
 
     function choose(level) {
+      currentLevel = level;
       var res = generatePuzzle(level);
       puzzle = res.puzzle;
       clearResults();
@@ -688,7 +707,7 @@
 
     // Hint: step 1 unless a hint is already showing, then step 2.
     document.getElementById('hint').addEventListener('click', function () {
-      var res = hintFor(currentGrid(), hint ? 2 : 1);
+      var res = hintFor(currentGrid(), hint ? 2 : 1, preferredTechnique(tally, currentLevel));
       clearResults();
       status.textContent = res.text;
       status.className = res.kind === 'conflict' ? 'fail' : '';
@@ -739,7 +758,7 @@
     LEVELS: LEVELS, isValidSolution: isValidSolution,
     findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
-    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, hintFor: hintFor, hintApplied: hintApplied,
+    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
     classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, completionFor: completionFor, tallyLines: tallyLines,
     TECHNIQUE_DEFINITIONS: TECHNIQUE_DEFINITIONS
   };
