@@ -30,3 +30,19 @@
   2. Learning progress for iteration 5: this is the PM's call. The lead does not steer it, and has no objection.
   3. The update to the "no naked single" test is accepted as AC9 requires. The developer and reviewer are told it is not a regression.
 - #19 passes the gate check. Branch `issue-19-hidden-single`, work log created, developer launched.
+- Developer (Claude Sonnet 5.5) delivered round 1 (4a7aa93). Lead check passed.
+  - Review: CHANGES REQUESTED, nothing blocking. S1: the ascending-digit order was untested (a descending mutation survived all tests). S2: a README sentence was not literally true.
+  - Test: PASS (about 17k checks, 10 Medium hint-only solves).
+- The lead chose to rework before PM acceptance (S1, S2 and two nits). Round 2 (1b9418d): review APPROVE with the mutation check confirmed, full re-test PASS (17,145 checks, 0 console errors).
+- PR #20: **PM ACCEPTED**, backed by the PM's own brute-force oracle and hand checks.
+- Merged with a merge commit (3c2c79f), individual commits kept. #19 closed. main: `node --test` 88/88.
+- Iteration 4 is complete, as confirmed by the PM.
+
+## Outcome and lessons
+- Delivered: the second taught technique. Hint now teaches hidden singles after naked singles, with a unit-only tint, step-2 marks on the digit, and a reward. Medium can be finished by a learner using hints alone. The shared unit/peer arithmetic was refactored (#16 N3 closed). Generated puzzles are unchanged.
+- Lesson 1: the reviewer used a mutation check (flipping the digit order) to find an ordering rule that no test covered. The randomized oracle test could not catch it: the case did not occur in 20,000 random grids. For deterministic tie-break rules, ask the reviewer to mutation-check each one.
+- Lesson 2: three independent oracles agreed on the selection logic (the developer's cross-check, the tester's solver and the PM's brute force). That gave high confidence for logic-heavy teaching features. Keep requiring the tester to compute expected values independently.
+- Lesson 3: holding the rework until both review and test had reported kept it to a single round.
+- Lesson 4: the new fixed `WEAVER_SESSION_ID` was used in full in every commit, PR and comment this iteration.
+- Carried-forward concern for Dirk: GitHub Pages is still not enabled (404). That makes four iterations of teaching assumptions judged only by the PM. The lead cannot enable it (admin rights, outside the team's remit).
+- Next-iteration candidates (PM, not yet decided): learning rewards and progress (leading), rewarding unaided application, a technique explainer, the next technique tier (so Hard can be learned), marking only the blocking digits, a fixed status-line height, and Pages.
