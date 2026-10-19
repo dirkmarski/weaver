@@ -98,6 +98,60 @@
     return cell.value ? cell : { value: '', notes: cell.notes ^ (1 << d) };
   }
 
+  // ---- Hints: the naked single ----
+
+  // First empty cell (reading order) whose row, column and box already hold 8
+  // different digits, so exactly one digit fits. Returns { r, c, digit, seen }
+  // (0-based r/c, seen = those 8 digits ascending) or null.
+  function findNakedSingle(grid) {
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) {
+        if (grid[r][c]) continue;
+        var used = {};
+        for (var i = 0; i < 9; i++) {
+          used[grid[r][i]] = used[grid[i][c]] = true;
+          used[grid[3 * Math.floor(r / 3) + Math.floor(i / 3)][3 * Math.floor(c / 3) + (i % 3)]] = true;
+        }
+        var seen = [];
+        var digit = 0;
+        for (var d = 1; d <= 9; d++) if (used[d]) seen.push(d); else digit = d;
+        if (seen.length === 8) return { r: r, c: c, digit: digit, seen: seen };
+      }
+    }
+    return null;
+  }
+
+  // What Hint says for a grid. step 1 = nudge, step 2 = explain (only used when
+  // a naked single is found). Returns { kind, r, c, digit, text } where kind is
+  // 'conflict' | 'full' | 'none' | 'nudge' | 'explain' (r/c 0-based, set for the last two).
+  function hintFor(grid, step) {
+    if (findConflicts(grid).length) {
+      return { kind: 'conflict', text: 'Some numbers break the rules. Fix them first: click Verify to see which.' };
+    }
+    if (verify(grid).complete) return { kind: 'full', text: 'Every cell is filled. Click Verify to check the grid.' };
+    var s = findNakedSingle(grid);
+    if (!s) {
+      return { kind: 'none', text: 'No naked single right now. At this point the puzzle needs another technique.' };
+    }
+    var where = 'row ' + (s.r + 1) + ', column ' + (s.c + 1);
+    var text;
+    if (step === 2) {
+      text = 'Naked single: ' + where + ' must be ' + s.digit + ', because its row, column and box already contain '
+        + s.seen.slice(0, -1).join(', ') + ' and ' + s.seen[7] + '.';
+    } else {
+      text = 'Hint: ' + where + ' is a naked single: only one digit fits there. Check its row, column and box to find it. '
+        + 'Click Hint again to see why.';
+    }
+    return { kind: step === 2 ? 'explain' : 'nudge', r: s.r, c: s.c, digit: s.digit, text: text };
+  }
+
+  // Reward text when `value` ('' or '1'-'9') entered in the hint's target cell
+  // applies the showing hint (a hintFor result of kind nudge/explain); '' otherwise.
+  function hintApplied(hint, value) {
+    if (!hint || String(hint.digit) !== value) return '';
+    return 'Well done! You applied a naked single: row ' + (hint.r + 1) + ', column ' + (hint.c + 1) + ' is ' + value + '.';
+  }
+
   // ---- Generator -------------------------------------------------------
   // Internally a grid is a flat array of 81 digits (0 = empty).
 
@@ -311,10 +365,16 @@
     var notesMode = false;
     var lastCell = null; // cell input that last had focus
     var notesButton = document.getElementById('notes');
+    var hint = null;     // hint showing now (result of hintFor), or null
 
+    // Clears the status line, the Verify flags and any showing hint.
     function clearResults() {
+      hint = null;
       status.textContent = '';
       status.className = '';
+      table.querySelectorAll('.hint-target, .hint-area').forEach(function (el) {
+        el.classList.remove('hint-target', 'hint-area');
+      });
       table.querySelectorAll('.conflict').forEach(function (el) {
         el.classList.remove('conflict');
         el.removeAttribute('aria-invalid');
@@ -322,7 +382,8 @@
     }
 
     // Single write path for a cell: keeps the remembered value, notes and
-    // their display in sync. Only a changed value clears the Verify results.
+    // their display in sync. Only a changed value clears the Verify results and any hint
+    // (and entering the hinted digit shows the reward instead).
     function setCell(inp, cell) {
       var changed = inp.value !== cell.value || (inp.dataset.prev || '') !== cell.value;
       inp.value = cell.value;
@@ -333,7 +394,11 @@
         s.textContent = digits.indexOf(i + 1) < 0 ? '' : i + 1;
       });
       inp.setAttribute('aria-label', inp.dataset.label + (digits.length ? ', notes ' + digits.join(' ') : ''));
-      if (changed) clearResults();
+      if (changed) {
+        var reward = hint && inp === inputs[hint.r][hint.c] ? hintApplied(hint, cell.value) : '';
+        clearResults();
+        if (reward) { status.textContent = reward; status.className = 'ok'; }
+      }
     }
 
     function enter(inp, key) {
@@ -452,11 +517,34 @@
     notesButton.addEventListener('click', toggleNotes);
     document.getElementById('new-puzzle').addEventListener('click', newPuzzle);
 
-    button.addEventListener('click', function () {
-      clearResults();
-      var grid = buildGrid(puzzle, inputs.map(function (row) {
+    // The grid Verify and Hint check: givens plus entered values (notes excluded).
+    function currentGrid() {
+      return buildGrid(puzzle, inputs.map(function (row) {
         return row.map(function (inp) { return inp ? inp.value : ''; });
       }));
+    }
+
+    // Hint: step 1 unless a hint is already showing, then step 2.
+    document.getElementById('hint').addEventListener('click', function () {
+      var res = hintFor(currentGrid(), hint ? 2 : 1);
+      clearResults();
+      status.textContent = res.text;
+      status.className = res.kind === 'conflict' ? 'fail' : '';
+      if (res.kind !== 'nudge' && res.kind !== 'explain') return;
+      hint = res;
+      for (var r = 0; r < 9; r++) {
+        for (var c = 0; c < 9; c++) {
+          var inBox = Math.floor(r / 3) === Math.floor(res.r / 3) && Math.floor(c / 3) === Math.floor(res.c / 3);
+          if (r === res.r && c === res.c) table.rows[r].cells[c].classList.add('hint-target');
+          else if (r === res.r || c === res.c || inBox) table.rows[r].cells[c].classList.add('hint-area');
+        }
+      }
+      inputs[res.r][res.c].focus();
+    });
+
+    button.addEventListener('click', function () {
+      clearResults();
+      var grid = currentGrid();
       var res = verify(grid);
       res.conflicts.forEach(function (p) {
         var inp = inputs[p[0]][p[1]];
@@ -481,7 +569,8 @@
     solvableBy: function (grid, technique) { return solvableBy(toFlat(grid), technique); },
     LEVELS: LEVELS, isValidSolution: isValidSolution,
     findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
-    noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell
+    noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
+    findNakedSingle: findNakedSingle, hintFor: hintFor, hintApplied: hintApplied
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (typeof window !== 'undefined') {

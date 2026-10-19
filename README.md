@@ -10,7 +10,7 @@ Open `index.html` in a browser, or serve the folder:
 ## How to play
 - On load, pick **Easy**, **Medium** or **Hard**. The chosen level is shown above the grid. **New puzzle** clears the grid and returns to the difficulty prompt.
 - Bold dark numbers are givens and cannot be changed.
-- Click an empty cell and type a digit 1-9. Other input (letters, 0, pasted or dropped multi-character text) is rejected and the cell keeps its previous value. Backspace or Delete clears the cell.
+- Click an empty cell and type a digit 1-9. Other input (letters other than N, 0, pasted or dropped multi-character text) is rejected and the cell keeps its previous value. With Notes off, Backspace or Delete clears the cell's value; on a cell that holds only notes it does nothing and the notes stay.
 - Keyboard: with a cell focused:
   - Arrow keys move to the nearest cell that is not a given in that direction, in the same row or column. Cells holding your own value are valid targets. Givens are skipped and there is no wrapping (at the edge, or with only givens beyond, the focus stays put). Holding an arrow key auto-repeats.
   - Arrow keys never change a value, a note, the Verify results or Notes mode.
@@ -25,9 +25,15 @@ Open `index.html` in a browser, or serve the folder:
   - **New puzzle** discards all notes.
 - Click **Verify** to check the grid. Checking is by the sudoku rules only (no stored answer is compared), so any valid solution is accepted.
   - Complete grid: tells you whether it is solved.
-  - Incomplete grid: tells you whether the numbers so far break any rule, and how many cells are empty.
+  - Incomplete grid: tells you whether the numbers so far break any rule. If they do not, it also says how many cells are empty; if they do, it only points out the mistakes.
   - Numbers you entered that repeat a digit in their row, column or 3x3 box are shown in red (both digits if two of yours clash). Givens are never flagged.
-- Any change to a value clears the red flags and the message. There is no live checking and no hints.
+- Click **Hint** to learn the first technique, the **naked single**: an empty cell where the numbers already in its row, column and box leave only one digit that fits. Hint never fills in a cell; you always enter the digit yourself. Hint looks at the givens and the values you entered (notes are ignored) and follows the sudoku rules only.
+  - First click: the cell is highlighted in amber, its row, column and box are lightly tinted, focus moves to the cell, and the message tells you to check its row, column and box. If several cells qualify, the first one in reading order (top row first, left to right) is used.
+  - Second click (while that hint is showing): the same highlight stays and the message names the digit that fits and the 8 digits it excludes. The digit is still not entered. Further clicks show the same explanation.
+  - Enter the hinted digit in that cell (Notes off) and the highlight goes away and "Well done!" is shown. Any other value change just removes the hint.
+  - If some numbers break the rules, Hint says so and asks you to click Verify; if every cell is filled, it says so; if no naked single exists, it says another technique is needed. In these cases nothing is highlighted.
+  - The hint (highlight and message) is removed by any change to a value, by **Verify**, by **New puzzle** and by choosing a level. Changing notes keeps it. Clicking Hint also clears any red flags and message before showing its own.
+- Any change to a value clears the red flags and the message (entering the hinted digit shows "Well done!" instead of a blank message). There is no live checking.
 
 ## Difficulty levels
 Each puzzle is a random complete grid with cells removed in random order; a cell stays removed only if the solution remains unique (and, for Easy/Medium, still solvable by the level's technique). After removal the puzzle is graded: Medium and Hard puzzles that are still solvable by the lower level's technique are discarded and a new puzzle is generated, so each level needs something the one below does not.
@@ -51,7 +57,8 @@ Requires Node 18+ (no packages needed):
   - `generatePuzzle(level, {rng, maxMs})` -> `{level, puzzle, solution, givens}` (9x9 arrays, 0 = empty); `generateSolution(rng)`; `seededRng(seed)` for reproducible output; `countSolutions(grid, limit)`; `solvableBy(grid, 'naked'|'singles')`; `LEVELS`
   - `isValidSolution`, `findConflicts`, `verify`, `sanitizeDigit`, `buildGrid(puzzle, values)` (grid passed to verify; notes excluded)
   - keyboard: `nextCell(puzzle, r, c, 'up'|'down'|'left'|'right')` -> `[r, c]` of the next editable cell (givens skipped, no wrap) or `null`
+  - hints: `findNakedSingle(grid)` -> `{r, c, digit, seen}` (0-based r/c, `seen` = the 8 digits excluded, ascending) or `null`; `hintFor(grid, step)` -> `{kind, r, c, digit, text}` (kind `conflict`, `full`, `none`, `nudge` or `explain`; step 2 gives `explain`); `hintApplied(hint, value)` -> the "Well done!" text or `''`
   - notes: `applyEntry(cell, key, notesMode)` (pure transition of `{value, notes}`, notes a bitmask with bit d = digit d), `noteDigits(mask)`
-- `tests/sudoku.test.js` - validation/verify/input/notes/next-cell unit tests
+- `tests/sudoku.test.js` - validation/verify/input/notes/next-cell/hint unit tests
 - `tests/generator.test.js` - generator tests (validity, uniqueness, givens bands, technique, determinism, timing; prints max/avg ms per level)
 - `tests/fixture.js` - a known-valid grid and puzzle used only as a test fixture
