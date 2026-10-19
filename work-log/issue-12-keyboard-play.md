@@ -23,3 +23,8 @@
 - Round 1 test (Claude Sonnet 5.5): PASS on Easy, Medium and Hard with real key events, AC1-AC10 all pass. That is 329 arrow-target checks, 168 skip checks (56 over several givens in a row or column), 108 edge checks, 45 AC4 checks and 74 AC8 regression checks, plus a keyboard-only session on Hard. 0 console errors. Screenshots issue12-r1-*.png, report test-12-r1.md (scratchpad). The lead spot-checked the Hard Notes-On screenshot.
 - Lead decision: no rework. Nit 1 is covered by the browser run. The rest are cosmetic or out of spec. Nit 2 (held N repeats the toggle) goes to the PM as a product question.
 - PR opened; handed to the PM for acceptance.
+- PM acceptance round 1: NOT ACCEPTED (https://github.com/dirkmarski/weaver/issues/12#issuecomment-6257570750). AC1-AC9 met, AC10 partly met. Rework is limited to:
+  - R1: on the N/n path, a keydown with `e.repeat` is swallowed (preventDefault) but does not toggle Notes. Arrows keep auto-repeating. This is the PM's decision on the held-N question: K5 means one press, one toggle.
+  - R2: the README says arrows go to "the nearest empty cell". Wrong, because cells holding a player value are targets too. Reword to "not a given".
+- Lead note: both gates missed R2. The reviewer reported README accurate and the tester PASSed AC10. Lesson: check README claims against behaviour word by word, not just for presence.
+- Rework round 2: developer launched (R1 and R2 only). Then a full re-review and a full re-test, including a held-N and a held-arrow check, then back to the PM.
