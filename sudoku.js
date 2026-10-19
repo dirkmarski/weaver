@@ -240,6 +240,75 @@
     return 'Well done! You applied a ' + hint.technique + ' single: row ' + (hint.r + 1) + ', column ' + (hint.c + 1) + ' is ' + value + '.';
   }
 
+  // ---- Rewards: recognising naked and hidden singles the learner enters ----
+
+  // Which technique makes `digit` in the empty cell (r, c) of `grid` (the grid
+  // just before the entry, 0 = empty) a single? Returns { technique: 'naked' },
+  // { technique: 'hidden', unit: 'box' | 'row' | 'column' } or null (also null
+  // when the grid has a conflict, the cell is filled or digit is not 1-9).
+  // Naked wins over hidden; hidden units are tried box, row, column.
+  function classifyEntry(grid, r, c, digit) {
+    if (!Number.isInteger(digit) || digit < 1 || digit > 9) return null;
+    if (findConflicts(grid).length || grid[r][c] !== 0) return null;
+    var cells = toFlat(grid), p = r * 9 + c;
+    var used = usedMask(cells, p);
+    if (used & (1 << digit)) return null;
+    var seen = 0;
+    for (var d = 1; d <= 9; d++) if (used & (1 << d)) seen++;
+    if (seen === 8) return { technique: 'naked' };
+    var order = [2, 0, 1]; // kinds: box, row, column
+    for (var k = 0; k < 3; k++) {
+      var spots = spotsFor(cells, UNITS[CELL_UNITS[p][order[k]]], digit);
+      if (spots.length === 1 && spots[0] === p) return { technique: 'hidden', unit: UNIT_NAMES[order[k]] };
+    }
+    return null;
+  }
+
+  function emptyTally() {
+    return { naked: { own: 0, hint: 0 }, hidden: { own: 0, hint: 0 } };
+  }
+
+  // Decide the reward for `value` ('' or '1'-'9') entered in cell (r, c).
+  //  tally: as emptyTally(); credited: { cellIndex: true } for cells already credited
+  //  hint: the hintFor result showing now (nudge/explain) or null
+  //  grid: the grid just before the entry
+  // Only a digit entered in an empty cell is judged. Returns the new
+  // { tally, credited, text } (inputs are not changed); text is '' when there is no credit.
+  // A cell already credited shows the text again but changes no count.
+  function creditEntry(tally, credited, hint, grid, r, c, value) {
+    var none = { tally: tally, credited: credited, text: '' };
+    var digit = sanitizeDigit(value) ? parseInt(value, 10) : 0;
+    if (!digit || grid[r][c] !== 0) return none;
+    var technique, how, text;
+    if (hint && hint.r === r && hint.c === c && hint.digit === digit) {
+      technique = hint.technique;
+      how = 'hint';
+      text = hintApplied(hint, value);
+    } else {
+      var res = classifyEntry(grid, r, c, digit);
+      if (!res) return none;
+      technique = res.technique;
+      how = 'own';
+      text = 'Well spotted! You found a ' + technique + ' single'
+        + (technique === 'hidden' ? ' in its ' + res.unit : '')
+        + ' on your own: row ' + (r + 1) + ', column ' + (c + 1) + ' is ' + digit + '.';
+    }
+    var p = r * 9 + c;
+    if (credited[p]) return { tally: tally, credited: credited, text: text };
+    var t = emptyTally(), cr = {};
+    ['naked', 'hidden'].forEach(function (k) { t[k].own = tally[k].own; t[k].hint = tally[k].hint; });
+    Object.keys(credited).forEach(function (k) { cr[k] = true; });
+    t[technique][how]++;
+    cr[p] = true;
+    return { tally: t, credited: cr, text: text };
+  }
+
+  // The heading and the two lines shown for a tally.
+  function tallyLines(tally) {
+    function line(name, t) { return name + ' single: ' + t.own + ' on your own, ' + t.hint + ' with a hint'; }
+    return ['Techniques applied in this puzzle', line('Naked', tally.naked), line('Hidden', tally.hidden)];
+  }
+
   // ---- Generator -------------------------------------------------------
   // Internally a grid is a flat array of 81 digits (0 = empty).
 
@@ -408,6 +477,15 @@
     var lastCell = null; // cell input that last had focus
     var notesButton = document.getElementById('notes');
     var hint = null;     // hint showing now (result of hintFor), or null
+    var tally = emptyTally(); // techniques applied in this puzzle
+    var credited = {};   // cells already credited in this puzzle
+    var tallyBox = document.getElementById('tally');
+
+    function showTally() {
+      var lines = tallyLines(tally);
+      tallyBox.querySelector('h2').textContent = lines[0];
+      tallyBox.querySelectorAll('p').forEach(function (el, i) { el.textContent = lines[i + 1]; });
+    }
 
     // Clears the status line, the Verify flags and any showing hint.
     function clearResults() {
@@ -428,6 +506,12 @@
     // (and entering the hinted digit shows the reward instead).
     function setCell(inp, cell) {
       var changed = inp.value !== cell.value || (inp.dataset.prev || '') !== cell.value;
+      // Judge a digit entered into a cell without a value, using the grid before the write.
+      var credit = null;
+      if (changed && !(inp.dataset.prev || '') && cell.value) {
+        var pos = +inp.dataset.pos;
+        credit = creditEntry(tally, credited, hint, currentGrid(), Math.floor(pos / 9), pos % 9, cell.value);
+      }
       inp.value = cell.value;
       inp.dataset.prev = cell.value;
       inp.dataset.notes = cell.notes;
@@ -437,9 +521,13 @@
       });
       inp.setAttribute('aria-label', inp.dataset.label + (digits.length ? ', notes ' + digits.join(' ') : ''));
       if (changed) {
-        var reward = hint && inp === inputs[hint.r][hint.c] ? hintApplied(hint, cell.value) : '';
         clearResults();
-        if (reward) { status.textContent = reward; status.className = 'ok'; }
+        if (credit) {
+          tally = credit.tally;
+          credited = credit.credited;
+          showTally();
+          if (credit.text) { status.textContent = credit.text; status.className = 'ok'; }
+        }
       }
     }
 
@@ -481,6 +569,7 @@
             inp.type = 'text';
             inp.inputMode = 'numeric';
             inp.autocomplete = 'off';
+            inp.dataset.pos = r * 9 + c;
             inp.dataset.label = 'Row ' + (r + 1) + ', column ' + (c + 1);
             inp.setAttribute('aria-label', inp.dataset.label);
             inp.addEventListener('focus', function () { lastCell = inp; });
@@ -532,6 +621,10 @@
       var res = generatePuzzle(level);
       puzzle = res.puzzle;
       clearResults();
+      tally = emptyTally();
+      credited = {};
+      showTally();
+      tallyBox.hidden = false;
       setNotesMode(false);
       buildTable();
       levelLabel.textContent = 'Difficulty: ' + level.charAt(0).toUpperCase() + level.slice(1);
@@ -547,6 +640,7 @@
       puzzle = null;
       inputs = [];
       clearResults();
+      tallyBox.hidden = true;
       game.hidden = true;
       picker.hidden = false;
       var b = picker.querySelector('button');
@@ -619,7 +713,8 @@
     LEVELS: LEVELS, isValidSolution: isValidSolution,
     findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
-    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, hintFor: hintFor, hintApplied: hintApplied
+    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, hintFor: hintFor, hintApplied: hintApplied,
+    classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, tallyLines: tallyLines
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (typeof window !== 'undefined') {
