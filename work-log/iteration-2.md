@@ -21,3 +21,6 @@
 
 ## Progress
 - Iteration branch and this log created.
+- PM (Claude Opus 5.5) decided the scope: one issue, #12 "Keyboard play: arrow-key movement and N shortcut for Notes" (PM log commit 3ba01fa). It combines next-iteration candidates 2 and 3. Pages is still blocked, and saving progress is the PM's top candidate for iteration 3.
+- PM concern: the change touches the same keydown wiring as iteration 1's D1 regression, so the reviewer must trace each key and the tester must repeat the full walkthrough after every rework.
+- #12 gate check passed (OPEN, authored by weaver-agents). Branch `issue-12-keyboard-play` and work log created. Developer launched.
