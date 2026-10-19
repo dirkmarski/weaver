@@ -45,3 +45,16 @@
   - S2: README:36 "(and tint, for a hidden single)" wrongly implies the naked tint does not stay.
   - Nits: N3 the section heading sudoku.js:145, N4 README:64 is ambiguous about `unit`, N5 the README:30 definition is dense (optional).
   - Lead: waiting for the tester before scoping the rework, so a single round covers both reports.
+- Round 1 test (tester agent): PASS (https://github.com/dirkmarski/weaver/issues/19#issuecomment-6258449584).
+  - About 17,150 checks with independently computed expected values. 0 failures, 0 console errors.
+  - Hidden hints checked: 141 (box 96, row 26, column 19).
+  - AC7: 10 Medium puzzles solved by hints only, with row units seen in 8 of them.
+  - AC8: Easy solved with naked singles only.
+  - AC5: 6 Hard puzzles reached the D1.5 text.
+  - New puzzle renders in at most 50 ms.
+  - Observations (not defects): Backspace on the empty target keeps the hint (no value change, as specified). A small layout shift between the two-line and one-line messages already existed. Paste was simulated (headless limit).
+  - Lead checked medium-hidden-row-step2.png by hand: row 1, column 8 = 2 is correct (columns 5, 6 and 9 hold a 2, column 8 and its box do not). The marks are readable.
+- Lead decision: rework round 2 before PM acceptance.
+  - Scope: S1 (the ascending-digit unit test, using the reviewer's grid), S2 (README:36 wording, the same literal-truth class the PM rejected in iteration 2), N3 (section heading) and N4 (README:64 `unit` wording).
+  - Not taken: N5 (optional, already true). The layout shift already existed and is out of scope.
+  - Gates: full re-review and full re-test.
