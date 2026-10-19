@@ -2,6 +2,16 @@
 
 ## Entries (newest first)
 
+### Two sentences of strategy changed the product's direction
+- **Seen:** 2026-10-19
+- **Means:** Same team, same definitions. Two runs without a product aim delivered standard sudoku-app features: pencil notes, then keyboard play. With two sentences of aim restored, the product manager delivered a hint that teaches a solving technique and never gives away the answer, and it reordered its backlog around teaching. The product context is where my input changes what the agents build.
+- **Response:** Pending.
+
+### Earlier product choices are state, not principle
+- **Seen:** 2026-10-19
+- **Means:** As soon as the aim changed, the product manager reversed "no hints", which was in the README and in a scope line I wrote into issue #3. It treats what the product does today as a starting point it can overturn, not as a decision to defend. Anything that should survive a change of direction has to be written down as a principle in the product context.
+- **Response:** Pending.
+
 ### Agents go for discovery by default
 - **Seen:** 2026-10-19
 - **Means:** Agents go for discovery by default, not just the items their definition raises. Pointed at the context folder, the product manager read it first, then everything else in the repository: the charter, this log, every issue and work log, its own definition and the settings. Whatever is in the repository is part of every agent's context, whether a definition points at it or not.
