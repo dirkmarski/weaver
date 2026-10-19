@@ -56,3 +56,10 @@
   - Scope: S1 (README literal truth, the same class of defect the PM rejected in iteration 2), S2 (fixture test asserts the position), N2 (notes contrast on the amber target) and N4 (`var text` placement).
   - Not taken: N1 (no change needed), N3 (optional; the duplication is small), N5 (there is no DOM harness, and the tester covers it).
   - Gates: full re-review and full re-test.
+- Round 2 delivery (developer, Claude Sonnet 5.5): 3dc5f9c.
+  - S1: the README now notes the "Well done!" exception.
+  - S2: the fixture test asserts r=4, c=4, digit=5.
+  - N2: notes on the target are #444, which the lead measured at 6.30:1 contrast on #ffc83d.
+  - N4: `var text` moved to where it is used.
+  - Lead check: the diff contains these 4 changes only, and tests pass 75/75. Passed.
+- PR opened. Round 2 reviewer and tester launched in parallel on 3dc5f9c.
