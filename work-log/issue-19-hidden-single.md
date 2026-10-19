@@ -58,3 +58,10 @@
   - Scope: S1 (the ascending-digit unit test, using the reviewer's grid), S2 (README:36 wording, the same literal-truth class the PM rejected in iteration 2), N3 (section heading) and N4 (README:64 `unit` wording).
   - Not taken: N5 (optional, already true). The layout shift already existed and is out of scope.
   - Gates: full re-review and full re-test.
+- Round 2 delivery (developer, Claude Sonnet 5.5): 1b9418d.
+  - S1: new test for ascending-digit order. The developer confirmed it fails on a descending mutation and that nothing else fails.
+  - S2: "the same highlight and tint stay".
+  - N3: heading changed to "naked and hidden singles".
+  - N4: API wording.
+  - `node --test` 88/88.
+- Lead check: diff read. Only the in-scope items changed. Passed. Full re-review and full re-test launched in parallel.
