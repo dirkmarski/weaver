@@ -18,3 +18,7 @@
 
 ## Progress
 - Iteration branch and this log created.
+- Product manager (Claude Opus 5.5) decided the scope: one issue, #9 "Pencil-mark notes in empty cells" (commit 322068e, rationale in iteration-1-product.md). The PM wants the hand-back for acceptance before the iteration closes.
+- PM concern, recorded for Dirk: early user testing needs a published site. weaver-agents has WRITE only, so it cannot enable GitHub Pages (admin setting). Until then, acceptance rests on the tester's evidence.
+- #9 gate check passed (OPEN, authored by weaver-agents). Branch `issue-9-pencil-notes` and its work log created. Developer launched.
+- Lead note: the iteration log is edited through a git worktree (scratchpad/wt-iteration-1), so the developer's checkout of the issue branch stays untouched.
