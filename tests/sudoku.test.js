@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell } = require('../sudoku.js');
+const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, hintFor, hintApplied } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
 const clone = () => SOLUTION.map((r) => r.slice());
@@ -288,4 +288,98 @@ test('nextCell from a cell surrounded by givens finds nothing', () => {
   const g = NC.map(row => row.map(() => 1));
   g[4][4] = 0;
   for (const d of ['up', 'down', 'left', 'right']) assert.strictEqual(nextCell(g, 4, 4, d), null);
+});
+
+// ---- Hints: naked single ----
+
+const emptyGrid = () => Array.from({ length: 9 }, () => Array(9).fill(0));
+// SOLUTION with the given cells blanked.
+const blank = (...cells) => { const g = clone(); cells.forEach(([r, c]) => { g[r][c] = 0; }); return g; };
+
+const TWO_CANDIDATES = [[0, 3], [0, 4], [3, 3], [3, 4]];
+
+test('findNakedSingle: empty grid has none', () => assert.strictEqual(findNakedSingle(emptyGrid()), null));
+
+test('findNakedSingle: cells with 2+ candidates are not naked singles', () => {
+  // 6/7 swapped across rows 1 and 4: every blank cell has two candidates.
+  assert.strictEqual(findNakedSingle(blank(...TWO_CANDIDATES)), null);
+});
+
+test('findNakedSingle: a full grid has none', () => assert.strictEqual(findNakedSingle(clone()), null));
+
+test('findNakedSingle: finds a single one with its 0-based cell, digit and ascending seen digits', () => {
+  const s = findNakedSingle(blank([4, 7]));
+  assert.deepStrictEqual(s, { r: 4, c: 7, digit: SOLUTION[4][7], seen: [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((d) => d !== SOLUTION[4][7]) });
+});
+
+test('findNakedSingle: picks the first in reading order among several', () => {
+  const s = findNakedSingle(blank([6, 1], [2, 8], [2, 3], [5, 0]));
+  assert.deepStrictEqual([s.r, s.c], [2, 3]);
+  assert.strictEqual(s.digit, SOLUTION[2][3]);
+});
+
+test('findNakedSingle: PUZZLE fixture first naked single in reading order', () => {
+  const s = findNakedSingle(PUZZLE);
+  assert.ok(s);
+  assert.strictEqual(s.r, 4);
+  assert.strictEqual(s.c, 4);
+  assert.strictEqual(s.digit, 5);
+  assert.strictEqual(s.digit, SOLUTION[s.r][s.c]);
+  assert.strictEqual(s.seen.length, 8);
+});
+
+test('hintFor: conflicts come first, even on a full grid', () => {
+  const g = clone(); g[0][0] = g[0][1];
+  const h = hintFor(g, 1);
+  assert.strictEqual(h.kind, 'conflict');
+  assert.strictEqual(h.text, 'Some numbers break the rules. Fix them first: click Verify to see which.');
+  assert.strictEqual(hintFor(g, 2).kind, 'conflict');
+  const g2 = blank([8, 8]); g2[0][0] = g2[0][1];
+  assert.strictEqual(hintFor(g2, 1).kind, 'conflict');
+});
+
+test('hintFor: full grid without conflicts', () => {
+  const h = hintFor(clone(), 1);
+  assert.strictEqual(h.kind, 'full');
+  assert.strictEqual(h.text, 'Every cell is filled. Click Verify to check the grid.');
+});
+
+test('hintFor: no naked single', () => {
+  for (const g of [emptyGrid(), blank(...TWO_CANDIDATES)]) {
+    const h = hintFor(g, 1);
+    assert.strictEqual(h.kind, 'none');
+    assert.strictEqual(h.text, 'No naked single right now. At this point the puzzle needs another technique.');
+  }
+});
+
+test('hintFor: step 1 nudge uses 1-based row and column', () => {
+  const h = hintFor(blank([4, 7]), 1);
+  assert.strictEqual(h.kind, 'nudge');
+  assert.deepStrictEqual([h.r, h.c, h.digit], [4, 7, SOLUTION[4][7]]);
+  assert.strictEqual(h.text, 'Hint: row 5, column 8 is a naked single: only one digit fits there. '
+    + 'Check its row, column and box to find it. Click Hint again to see why.');
+});
+
+test('hintFor: step 2 explains with the digit list, "and" before the last', () => {
+  const g = blank([0, 0]); // SOLUTION[0][0] is 5; the other 8 digits are seen
+  const h = hintFor(g, 2);
+  assert.strictEqual(h.kind, 'explain');
+  assert.deepStrictEqual([h.r, h.c, h.digit], [0, 0, 5]);
+  assert.strictEqual(h.text, 'Naked single: row 1, column 1 must be 5, because its row, column and box already contain 1, 2, 3, 4, 6, 7, 8 and 9.');
+});
+
+test('hintFor: any step other than 2 is the nudge; the grid is not changed', () => {
+  const g = blank([4, 7]), copy = JSON.stringify(g);
+  assert.strictEqual(hintFor(g, 1).kind, 'nudge');
+  assert.strictEqual(hintFor(g, 2).kind, 'explain');
+  assert.strictEqual(JSON.stringify(g), copy);
+});
+
+test('hintApplied: reward only for the hinted digit', () => {
+  const h = hintFor(blank([4, 7]), 1);
+  const d = String(SOLUTION[4][7]);
+  assert.strictEqual(hintApplied(h, d), 'Well done! You applied a naked single: row 5, column 8 is ' + d + '.');
+  assert.strictEqual(hintApplied(h, d === '1' ? '2' : '1'), '');
+  assert.strictEqual(hintApplied(h, ''), '');
+  assert.strictEqual(hintApplied(null, d), '');
 });
