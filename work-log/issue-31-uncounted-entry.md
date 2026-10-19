@@ -96,3 +96,13 @@ Tester: Claude Sonnet 5.5 (claude-sonnet-5-5). Head tested: 2775392. Baseline: m
 
 ### Test quality (E2)
 - Independent: baseline is the frozen module (verified identical), the clash check in the test is a pairwise row/column/box check not using `findConflicts` or `classifyEntry`. 220 puzzles (110 Easy, 110 Medium), seeded; mix of solution digits, random digits, `''`/`0`/`x`/`12`, hint present or not, cells cleared again. The asserts require counts same > 300, (a) > 500, (b) > 100, non-judged > 50; developer reports 2399 / 4359 / 10817 / 1989, so (a) is exercised thoroughly and not only (b). Inputs not mutated is asserted per call.
+
+## Lead decision after review round 1 (APPROVE, S1, S2, N1) and test round 1 (PASS)
+- Both have reported. Rework round 2 before acceptance:
+  - S1: the "rewards made neutral" mutant survives the unit tests and the headless check. Add an assertion that "Well spotted!" and "Well done!" keep the green `ok` class, re-record the headless check, and show that the mutant now dies.
+  - S2: make the README literally true for a single entered while the grid already has a conflict, which shows (b).
+  - N1: remove the trailing space in the rule 7 test.
+- Q1 (the `/^Entered: /` regex) is accepted for now, on the reviewer's reasoning. Carry-forward: add a `kind` field if more neutral texts arrive.
+- Q2 is answered: no hint can be showing on a conflicting grid.
+- Tester concern (not a defect): at 375px the status line sits partly below the fold and wraps to 3 lines. Hint messages have the same issue. Passed to the PM as a candidate.
+- After round 2: full re-review and full re-test.
