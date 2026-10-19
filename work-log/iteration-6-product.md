@@ -113,3 +113,75 @@ Detached worktree scratchpad/pm-accept-25. I did not edit the branch. Diff: sudo
 - Process: the persona fallback can cheat (C used a solver). Future persona prompts must forbid helper scripts explicitly.
 - 2026-10-19: #25 ACCEPTED (PR #27, df7945b). Decision posted on PR #27. Next: acceptance of #26 when delivered.
 - 2026-10-19: PM acceptance of #26 (PR #28, head bbc9fe6) started in detached worktree scratchpad/pm-accept-26. main is an ancestor of the head, so the head is the merged-equivalent state. Done so far: byte checks, own oracle vs main, `node --test` 109/109, own headless DOM run on desktop and 375px (scratchpad/pm-accept-26-checks), README read. Persona re-runs (assistant fallback, sessions pm26-user{a,b,c}) in progress.
+
+## Acceptance #26 (PR #28, head bbc9fe6, 2026-10-19): ACCEPTED
+I worked in the detached worktree scratchpad/pm-accept-26 and did not edit the branch. main (after #25) is an ancestor of the head, so the head is the merged-equivalent state. I did not read governance/LOG.md.
+
+**Byte checks**
+- The `TECHNIQUE_DEFINITIONS` texts are byte-equal to the issue #26 body. I parsed the issue text, not the code, and compared it as hex.
+- The keys are exactly `naked` and `hidden`.
+- The constant is on `window.Sudoku` because `api` is assigned there.
+- `tallyLines` is unchanged.
+
+**My own oracle against main** (scratchpad/pm26-oracle.js)
+- 450 generated puzzles. Each one was walked cell by cell, comparing `hintFor` steps 1 and 2, `creditEntry` text, `completionFor` and `tallyLines`.
+- 110,420 checks, 0 unexpected differences.
+- 33 expected changes, each exactly "has a 8" changing to "has an 8".
+- One generated step-2 hidden-single text for each digit 1-9: only 8 uses "an". The text reads "...already has an 8 in its row or column.".
+- No other article-plus-digit string exists in sudoku.js.
+- `node --test`: 109/109.
+
+**Headless DOM run as a learner** (scratchpad/pm-accept-26-checks/ua.js, at 820px and 375px)
+- The children are in the order H2, `#tally-naked`, `p.definition#definition-naked`, `#tally-hidden`, `p.definition#definition-hidden`.
+- The definitions are 12.8px in rgb(89,89,89) on rgb(245,245,247), against 15.2px for the count lines.
+- After a hinted entry the naked count goes to "0 on your own, 1 with a hint".
+- The full solve gives "Puzzle solved! Singles applied: 39 on your own, 1 with a hint." with 31+8 / 1+0.
+- The block is hidden after New puzzle.
+- No horizontal scroll at 375px and 0 console errors.
+- Screenshots viewed (tally-desktop-solved.png, tally-mobile-solved.png, test-26/hint-an8-desktop.png). Each definition sits directly under its own count line and reads as a caption. The block stays calm and readable on a phone.
+- Cosmetic only: on desktop the naked definition wraps with a widow word, "eight.".
+
+**README**
+- I read the changed sentences and the Files entry one by one. All are literally true: the order, "short grey", the quoted texts, "smaller than the count lines", "never change during a puzzle", and the `TECHNIQUE_DEFINITIONS` entry.
+- The test file description is updated.
+- The hint step-2 description (line 36) does not quote the article, so it is still true.
+
+**Persona re-runs** (assistant fallback; the user-a/b/c agent types are still not available to me)
+- The prompts forbade scripts, solvers and reading the source. All three confirmed they used none.
+- Sessions: pm26-usera, pm26-userb, pm26-userc in pm-proto6/sessions. I replayed each one, and the final screens match their reports.
+- A (Easy, seed 6161, about 61 actions, 17 hint clicks): solved, with "Singles applied: 25 on your own, 15 with a hint".
+  - A defined the naked single correctly and is about 90% sure, crediting the grey text and the hint explanation.
+  - A defined the hidden single correctly from the grey text alone, but is only about 60% sure. The "even if" clause took two reads.
+  - "Singles applied" half made sense: A inferred naked plus hidden from 23+2.
+- B (Medium, seed 6262, 2 hint clicks): solved, with 44/1 = 30+14 / 1+0.
+  - B judged both definitions accurate, with neither wrong nor misleading. Nits: "the other eight" works only through the union of row, column and box, and "this digit" has nothing it refers to.
+  - B: "Singles applied" now makes sense and the numbers add up to 45 empty cells.
+  - B did not see a hidden-single hint, because Hint chose a naked single.
+- C (Easy, seed 6363, 1 hint click): solved, with 44/1 = 43+1 / 1+0.
+  - C: "The grey text did make it clearer", now seen as "look at the cell vs look at the digit", about 80% sure.
+  - What made it stick for C was a "Well spotted! ... hidden single in its box" reward on a move C had actually made, together with the definition.
+  - C: "Singles" means naked plus hidden, worked out from the sums, and was "a little odd".
+- Caveat: these are LLM personas. B and C solved in few tool calls, so the evidence about play is weak. The evidence about understanding the texts is what counts here.
+
+**Re-check of the #25 concern ("Singles applied" is jargon)**
+- Improved: 3/3 personas now explain naked and hidden single in correct words, and 3/3 map "Singles" to naked plus hidden.
+- Not fully solved: they get there by adding up the numbers, not because the message says so. This is a follow-up candidate, not a defect of #26, which is in scope as written.
+
+**Verdict:** E1-E5 are met, and the iteration-6 jargon finding is addressed. **ACCEPTED, no conditions.** The lead may merge.
+
+### Observations from acceptance (candidates, not defects)
+- Hidden singles are under-taught. Hint always prefers a naked single, so in all three games no persona saw a hidden-single explanation. A is only about 60% sure it could spot one on purpose. Learners meet the term mostly by accident. Highest-value teaching gap.
+- The finish line could name the singles, for example "Singles applied (naked + hidden): ...", and offer the next step (try Medium). This also covers the #25 notes "38 out of what?" and the next-level offer.
+- B: a non-single deduction (box-line) gets silence. This matches the feedback-clarity candidate.
+- A: Hint on a conflict is a dead end that says "click Verify". "Well done!" feels less rewarding than "Well spotted!".
+- Wording nits (B): "the other eight" and "this cell" or "this digit" without a referent. These are not worth an issue on their own and can be folded into a future wording pass.
+- Tool: the personas mis-chained `type` actions. That is play.js syntax, not the app.
+- 2026-10-19: #26 ACCEPTED (PR #28, bbc9fe6). Decision posted on PR #28. Iteration 6 is complete from the product side once #28 merges.
+
+## Next-iteration candidates (ordered, revised after #26 acceptance)
+1. Hidden-single mastery: make Hint (or a practice option) teach hidden singles even when a naked single exists, for example by teaching the technique the learner has applied least in this puzzle. This is small and closes the gap seen in all three persona games.
+2. Make Hard teachable: introduce the next technique (pointing pairs or claiming) with a level that needs it. This is the strategy's core "progressively teach new techniques", using the lc.js data.
+3. Finish-line clarity and next step: say what "Singles" are in the solved message, possibly "N of M cells were singles", and offer the next level.
+4. Progress across puzzles: a per-technique "learned" state with persistence, and possibly a daily puzzle.
+5. Feedback clarity: a neutral acknowledgement for non-single placements, and a gentler Hint when there is a conflict.
+6. Notes usability.
