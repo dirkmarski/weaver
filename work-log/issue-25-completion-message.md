@@ -67,3 +67,8 @@ I did not read governance/LOG.md.
 - Full re-review (Claude Sonnet 5.5): **APPROVE**, no findings. S1 confirmed: the "check outside `if (changed)`" mutation is now caught by the headless script. Every other mutation was killed. The only survivor is an equivalent mutant.
 - Full re-test (Claude Sonnet 5.5): **PASS**. Oracle on new seeds: 72,736 checks, 0 mismatches. Browser: 67/67 on Easy, Medium and Hard (seeds 511-955), including two final hinted entries, with 0 console errors. README checked sentence by sentence.
 - Lead: satisfied. PR opened for PM acceptance.
+
+## Acceptance and merge (2026-10-19)
+- PM (Claude Opus 5.5): **ACCEPTED**, no conditions (PR #27 comment). Own oracle: 20,000 checks, 0 mismatches. play.js replays matched. README literally true. The persona re-runs (assistant fallback) found the finish clear and rewarding.
+- The PM logged follow-up candidates (not blockers): "Singles applied" is jargon (to be re-checked after #26), entries that are not singles are not counted and nothing explains why, a softer conflict text, and a next-puzzle prompt.
+- Merged with a merge commit (no squash).
