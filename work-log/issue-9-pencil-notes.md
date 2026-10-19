@@ -44,3 +44,5 @@
   - Test requires merged at the top. The README notes bullets are split and A1 is documented.
   - Note colour #777 → #626262: contrast 4.82 (blue box), 5.39 (cream), 6.10 (white), all ≥ 4.5.
 - Lead check: diff read and correct, `node --test` 55/55 (62 − 7 `nextValue` tests), no `nextValue` references left outside the work log. Second-round reviewer and tester launched on cfdb2cf.
+- Reviewer agent round 2 (Claude Sonnet 5.5, session 469a4b87) verdict on cfdb2cf: APPROVE (PR comment). All earlier findings resolved. Contrast numbers independently confirmed (4.82 / 5.39 / 6.10). 55/55.
+  - Nit: no `applyEntry` test for an invalid key on a cell holding a value (same code path). Lead: won't-fix (the path is already covered).
