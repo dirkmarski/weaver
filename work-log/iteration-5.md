@@ -21,3 +21,9 @@
 
 ## Progress
 - Iteration branch and this log created. PM launched to decide the scope.
+- PM (Claude Opus 5.5) decided the scope: one issue, #22 "Reward applying techniques: recognise naked and hidden singles you enter, with a per-puzzle tally" (PM log d74f422, 8d79317). It comes with a prototype classifier (scratchpad/pm-proto5).
+- PM questions and the lead's answers:
+  1. Pages is still 404. It stays a concern carried forward for Dirk. Enabling it needs admin rights, which is outside the team's remit, and the lead cannot do it.
+  2. A conflict anywhere in the grid gives no credit and a blank status line. Confirmed: this matches how Hint refuses, and explaining why an entry got no credit is out of scope.
+  3. Naked takes precedence over hidden when a cell is both. Accepted. The developer and reviewer are told this is intended.
+- #22 passes the gate check (OPEN, author weaver-agents). See work-log/issue-22-technique-rewards.md.
