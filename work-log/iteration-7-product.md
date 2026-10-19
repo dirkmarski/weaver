@@ -78,3 +78,6 @@ Not chosen, and why:
 
 ## Acceptance of #30 (PR #32, head 69d876e)
 - 2026-10-19: acceptance started. Detached worktree scratchpad/pm-accept-30 at 69d876e. Delivery log read: review APPROVE (2 rounds), test PASS (2 rounds), carry-forward: frozen oracle tests/frozen-sudoku-e81999c.js. Next: own checks, README, play.js replays, personas.
+- PM own checks (head 69d876e): `node --test` 122/122 pass. Frozen oracle byte-identical to `git show e81999c:sudoku.js`; index.html/style.css unchanged. Code diff read in full (sudoku.js +33 lines): matches rules 1-4.
+- PM oracle pm-proto7/acc30.js (own brute-force candidate model, frozen module for E2): E1 table by hand (10 cases incl. mixed own/hint), E2/E3/E4 at every position of a Hint-following walk of 150 Easy + 150 Medium puzzles (seeds 9000-9149 / 9500-9649), steps 1 and 2, same cell on both clicks, input not mutated, every hinted entry gives "Well done!": 168,872 checks, 0 failures. (First run had a bug in MY script: creditEntry needs the value as a string; fixed.)
+- Key metric, simulated learner who always uses Hint: Easy, first hidden-single hint at hint #2 in 150/150 puzzles (before: never, 0/150 puzzles ever showed one); Medium, first hint is a hidden single in 150/150 (before: on average hint #10). Share of hidden hints per puzzle: Easy 39%, Medium 43%.
