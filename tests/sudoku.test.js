@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, seededRng } = require('../sudoku.js');
+const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle, preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, seededRng } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
 const clone = () => SOLUTION.map((r) => r.slice());
@@ -796,4 +796,211 @@ test('TECHNIQUE_DEFINITIONS: the two texts, byte for byte', () => {
     naked: 'Only one digit fits this cell: its row, column and box already hold the other eight.',
     hidden: 'This digit fits in only one cell of a row, column or box, even if that cell could take other digits.'
   });
+});
+
+// ---- Issue 30: Hint prefers the technique applied less ----
+
+const frozen = require('./frozen-sudoku-e81999c.js'); // byte copy of sudoku.js at e81999c (before issue 30)
+
+const tallyOf = (no, nh, ho, hh) => ({ naked: { own: no, hint: nh }, hidden: { own: ho, hint: hh } });
+
+test('preferredTechnique: all-zero tally follows the level', () => {
+  assert.strictEqual(preferredTechnique(emptyTally(), 'easy'), 'naked');
+  assert.strictEqual(preferredTechnique(emptyTally(), 'medium'), 'hidden');
+  assert.strictEqual(preferredTechnique(emptyTally(), 'hard'), 'hidden');
+});
+
+test('preferredTechnique: the technique with the lower count wins on every level', () => {
+  for (const level of ['easy', 'medium', 'hard']) {
+    assert.strictEqual(preferredTechnique(tallyOf(2, 1, 1, 0), level), 'hidden', 'N>H ' + level);
+    assert.strictEqual(preferredTechnique(tallyOf(0, 0, 0, 3), level), 'naked', 'H>N ' + level);
+  }
+});
+
+test('preferredTechnique: equal non-zero counts follow the level', () => {
+  assert.strictEqual(preferredTechnique(tallyOf(1, 0, 0, 1), 'easy'), 'naked');
+  assert.strictEqual(preferredTechnique(tallyOf(1, 0, 0, 1), 'medium'), 'hidden');
+  assert.strictEqual(preferredTechnique(tallyOf(2, 1, 3, 0), 'hard'), 'hidden');
+});
+
+test('preferredTechnique: own and hint counts are added together', () => {
+  assert.strictEqual(preferredTechnique(tallyOf(0, 2, 1, 0), 'easy'), 'hidden');
+  assert.strictEqual(preferredTechnique(tallyOf(0, 2, 1, 0), 'medium'), 'hidden');
+  assert.strictEqual(preferredTechnique(tallyOf(1, 0, 0, 2), 'medium'), 'naked');
+});
+
+test('preferredTechnique: does not change its input', () => {
+  const t = tallyOf(3, 1, 2, 0), copy = JSON.stringify(t);
+  preferredTechnique(t, 'easy');
+  assert.strictEqual(JSON.stringify(t), copy);
+});
+
+// Independent oracle (no use of the code under test): candidates by brute force.
+const peersHold = (g, r, c, d) => {
+  for (let i = 0; i < 9; i++) if (g[r][i] === d || g[i][c] === d) return true;
+  const br = 3 * Math.floor(r / 3), bc = 3 * Math.floor(c / 3);
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (g[br + i][bc + j] === d) return true;
+  return false;
+};
+const candidates = (g, r, c) => {
+  const out = [];
+  if (g[r][c]) return out;
+  for (let d = 1; d <= 9; d++) if (!peersHold(g, r, c, d)) out.push(d);
+  return out;
+};
+const unitCells = (kind, r, c) => {
+  const out = [];
+  for (let i = 0; i < 9; i++) {
+    if (kind === 'row') out.push([r, i]);
+    else if (kind === 'column') out.push([i, c]);
+    else out.push([3 * Math.floor(r / 3) + Math.floor(i / 3), 3 * Math.floor(c / 3) + (i % 3)]);
+  }
+  return out;
+};
+// First hidden single in reading order; unit order box, row, column; digits 1-9.
+// pure = skip cells with exactly one candidate.
+const oracleHidden = (g, pure) => {
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      const cand = candidates(g, r, c);
+      if (!cand.length || (pure && cand.length === 1)) continue;
+      for (const unit of ['box', 'row', 'column']) {
+        for (let d = 1; d <= 9; d++) {
+          if (!cand.includes(d)) continue;
+          const spots = unitCells(unit, r, c).filter(([a, b]) => candidates(g, a, b).includes(d));
+          if (spots.length === 1) return { r, c, digit: d, unit };
+        }
+      }
+    }
+  }
+  return null;
+};
+
+// Walk seeded Easy and Medium puzzles, following the Hint with the preferred technique
+// (as the page would); where Hint has nothing, fill the first empty cell from the solution.
+const walkPositions = (() => {
+  const cache = [];
+  return () => {
+    if (cache.length) return cache;
+    let seed = 3000;
+    for (const level of ['easy', 'medium']) {
+      for (let i = 0; i < 120; i++) {
+        const p = generatePuzzle(level, { rng: seededRng(seed++) });
+        const g = p.puzzle.map((row) => row.slice());
+        const tally = emptyTally();
+        for (let guard = 0; guard < 81; guard++) {
+          cache.push({ level, grid: g.map((row) => row.slice()) });
+          const h = hintFor(g, 1, preferredTechnique(tally, level));
+          let r, c, d;
+          if (h.kind === 'nudge') { r = h.r; c = h.c; d = h.digit; tally[h.technique].hint++; }
+          else {
+            const e = [].concat(...g.map((row, rr) => row.map((v, cc) => [rr, cc, v]))).find((x) => !x[2]);
+            if (!e) break;
+            [r, c] = e; d = p.solution[r][c];
+          }
+          g[r][c] = d;
+        }
+      }
+    }
+    return cache;
+  };
+})();
+
+test('walk covers at least 200 generated Easy and Medium puzzles with varied positions', () => {
+  const pos = walkPositions();
+  assert.ok(pos.length > 5000);
+  assert.ok(pos.some((x) => x.level === 'easy') && pos.some((x) => x.level === 'medium'));
+});
+
+test('hintFor without prefer, or with naked, equals the frozen pre-change hintFor (steps 1 and 2)', () => {
+  for (const { grid } of walkPositions()) {
+    for (const step of [1, 2]) {
+      const want = frozen.hintFor(grid, step);
+      assert.deepStrictEqual(hintFor(grid, step), want);
+      assert.deepStrictEqual(hintFor(grid, step, 'naked'), want);
+    }
+  }
+});
+
+test('hintFor with hidden: first pure hidden single in reading order, else the unchanged result', () => {
+  let pure = 0, fallback = 0, nakedAlsoExisted = 0;
+  for (const { grid } of walkPositions()) {
+    const want = oracleHidden(grid, true);
+    for (const step of [1, 2]) {
+      const got = hintFor(grid, step, 'hidden');
+      if (want) {
+        assert.strictEqual(got.technique, 'hidden');
+        assert.strictEqual(got.kind, step === 2 ? 'explain' : 'nudge');
+        assert.deepStrictEqual({ r: got.r, c: got.c, digit: got.digit, unit: got.unit }, want);
+        assert.notStrictEqual(candidates(grid, got.r, got.c).length, 1, 'not a naked single');
+      } else {
+        assert.deepStrictEqual(got, frozen.hintFor(grid, step));
+      }
+    }
+    if (want) { pure++; if (frozen.hintFor(grid, 1).technique === 'naked') nakedAlsoExisted++; } else fallback++;
+  }
+  assert.ok(pure > 500 && fallback > 50 && nakedAlsoExisted > 200, [pure, fallback, nakedAlsoExisted].join());
+});
+
+test('hintFor with hidden: step 2 explains the same cell as step 1, and a hidden hint uses the existing texts', () => {
+  for (const { grid } of walkPositions()) {
+    for (const prefer of [undefined, 'naked', 'hidden']) {
+      const a = hintFor(grid, 1, prefer), b = hintFor(grid, 2, prefer);
+      if (a.kind !== 'nudge') { assert.strictEqual(a.kind, b.kind); continue; }
+      assert.deepStrictEqual([b.r, b.c, b.digit, b.technique, b.unit], [a.r, a.c, a.digit, a.technique, a.unit]);
+    }
+  }
+  // Same texts as the frozen code for the same hidden single: H_BOX-like grid where only hidden singles exist.
+  for (const { grid } of walkPositions().slice(0, 4000)) {
+    const f = frozen.hintFor(grid, 1);
+    const h = hintFor(grid, 1, 'hidden');
+    if (h.technique === 'hidden' && f.technique === 'hidden') assert.deepStrictEqual(h, f);
+  }
+});
+
+test('hintFor with hidden: conflicts, full grid and no single are the same for every prefer', () => {
+  const conflict = PUZZLE.map((r) => r.slice()); conflict[0][2] = 5;
+  const full = clone();
+  for (const prefer of [undefined, 'naked', 'hidden']) {
+    assert.deepStrictEqual(hintFor(conflict, 1, prefer), frozen.hintFor(conflict, 1));
+    assert.strictEqual(hintFor(conflict, 1, prefer).kind, 'conflict');
+    assert.deepStrictEqual(hintFor(full, 1, prefer), frozen.hintFor(full, 1));
+    assert.strictEqual(hintFor(full, 1, prefer).kind, 'full');
+    const empty = Array.from({ length: 9 }, () => Array(9).fill(0));
+    assert.deepStrictEqual(hintFor(empty, 2, prefer), frozen.hintFor(empty, 2));
+    assert.strictEqual(hintFor(empty, 2, prefer).kind, 'none');
+  }
+});
+
+test('hintFor with hidden falls back to the naked single when the only hidden singles are naked singles', () => {
+  // Cell (0,8) is the only gap: it is a naked single and also a hidden single.
+  const g = clone(); g[0][8] = 0;
+  assert.deepStrictEqual(findHiddenSingle(g, { notNaked: true }), null);
+  assert.ok(findHiddenSingle(g));
+  const h = hintFor(g, 1, 'hidden');
+  assert.strictEqual(h.technique, 'naked');
+  assert.deepStrictEqual(h, frozen.hintFor(g, 1));
+});
+
+test('findHiddenSingle: without options unchanged; notNaked matches the oracle and never returns a naked single', () => {
+  let skipped = 0;
+  for (const { grid } of walkPositions()) {
+    const copy = JSON.stringify(grid);
+    const plain = findHiddenSingle(grid);
+    assert.deepStrictEqual(plain, frozen.findHiddenSingle(grid));
+    assert.deepStrictEqual(findHiddenSingle(grid, {}), plain);
+    assert.deepStrictEqual(findHiddenSingle(grid, { notNaked: false }), plain);
+    const pure = findHiddenSingle(grid, { notNaked: true });
+    assert.deepStrictEqual(pure, oracleHidden(grid, true));
+    if (pure) assert.notStrictEqual(candidates(grid, pure.r, pure.c).length, 1);
+    if (plain && (!pure || pure.r !== plain.r || pure.c !== plain.c)) skipped++;
+    assert.strictEqual(JSON.stringify(grid), copy, 'input not mutated');
+  }
+  assert.ok(skipped > 100, 'the option really skips naked-single cells: ' + skipped);
+});
+
+test('hintFor does not mutate its input for any prefer', () => {
+  const g = PUZZLE.map((r) => r.slice()), copy = JSON.stringify(g);
+  for (const prefer of [undefined, 'naked', 'hidden']) for (const step of [1, 2]) hintFor(g, step, prefer);
+  assert.strictEqual(JSON.stringify(g), copy);
 });
