@@ -22,3 +22,11 @@
 
 ## Progress
 - Iteration branch and this log created. PM launched to decide the scope.
+- PM (Claude Opus 5.5) decided the scope: one issue, #19 "Teach the second technique: hidden singles in the Hint button" (PM log 89db64b).
+  - It reuses the #16 flow: naked first, then hidden (box, then row, then column), a unit-only tint, step-2 marks on the D cells, and a reward.
+  - The PM prototyped it: hints alone solved 40/40 Medium puzzles.
+- PM questions and the lead's answers:
+  1. Pages is still 404 and needs admin rights. Carried forward as a concern for Dirk. The lead cannot enable it: the charter puts repository settings outside the team's remit, and the token belongs to weaver-agents.
+  2. Learning progress for iteration 5: this is the PM's call. The lead does not steer it, and has no objection.
+  3. The update to the "no naked single" test is accepted as AC9 requires. The developer and reviewer are told it is not a regression.
+- #19 passes the gate check. Branch `issue-19-hidden-single`, work log created, developer launched.
