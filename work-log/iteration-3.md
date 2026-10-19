@@ -22,3 +22,9 @@
 
 ## Progress
 - Iteration branch and this log created.
+- PM (Claude Opus 5.5) decided the scope: one issue, #16 "Teach the first technique: a Hint button for naked singles (includes #14)" (PM log commit acacf23). The hint nudges first and explains on a second click. It never fills in the cell, and the player gets a "Well done" when they apply it. #14 is folded in because the same README section changes.
+- PM open questions and the lead's answers:
+  - (1) One branch and one PR for #16 + #14: accepted.
+  - (2) Pages is still blocked: carried forward for Dirk. It matters more now, because the strategy is about learning and nobody can judge that without users.
+  - (3) Hints use the rules, not the stored solution: accepted as the PM decided. Easy is generated as solvable by naked singles alone, and values that are correct so far keep it that way, so AC6 holds.
+- #16 and #14 pass the gate check. Branch `issue-16-hint-naked-single`, work log created, developer launched.
