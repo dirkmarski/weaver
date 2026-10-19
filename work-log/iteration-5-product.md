@@ -11,7 +11,7 @@
 - [x] Pages re-checked 2026-10-19 (`gh api repos/dirkmarski/weaver/pages`): 404, still not enabled. No real users yet.
 - [x] Prototype: entry classifier with an independent brute-force candidate oracle (scratchpad/pm-proto5/proto.js) and a UI mock (scratchpad/pm-proto5/mock.png).
 - [x] Scope decided: one feature issue (below).
-- [ ] Issue raised (number filled in below once created).
+- [x] Issue raised: #22 "Reward applying techniques: recognise naked and hidden singles you enter, with a per-puzzle tally" (https://github.com/dirkmarski/weaver/issues/22), label enhancement.
 - [ ] Delivery by the lead.
 - [ ] PM user acceptance.
 
@@ -43,7 +43,7 @@ Reading: the detector discriminates. Early "correct but unjustified" entries are
 
 UI mock: the reward line under the buttons, then a small block "Techniques applied in this puzzle" with one line per technique, below the status line. It reads clearly and does not compete with the grid.
 
-## Product decisions settled in the issue (see issue body, E1-E10)
+## Product decisions settled in the issue (see #22, E1-E7)
 - Credit only for a digit entered (Notes off) into a cell that held no value; overwrite gets none.
 - Classification on the grid just before the entry; notes ignored; any conflict in that grid means no credit; naked takes precedence over hidden; hidden units box, then row, then column.
 - With a hint: entering the showing hint's digit in its cell = "with a hint" (existing "Well done!" text unchanged). Anything else is judged as an unaided entry.
@@ -67,3 +67,4 @@ Persistence, "learned" states, scores, streaks, badges; penalties for wrong entr
 
 ## Progress
 - 2026-10-19: context read, Pages re-checked, prototype and mock done, scope decided. Next: raise the issue, record the number here, commit and push, hand back to the lead.
+- 2026-10-19: #22 raised (body source: scratchpad/pm-proto5/issue.md). Handed back to the lead for delivery. Next PM step: user acceptance of #22 when the lead reports delivery (re-run scratchpad/pm-proto5/proto.js style oracle against the delivered `classifyEntry`, check texts verbatim, look at the screenshots as a learner, README sentence by sentence).
