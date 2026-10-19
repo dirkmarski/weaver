@@ -38,3 +38,10 @@
     - (b) The developer did not check in the browser that a re-entered credited cell leaves the tally unchanged, or that unjudged entries leave the status line blank. The tester must cover both.
     - (c) The with-a-hint path skips the conflict check. It is unreachable because any value change clears the hint, but the reviewer should confirm.
 - Reviewer and tester launched in parallel on 6474e31.
+- Round 1 review (reviewer agent): APPROVE (https://github.com/dirkmarski/weaver/issues/22#issuecomment-6258935175).
+  - Confirmed: E2 exact; every write path is judged only for E1 entries, on the grid from before the entry; the hint path skipping the conflict check is unreachable (a) (c); existing texts byte-identical; generator untouched; README true apart from N2.
+  - Mutation checks: every ordering rule is caught (box/row 6 fails, row/column 2, hidden-first 3), as are once-per-cell, empty-before and the conflict check.
+  - S1: removing the filled-cell check in `classifyEntry` survives all tests. The existing fixture is null for another reason. Fix: assert `classifyEntry(H_BOX, 0, 3, 3) === null`.
+  - N1: use `bitCount(used) === 8` instead of the hand loop.
+  - N2: the README sentence "Each rewarded entry adds 1 to the matching count." is false on its own. The Files entry for the tests does not mention the reward tests.
+  - Lead: waiting for the tester before scoping the rework.
