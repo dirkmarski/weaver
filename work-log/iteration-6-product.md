@@ -25,3 +25,4 @@ Each simulated user plays only through play.js (no source code, no README, no go
 ## Progress
 - 2026-10-19: context read, play tool built and smoke-tested. Next: run the three simulated users in parallel.
 - 2026-10-19: user-* agent types not available; launched three persona sessions via assistant (sessions usera*, userb*, userc* in pm-proto6/sessions). Waiting for reports.
+- 2026-10-19: persona A (vibes) report received; recorded under "Simulated user findings" when all three are in. Summary: Easy, ~10 cells, quit on boredom when easy wins ran out; liked Hint 2-step and "Well spotted!"; tally credited lucky guesses; "Hidden single: 1" shown but never explained; wants completion celebration, daily/streak, term explanations.
