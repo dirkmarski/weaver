@@ -19,3 +19,10 @@
 
 ## Progress
 - Branch and work log created.
+- Developer agent (Claude Sonnet 5.5, session 469a4b87) delivered commit 97d46c9:
+  - Pure `applyEntry(cell, key, notesMode)` (cell = `{value, notes bitmask}`) and `noteDigits(mask)`, both exported. Keydown and the paste/drop/IME fallback both go through `applyEntry`.
+  - Notes are drawn by an `aria-hidden` absolutely positioned 3x3 overlay in the td (13px grey, pointer-events none). The Notes button sits between Verify and New puzzle, with `aria-pressed` and a filled style when on, and returns focus to the last cell. `choose()` resets the button to Off.
+  - Tests 62/62 (9 new). The developer's headless sanity check found the cell size unchanged with 0/1/8 notes.
+- Ambiguity A1 (not in the issue): Backspace/Delete in notes mode on a cell holding a value. Developer choice: clear the value, as in normal mode. Lead accepts this as the least surprising behaviour; flagged to the PM at acceptance.
+- Concern C1: `nextValue` is no longer used by the page (still exported and tested). Development practices say keep the code concise, so the reviewer is asked to rule on it.
+- Lead check: diff in scope, `node --test` 62/62 locally, logic read and sound.
