@@ -284,6 +284,21 @@
     }
   }
 
+  // Next editable (empty in the puzzle) cell from (r, c) in a direction
+  // ('up'|'down'|'left'|'right'), skipping givens, no wrapping.
+  // Returns [r, c], or null if there is none.
+  function nextCell(puzzle, r, c, direction) {
+    var dr = direction === 'up' ? -1 : direction === 'down' ? 1 : 0;
+    var dc = direction === 'left' ? -1 : direction === 'right' ? 1 : 0;
+    if (!dr && !dc) return null;
+    for (r += dr, c += dc; r >= 0 && r < 9 && c >= 0 && c < 9; r += dr, c += dc) {
+      if (!puzzle[r][c]) return [r, c];
+    }
+    return null;
+  }
+
+  var ARROWS = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+
   function render() {
     var table = document.getElementById('sudoku');
     var status = document.getElementById('status');
@@ -331,6 +346,11 @@
       notesButton.setAttribute('aria-pressed', on);
     }
 
+    function toggleNotes() {
+      setNotesMode(!notesMode);
+      if (lastCell) lastCell.focus();
+    }
+
     function buildTable() {
       var tbody = document.createElement('tbody');
       inputs = [];
@@ -360,6 +380,18 @@
             inp.addEventListener('keydown', function (e) {
               if (!e.key) return;
               if (e.ctrlKey || e.metaKey || e.altKey) return;
+              var dir = ARROWS[e.key];
+              if (dir) {
+                e.preventDefault();
+                var next = nextCell(puzzle, r, c, dir);
+                if (next) inputs[next[0]][next[1]].focus();
+                return;
+              }
+              if (e.key === 'n' || e.key === 'N') {
+                e.preventDefault();
+                toggleNotes();
+                return;
+              }
               if (e.key === 'Backspace' || e.key === 'Delete' || e.key.length === 1) {
                 e.preventDefault();
                 enter(inp, e.key);
@@ -417,10 +449,7 @@
     Array.prototype.forEach.call(picker.querySelectorAll('button[data-level]'), function (b) {
       b.addEventListener('click', function () { choose(b.getAttribute('data-level')); });
     });
-    notesButton.addEventListener('click', function () {
-      setNotesMode(!notesMode);
-      if (lastCell) lastCell.focus();
-    });
+    notesButton.addEventListener('click', toggleNotes);
     document.getElementById('new-puzzle').addEventListener('click', newPuzzle);
 
     button.addEventListener('click', function () {
@@ -452,7 +481,7 @@
     solvableBy: function (grid, technique) { return solvableBy(toFlat(grid), technique); },
     LEVELS: LEVELS, isValidSolution: isValidSolution,
     findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
-    noteDigits: noteDigits, applyEntry: applyEntry
+    noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (typeof window !== 'undefined') {
