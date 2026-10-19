@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, generatePuzzle, seededRng } = require('../sudoku.js');
+const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, seededRng } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
 const clone = () => SOLUTION.map((r) => r.slice());
@@ -518,6 +518,15 @@ test('hintFor: hidden single explain text for box, row and column', () => {
   assert.strictEqual(hintFor(H_COL, 2).text, 'Hidden single: row 1, column 6 must be 4, because every other empty cell in its column already has a 4 in its row or box.');
 });
 
+test('hintFor: hidden single explain text uses "an" before 8 and "a" before 7 and 9', () => {
+  const relabel = (d) => H_BOX.map((row) => row.map((v) => (v === 5 ? d : v === d ? 5 : v)));
+  const text = (d, a) => 'Hidden single: row 5, column 6 must be ' + d + ', because every other empty cell in its box already has ' + a + ' ' + d + ' in its row or column.';
+  assert.strictEqual(hintFor(relabel(8), 2).text, text(8, 'an'));
+  assert.strictEqual(hintFor(relabel(8), 2).text, 'Hidden single: row 5, column 6 must be 8, because every other empty cell in its box already has an 8 in its row or column.');
+  assert.strictEqual(hintFor(relabel(7), 2).text, text(7, 'a'));
+  assert.strictEqual(hintFor(relabel(9), 2).text, text(9, 'a'));
+});
+
 test('hintApplied: hidden single reward text for box, row and column', () => {
   assert.strictEqual(hintApplied(hintFor(H_BOX, 1), '5'), 'Well done! You applied a hidden single: row 5, column 6 is 5.');
   assert.strictEqual(hintApplied(hintFor(H_ROW, 2), '6'), 'Well done! You applied a hidden single: row 4, column 7 is 6.');
@@ -780,4 +789,11 @@ test('completionFor: the last entry is counted first, so the final single is in 
   assert.strictEqual(completionFor(clone(), res.tally).text, 'Puzzle solved! Singles applied: 1 on your own, 0 with a hint.');
   // With the tally from before the entry the final single would be missing.
   assert.strictEqual(completionFor(clone(), before).text, SOLVED_0);
+});
+
+test('TECHNIQUE_DEFINITIONS: the two texts, byte for byte', () => {
+  assert.deepStrictEqual(TECHNIQUE_DEFINITIONS, {
+    naked: 'Only one digit fits this cell: its row, column and box already hold the other eight.',
+    hidden: 'This digit fits in only one cell of a row, column or box, even if that cell could take other digits.'
+  });
 });
