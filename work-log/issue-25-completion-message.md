@@ -43,3 +43,12 @@ Script: scratchpad `wt25-check.js` (not committed; Chrome via DevTools protocol,
 - Code read: the completion check is in `setCell` inside `if (changed)`, after `tally = credit.tally`, with `currentGrid()` read after `inp.value` is written, and only when `cell.value` is non-empty. This meets E2 on both the keydown and paste paths. The credit still uses the grid from before the write.
 - Minor: `completionFor` was inserted between the comment "The heading and the two lines shown for a tally." and `tallyLines`, so that comment now sits above the wrong function. Passed to the reviewer.
 - Passed. Reviewer and tester launched in parallel.
+
+## Review and test, round 1 (2026-10-19)
+- Review (Claude Sonnet 5.5): **APPROVE**. Mutation sweep: every pure guard was killed by the unit tests, and the DOM ordering was killed by the headless script. Survivors: the `cell.value ?` guard (an equivalent mutant, redundant but harmless) and the check moved outside `if (changed)` (DOM-only). Findings:
+  - S1: document a headless non-trigger check for retyping the same digit on a full grid after Verify, and for a notes toggle on a filled cell.
+  - N1: the misplaced tallyLines comment (sudoku.js:304).
+  - N2: the README "Well done!" sentence and the tally "shown again" sentence lack the fill-the-grid qualifier.
+  - N3: the Files list test description does not mention the completion tests.
+- Test (Claude Sonnet 5.5): **PASS**. Independent oracle: 72,736 checks, 0 mismatches. Browser: 50 checks on Medium 101/303 and Hard 202/404, including a hinted final entry and a paste final entry, with 0 console errors. Point (f) already shows no trigger for a notes toggle on a full grid or for retyping the identical digit. The same two README notes as N2 and N3.
+- Lead decision: rework round 2 before PM acceptance for S1, N1, N2 and N3 (all small). The full review and full test are then repeated, as per the carried lessons.
