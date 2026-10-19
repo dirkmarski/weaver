@@ -1069,7 +1069,7 @@ test('creditEntry: a credited cell re-entered with a non-single shows (a), count
   // a different digit in the hinted cell, or any digit in another cell while a hint shows
   const hint = hintFor(H_BOX, 1);
   assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '6').text, NOT_SINGLE(5, 6, 6));
-  assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '1').text, NOT_SINGLE(5, 6, 1)); 
+  assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '1').text, NOT_SINGLE(5, 6, 1));
 });
 
 // E2: walk generated puzzles against the frozen pre-#31 creditEntry (frozen-sudoku-e81999c.js; its

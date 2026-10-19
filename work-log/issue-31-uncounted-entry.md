@@ -106,3 +106,12 @@ Tester: Claude Sonnet 5.5 (claude-sonnet-5-5). Head tested: 2775392. Baseline: m
 - Q2 is answered: no hint can be showing on a conflicting grid.
 - Tester concern (not a defect): at 375px the status line sits partly below the fold and wraps to 3 lines. Hint messages have the same issue. Passed to the PM as a candidate.
 - After round 2: full re-review and full re-test.
+
+## Developer round 2
+- Developer: Claude Sonnet 5.5, session `246ca1dd-69c1-44b3-80a4-65e176ec6193`.
+- S1: the headless check (`.../scratchpad/dom31/check.js`, outside the repo) has a new section 7. On seed 3 Easy it enters a naked single on its own and asserts the text starts with "Well spotted!" and the status class is `ok`. In a fresh puzzle it clicks Hint, enters the hinted digit and asserts "Well done!" with class `ok`. No unit test was added: the class choice lives in `setCell`, and a testable version would need a change to the `creditEntry` result shape or a refactor, which is out of scope.
+  - Run on the tip (before the round 2 commit, same `sudoku.js`): `node check.js <worktree>` exits 0, 30 PASS lines, including `Well spotted! has class ok -> {"c":"ok"}` and `Well done! has class ok -> {"c":"ok"}`.
+  - Run on the mutant (throwaway copy made with `git archive HEAD`, outside the branch; `/^Entered: /.test(credit.text) ? '' : 'ok'` changed to `? '' : ''`): exits 1 with `FAIL Well spotted! has class ok {"s":"Well spotted! You found a naked single on your own: row 1, column 2 is 6.","c":""}`. `node --test` in the mutant copy still passes 128/128, as the review found, so only the headless check guards this.
+- S2: README "neither applies" bullet now starts "If neither applies, or if some numbers in the grid just before the entry break the rules, nothing is rewarded and nothing is counted, ...". The Well spotted bullets are unchanged. The two sub-bullets that follow (no conflict gives (a); conflict gives (b), whatever the digit) still hold.
+- N1: trailing space removed from the last assert line of the rule 7 test.
+- `node --test`: 128/128 pass.
