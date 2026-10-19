@@ -140,3 +140,10 @@ Full review done, not only the delta.
 - N1 (trailing space): fixed.
 
 Scratch: scratchpad/mutb.py (mut.py pointed at rv-31b), scratchpad/dom31/check.js.
+
+## Lead decision after round 2 (review APPROVE with no findings, test PASS)
+- Round 2 closed S1, S2 and N1.
+- Review: all 14 mutants die, including "rewards made neutral".
+- Test: 73,741 oracle checks with 0 mismatches. Browser: 61 PASS at desktop and 375px.
+- Carry-forward: the UI class wiring (neutral vs ok) is guarded only by scratchpad headless scripts, not by a test in the repo. This is the same pattern as earlier issues. Consider an in-repo headless test or a `kind` field later.
+- PR opened for PM acceptance.
