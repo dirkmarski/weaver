@@ -32,3 +32,14 @@ Developer, then reviewer and tester in parallel, then lead check, then PR, then 
 - Code read: count lines are set by id (no "all p"). TECHNIQUE_DEFINITIONS is byte-identical to the issue. The article change is limited to the step-2 hidden text. `#tally .definition` (specificity 1,1,0) overrides `#tally p` (1,0,1). The lead independently computed the contrast of #595959 on #f5f5f7 as 6.43:1 (at least 4.5 required).
 - Passed to the reviewer: (a) the `max-width: 28rem; margin: 0 auto` on `.definition` goes beyond the issue wording. Check how it lines up visually with the count lines. (b) b00e34e alone would not work in a browser (showTally uses ids that only arrive in 081d03f). The branch tip is fine. Lead view: acceptable, since the commits are kept, but noted. (c) The DOM check did not cover a rewarded hidden-single entry.
 - Passed. Reviewer and tester launched in parallel.
+
+## Review and test, round 1 (2026-10-19)
+- Review (Claude Sonnet 5.5): **APPROVE**, with no B or S findings. Mutation sweep: every mutant was caught by unit tests or the DOM script, with no survivors. Nits:
+  - N1: the DOM script prints rather than asserts.
+  - N2: lead note (c), low risk.
+  - N3: lead note (a), the max-width keeps the definitions centred within the grid width. Judged in scope; keep it.
+  - N4: lead note (b), b00e34e alone breaks the browser. It does not matter at the tip, but it is a trap when bisecting.
+- Test (Claude Sonnet 5.5): **PASS**.
+  - Text oracle: 4,506,150 checks against main's sudoku.js, 0 mismatches. Every hidden step-2 digit was covered (8 appeared 222 times).
+  - Browser: 25/25 on Easy, Medium and Hard. This covered a rewarded hidden single (closing lead note c) and "an 8" on the page. Contrast 6.43:1 computed, desktop and 375px screenshots legible, 0 console errors.
+- Lead decision: no rework. The nits need no change. N4 is accepted as is: the individual commits must be kept (no squash), and the branch tip is correct. It is noted here for anyone bisecting. PR opened for PM acceptance.
