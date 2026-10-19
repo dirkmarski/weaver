@@ -9,7 +9,7 @@
 - [x] Context read: charter, product strategy (unchanged), development practices, README, iteration 6 PM and lead logs, lead's iteration 7 log.
 - [x] `governance/LOG.md` NOT read (Dirk denied agents read access).
 - [x] Play tool copied from iteration 6 to scratchpad/pm-proto7.
-- [ ] Simulated user sessions (try user-a/b/c agent types directly first).
+- [ ] Simulated user sessions. user-a/b/c agent types called DIRECTLY: all three launched successfully (no "not found"). Sessions i7-usera (seed 7101), i7-userb (7202, Hard suggested), i7-userc (7303, Medium suggested).
 - [ ] Scope decided.
 - [ ] Issues raised.
 - [ ] PM acceptance (later run).
@@ -20,3 +20,4 @@ Carried candidate list (iteration 6, end): 1 hidden-single mastery; 2 finish-lin
 
 ## Progress
 - 2026-10-19: context read, log opened. Next: persona scoping sessions on main.
+- 2026-10-19: user-a, user-b, user-c launched directly as agent types (the cascade works; no assistant fallback needed). Prompts forbid scripts, solvers, source files and the README. Waiting for reports.
