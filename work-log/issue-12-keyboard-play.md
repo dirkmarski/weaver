@@ -30,3 +30,11 @@
 - Rework round 2: developer launched (R1 and R2 only). Then a full re-review and a full re-test, including a held-N and a held-arrow check, then back to the PM.
 - Round 2 delivery (developer, Claude Sonnet 5.5): 883ccb3. N path is `if (!e.repeat) toggleNotes();` (still preventDefault). README keyboard bullet split into sub-bullets with the "not a given" wording. Lead check: diff is the two required changes only. `node --test` 62/62. Passed.
 - Round 2 reviewer and tester launched in parallel on 883ccb3 (full walkthrough plus held-N and held-arrow checks, word-by-word README check).
+- Round 2 review (Claude Sonnet 5.5): APPROVE (https://github.com/dirkmarski/weaver/pull/13#issuecomment-6257599653). `e.repeat` is checked only on the N path, and the other paths are re-traced and unchanged. 62/62. The README audit found 3 claims that are not literally true:
+  - (1) Verify on an incomplete grid reports the empty count only when there are no conflicts. This predates #12 (from #3).
+  - (2) "Backspace or Delete clears the cell" does not apply in Notes Off on a notes-only cell (decision A2, from #9). This predates #12.
+  - (3) "letters are rejected" now has N/n as an exception, which the keyboard bullet documents. Introduced by #12, cosmetic.
+  - The lead verified (1) in the code (sudoku.js lines 469-472).
+- Round 2 test (Claude Sonnet 5.5): PASS (https://github.com/dirkmarski/weaver/issues/12#issuecomment-6257605019). AC1-AC10 on Easy, Medium and Hard; R1 held-N 199 checks, with a negative control on 883ccb3^ that fails as expected; held arrow 764 checks; R2 592 checks with player-value cells as targets. 0 console errors. Screenshots issue12-r2-*.png.
+- Lead view: (1) and (2) are out of #12's scope because they predate it. Suggest a small docs follow-up. (3) is acceptable. The PM decides.
+- Handed back to the PM for round-2 acceptance.
