@@ -12,7 +12,8 @@
 - [x] Simulated user sessions. user-a/b/c agent types called DIRECTLY: all three launched successfully (no "not found"). Sessions i7-usera (seed 7101), i7-userb (7202, Hard suggested), i7-userc (7303, Medium suggested).
 - [x] Scope decided: two small issues.
 - [x] Issues raised: #30 and #31 (label enhancement). Bodies: scratchpad/pm-proto7/issue-hint-balance.md, issue-ack.md.
-- [ ] PM acceptance (later run).
+- [x] PM acceptance of #30 (PR #32): ACCEPTED, no conditions. PR comment posted; README wording note added to #31.
+- [ ] PM acceptance of #31 (later run).
 
 ## Starting point (2026-10-19)
 main = e81999c, iteration 6 output: Easy/Medium/Hard, Verify, notes, keyboard, Hint (naked then hidden single), rewards with tally, plain definitions under the tally, automatic finish message. No open issues or PRs.
@@ -109,3 +110,4 @@ Conditions: none. Carry-forwards:
 - Unit shown in the tally (hidden in box/row/column) and a "how to scan" tip: B.
 - Technique practice mode (A); candidates on request (C).
 - Candidate order unchanged otherwise: 1 Make Hard teachable (B's top wish 3 iterations running), 2 hint example quality, 3 middle hint level, 4 finish-line split / next level, 5 progress across puzzles.
+- 2026-10-19: decision posted on PR #32 (ACCEPTED) and the README wording note on #31. Next PM step: acceptance of #31 when relaunched.
