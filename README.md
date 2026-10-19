@@ -11,7 +11,11 @@ Open `index.html` in a browser, or serve the folder:
 - On load, pick **Easy**, **Medium** or **Hard**. The chosen level is shown above the grid. **New puzzle** clears the grid and returns to the difficulty prompt.
 - Bold dark numbers are givens and cannot be changed.
 - Click an empty cell and type a digit 1-9. Other input (letters, 0, pasted or dropped multi-character text) is rejected and the cell keeps its previous value. Backspace or Delete clears the cell.
-- Keyboard: with a cell focused, the arrow keys move to the nearest empty cell in that direction in the same row or column. Givens are skipped and there is no wrapping (at the edge, or with only givens beyond, the focus stays put). Arrow keys never change a value, a note, the Verify results or Notes mode. Press **N** (or `n`) to toggle Notes without leaving the cell; nothing is typed. Ctrl/Cmd/Alt combinations keep their browser behaviour.
+- Keyboard: with a cell focused:
+  - Arrow keys move to the nearest cell that is not a given in that direction, in the same row or column. Cells holding your own value are valid targets. Givens are skipped and there is no wrapping (at the edge, or with only givens beyond, the focus stays put). Holding an arrow key auto-repeats.
+  - Arrow keys never change a value, a note, the Verify results or Notes mode.
+  - Press **N** (or `n`) to toggle Notes without leaving the cell; nothing is typed. Holding N toggles once (key auto-repeat is ignored).
+  - Ctrl/Cmd/Alt combinations keep their browser behaviour.
 - Click **Notes** to switch pencil-mark notes on (`Notes: On`) or off (`Notes: Off`). It starts Off for every puzzle.
   - Notes on, digit 1-9 in an empty cell: adds a small grey note in a fixed spot of a 3x3 mini-grid (1 top-left ... 9 bottom-right); typing it again removes it.
   - Notes on, Backspace or Delete: on an empty cell removes all its notes; on a cell holding your value, clears the value.

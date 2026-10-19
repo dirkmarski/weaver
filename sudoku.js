@@ -389,7 +389,7 @@
               }
               if (e.key === 'n' || e.key === 'N') {
                 e.preventDefault();
-                toggleNotes();
+                if (!e.repeat) toggleNotes();
                 return;
               }
               if (e.key === 'Backspace' || e.key === 'Delete' || e.key.length === 1) {
