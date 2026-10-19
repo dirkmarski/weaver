@@ -37,3 +37,9 @@ Script: scratchpad `wt25-check.js` (not committed; Chrome via DevTools protocol,
 ### Assumptions and notes
 - "Value change" is taken as `changed` in `setCell` with a non-empty new value. Overwriting with the same digit is not a change, so it does not re-announce.
 - Entering a hinted digit that fills the last cell shows the solved/conflict text instead of "Well done!", per E3.
+
+## Lead check, round 1 (2026-10-19)
+- Developer (Claude Sonnet 5.5) round 1: fd8bd7c, 47be363, a3f6c1b. `node --test` 107/107.
+- Code read: the completion check is in `setCell` inside `if (changed)`, after `tally = credit.tally`, with `currentGrid()` read after `inp.value` is written, and only when `cell.value` is non-empty. This meets E2 on both the keydown and paste paths. The credit still uses the grid from before the write.
+- Minor: `completionFor` was inserted between the comment "The heading and the two lines shown for a tally." and `tallyLines`, so that comment now sits above the wrong function. Passed to the reviewer.
+- Passed. Reviewer and tester launched in parallel.
