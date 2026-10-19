@@ -36,3 +36,12 @@
     - (b) Generator time under the 1 s cap after the refactor (`spotsFor` allocates arrays).
     - (c) The README, sentence by sentence.
 - Reviewer and tester launched in parallel on 4a7aa93.
+- Round 1 review (reviewer agent): CHANGES REQUESTED, nothing blocking (https://github.com/dirkmarski/weaver/issues/19#issuecomment-6258403453).
+  - Confirmed correct:
+    - D2/D3 logic, every clearing path, the reward for both techniques, and the naked path byte-identical.
+    - Generated puzzles are identical between main and the branch (md5, seeds 1-40, all levels). Medium generation is about 1.7x slower (avg 2.5 ms, max 9.3 ms), far under the 1 s cap.
+    - D8 contrast is OK.
+  - S1: the ascending-digit order is untested. A descending mutation passes all tests. The reviewer gave a constructible grid, and the lead checked it by hand.
+  - S2: README:36 "(and tint, for a hidden single)" wrongly implies the naked tint does not stay.
+  - Nits: N3 the section heading sudoku.js:145, N4 README:64 is ambiguous about `unit`, N5 the README:30 definition is dense (optional).
+  - Lead: waiting for the tester before scoping the rework, so a single round covers both reports.
