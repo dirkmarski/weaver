@@ -22,3 +22,11 @@
 
 ## Progress
 - Iteration branch and this log created. PM launched to decide the scope.
+- PM (Claude Opus 5.5) decided the scope, informed by three simulated-user play sessions: two issues.
+  - #25 "Announce a finished puzzle automatically, with a summary of the singles applied" (all 3 personas hit the silent finish).
+  - #26 "Explain technique names under the tally, and fix 'a 8' in the hidden-single explanation" (2 of 3 personas did not know the terms; 1 found the typo).
+  - Candidate 1 for next time: the Hard dead end. The PM's prototype shows locked candidates alone would not make Hard teachable (only 10 of 60 solved), so it needs a level redesign.
+- Gate check: #25 and #26 are both OPEN and written by weaver-agents (PM). Both pass.
+- Decision: deliver them one after the other (#25 first, then #26 branched from main after the #25 merge). Both edit the README and sudoku.js. Doing them in sequence avoids merge conflicts and keeps each review clean. Accuracy over speed.
+- Concern for Dirk: the `user-a/b/c` agent types were NOT available to the PM when the lead launched it ("Agent type 'user-a' not found"). Possibly nested agents cannot reach them, or they need a session restart. The PM fell back to the `assistant` agent, using the persona text verbatim and the same model and effort. The lead cannot register agent types (that would mean editing `.claude/`, which Dirk owns). The finding is simulated evidence either way.
+- GitHub Pages was not re-checked this run. Still carried forward for Dirk.
