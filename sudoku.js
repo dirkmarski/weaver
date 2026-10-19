@@ -98,71 +98,9 @@
     return cell.value ? cell : { value: '', notes: cell.notes ^ (1 << d) };
   }
 
-  // ---- Hints: the naked single ----
+  // ---- Units and peers (flat cell index p = 9 * row + column) ----
 
-  // First empty cell (reading order) whose row, column and box already hold 8
-  // different digits, so exactly one digit fits. Returns { r, c, digit, seen }
-  // (0-based r/c, seen = those 8 digits ascending) or null.
-  function findNakedSingle(grid) {
-    for (var r = 0; r < 9; r++) {
-      for (var c = 0; c < 9; c++) {
-        if (grid[r][c]) continue;
-        var used = {};
-        for (var i = 0; i < 9; i++) {
-          used[grid[r][i]] = used[grid[i][c]] = true;
-          used[grid[3 * Math.floor(r / 3) + Math.floor(i / 3)][3 * Math.floor(c / 3) + (i % 3)]] = true;
-        }
-        var seen = [];
-        var digit = 0;
-        for (var d = 1; d <= 9; d++) if (used[d]) seen.push(d); else digit = d;
-        if (seen.length === 8) return { r: r, c: c, digit: digit, seen: seen };
-      }
-    }
-    return null;
-  }
-
-  // What Hint says for a grid. step 1 = nudge, step 2 = explain (only used when
-  // a naked single is found). Returns { kind, r, c, digit, text } where kind is
-  // 'conflict' | 'full' | 'none' | 'nudge' | 'explain' (r/c 0-based, set for the last two).
-  function hintFor(grid, step) {
-    if (findConflicts(grid).length) {
-      return { kind: 'conflict', text: 'Some numbers break the rules. Fix them first: click Verify to see which.' };
-    }
-    if (verify(grid).complete) return { kind: 'full', text: 'Every cell is filled. Click Verify to check the grid.' };
-    var s = findNakedSingle(grid);
-    if (!s) {
-      return { kind: 'none', text: 'No naked single right now. At this point the puzzle needs another technique.' };
-    }
-    var where = 'row ' + (s.r + 1) + ', column ' + (s.c + 1);
-    var text;
-    if (step === 2) {
-      text = 'Naked single: ' + where + ' must be ' + s.digit + ', because its row, column and box already contain '
-        + s.seen.slice(0, -1).join(', ') + ' and ' + s.seen[7] + '.';
-    } else {
-      text = 'Hint: ' + where + ' is a naked single: only one digit fits there. Check its row, column and box to find it. '
-        + 'Click Hint again to see why.';
-    }
-    return { kind: step === 2 ? 'explain' : 'nudge', r: s.r, c: s.c, digit: s.digit, text: text };
-  }
-
-  // Reward text when `value` ('' or '1'-'9') entered in the hint's target cell
-  // applies the showing hint (a hintFor result of kind nudge/explain); '' otherwise.
-  function hintApplied(hint, value) {
-    if (!hint || String(hint.digit) !== value) return '';
-    return 'Well done! You applied a naked single: row ' + (hint.r + 1) + ', column ' + (hint.c + 1) + ' is ' + value + '.';
-  }
-
-  // ---- Generator -------------------------------------------------------
-  // Internally a grid is a flat array of 81 digits (0 = empty).
-
-  var LEVELS = {
-    // technique: what removal keeps solvable; beyond: technique the puzzle must NOT be solvable by
-    easy:   { min: 36, max: 40, technique: 'naked',   beyond: null },     // naked singles only
-    medium: { min: 30, max: 35, technique: 'singles', beyond: 'naked' },  // needs hidden singles
-    hard:   { min: 22, max: 29, technique: null,      beyond: 'singles' } // unique, needs more than singles
-  };
-  var TIME_CAP_MS = 1000; // generation never runs past this (click-to-render must stay < 2 s)
-
+  var UNIT_NAMES = ['row', 'column', 'box']; // UNITS[3 * i + k] is unit i of kind UNIT_NAMES[k]
   var UNITS = (function () {
     var u = [], i, j;
     for (i = 0; i < 9; i++) {
@@ -203,6 +141,115 @@
   }
 
   function bitCount(x) { var n = 0; while (x) { x &= x - 1; n++; } return n; }
+
+  // ---- Hints: the naked single ----
+
+  // First empty cell (reading order) whose row, column and box already hold 8
+  // different digits, so exactly one digit fits. Returns { r, c, digit, seen }
+  // (0-based r/c, seen = those 8 digits ascending) or null.
+  function findNakedSingle(grid) {
+    var cells = toFlat(grid);
+    for (var p = 0; p < 81; p++) {
+      if (cells[p]) continue;
+      var used = usedMask(cells, p);
+      var seen = [];
+      var digit = 0;
+      for (var d = 1; d <= 9; d++) if (used & (1 << d)) seen.push(d); else digit = d;
+      if (seen.length === 8) return { r: Math.floor(p / 9), c: p % 9, digit: digit, seen: seen };
+    }
+    return null;
+  }
+
+  // Empty cells of `unit` (list of cell indices) that can take digit d: d is not
+  // in their row, column or box. Empty when d is already in the unit.
+  function spotsFor(cells, unit, d) {
+    var spots = [];
+    for (var i = 0; i < 9; i++) {
+      var q = unit[i];
+      if (!cells[q] && !(usedMask(cells, q) & (1 << d))) spots.push(q);
+    }
+    return spots;
+  }
+
+  // The first empty cell (reading order) that is the only place for some digit
+  // in one of its units. Units are tried box, row, column; digits ascending.
+  // Returns { r, c, digit, unit } (0-based r/c, unit 'box' | 'row' | 'column') or null.
+  function findHiddenSingle(grid) {
+    var cells = toFlat(grid), order = [2, 0, 1]; // kinds: box, row, column
+    for (var p = 0; p < 81; p++) {
+      if (cells[p]) continue;
+      var used = usedMask(cells, p);
+      for (var k = 0; k < 3; k++) {
+        var unit = UNITS[CELL_UNITS[p][order[k]]];
+        for (var d = 1; d <= 9; d++) {
+          // d must be absent from p's peers (so from this unit) and p its only spot.
+          if (used & (1 << d)) continue;
+          if (spotsFor(cells, unit, d).length === 1) {
+            return { r: Math.floor(p / 9), c: p % 9, digit: d, unit: UNIT_NAMES[order[k]] };
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  // What Hint says for a grid. step 1 = nudge, step 2 = explain (only used when
+  // a single is found). A naked single is taught before a hidden single. Returns
+  // { kind, technique, unit, r, c, digit, text } where kind is
+  // 'conflict' | 'full' | 'none' | 'nudge' | 'explain'. For the last two, r/c are
+  // 0-based, technique is 'naked' | 'hidden' and unit ('box' | 'row' | 'column') is set for hidden.
+  function hintFor(grid, step) {
+    if (findConflicts(grid).length) {
+      return { kind: 'conflict', text: 'Some numbers break the rules. Fix them first: click Verify to see which.' };
+    }
+    if (verify(grid).complete) return { kind: 'full', text: 'Every cell is filled. Click Verify to check the grid.' };
+    var s = findNakedSingle(grid);
+    var technique = 'naked';
+    if (!s) {
+      s = findHiddenSingle(grid);
+      technique = 'hidden';
+    }
+    if (!s) {
+      return { kind: 'none', text: 'No naked or hidden single right now. At this point the puzzle needs another technique.' };
+    }
+    var where = 'row ' + (s.r + 1) + ', column ' + (s.c + 1);
+    var text;
+    if (technique === 'naked') {
+      if (step === 2) {
+        text = 'Naked single: ' + where + ' must be ' + s.digit + ', because its row, column and box already contain '
+          + s.seen.slice(0, -1).join(', ') + ' and ' + s.seen[7] + '.';
+      } else {
+        text = 'Hint: ' + where + ' is a naked single: only one digit fits there. Check its row, column and box to find it. '
+          + 'Click Hint again to see why.';
+      }
+    } else if (step === 2) {
+      var others = { box: 'row or column', row: 'column or box', column: 'row or box' }[s.unit];
+      text = 'Hidden single: ' + where + ' must be ' + s.digit + ', because every other empty cell in its ' + s.unit
+        + ' already has a ' + s.digit + ' in its ' + others + '.';
+    } else {
+      text = 'Hint: ' + where + ' is a hidden single: in its ' + s.unit + ', one of the missing digits fits only in this cell. '
+        + 'Check where each missing digit can go in the ' + s.unit + '. Click Hint again to see why.';
+    }
+    return { kind: step === 2 ? 'explain' : 'nudge', technique: technique, unit: s.unit, r: s.r, c: s.c, digit: s.digit, text: text };
+  }
+
+  // Reward text when `value` ('' or '1'-'9') entered in the hint's target cell
+  // applies the showing hint (a hintFor result of kind nudge/explain); '' otherwise.
+  function hintApplied(hint, value) {
+    if (!hint || String(hint.digit) !== value) return '';
+    return 'Well done! You applied a ' + hint.technique + ' single: row ' + (hint.r + 1) + ', column ' + (hint.c + 1) + ' is ' + value + '.';
+  }
+
+  // ---- Generator -------------------------------------------------------
+  // Internally a grid is a flat array of 81 digits (0 = empty).
+
+  var LEVELS = {
+    // technique: what removal keeps solvable; beyond: technique the puzzle must NOT be solvable by
+    easy:   { min: 36, max: 40, technique: 'naked',   beyond: null },     // naked singles only
+    medium: { min: 30, max: 35, technique: 'singles', beyond: 'naked' },  // needs hidden singles
+    hard:   { min: 22, max: 29, technique: null,      beyond: 'singles' } // unique, needs more than singles
+  };
+  var TIME_CAP_MS = 1000; // generation never runs past this (click-to-render must stay < 2 s)
 
   function shuffle(arr, rng) {
     for (var i = arr.length - 1; i > 0; i--) {
@@ -247,7 +294,7 @@
   // 'naked': cells with a single candidate. 'singles': also digits with only
   // one possible cell in a row, column or box (hidden singles).
   function solvableBy(cells, technique) {
-    var g = cells.slice(), progress = true, p, i, d;
+    var g = cells.slice(), progress = true, p, d;
     while (progress) {
       progress = false;
       for (p = 0; p < 81; p++) {
@@ -260,13 +307,8 @@
         for (var u = 0; u < 27; u++) {
           var unit = UNITS[u];
           for (d = 1; d <= 9; d++) {
-            var spot = -1, n = 0, placed = false;
-            for (i = 0; i < 9; i++) {
-              var q = unit[i];
-              if (g[q] === d) { placed = true; break; }
-              if (!g[q] && !(usedMask(g, q) & (1 << d))) { spot = q; n++; }
-            }
-            if (!placed && n === 1) { g[spot] = d; progress = true; }
+            var spots = spotsFor(g, unit, d);
+            if (spots.length === 1) { g[spots[0]] = d; progress = true; }
           }
         }
       }
@@ -372,8 +414,8 @@
       hint = null;
       status.textContent = '';
       status.className = '';
-      table.querySelectorAll('.hint-target, .hint-area').forEach(function (el) {
-        el.classList.remove('hint-target', 'hint-area');
+      table.querySelectorAll('.hint-target, .hint-area, .hint-digit').forEach(function (el) {
+        el.classList.remove('hint-target', 'hint-area', 'hint-digit');
       });
       table.querySelectorAll('.conflict').forEach(function (el) {
         el.classList.remove('conflict');
@@ -532,11 +574,18 @@
       status.className = res.kind === 'conflict' ? 'fail' : '';
       if (res.kind !== 'nudge' && res.kind !== 'explain') return;
       hint = res;
-      for (var r = 0; r < 9; r++) {
-        for (var c = 0; c < 9; c++) {
-          var inBox = Math.floor(r / 3) === Math.floor(res.r / 3) && Math.floor(c / 3) === Math.floor(res.c / 3);
-          if (r === res.r && c === res.c) table.rows[r].cells[c].classList.add('hint-target');
-          else if (r === res.r || c === res.c || inBox) table.rows[r].cells[c].classList.add('hint-area');
+      var p = res.r * 9 + res.c;
+      // Tint: a naked single's row, column and box; a hidden single's unit only.
+      var area = res.technique === 'hidden' ? [CELL_UNITS[p][UNIT_NAMES.indexOf(res.unit)]] : CELL_UNITS[p];
+      area.forEach(function (u) {
+        UNITS[u].forEach(function (q) { table.rows[Math.floor(q / 9)].cells[q % 9].classList.add('hint-area'); });
+      });
+      table.rows[res.r].cells[res.c].classList.remove('hint-area');
+      table.rows[res.r].cells[res.c].classList.add('hint-target');
+      if (res.technique === 'hidden' && res.kind === 'explain') { // mark every cell holding the digit
+        var grid = currentGrid();
+        for (var q = 0; q < 81; q++) {
+          if (grid[Math.floor(q / 9)][q % 9] === res.digit) table.rows[Math.floor(q / 9)].cells[q % 9].classList.add('hint-digit');
         }
       }
       inputs[res.r][res.c].focus();
@@ -570,7 +619,7 @@
     LEVELS: LEVELS, isValidSolution: isValidSolution,
     findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
-    findNakedSingle: findNakedSingle, hintFor: hintFor, hintApplied: hintApplied
+    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, hintFor: hintFor, hintApplied: hintApplied
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (typeof window !== 'undefined') {
