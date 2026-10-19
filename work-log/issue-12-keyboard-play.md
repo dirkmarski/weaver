@@ -28,3 +28,5 @@
   - R2: the README says arrows go to "the nearest empty cell". Wrong, because cells holding a player value are targets too. Reword to "not a given".
 - Lead note: both gates missed R2. The reviewer reported README accurate and the tester PASSed AC10. Lesson: check README claims against behaviour word by word, not just for presence.
 - Rework round 2: developer launched (R1 and R2 only). Then a full re-review and a full re-test, including a held-N and a held-arrow check, then back to the PM.
+- Round 2 delivery (developer, Claude Sonnet 5.5): 883ccb3. N path is `if (!e.repeat) toggleNotes();` (still preventDefault). README keyboard bullet split into sub-bullets with the "not a given" wording. Lead check: diff is the two required changes only. `node --test` 62/62. Passed.
+- Round 2 reviewer and tester launched in parallel on 883ccb3 (full walkthrough plus held-N and held-arrow checks, word-by-word README check).
