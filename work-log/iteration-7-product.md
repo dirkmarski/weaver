@@ -75,3 +75,6 @@ Not chosen, and why:
 4. Progress across puzzles (learned state, persistence).
 5. Notes usability / auto-candidates; progress indicator; collapsible definitions.
 - 2026-10-19: scope decided, #30 and #31 raised. Hand-off to the lead. Next PM step: acceptance when relaunched (oracles for preferredTechnique/hintFor and creditEntry texts, byte checks, play.js replays, README sentence by sentence, persona re-runs with user-a/b/c, asking B about tone of text (a)).
+
+## Acceptance of #30 (PR #32, head 69d876e)
+- 2026-10-19: acceptance started. Detached worktree scratchpad/pm-accept-30 at 69d876e. Delivery log read: review APPROVE (2 rounds), test PASS (2 rounds), carry-forward: frozen oracle tests/frozen-sudoku-e81999c.js. Next: own checks, README, play.js replays, personas.
