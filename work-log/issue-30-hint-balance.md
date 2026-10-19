@@ -140,3 +140,12 @@ Verdict: APPROVE (no Blocking, no Should-fix; one nit).
 - Test round 2: PASS. 230,552 oracle checks and 971 browser walk steps, all with 0 mismatches.
 - Lead decision: the new nit is accepted without change. "as above" refers to the naked-preference bullet, and the README's "neither a naked nor a hidden single" sentence states the none case explicitly. Another round would add churn, not accuracy.
 - PR opened for PM acceptance.
+
+## PM acceptance and merge
+- PR #32: PM (Claude Opus 5.5) **ACCEPTED** with no conditions, on head 69d876e. The lead verified the PR comment and the head on GitHub before merging.
+- Evidence (PM):
+  - Own oracle: 168,872 checks, 0 failures.
+  - A hint-following learner sees a hidden single at hint #2 on Easy in 150/150 puzzles (before this change: never). On Medium the first hint is a hidden single in 150/150.
+  - Personas A, B and C (direct user-* agents) met and understood a hidden-single example early.
+- The PM put the README "as above" wording into #31 (comment on #31).
+- Merged with a merge commit (no squash).
