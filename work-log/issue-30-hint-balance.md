@@ -103,3 +103,14 @@ Verdict: APPROVE (no Blocking, no Should-fix; four nits).
 
 ## Developer round 2 (Claude Sonnet 5.5)
 - README only. N1: the Order bullet now says the "on your own" and "with a hint" numbers on each technique's line in the tally block are added together. N2: the hidden-preference bullet now ends "If there is none, it teaches a naked single as above." Checked against `preferredTechnique` and `hintFor` in sudoku.js. No code changes.
+
+## Test round 2 (tester, Claude Sonnet 5.5) - head 12e8942
+- Verdict: PASS.
+- Scope: fresh worktree at origin/issue-30-hint-balance. Since 27650b2 the only non-work-log change is README.md (2 lines); no code or test change.
+- `node --test`: 122 tests, 122 pass, 0 fail.
+- Independent oracle (oracle30.js, pointed at the new worktree): 330 puzzles (110 per level), 12,368 positions, 230,552 checks, 0 mismatches (20,064 pure hidden finds, 4,232 naked fallbacks).
+- Browser check (headless Chrome over CDP, real index.html, desktop and 375px): 26 checks pass (12 per viewport plus the full-game walk and the console check), 0 failures, 0 console errors. Full-game walk: 971 steps, 0 mismatches; 130 steps took the hidden-preferred-but-naked-fallback path, 383 pure hidden, 449 naked-preferred, 9 "none", 18 filled grids.
+- README sentences checked against observed behaviour:
+  - Order bullet: the preference in the browser always followed the sum of the "on your own" and "with a hint" numbers read from each tally line (the check parses the two on-screen lines); ties went naked on Easy and hidden on Medium/Hard, and the level used was the one chosen last (Medium then Easy gave naked first). True.
+  - "If there is none, it teaches a naked single as above": when hidden was preferred and no non-naked hidden single existed, the page taught the naked single (first in reading order) in all 130 such steps. When no naked single exists either, the "No naked or hidden single" text shows, as the README says in its no-single bullet. True.
+- Rest of the Hint section re-checked (naked/hidden definitions, first/second click highlights, same cell on both clicks, notes keep the hint, entering the digit gives "Well done!", reward and tally counts, tally block text, hint cleared on value change): consistent with the browser run and the oracle. No discrepancies.
