@@ -91,3 +91,4 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 /* Techniques tally below the status line. */
 #tally h2 { margin: 1rem 0 0.5rem; font-size: 1.1rem; }
 #tally p { margin: 0.25rem 0; font-size: 0.95rem; }
+#tally .definition { margin: 0 auto 0.75rem; max-width: 28rem; font-size: 0.8rem; color: #595959; }
