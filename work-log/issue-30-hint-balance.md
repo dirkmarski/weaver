@@ -114,3 +114,23 @@ Verdict: APPROVE (no Blocking, no Should-fix; four nits).
   - Order bullet: the preference in the browser always followed the sum of the "on your own" and "with a hint" numbers read from each tally line (the check parses the two on-screen lines); ties went naked on Easy and hidden on Medium/Hard, and the level used was the one chosen last (Medium then Easy gave naked first). True.
   - "If there is none, it teaches a naked single as above": when hidden was preferred and no non-naked hidden single existed, the page taught the naked single (first in reading order) in all 130 such steps. When no naked single exists either, the "No naked or hidden single" text shows, as the README says in its no-single bullet. True.
 - Rest of the Hint section re-checked (naked/hidden definitions, first/second click highlights, same cell on both clicks, notes keep the hint, entering the digit gives "Well done!", reward and tally counts, tally block text, hint cleared on value change): consistent with the browser run and the oracle. No discrepancies.
+
+## Review round 2 (reviewer, Claude Sonnet 5.5, head 12e8942)
+Verdict: APPROVE (no Blocking, no Should-fix; one nit).
+
+### Checks done (full review, not a diff review)
+- `git diff 27650b2 12e8942 -- . ':!work-log'` is README.md only (2 lines). `sudoku.js`, `index.html` and tests are unchanged since round 1.
+- `node --test` in full on a fresh worktree of 12e8942: 122 tests, 122 pass, 0 fail.
+- Mutation script re-run on the new head (same 33 mutants): none survives. Every mutant fails at least 1 unit test (unit fails column 1-11 for the logic mutants, 8 for the missing export). All 12 UI-wiring mutants (currentLevel not set / always easy / always medium, no prefer, empty tally, prefer always hidden / always naked, step always 1, level argument missing, swapped level, UI mutants) have 0 unit fails and die in the headless script, as in round 1.
+- Full diff against main (e81999c) re-read against rules 1-5, the edge cases and E1-E6: unchanged from round 1; still conformant. Frozen file unchanged.
+- README, every changed sentence against the code:
+  - Order bullet: "the technique you have applied less ... adding together, for each technique, the 'on your own' and 'with a hint' numbers on its line in the block below the message": true; `tallyLines` prints `Naked single: X on your own, Y with a hint` and the same for hidden, and `preferredTechnique` adds own + hint per technique. Equal counts, start of puzzle, Easy naked, Medium/Hard hidden: true (strict `<`, tie by level). "The level is the one you chose for the current puzzle": true (`currentLevel` set in `choose`).
+  - "Preferring the naked single": true (default order unchanged, checked against the frozen copy by E2).
+  - "Preferring the hidden single": pure hidden single first, first in reading order, box/row/column/digit order: true. "If there is none, it teaches a naked single as above": true whenever a naked single exists; see N1 for the case where none exists.
+  - "Both clicks of one hint explain the same cell": true (value change removes the hint, tally only changes on a value change, notes do not alter grid or tally).
+  - Hidden first-click parenthesis, Files list entries (`findHiddenSingle(grid, options)`, `preferredTechnique`, `hintFor(grid, step, prefer)`, test list, frozen file line): true, unchanged from round 1.
+- "As above" when there is no naked single either: the code returns kind `none` with today's text (no pure hidden single and no naked single implies no hidden single at all, since any non-pure hidden single is a naked single). The "as above" bullet ("Only when there is no naked single does it look for a hidden single") plus the existing "neither a naked nor a hidden single ... says 'No naked or hidden single right now...'" sentence cover this, so the README is not false, but it is not literally "teaches a naked single" in that case.
+
+### Findings
+- N1 (Nit) README "If there is none, it teaches a naked single as above." is only literally true when a naked single exists; with no naked single the result is the `none` message (described two bullets away). Optional wording: "If there is none, it follows the naked-single order above." No change required for approval.
+- N3 (carried, accepted by lead) Frozen copy: replace or delete the next time `hintFor` changes.
