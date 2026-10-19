@@ -11,9 +11,9 @@
 - [x] Scope decided (one feature issue, with #14 bundled in)
 - [x] Issue raised: #16 "Teach the first technique: a Hint button for naked singles (includes #14)" (https://github.com/dirkmarski/weaver/issues/16)
 - [x] #14 commented as bundled into #16 (https://github.com/dirkmarski/weaver/issues/14#issuecomment-6257773701)
-- [ ] Delivery by the lead (PR closing #16 and #14)
-- [ ] User acceptance by the product manager
-- [ ] Iteration closed
+- [x] Delivery by the lead (PR #17 closing #16 and #14; code 3dc5f9c, head ec8f8ae; 2 rounds)
+- [x] User acceptance by the product manager: **ACCEPTED** (https://github.com/dirkmarski/weaver/issues/16#issuecomment-6257905181)
+- [ ] Iteration closed (complete once the lead merges PR #17 and #16/#14 close)
 
 ## Starting point (2026-10-19)
 main has generated puzzles (Easy/Medium/Hard), digit entry, Verify, New puzzle, pencil-mark notes and keyboard play (arrows + N). Open: #14 (README docs). **The strategy changed:** the aim is now to teach solving techniques progressively and to reward learning and applying them. Solving is secondary. Small increments and early user testing still apply.
@@ -64,6 +64,20 @@ Developer: H10 unit tests and README (including #14). Reviewer: trace the hint s
 
 ## Progress
 - 2026-10-19: Scope decided, #16 raised, #14 bundled (comment posted), work log written and pushed on `iteration-3`. Handed back to the lead for delivery. Next PM step: user acceptance of #16 (and #14) when the lead reports delivery.
+
+- 2026-10-19: User acceptance of #16 (+#14) on PR #17. **ACCEPTED.** Details below.
+
+## User acceptance of #16 (+#14), PR #17
+- Delivery: round 1 (c38a10a) review CHANGES REQUESTED (S1 README last bullet not literally true after "Well done!"; S2 a test name promised an unchecked assertion), test PASS. Round 2 (3dc5f9c) fixed S1, S2, N2 (target notes #444) and N4; review APPROVE; test PASS with the full walkthrough repeated (294 checks, 3 levels, AC6 Easy hint-only solve on 4 puzzles, 0 console errors).
+- My own checks: I created a detached worktree of the PR head (scratchpad/pm-ua16). `node --test` passed 75/75. I read the sudoku.js, index.html, style.css and README diffs: the H4-H7 texts are verbatim, the hint state clears through `clearResults`, and the reward is computed in `setCell` before the clear and only for the target cell plus the hinted digit. I read the README sentence by sentence (Hint section and the three #14 fixes): it is literally true.
+- Visuals as a learner: step 1 is clear and does not give the answer away. The amber target is distinct from the blue focus and the red conflict. The tint is readable over both box colours. In step 2 I verified the digit and the 8 seen digits by hand on the screenshot (row 1, column 1 = 2). The reward is green and shown only after the learner types the digit. Notes on the target are readable.
+- Decision: **ACCEPTED**. Non-blocking observations: pasted "n" is rejected while the README says "letters other than N" (accepted wording, explained by the keyboard bullet); Medium/Hard often get "needs another technique" (expected); there is no reward for unaided naked singles (future); paste was tested via CDP insertText (accepted limit).
+- **Iteration 3 is complete once PR #17 is merged** and #16 and #14 are closed by it. No further PM work is needed for this iteration.
+
+## Lessons
+- Fixing every message text verbatim in the issue made acceptance fast and objective, and the tester could assert exact strings. Keep doing this for teaching texts.
+- The iteration-2 lesson (check the README sentence by sentence) caught S1 in review before it reached me.
+- Concern carried over: every teaching assumption is still PM judgement. There are no real learners because Pages is not enabled.
 
 ## Next-iteration candidates (not yet decided)
 1. Hidden-single hint (extends the #16 mechanism; serves Medium).
