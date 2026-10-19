@@ -26,3 +26,10 @@
 - Ambiguity A1 (not in the issue): Backspace/Delete in notes mode on a cell holding a value. Developer choice: clear the value, as in normal mode. Lead accepts this as the least surprising behaviour; flagged to the PM at acceptance.
 - Concern C1: `nextValue` is no longer used by the page (still exported and tested). Development practices say keep the code concise, so the reviewer is asked to rule on it.
 - Lead check: diff in scope, `node --test` 62/62 locally, logic read and sound.
+- PR #10 opened. Reviewer and tester launched in parallel on 97d46c9.
+- Reviewer agent (Claude Sonnet 5.5, session 469a4b87) verdict: APPROVE (PR comment), 62/62. Correctness of P1-P11 confirmed, including IME/Tab/modifier handling and the input fallback.
+  - Should-fix 1: remove dead `nextValue` (code, export, 7 tests, README). This also resolves C1.
+  - Should-fix 2: the "verify ignores notes" unit test is tautological (it compares verify with itself).
+  - Nits: merge the mid-file `require`s; split the long README How-to-play line and document A1; note colour #777 is borderline for AA contrast, use #6b6b6b.
+  - A1: the reviewer recommends keeping it (consistent, safe, already tested).
+- Lead decision D1: all should-fix items and nits accepted for one rework round (all cheap and in scope). Waiting for the tester so the rework is batched.
