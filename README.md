@@ -11,7 +11,13 @@ Open `index.html` in a browser, or serve the folder:
 - On load, pick **Easy**, **Medium** or **Hard**. The chosen level is shown above the grid. **New puzzle** clears the grid and returns to the difficulty prompt.
 - Bold dark numbers are givens and cannot be changed.
 - Click an empty cell and type a digit 1-9. Other input (letters, 0, pasted or dropped multi-character text) is rejected and the cell keeps its previous value. Backspace or Delete clears the cell.
-- Click **Notes** to switch pencil-mark notes on (`Notes: On`) or off (`Notes: Off`); it starts Off for every puzzle. With notes on, typing 1-9 in an empty cell adds that digit as a small grey note in a fixed spot of a 3x3 mini-grid (1 top-left ... 9 bottom-right); typing it again removes it. Backspace or Delete on an empty cell removes all its notes. Typing a digit into a cell that already holds your value does nothing in notes mode. With notes off, typing a digit into a cell with notes enters the value and removes its notes. Verify ignores notes (a notes-only cell counts as empty), and changing a note keeps the Verify flags and message. **New puzzle** discards all notes.
+- Click **Notes** to switch pencil-mark notes on (`Notes: On`) or off (`Notes: Off`). It starts Off for every puzzle.
+  - Notes on, digit 1-9 in an empty cell: adds a small grey note in a fixed spot of a 3x3 mini-grid (1 top-left ... 9 bottom-right); typing it again removes it.
+  - Notes on, Backspace or Delete: on an empty cell removes all its notes; on a cell holding your value, clears the value.
+  - Notes on, a digit in a cell that already holds your value does nothing.
+  - Notes off, a digit in a cell with notes: enters the value and removes its notes.
+  - Verify ignores notes (a notes-only cell counts as empty), and changing a note keeps the Verify flags and message.
+  - **New puzzle** discards all notes.
 - Click **Verify** to check the grid. Checking is by the sudoku rules only (no stored answer is compared), so any valid solution is accepted.
   - Complete grid: tells you whether it is solved.
   - Incomplete grid: tells you whether the numbers so far break any rule, and how many cells are empty.
@@ -38,7 +44,7 @@ Requires Node 18+ (no packages needed):
 - `index.html`, `style.css` - page and styling
 - `sudoku.js` - pure logic, exported for Node (and as `window.Sudoku`), plus the browser UI:
   - `generatePuzzle(level, {rng, maxMs})` -> `{level, puzzle, solution, givens}` (9x9 arrays, 0 = empty); `generateSolution(rng)`; `seededRng(seed)` for reproducible output; `countSolutions(grid, limit)`; `solvableBy(grid, 'naked'|'singles')`; `LEVELS`
-  - `isValidSolution`, `findConflicts`, `verify`, `sanitizeDigit`, `nextValue`
+  - `isValidSolution`, `findConflicts`, `verify`, `sanitizeDigit`, `buildGrid(puzzle, values)` (grid passed to verify; notes excluded)
   - notes: `applyEntry(cell, key, notesMode)` (pure transition of `{value, notes}`, notes a bitmask with bit d = digit d), `noteDigits(mask)`
 - `tests/sudoku.test.js` - validation/verify/input/notes unit tests
 - `tests/generator.test.js` - generator tests (validity, uniqueness, givens bands, technique, determinism, timing; prints max/avg ms per level)

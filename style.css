@@ -74,7 +74,7 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
   font-size: 13px;
   font-weight: 400;
   line-height: 1;
-  color: #777;
+  color: #626262;
 }
 #sudoku .notes span { display: flex; align-items: center; justify-content: center; }
 #notes[aria-pressed="true"] { background: #1a4fd0; color: #fff; font-weight: 600; }

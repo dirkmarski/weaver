@@ -65,11 +65,12 @@
     return typeof text === 'string' && /^[1-9]$/.test(text) ? text : null;
   }
 
-  // Pure input-layer transition: the value a cell should show after its raw
-  // text changed from prev. Invalid or multi-character raw text keeps prev.
-  function nextValue(prev, raw) {
-    var d = sanitizeDigit(raw);
-    return d === null ? (prev || '') : d;
+  // Build the grid verify() checks: givens from puzzle, plus the entered
+  // value strings ('' or '1'-'9'). Notes are never part of it.
+  function buildGrid(puzzle, values) {
+    return puzzle.map(function (row, r) {
+      return row.map(function (v, c) { return v || (values[r][c] ? parseInt(values[r][c], 10) : 0); });
+    });
   }
 
   // ---- Pencil-mark notes ----
@@ -424,11 +425,9 @@
 
     button.addEventListener('click', function () {
       clearResults();
-      var grid = puzzle.map(function (row, r) {
-        return row.map(function (v, c) {
-          return v || (inputs[r][c].value ? parseInt(inputs[r][c].value, 10) : 0);
-        });
-      });
+      var grid = buildGrid(puzzle, inputs.map(function (row) {
+        return row.map(function (inp) { return inp.value; });
+      }));
       var res = verify(grid);
       res.conflicts.forEach(function (p) {
         var inp = inputs[p[0]][p[1]];
@@ -452,7 +451,7 @@
     countSolutions: function (grid, limit) { return search(toFlat(grid), limit || 2); },
     solvableBy: function (grid, technique) { return solvableBy(toFlat(grid), technique); },
     LEVELS: LEVELS, isValidSolution: isValidSolution,
-    findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, nextValue: nextValue,
+    findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
