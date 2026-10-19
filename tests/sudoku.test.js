@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { isValidSolution } = require('../sudoku.js');
+const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
 const clone = () => SOLUTION.map((r) => r.slice());
@@ -81,7 +81,6 @@ test('rejects an extra 10th row', () => {
 });
 
 // ---- Playable puzzle, conflicts, verify, input sanitising ----
-const { findConflicts, verify, sanitizeDigit } = require('../sudoku.js');
 const grid = (g) => g.map((r) => r.slice());
 const keys = (list) => list.map((p) => p.join(',')).sort();
 
@@ -150,17 +149,6 @@ test('sanitizeDigit accepts one digit 1-9 or empty, rejects the rest', () => {
   }
 });
 
-// ---- Input-layer transition (regression for stale-prev / maxLength bugs) ----
-const { nextValue } = require('../sudoku.js');
-
-test('nextValue: typed 4 then "4x" is rejected', () => assert.strictEqual(nextValue('4', '4x'), '4'));
-test('nextValue: selection replaced by "x" keeps 4', () => assert.strictEqual(nextValue('4', 'x'), '4'));
-test('nextValue: multi-digit "12" keeps 4', () => assert.strictEqual(nextValue('4', '12'), '4'));
-test('nextValue: "7" into empty gives 7', () => assert.strictEqual(nextValue('', '7'), '7'));
-test('nextValue: "7" replacing 4 gives 7', () => assert.strictEqual(nextValue('4', '7'), '7'));
-test('nextValue: cleared gives empty', () => assert.strictEqual(nextValue('4', ''), ''));
-test('nextValue: invalid with no prev gives empty', () => assert.strictEqual(nextValue('', 'x'), ''));
-
 test('two user-entered clashing digits are both reported', () => {
   const g = PUZZLE.map((r) => r.slice());
   g[0][2] = 2; g[0][3] = 2; // both user cells, same row, different boxes
@@ -173,4 +161,82 @@ test('cell in conflict in both row and box is reported once', () => {
   const res = findConflicts(g).map((p) => p.join(','));
   assert.deepStrictEqual(res, ['0,1', '0,2']);
   assert.strictEqual(res.filter((k) => k === '0,2').length, 1);
+});
+
+// ---- Pencil-mark notes ----
+const empty = { value: '', notes: 0 };
+const bit = (...ds) => ds.reduce((m, d) => m | (1 << d), 0);
+
+test('noteDigits lists noted digits in order', () => {
+  assert.deepStrictEqual(noteDigits(0), []);
+  assert.deepStrictEqual(noteDigits(bit(7, 1, 4)), [1, 4, 7]);
+  assert.deepStrictEqual(noteDigits(bit(1, 2, 3, 4, 5, 6, 7, 8, 9)), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+});
+
+test('notes mode: digits toggle notes on an empty cell', () => {
+  let c = applyEntry(applyEntry(empty, '3', true), '7', true);
+  assert.deepStrictEqual(c, { value: '', notes: bit(3, 7) });
+  c = applyEntry(c, '3', true);
+  assert.deepStrictEqual(c, { value: '', notes: bit(7) });
+});
+
+test('notes mode: a cell with a value ignores digits', () => {
+  const c = { value: '5', notes: 0 };
+  assert.deepStrictEqual(applyEntry(c, '3', true), c);
+  assert.deepStrictEqual(applyEntry(c, '5', true), c);
+});
+
+test('notes mode: Backspace/Delete removes all notes of an empty cell', () => {
+  const c = { value: '', notes: bit(1, 9) };
+  assert.deepStrictEqual(applyEntry(c, 'Backspace', true), empty);
+  assert.deepStrictEqual(applyEntry(c, 'Delete', true), empty);
+});
+
+test('notes mode: Backspace on a cell with a value clears the value', () => {
+  assert.deepStrictEqual(applyEntry({ value: '5', notes: 0 }, 'Backspace', true), empty);
+});
+
+test('normal mode: a digit sets the value and removes the notes', () => {
+  assert.deepStrictEqual(applyEntry({ value: '', notes: bit(2, 4) }, '6', false), { value: '6', notes: 0 });
+  assert.deepStrictEqual(applyEntry({ value: '1', notes: 0 }, '6', false), { value: '6', notes: 0 });
+});
+
+test('normal mode: clearing the value leaves no notes, Delete keeps existing notes', () => {
+  assert.deepStrictEqual(applyEntry({ value: '6', notes: 0 }, 'Delete', false), empty);
+  assert.deepStrictEqual(applyEntry({ value: '', notes: bit(2) }, 'Delete', false), { value: '', notes: bit(2) });
+});
+
+test('letters, 0 and multi-character text change nothing in either mode', () => {
+  const c = { value: '', notes: bit(2) };
+  ['a', '0', '12', '4x', ' '].forEach((k) => {
+    assert.deepStrictEqual(applyEntry(c, k, true), c);
+    assert.deepStrictEqual(applyEntry(c, k, false), c);
+  });
+});
+
+test('verify ignores notes: a notes-only cell is empty in the grid verify checks', () => {
+  const values = PUZZLE.map((r) => r.map(() => ''));
+  const r = PUZZLE.findIndex((row) => row.includes(0));
+  const c = PUZZLE[r].indexOf(0);
+  const cell = applyEntry({ value: '', notes: 0 }, '1', true);
+  assert.strictEqual(cell.value, '');
+  values[r][c] = cell.value; // the input shows no value, only a note
+  const grid = buildGrid(PUZZLE, values);
+  assert.strictEqual(grid[r][c], 0);
+  assert.strictEqual(verify(grid).empty, verify(PUZZLE).empty);
+  values[r][c] = '9';
+  assert.strictEqual(buildGrid(PUZZLE, values)[r][c], 9);
+});
+
+test('buildGrid accepts the UI shape: given cells have no input and yield "" in values', () => {
+  // The Verify handler maps a missing input (given cell) to '' - see sudoku.js.
+  const values = PUZZLE.map((row) => row.map((v) => ''));
+  const r = PUZZLE.findIndex((row) => row.includes(0));
+  const c = PUZZLE[r].indexOf(0);
+  values[r][c] = '7';
+  const grid = buildGrid(PUZZLE, values);
+  PUZZLE.forEach((row, i) => row.forEach((v, j) => {
+    if (v) assert.strictEqual(grid[i][j], v);
+    else assert.strictEqual(grid[i][j], i === r && j === c ? 7 : 0);
+  }));
 });
