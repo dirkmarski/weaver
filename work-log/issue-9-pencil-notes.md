@@ -33,3 +33,8 @@
   - Nits: merge the mid-file `require`s; split the long README How-to-play line and document A1; note colour #777 is borderline for AA contrast, use #6b6b6b.
   - A1: the reviewer recommends keeping it (consistent, safe, already tested).
 - Lead decision D1: all should-fix items and nits accepted for one rework round (all cheap and in scope). Waiting for the tester so the rework is batched.
+- Tester agent (Claude Sonnet 5.5, session 469a4b87) verdict: PASS (PR comment). AC1-AC13 and P1 pass on Easy and Hard (86 browser checks, real CDP key events), 0 console errors, no defects. Cell 58x58, input 56x56, table 522x547 with 0/1/9 notes. Note toggles average under 16 ms. A1 observed as designed. Screenshots in the scratchpad: issue9-notes-cell.png, issue9-notes-on.png, issue9-verify-notes.png.
+  - Observation: notes #777 at 13px have about 3.5:1 contrast on the blue box shade.
+- Lead viewed the notes-cell and verify screenshots. Layout is correct, but the notes are faint on blue.
+- Lead decision D2 (amends D1's colour nit): the note colour must reach at least 4.5:1 (WCAG AA) on both box shades and plain white. Font size stays as is. This is a legibility fix within P3 ("muted grey", "readable").
+- Rework launched with the developer (D1 + D2). Reviewer and tester re-check afterwards.
