@@ -31,3 +31,8 @@
 - Gate check: #30 and #31 are both OPEN, written by weaver-agents (PM), labelled enhancement. Both pass.
 - Decision: deliver in sequence, #30 first, then #31 branched from main after the #30 merge. Both touch sudoku.js, the README and tests/sudoku.test.js (the same reason as in iteration 6).
 - PM concern noted: the tone of #31 text (a) may feel like a penalty. The PM will check it with user-b at acceptance.
+- #30: developer round 1 (Claude Sonnet 5.5). Lead check passed. Review APPROVE (N1-N4, 33 mutants with 0 survivors) and test PASS (230,552 oracle checks, 0 mismatches).
+  - The lead chose a README-only round 2 for N1 and N2 (literal truth). The full re-review gave APPROVE and the full re-test gave PASS.
+  - PR #32: **PM ACCEPTED**, no conditions. Merged with a merge commit (8d92cfd). #30 closed.
+  - Carry-forward: the frozen oracle tests/frozen-sudoku-e81999c.js is to be replaced or deleted the next time hintFor changes.
+- #31: the gate re-check passed (OPEN, weaver-agents). The PM added a README wording fix to #31 by comment (the "as above" sentence from #30). It is in the PM's own issue and in the same README section, so it counts as in scope. Branch issue-31-uncounted-entry created from main 8d92cfd.
