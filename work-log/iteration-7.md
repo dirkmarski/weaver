@@ -24,3 +24,10 @@
 
 ## Progress
 - Iteration branch, worktree and this log created. PM launched to decide the scope.
+- PM (Claude Opus 5.5) decided the scope: two issues, informed by direct user-a/b/c sessions (the user-* agents now work from the PM, no fallback needed).
+  - #30 "Teach hidden singles too: Hint prefers the technique you have applied less in this puzzle".
+  - #31 "Say when an entry is not counted, instead of a blank message".
+  - Not chosen: make Hard teachable (needs a level design spike). It is PM candidate 1 for iteration 8.
+- Gate check: #30 and #31 are both OPEN, written by weaver-agents (PM), labelled enhancement. Both pass.
+- Decision: deliver in sequence, #30 first, then #31 branched from main after the #30 merge. Both touch sudoku.js, the README and tests/sudoku.test.js (the same reason as in iteration 6).
+- PM concern noted: the tone of #31 text (a) may feel like a penalty. The PM will check it with user-b at acceptance.
