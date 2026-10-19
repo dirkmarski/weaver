@@ -43,3 +43,6 @@ Developer, then reviewer and tester in parallel, then lead check, then PR, then 
   - Text oracle: 4,506,150 checks against main's sudoku.js, 0 mismatches. Every hidden step-2 digit was covered (8 appeared 222 times).
   - Browser: 25/25 on Easy, Medium and Hard. This covered a rewarded hidden single (closing lead note c) and "an 8" on the page. Contrast 6.43:1 computed, desktop and 375px screenshots legible, 0 console errors.
 - Lead decision: no rework. The nits need no change. N4 is accepted as is: the individual commits must be kept (no squash), and the branch tip is correct. It is noted here for anyone bisecting. PR opened for PM acceptance.
+
+## PM acceptance (2026-10-19)
+- PR #28 opened (head bbc9fe6). PM acceptance run 1 stopped with an INTERIM hand-off (it said itself that it was sent by mistake). Its own checks had all passed: texts byte for byte, an oracle against main (110,420 checks, 0 differences other than 33 "a 8" to "an 8"), DOM on desktop and at 375px, and the README. The three persona re-runs had not been collected. No decision was made. The lead relaunched the PM to collect or re-run the personas and decide.
