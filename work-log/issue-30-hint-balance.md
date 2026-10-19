@@ -134,3 +134,9 @@ Verdict: APPROVE (no Blocking, no Should-fix; one nit).
 ### Findings
 - N1 (Nit) README "If there is none, it teaches a naked single as above." is only literally true when a naked single exists; with no naked single the result is the `none` message (described two bullets away). Optional wording: "If there is none, it follows the naked-single order above." No change required for approval.
 - N3 (carried, accepted by lead) Frozen copy: replace or delete the next time `hintFor` changes.
+
+## Lead decision after round 2 (review APPROVE, test PASS)
+- Review round 2: APPROVE. 33/33 mutants die. One new nit: "as above" when no single exists at all.
+- Test round 2: PASS. 230,552 oracle checks and 971 browser walk steps, all with 0 mismatches.
+- Lead decision: the new nit is accepted without change. "as above" refers to the naked-preference bullet, and the README's "neither a naked nor a hidden single" sentence states the none case explicitly. Another round would add churn, not accuracy.
+- PR opened for PM acceptance.
