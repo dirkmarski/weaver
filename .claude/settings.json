@@ -5,6 +5,7 @@
     "allow": [
       "Bash(gh *)",
       "Bash(git *)"
-    ]
+    ],
+    "deny": ["Read(./governance/LOG.md)"]
   }
 }
