@@ -45,3 +45,14 @@
     - N3: box arithmetic is duplicated.
     - N4: `var text` is declared too early.
     - N5: there is no DOM test harness.
+- Round 1 test (Claude Sonnet 5.5): PASS (https://github.com/dirkmarski/weaver/issues/16#issuecomment-6257858326).
+  - 240 checks, with the expected values computed independently from the DOM. AC1-AC7 pass on all levels.
+  - AC6: 4 Easy puzzles were solved to "Solved!" using hints only.
+  - No-naked-single case found on both Medium and Hard. The 3 claims from #14 were verified.
+  - 0 console errors.
+  - Limit: a real clipboard paste is not possible headless. CDP insertText was used instead, which drives the same `input` path.
+  - Lead checked the step-2 screenshot: row 3, column 1 = 5 was verified by hand, and it is readable.
+- Lead decision: rework round 2 before PM acceptance.
+  - Scope: S1 (README literal truth, the same class of defect the PM rejected in iteration 2), S2 (fixture test asserts the position), N2 (notes contrast on the amber target) and N4 (`var text` placement).
+  - Not taken: N1 (no change needed), N3 (optional; the duplication is small), N5 (there is no DOM harness, and the tester covers it).
+  - Gates: full re-review and full re-test.
