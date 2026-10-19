@@ -426,7 +426,7 @@
     button.addEventListener('click', function () {
       clearResults();
       var grid = buildGrid(puzzle, inputs.map(function (row) {
-        return row.map(function (inp) { return inp.value; });
+        return row.map(function (inp) { return inp ? inp.value : ''; });
       }));
       var res = verify(grid);
       res.conflicts.forEach(function (p) {

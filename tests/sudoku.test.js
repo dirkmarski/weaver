@@ -227,3 +227,16 @@ test('verify ignores notes: a notes-only cell is empty in the grid verify checks
   values[r][c] = '9';
   assert.strictEqual(buildGrid(PUZZLE, values)[r][c], 9);
 });
+
+test('buildGrid accepts the UI shape: given cells have no input and yield "" in values', () => {
+  // The Verify handler maps a missing input (given cell) to '' - see sudoku.js.
+  const values = PUZZLE.map((row) => row.map((v) => ''));
+  const r = PUZZLE.findIndex((row) => row.includes(0));
+  const c = PUZZLE[r].indexOf(0);
+  values[r][c] = '7';
+  const grid = buildGrid(PUZZLE, values);
+  PUZZLE.forEach((row, i) => row.forEach((v, j) => {
+    if (v) assert.strictEqual(grid[i][j], v);
+    else assert.strictEqual(grid[i][j], i === r && j === c ? 7 : 0);
+  }));
+});
