@@ -90,3 +90,13 @@ Verdict: APPROVE (no Blocking, no Should-fix; four nits).
 - N2 (Nit) README "falls back to the naked single, then to any hidden single" and the third step in `hintFor` (hidden single after naked) are literally true of the code but unreachable when `prefer === 'hidden'`: when no pure hidden single exists and no naked single exists, no hidden single exists either. No change needed; the third step is still needed for the default order. Optional: drop "then to any hidden single" from the README to avoid a promise about a path that cannot happen.
 - N3 (Nit, Q1) Frozen 750-line copy: fine for this issue. It is the only truly independent E2 oracle and it is byte-identical to e81999c (verified). Hazards: a second copy of the logic in the repo that will never be updated (a future reader may mistake it for live code), and the file is named by commit hash. Alternatives considered: `git show` at test time (breaks in shallow checkouts, as the developer noted); a golden snapshot of results (a hash of `hintFor` results for the seeded walk, a few lines, but the oracle is then opaque and cannot show a diff on failure). Suggestion: keep it, and when a later issue changes `hintFor` again either delete it or replace by a golden file. The README line already says what it is.
 - N4 (Nit) The E5 check script is outside the repo (scratchpad), so it cannot be re-run after the session. The issue only asks for "a test or recorded headless check", so this meets it; if the lead wants it reproducible later, add it under `tests/` with a note that it needs Chrome.
+
+## Lead decision after review round 1 (APPROVE, N1-N4) and test round 1 (PASS)
+- Both have reported. No Blocking or Should-fix items.
+- Rework round 2 is README only, because README sentences must be literally true:
+  - N1: "the two counts in the block" is inaccurate. The block has two lines with four numbers.
+  - N2: drop or fix the unreachable "then to any hidden single" fallback phrase in the "prefer hidden" bullet. Keep every sentence literally true.
+- N3 is accepted. The frozen copy is the only independent E2 oracle. Carried forward: replace or delete it the next time `hintFor` changes.
+- N4 is accepted. The issue asked for a recorded headless check, and it is recorded in this log.
+- Q1 and Q2 are answered. Hint is unreachable while `#game` is hidden, so `currentLevel` cannot be stale or null when Hint is clicked.
+- After round 2: full re-review and full re-test, as the carried rule requires.
