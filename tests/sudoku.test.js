@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle, hintFor, hintApplied, generatePuzzle, seededRng } = require('../sudoku.js');
+const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, tallyLines, generatePuzzle, seededRng } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
 const clone = () => SOLUTION.map((r) => r.slice());
@@ -529,4 +529,180 @@ test('hintApplied: hidden single reward text for box, row and column', () => {
 test('hintFor: naked single results carry technique naked', () => {
   assert.strictEqual(hintFor(blank([4, 7]), 1).technique, 'naked');
   assert.strictEqual(hintFor(blank([4, 7]), 2).technique, 'naked');
+});
+
+// ---- Rewards: classifyEntry, creditEntry, tallyLines ----
+
+const cl = (g) => g.map((r) => r.slice());
+
+// number of empty cells of the unit of (r, c) (kind 0 row, 1 column, 2 box) where d fits
+function spotsForTest(g, r, c, kind, d) {
+  let n = 0;
+  for (let i = 0; i < 9; i++) {
+    const rr = kind === 0 ? r : kind === 1 ? i : 3 * Math.floor(r / 3) + Math.floor(i / 3);
+    const cc = kind === 0 ? i : kind === 1 ? c : 3 * Math.floor(c / 3) + (i % 3);
+    if (g[rr][cc]) continue;
+    let fits = true;
+    for (let j = 0; j < 9; j++) {
+      if (g[rr][j] === d || g[j][cc] === d) fits = false;
+      if (g[3 * Math.floor(rr / 3) + Math.floor(j / 3)][3 * Math.floor(cc / 3) + (j % 3)] === d) fits = false;
+    }
+    if (fits) n++;
+  }
+  return n;
+}
+
+test('classifyEntry: null for a conflict elsewhere, a filled cell and digits outside 1-9', () => {
+  assert.deepStrictEqual(classifyEntry(H_BOX, 4, 5, 5), { technique: 'hidden', unit: 'box' });
+  const bad = cl(H_BOX);
+  bad[0][3] = 8; // clashes with (0,0) in row 0
+  assert.ok(findConflicts(bad).length > 0);
+  assert.strictEqual(classifyEntry(bad, 4, 5, 5), null);
+  assert.strictEqual(classifyEntry(H_BOX, 0, 0, 8), null); // filled target cell
+  assert.strictEqual(classifyEntry(H_BOX, 0, 3, 3), null); // filled with 3: would be naked if the filled check were missing
+  assert.strictEqual(classifyEntry(H_BOX, 4, 5, 0), null);
+  assert.strictEqual(classifyEntry(H_BOX, 4, 5, 10), null);
+  assert.strictEqual(classifyEntry(H_BOX, 4, 5, 5.5), null);
+  assert.strictEqual(classifyEntry(H_BOX, 4, 5, '5'), null);
+});
+
+test('classifyEntry: null for a non-candidate and for a candidate that is no single', () => {
+  assert.strictEqual(classifyEntry(H_BOX, 4, 5, 1), null); // 1 is in the cell's row/column/box
+  assert.strictEqual(classifyEntry(H_BOX, 4, 5, 4), null); // candidate (4, 5, 6) but no single
+  assert.strictEqual(classifyEntry(H_BOX, 4, 5, 6), null);
+  assert.strictEqual(classifyEntry(H_BOX, 4, 4, 4), null);
+});
+
+test('classifyEntry: naked single, and naked wins over hidden', () => {
+  const g = clone();
+  g[2][3] = 0;
+  const d = SOLUTION[2][3];
+  // the only empty cell: d is also the only place for d in the row, column and box
+  for (let kind = 0; kind < 3; kind++) assert.strictEqual(spotsForTest(g, 2, 3, kind, d), 1);
+  assert.deepStrictEqual(classifyEntry(g, 2, 3, d), { technique: 'naked' });
+  assert.strictEqual(classifyEntry(g, 2, 3, d === 9 ? 1 : d + 1), null);
+});
+
+test('classifyEntry: unit order box, then row, then column', () => {
+  // (2,3) with 2: the only spot in its box, its row and its column -> box
+  for (let kind = 0; kind < 3; kind++) assert.strictEqual(spotsForTest(H_ALL, 2, 3, kind, 2), 1);
+  assert.strictEqual(findNakedSingle(H_ALL), null);
+  assert.deepStrictEqual(classifyEntry(H_ALL, 2, 3, 2), { technique: 'hidden', unit: 'box' });
+  // (0,4) with 7: the only spot in its row and its column, not in its box -> row
+  assert.strictEqual(spotsForTest(H_ROWCOL, 0, 4, 0, 7), 1);
+  assert.strictEqual(spotsForTest(H_ROWCOL, 0, 4, 1, 7), 1);
+  assert.ok(spotsForTest(H_ROWCOL, 0, 4, 2, 7) > 1);
+  assert.deepStrictEqual(classifyEntry(H_ROWCOL, 0, 4, 7), { technique: 'hidden', unit: 'row' });
+  // (0,5) with 4: only the column
+  assert.ok(spotsForTest(H_COL, 0, 5, 0, 4) > 1);
+  assert.ok(spotsForTest(H_COL, 0, 5, 2, 4) > 1);
+  assert.strictEqual(spotsForTest(H_COL, 0, 5, 1, 4), 1);
+  assert.deepStrictEqual(classifyEntry(H_COL, 0, 5, 4), { technique: 'hidden', unit: 'column' });
+});
+
+test('classifyEntry agrees with Hint at every step of 6 seeded Medium puzzles', () => {
+  let steps = 0, naked = 0, hidden = 0;
+  for (let seed = 1; seed <= 6; seed++) {
+    const g = generatePuzzle('medium', { rng: seededRng(seed) }).puzzle.map((r) => r.slice());
+    for (;;) {
+      const h = hintFor(g, 1);
+      if (h.kind !== 'nudge') break;
+      const res = classifyEntry(g, h.r, h.c, h.digit);
+      assert.strictEqual(res.technique, h.technique);
+      if (h.technique === 'hidden') { assert.strictEqual(res.unit, h.unit); hidden++; } else naked++;
+      g[h.r][h.c] = h.digit;
+      steps++;
+    }
+    assert.ok(verify(g).solved, 'seed ' + seed + ' solved by hints');
+  }
+  assert.ok(steps > 30 && naked > 0 && hidden > 0);
+});
+
+const T0 = emptyTally();
+
+test('creditEntry: with a hint, right cell and digit', () => {
+  const hint = hintFor(H_BOX, 1);
+  const res = creditEntry(T0, {}, hint, H_BOX, 4, 5, '5');
+  assert.strictEqual(res.text, 'Well done! You applied a hidden single: row 5, column 6 is 5.');
+  assert.deepStrictEqual(res.tally, { naked: { own: 0, hint: 0 }, hidden: { own: 0, hint: 1 } });
+  assert.deepStrictEqual(res.credited, { 41: true });
+  assert.deepStrictEqual(T0, { naked: { own: 0, hint: 0 }, hidden: { own: 0, hint: 0 } }); // inputs untouched
+  const g = clone();
+  g[4][7] = 0;
+  const nh = hintFor(g, 2);
+  const r2 = creditEntry(T0, {}, nh, g, 4, 7, String(SOLUTION[4][7]));
+  assert.strictEqual(r2.text, 'Well done! You applied a naked single: row 5, column 8 is ' + SOLUTION[4][7] + '.');
+  assert.deepStrictEqual(r2.tally.naked, { own: 0, hint: 1 });
+});
+
+test('creditEntry: on your own (naked and hidden texts)', () => {
+  const g = clone();
+  g[2][3] = 0;
+  const n = creditEntry(T0, {}, null, g, 2, 3, String(SOLUTION[2][3]));
+  assert.strictEqual(n.text, 'Well spotted! You found a naked single on your own: row 3, column 4 is ' + SOLUTION[2][3] + '.');
+  assert.deepStrictEqual(n.tally, { naked: { own: 1, hint: 0 }, hidden: { own: 0, hint: 0 } });
+  const h = creditEntry(T0, {}, null, H_ALL, 2, 3, '2');
+  assert.strictEqual(h.text, 'Well spotted! You found a hidden single in its box on your own: row 3, column 4 is 2.');
+  assert.deepStrictEqual(h.tally, { naked: { own: 0, hint: 0 }, hidden: { own: 1, hint: 0 } });
+  assert.strictEqual(creditEntry(T0, {}, null, H_ROWCOL, 0, 4, '7').text,
+    'Well spotted! You found a hidden single in its row on your own: row 1, column 5 is 7.');
+  assert.strictEqual(creditEntry(T0, {}, null, H_COL, 0, 5, '4').text,
+    'Well spotted! You found a hidden single in its column on your own: row 1, column 6 is 4.');
+});
+
+test('creditEntry: wrong digit in the hinted cell is judged on its own', () => {
+  const hint = hintFor(H_BOX, 1); // (4,5) is 5
+  const no = creditEntry(T0, {}, hint, H_BOX, 4, 5, '4');
+  assert.deepStrictEqual(no, { tally: T0, credited: {}, text: '' });
+  const fake = { kind: 'nudge', technique: 'naked', r: 4, c: 5, digit: 4, text: '' }; // hint for another digit
+  const own = creditEntry(T0, {}, fake, H_BOX, 4, 5, '5');
+  assert.strictEqual(own.text, 'Well spotted! You found a hidden single in its box on your own: row 5, column 6 is 5.');
+  assert.deepStrictEqual(own.tally.hidden, { own: 1, hint: 0 });
+  assert.deepStrictEqual(own.tally.naked, { own: 0, hint: 0 });
+});
+
+test('creditEntry: a single in another cell while a hint shows counts on your own', () => {
+  const hint = hintFor(H_BOX, 1); // (4,5)
+  const res = creditEntry(T0, {}, hint, H_BOX, 5, 4, '9');
+  assert.strictEqual(res.text, 'Well spotted! You found a hidden single in its box on your own: row 6, column 5 is 9.');
+  assert.deepStrictEqual(res.tally.hidden, { own: 1, hint: 0 });
+});
+
+test('creditEntry: no credit for overwrite, clearing, a conflict or non-digits', () => {
+  const none = (r) => assert.deepStrictEqual(r, { tally: T0, credited: {}, text: '' });
+  none(creditEntry(T0, {}, null, H_BOX, 0, 0, '3')); // cell already holds a value
+  none(creditEntry(T0, {}, hintFor(H_BOX, 1), H_BOX, 4, 5, '')); // clearing
+  none(creditEntry(T0, {}, null, H_BOX, 4, 5, '0'));
+  none(creditEntry(T0, {}, null, H_BOX, 4, 5, 'x'));
+  const bad = cl(H_BOX);
+  bad[0][3] = 8;
+  none(creditEntry(T0, {}, null, bad, 4, 5, '5'));
+  const withValue = cl(H_BOX);
+  withValue[4][5] = 5;
+  none(creditEntry(T0, {}, hintFor(H_BOX, 1), withValue, 4, 5, '5'));
+});
+
+test('creditEntry: a cell is credited once; the message shows again', () => {
+  const first = creditEntry(T0, {}, null, H_BOX, 4, 5, '5');
+  const second = creditEntry(first.tally, first.credited, null, H_BOX, 4, 5, '5');
+  assert.strictEqual(second.text, first.text);
+  assert.deepStrictEqual(second.tally, first.tally);
+  assert.deepStrictEqual(second.tally.hidden, { own: 1, hint: 0 });
+  const third = creditEntry(first.tally, first.credited, hintFor(H_BOX, 1), H_BOX, 4, 5, '5');
+  assert.strictEqual(third.text, 'Well done! You applied a hidden single: row 5, column 6 is 5.');
+  assert.deepStrictEqual(third.tally, first.tally);
+  const other = creditEntry(first.tally, first.credited, null, H_BOX, 5, 4, '9');
+  assert.deepStrictEqual(other.tally.hidden, { own: 2, hint: 0 });
+});
+
+test('tallyLines: heading and two lines, including zeros', () => {
+  assert.deepStrictEqual(tallyLines(emptyTally()), [
+    'Techniques applied in this puzzle',
+    'Naked single: 0 on your own, 0 with a hint',
+    'Hidden single: 0 on your own, 0 with a hint'
+  ]);
+  assert.deepStrictEqual(tallyLines({ naked: { own: 3, hint: 12 }, hidden: { own: 1, hint: 0 } }).slice(1), [
+    'Naked single: 3 on your own, 12 with a hint',
+    'Hidden single: 1 on your own, 0 with a hint'
+  ]);
 });
