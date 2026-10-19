@@ -559,6 +559,7 @@ test('classifyEntry: null for a conflict elsewhere, a filled cell and digits out
   assert.ok(findConflicts(bad).length > 0);
   assert.strictEqual(classifyEntry(bad, 4, 5, 5), null);
   assert.strictEqual(classifyEntry(H_BOX, 0, 0, 8), null); // filled target cell
+  assert.strictEqual(classifyEntry(H_BOX, 0, 3, 3), null); // filled with 3: would be naked if the filled check were missing
   assert.strictEqual(classifyEntry(H_BOX, 4, 5, 0), null);
   assert.strictEqual(classifyEntry(H_BOX, 4, 5, 10), null);
   assert.strictEqual(classifyEntry(H_BOX, 4, 5, 5.5), null);

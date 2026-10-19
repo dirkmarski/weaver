@@ -253,9 +253,7 @@
     var cells = toFlat(grid), p = r * 9 + c;
     var used = usedMask(cells, p);
     if (used & (1 << digit)) return null;
-    var seen = 0;
-    for (var d = 1; d <= 9; d++) if (used & (1 << d)) seen++;
-    if (seen === 8) return { technique: 'naked' };
+    if (bitCount(used & ~1) === 8) return { technique: 'naked' };
     var order = [2, 0, 1]; // kinds: box, row, column
     for (var k = 0; k < 3; k++) {
       var spots = spotsFor(cells, UNITS[CELL_UNITS[p][order[k]]], digit);
