@@ -1,8 +1,10 @@
 #!/bin/bash
-# Launch the weaver agent team on one task.
+# Launch the weaver agent team on one task, or on the next iteration.
 #
 #   .claude/run-task <issue-number>           start "complete task #<n>"
+#   .claude/run-task --iteration              start "deliver the next iteration"
 #   .claude/run-task --check <issue-number>   run every check, print the launch, start nothing
+#   .claude/run-task --check --iteration      the same, for an iteration
 #
 # Run it from Dirk's clone. The team works in its own clone (WEAVER_TEAM_DIR, default
 # ~/Code/weaver-team), never in his. Before starting, the script:
@@ -20,12 +22,20 @@ set -euo pipefail
 
 die() { echo "run-task: $*" >&2; exit 1; }
 
+usage="usage: run-task [--check] <issue-number> | run-task [--check] --iteration"
 check_only=0
 if [ "${1:-}" = "--check" ]; then check_only=1; shift; fi
-task="${1:-}"
-case "$task" in
-  ''|*[!0-9]*) die "usage: run-task [--check] <issue-number>" ;;
-esac
+[ $# -eq 1 ] || die "$usage"
+if [ "$1" = "--iteration" ]; then
+  prompt="deliver the next iteration"
+  label="next iteration"
+else
+  case "$1" in
+    ''|*[!0-9]*) die "$usage" ;;
+  esac
+  prompt="complete task #$1"
+  label="task #$1"
+fi
 
 repo="$(cd -P "$(dirname "$0")/.." && pwd)"
 team="${WEAVER_TEAM_DIR:-$HOME/Code/weaver-team}"
@@ -94,9 +104,9 @@ eval "$(jq -r '.env // {} | to_entries[] | "export \(.key)=\(.value | @sh)"' "$s
 login="$(gh api user --jq .login 2>/dev/null)" || die "the token was rejected by GitHub"
 [ "$login" = "weaver-agents" ] || die "the token belongs to '$login', not weaver-agents"
 
-echo "run-task: task #$task, definitions at $defs, team clone $team, $(claude --version)"
+echo "run-task: $label, definitions at $defs, team clone $team, $(claude --version)"
 
-cmd=(claude --agent lead --settings "$team/$settings" --permission-mode auto "complete task #$task")
+cmd=(claude --agent lead --settings "$team/$settings" --permission-mode auto "$prompt")
 if [ "$check_only" = 1 ]; then
   echo "run-task: checks passed - would run in $team: ${cmd[*]}"
   exit 0
