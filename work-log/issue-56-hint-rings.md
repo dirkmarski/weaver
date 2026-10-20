@@ -16,6 +16,10 @@
 - Carry-forward nits from #55 (L4, tests/chrome.js: `watchdog` declaration order, dead `gone` check): not in scope here unless the developer touches tests/chrome.js anyway.
 - 2026-10-20: Developer launched on #56 (wt-56). Brief: issue is the spec; stop on pin/rule mismatch; key line via clearResults; badge CSS-only if possible; list changed digits assertions; page tests lean with skipped = 0; self-run AC7 mutants.
 
+- 2026-10-20: Developer delivered 31758fc: all pins match; 164 tests, 0 skipped, ~2.27 s; AC7 mutants killed (self-run). Lead read of the product diff: ring rule via reason cells in `hintMarks`; `pointingKey(d, ringCount)`; `#key` cleared in `clearResults`; badge via `--x/--y` per `data-d`; box case in `pointingHint(s, step, grid)` on step 2 only.
+- Points passed to reviewer/tester: (1) is the key line cleared on New puzzle and on choosing a level (do those paths call `clearResults`?); (2) Hint click with a non-pointing result after a pointing explain (key line cleared first?); (3) reason cells: the hidden-form check relies on `hint.unit` being absent for the naked form; (4) box-case count equality (empties == confined) is equivalent to "all empties confined" only because confined is a subset of the box's empties; (5) badge chip ~18.8 px vs slot ~18.67 px.
+- Lead question Q1 to the PM (wording): the pinned key text "a D" gives "a 8" (and "a 8 that rules out other cells"); "an 8" is grammatical. Asked the PM to decide; review and test proceed in parallel and any wording change rides in the rework round.
+
 ## Developer
 - 2026-10-20: Implemented #56 as specified. No pin disagreed with the rule.
 - Product: `hintMarks` ring rule (reason cells, helper `addReasons`); `pointingKey(digit, ringCount)` (exported); box-case parenthesis in `pointingHint` (now takes the grid; first click and `pointingClause`, so "Well spotted!", unchanged); `<p id="key">` below the status line (not a live region), set on a pointing explain in the Hint handler and cleared in `clearResults`; badge in D's note slot by CSS (`--x`/`--y` per `data-d`, `left/top` + `translate(-50%, -50%)`).
@@ -28,3 +32,11 @@
 - AC7 mutants, each killed (never committed): b dropped (3 fail), removed as reason (1), ring clause always (1, unit), key not cleared (2), box case "confined > 1" (2).
 - `node --test` x3: 164 tests, 0 fail, 0 skipped, ~2.27 s. Code lines: sudoku.js 993 -> 1023, style.css 116 -> 124, index.html 40 -> 41; tests 1574 -> 1694 (ratio ~1.43).
 - Caveat: the chip (about 18.8 px tall) is nominally 0.1 px taller than the 18.67 px slot; the badge is centred on the slot. Tester to confirm at 375/900 px.
+
+## Reviewer
+(pending)
+
+---
+
+## Tester
+(pending)
