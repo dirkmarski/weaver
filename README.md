@@ -73,6 +73,8 @@ Requires Node 18+ (no packages needed):
 
     node --test            # (on newer Node versions, observed on Node 24, "node --test tests/" is treated as a path and fails)
 
+The tests are targeted: hand-built grids for the behaviour rules (golden path, edge cases, error conditions) and at most 10 seeded generated puzzles per level for the generator properties. The whole run takes under 3 seconds.
+
 ## Files
 - `index.html`, `style.css` - page and styling
 - `sudoku.js` - pure logic, exported for Node (and as `window.Sudoku`), plus the browser UI:
@@ -83,7 +85,6 @@ Requires Node 18+ (no packages needed):
   - rewards: `classifyEntry(grid, r, c, digit)` (grid just before the entry, 0-based r/c) -> `{technique: 'naked'}`, `{technique: 'hidden', unit}` or `null`; `emptyTally()` -> `{naked: {own, hint}, hidden: {own, hint}}`; `creditEntry(tally, credited, hint, grid, r, c, value)` -> `{tally, credited, text}` (`credited` maps cell index 9 * r + c to `true`; `hint` is the showing `hintFor` result or `null`; inputs are not changed; `text` is the reward, or for a judged entry that earns none the "Entered: ... not counted" text (a) or (b) with the tally and `credited` unchanged, or `''` when the entry is not judged: the value is `''` or not a digit, or the cell already holds a value); `tallyLines(tally)` -> the heading and the two tally lines; `TECHNIQUE_DEFINITIONS` -> `{naked, hidden}`, the plain-language definition shown under each tally line
   - completion: `completionFor(grid, tally)` (grid after the change, tally after `creditEntry`; inputs are not changed) -> `{kind: 'solved', text}` when every cell is filled and nothing breaks the rules, `{kind: 'conflict', text}` when every cell is filled and something does, or `null` while any cell is empty
   - notes: `applyEntry(cell, key, notesMode)` (pure transition of `{value, notes}`, notes a bitmask with bit d = digit d), `noteDigits(mask)`
-- `tests/sudoku.test.js` - validation/verify/input/notes/next-cell/hint/hint-preference/reward/completion/technique-definition unit tests
-- `tests/generator.test.js` - generator tests (validity, uniqueness, givens bands, technique, determinism, timing; prints max/avg ms per level)
+- `tests/sudoku.test.js` - validation/verify/input/notes/next-cell/hint/hint-preference/reward/completion/technique-definition unit tests, on hand-built grids (plus a few fixed-seed generated puzzles)
+- `tests/generator.test.js` - generator tests on 10 seeded puzzles per level (validity, uniqueness, givens bands, technique, determinism, timing; prints max/avg ms per level)
 - `tests/fixture.js` - a known-valid grid and puzzle used only as a test fixture
-- `tests/frozen-sudoku-e81999c.js` - an unchanged copy of `sudoku.js` as it was before the hint preference was added; the tests compare the new `hintFor` and `findHiddenSingle` against it (not run as a test, not loaded by the page)
