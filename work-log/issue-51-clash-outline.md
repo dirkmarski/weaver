@@ -115,3 +115,13 @@ Tools (scratchpad/ts51/, see its README.md): `pins51.js`, `suite51.js` (106 page
   - N2 and N4: no change.
 - Re-check (delta; the round is behaviour-neutral): the lead runs `node --test`, ts51/pins51.js and ts51/suite51.js. The tester's page run otherwise stands.
 - Round 2 (developer): S1 dropped the unreachable `td.clash.hint-confined` rule and fixed CSS/README wording; S2 Files entry names `td.clash`; N1 comment back above `verify`; N3 single before-grid in `setCell`; N5 README givens clause. Behaviour-neutral.
+
+## Lead (round 2 and PR)
+- Developer round 2 (4afbc19). The diff since 84e7261 contains only S1 (the CSS rule and the README wording), S2 (Files), N1 (the comment moved back), N3 (`before` computed once and passed to `creditEntry`, still before the write) and N5 (the Verify clause).
+- Delta re-check by the lead, all on 4afbc19:
+  - `node --test`: 147/147, about 0.60 s;
+  - ts51/pins51.js: 7/7;
+  - ts51/suite51.js: 106 PASS, 0 FAIL;
+  - ts50/pins.js (#50 regression): 7/7.
+- Note: the developer's round-1 notes above still mention the -7px offset for "a dashed purple confined cell". That rule was removed in round 2, and the notes are history.
+- Gate: ready for PM acceptance at 4afbc19 plus this log commit.
