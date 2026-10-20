@@ -14,3 +14,4 @@
   - Badge: 375 px and 900 px screenshot check by the tester, with notes set in a confined cell.
   - Mutants in AC7 are the minimum targeted set.
 - Carry-forward nits from #55 (L4, tests/chrome.js: `watchdog` declaration order, dead `gone` check): not in scope here unless the developer touches tests/chrome.js anyway.
+- 2026-10-20: Developer launched on #56 (wt-56). Brief: issue is the spec; stop on pin/rule mismatch; key line via clearResults; badge CSS-only if possible; list changed digits assertions; page tests lean with skipped = 0; self-run AC7 mutants.
