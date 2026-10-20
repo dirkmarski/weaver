@@ -24,3 +24,4 @@
 
 ## Progress
 - Iteration branch, worktree and this log created.
+- PM (product-manager agent) launched to scope iteration 10 (backlog snapshot + live list; personas and spike at its discretion).
