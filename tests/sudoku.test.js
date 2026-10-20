@@ -334,6 +334,7 @@ test('hintFor: conflicts come first, even on a full grid', () => {
   assert.strictEqual(hintFor(fives([1, 1], [9, 1]), 1).text, HINT(named('column', 9, 1))); // column only
   assert.strictEqual(hintFor(fives([1, 1], [2, 2]), 1).text, HINT(named('box', 2, 2))); // box only
   assert.strictEqual(hintFor(fives([1, 1], [2, 2], [3, 1]), 1).text, HINT(named('column', 3, 1), true)); // the column holder, though a box holder comes first
+  assert.strictEqual(hintFor(fives([1, 1], [1, 3], [1, 9]), 1).text, HINT(named('row', 1, 3), true)); // two other holders in the row: the first one is named
   const two = fives([2, 5], [9, 5]); two[0][0] = two[0][1] = 7; // P is the first clashing cell in reading order, whatever its digit
   assert.strictEqual(hintFor(two, 1).text, HINT('row 1, column 1 and row 1, column 2 both hold 7 in the same row', true));
 });

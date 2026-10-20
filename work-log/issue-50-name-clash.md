@@ -32,6 +32,7 @@
 - Tests extended in place (hint conflict test, `creditEntry (c)`, `(b)`, pointing/classify tests); `fives()` helper builds two- and three-clash grids. 143 tests, about 0.6 s.
 - Pinned examples 7/7 by a Node script and on the real page (headless, seed 1); example 3 also checked for no red class and no highlights.
 - README updated (Hint, not-counted texts, named clash, summary sentence, Files).
+- Round 2: README clash wording (S1); added a three-in-a-row hint assert so the Q-last-holder mutant (`.pop()`) is killed (S2). 143 tests, about 0.65 s; pins 7/7.
 
 ## Review
 
