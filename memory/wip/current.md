@@ -10,7 +10,7 @@ Last updated: 2026-10-20, lead session 4ecb9163-8db9-4624-9aa5-9c6e3ff52aab
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
 | Scoping | done | PM log 3fb00a7: #55 then #56 | PM |
-| #55 page tests | delta re-review | reviewer re-reviews rounds 1-2 at 5868cdb (wt-55-review); then PR and PM acceptance | reviewer |
+| #55 page tests | PM acceptance | PR #57, head 0e699d5; PM accepting; then lead verifies the PR comment and merges with sha | PM |
 | #56 hint rings/key/badge | waiting | starts after #55 merges | - |
 
 ## Notes
@@ -18,7 +18,7 @@ Last updated: 2026-10-20, lead session 4ecb9163-8db9-4624-9aa5-9c6e3ff52aab
 - Do not read the work log unless specifically needed (Dirk, 1464355).
 
 ## Open issues / PRs
-- #55 (open), #56 (open); no PRs yet
+- #55 (open, PR #57), #56 (open)
 
 ## Blockers / waiting on
 - none
