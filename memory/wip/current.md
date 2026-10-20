@@ -8,7 +8,7 @@ Last updated: 2026-10-20, lead session 0245eb9f-91d7-4bfe-b523-bbf5b80a2438
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #45 pointing hint marks | review + test round 1 (code 332ef04) | collect both reports, decide rework | reviewer, tester |
+| #45 pointing hint marks | developer round 2 (S1-S3, N1) | delta re-review + smoke re-test, lead check, PR | developer |
 | #46 clash message | waiting (after #45 merges) | branch from main, developer | lead |
 
 ## Where things are

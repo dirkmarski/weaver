@@ -34,3 +34,7 @@
 - Decision D2: for #45 the tester's real-page check (screenshots, 375 px) is the main gate for the marks, because UI wiring has no repo tests.
 - #45: branch issue-45-pointing-hint-marks (45f3e38), developer round 1 launched.
 - #45 developer round 1 (Claude Sonnet 5.5) done, code head 332ef04: 143/143, about 0.6 s; sudoku.js +14, style.css +18, tests +7 lines. Lead check PASS with points L1-L4 (see the issue log). Review and test round 1 launched in parallel, each in its own detached worktree (wt-45-review, wt-45-test). The lead pre-created separate log sections so their pushes merge cleanly.
+- #45 round 1:
+  - Review: APPROVE with S1-S3 and nits N1, N2.
+  - Test: criteria 1-5 PASS on the real page, including clearing with the marks showing; D1 is a low cosmetic defect (the badge covers pencil note 3).
+  - Round 2: S1, S2, S3 and N1. D1 is accepted as a known limitation and flagged to the PM. The re-check is delta-scaled. Developer round 2 launched.
