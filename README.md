@@ -81,11 +81,18 @@ Each puzzle is a random complete grid with cells removed in random order; a cell
 Generation typically takes a few milliseconds (Tricky: tens of milliseconds, up to a few hundred). An internal time cap (1000 ms) guarantees click-to-render stays well under 2 seconds; if it were ever hit, the best valid unique puzzle found so far (fewest givens) is returned and the result has `capped: true` (it could then have more givens than the band or be easier than the level). `generatePuzzle` results also report `attempts`.
 
 ## Test
-Requires Node 18+ (no packages needed):
+Requires Node 18+ (22+ for the page tests; no packages needed):
 
     node --test            # (on newer Node versions, observed on Node 24, "node --test tests/" is treated as a path and fails)
 
-The tests are targeted: hand-built grids for the behaviour rules (golden path, edge cases, error conditions) and at most 10 seeded generated puzzles per level for the generator properties. The whole run takes under 3 seconds.
+The tests are targeted: hand-built grids for the behaviour rules (golden path, edge cases, error conditions) and at most 10 seeded generated puzzles per level for the generator properties. The whole run takes about 2 seconds with Chrome (about 0.6 seconds without it, when the page tests are skipped).
+
+The page tests (`tests/page.test.js`) load the real `index.html` in one headless Chrome, with `Math.random` replaced by `seededRng`, press keys and click buttons, and check the DOM (status text and class, tally lines, cell classes). They need Node 22+ (global `WebSocket`) and Google Chrome or Chromium, and use only Node built-ins (no packages). Chrome is looked up in `CHROME_PATH`, then in the usual macOS and Linux locations. Without Chrome the page tests are reported as skipped, with the reason; the other tests still run. To force the skip, set `WEAVER_NO_CHROME=1`; with `CHROME_PATH` set to a missing file they are skipped too, with no other lookup:
+
+    CHROME_PATH=/path/to/chrome node --test
+    WEAVER_NO_CHROME=1 node --test     # page tests skipped, unit tests only
+
+Later UI work adds its page checks to `tests/page.test.js`. Chrome and its temporary profile are removed when the run ends, also after a failed test or on Ctrl-C / SIGTERM (not after `kill -9`).
 
 ## Files
 - `index.html`, `style.css` - page and styling (`td.clash`: the orange clash outline)
@@ -100,3 +107,5 @@ The tests are targeted: hand-built grids for the behaviour rules (golden path, e
 - `tests/sudoku.test.js` - validation/verify/input/notes/next-cell/hint/pointing/hint-preference/reward/completion/technique-definition unit tests, on hand-built grids (plus a few fixed-seed generated puzzles)
 - `tests/generator.test.js` - generator tests on 10 seeded puzzles per level (validity, uniqueness, givens bands, technique, determinism, timing; prints max/avg ms per level)
 - `tests/fixture.js` - a known-valid grid and puzzle used only as a test fixture
+- `tests/page.test.js` - page tests: the real page in headless Chrome (scenarios for the status line, tally, clash outline, hint marks, notes and arrow keys; skipped without Chrome)
+- `tests/chrome.js` - test helper only: finds Chrome, starts it headless and talks to it over the DevTools protocol (Node built-ins only)
