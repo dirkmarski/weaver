@@ -117,3 +117,14 @@ Mutants (run on a scratch copy; none committed)
   - Suite: `node --test` x3: 164 tests, 164 pass, 0 fail, 0 skipped, 2.23-2.26 s.
 - Defects: D1 (should-fix) badge chip wider than the note slot at narrow widths (375 px: D=5 touches notes 4/6, D=3/6/9 chip clipped at the right cell edge; 320 px: overlaps neighbours). Nit: pinned wording "a 8"/"a 9" (grammar), lead question Q1 already open.
 - Not checked: AC6 README wording (not in my scope list).
+
+### Re-test rounds 1 + 1b
+- 2026-10-20, tested head fc76f9d (product 55b63d6). Scripts (scratch, not committed): /private/tmp/claude-502/-Users-dirk-Code-weaver-team/4ecb9163-8db9-4624-9aa5-9c6e3ff52aab/scratchpad/ts56b (m.js = own badge measurement, key.js, shots.js). Real page via tests/chrome.js launch; the badge box is derived from the ::after computed style (left/right/top, transform, padding, border, box-sizing) and compared with the padding box and the note glyph Ranges.
+- AC2 PASS: key line exact for P(3), P(4) (no ring clause, 0 rings), P(8) (1 ring); empty on the first click and for H(1); shown on explain and kept on a further Hint click and on a notes change (P(3), P(4)); cleared by Verify, a value change and New puzzle; next Hint after a value change is a nudge with an empty key. pointingKey(d, 2) has no article for every D = 1-9.
+- AC3 PASS (measured, notes 1-9 set in cells of columns 0/4/8, both kinds, 54 badges per width; cells 36.1/35.6/36.6 px at 375 after a 900 ms settle, 52.6 at 520, 58 at 900):
+  - 375: font 14px/800, padding 1px/1px, centre in D's slot for every D, worst edge -0.08 px (inside 1 px), worst overlap with another note glyph 1.14 px (D=4 vs note 5; D=6/7/8/9 0.06-0.22; D=1,2,3,5 0).
+  - 520: D=1,3,5 (all D measured) inside the padding box, worst edge -0.07 px, overlap 0, padding 1px.
+  - 900: overlap 0, padding 3px/3px, 14px/800, size 15.25 x 18.8 px as main; position identical (0.000 px) to the earlier tested head 8ac1f8b. Position against main cannot be 0.5 px for most D: main has the badge top-right, the issue moves it to the note slot (see Ambiguity).
+  - Screenshots (375 and 900 for D=1 seed 3, D=4 seed 33, D=5 seed 9, D=9 seed 4): /private/tmp/claude-502/-Users-dirk-Code-weaver-team/4ecb9163-8db9-4624-9aa5-9c6e3ff52aab/scratchpad/ts56b/zoom_s*_D*_*.png and shot_s*.png. Neighbour notes readable; strike visible; D=4 chip flush left touching note 5 slightly (readable), D=9 chip flush at the right edge touching note 8 slightly (readable).
+- AC7 PASS: five mutants killed on a scratch copy (b dropped 3 fail; removed as reason 1; ring clause always 2; key not cleared 2; box case "confined > 1" 2). Suite x3: 166 tests, 166 pass, 0 fail, 0 skipped, 2.50-2.55 s.
+- Ambiguity: AC3 "position within 0.5 px of today's" read as "unchanged since the slot placement (8ac1f8b)"; size, padding, font, colours equal main at 900. Defects: none (D1 closed). Not checked: 320 px (out of scope), AC6 README.
