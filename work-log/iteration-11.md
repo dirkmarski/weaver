@@ -27,3 +27,4 @@
 
 ## Progress
 - Iteration branch, worktree and this log created.
+- PM (product-manager agent) launched to scope iteration 11 from memory/wiki/backlog.md, with personas at its discretion. It was told about the new work-log rule (D1) and the LOG.md rule.
