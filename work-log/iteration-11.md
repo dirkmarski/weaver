@@ -28,3 +28,11 @@
 ## Progress
 - Iteration branch, worktree and this log created.
 - PM (product-manager agent) launched to scope iteration 11 from memory/wiki/backlog.md, with personas at its discretion. It was told about the new work-log rule (D1) and the LOG.md rule.
+- The PM (Claude Opus 5.5) scoped two issues, to be delivered in sequence (PM log a0eb86c):
+  - #50 "After a slip, name the clashing cells in the entry text and in Hint" (first);
+  - #51 "Outline clashing cells while the clash lasts, and say when it is fixed" (second; it builds on #50).
+  - The texts were settled with personas over three rounds (a mock-up, a play check on a prototype, then a wording check). No spec questions are open.
+- Gate check: #50 and #51 are OPEN, by weaver-agents, label `enhancement`. PASS.
+- D2: two issues is acceptable. They touch the same README section and the same `sudoku.js` text paths, so they are strictly sequential: #51 branches from main after #50 merges.
+- D3: #51 changes the README's "no live checking" stance (the outline is a live mark). The PM decided this and it is in scope by its criterion 9. The lead accepts it, and the reviewer must check the README sentences on that point.
+- #50: branch issue-50-name-clash (38d7381), per-issue log created, interpretation L0 recorded (the extra sentence goes on texts 2 and 3 only, per pinned example 6). Developer round 1 launched.
