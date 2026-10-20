@@ -9,3 +9,6 @@ Developer (rebuilds the suite, with the rule -> test mapping), then reviewer and
 
 ## Progress
 - 2026-10-20: Branch and log created. Developer round 1 launched.
+- Developer round 1 (Claude Sonnet 5.5): 0ea4aaf, 7bcafd6, a4b1b1b. Tests 128 -> 123, runtime ~14.9 s -> ~0.22 s, test lines 2025 -> 1041. The developer ran 12 mutation spot checks, and every one was caught. Mapping: <scratchpad>/issue-35-mapping.md.
+- Lead check: PASS. The product files show a 0-byte diff against main. The frozen file is gone. 123/123 tests pass in 0.25 s. Commit attribution is correct. 1041 test lines against 912 product lines (sudoku.js+index.html+style.css, as the issue counts it) is about 1.14x. The guide is not a gate, and the reviewer is asked whether more trimming is reasonable without losing rule coverage.
+- Reviewer and tester launched in parallel.
