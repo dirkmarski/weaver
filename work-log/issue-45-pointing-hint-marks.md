@@ -140,3 +140,12 @@ Head 579c1db. Result: PASS, no new defects. D1 remains the accepted known limita
 - First-click text, one per unit kind, read on the page: row unit (seed 5 hint 7, "fits only in row 7 ... look at column 3"), column unit (seed 7 hint 7, "fits only in column 9 ... look at row 2"), box unit (seed 10 hint 26, "fits only in row 8 ... look at the box of rows 7-9 and columns 7-9"). Wording is grammatical and complete; target and tint are present.
 - No script expectation was wrong in round 1 or this round.
 - Tools: scratchpad ts45/ (run1.js, run2.js, c3.js). governance/LOG.md was not read.
+## Review round 2 (reviewer, delta)
+
+Verdict: APPROVE. Delta 6a111e8..579c1db; I did not read governance/LOG.md.
+- S1: WALL_UNIT_COL is hidden form, unit column, target r9c3 (index 8,2: row and column differ); text says "column 3". Mutant `s.c` -> `s.r` in the unit name: killed (1 fail).
+- S2: split of `pointingHint` into `tail` / `unitName` is behaviour-neutral (same strings, same conditions). Mutants: naked/hidden switch inverted killed (3 fail); box unit via `s.box` killed (1 fail); `unit === 'box'` -> `'row'` killed (2 fail).
+- S3: README `hintFor` sentence is true (the return object carries `confined` and `removed`).
+- N1: comment is accurate (line 879 is the only place setting data-d, together with hint-confined / hint-removed).
+- Product code: only the pointingHint refactor and the comment changed. `node --test`: 143/143 pass.
+- Findings: none.
