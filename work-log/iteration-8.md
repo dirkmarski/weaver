@@ -37,4 +37,34 @@
   - Round 2 (test, comment and README only) got a proportionate re-review and re-test. This deliberately re-scopes the iteration-7 "full re-run every round" lesson to fit the test strategy.
   - PR #39 **PM ACCEPTED**, no conditions; personas could explain pointing in their own words. Merged (12f4a63).
   - The uncounted "Well done!" was noticed by all personas. Counting pointing is PM candidate 1 for iteration 9.
-- #37 started: branch issue-37-tricky-level, developer round 1.
+- #37: developer round 1. Lead check passed. Review APPROVE with S1 (the mutant "Hard beyond back to 'singles'" survived, because the Hard test seeds never exercised it). Test PASS (an independent solver check; Hint followed to the end on Tricky seeds 1-4).
+  - Round 2 (tests and README only) moved Hard to test seeds where the mutant is caught. The lead re-ran the mutant: 2 tests fail. The proportionate re-review gave APPROVE and the re-test PASS.
+  - PR #40 **PM ACCEPTED**, no conditions (personas B and C: "the next step after Medium"; both explained pointing). Merged (30cf3ba). #37 closed.
+- main after the three merges: `node --test` 137/137 in about 0.6 s. Individual commits are kept (merge commits 4c3e30b, 12f4a63, 30cf3ba).
+- The PM confirmed that iteration 8 is complete from the product side.
+
+## Outcome and lessons
+- Delivered:
+  - #35, test suite right-sized: the frozen oracle and the sweeps were removed. Tests 2025 -> 1041 lines and ~14.9 s -> ~0.22 s, with a rule -> test mapping. 25 mutation spot checks across the developer and reviewer were all caught.
+  - #36, Hint teaches pointing when there is no single (two clicks, naked and hidden forms, an uncounted "Well done!", a new "none" text). New pure exports findPointing and hintMarks; the hint marking is now unit-tested, which closes the iteration-7 carry-forward.
+  - #37, new level Tricky (singles plus pointing), and Hard now needs more than pointing. Following Hint always solves a Tricky puzzle.
+- Lesson 1 (test strategy): applying Dirk's strategy worked. Each level kept to its role. Developers wrote targeted unit tests. Testers wrote a plan and ran real-page checks on a few fixed seeds, with small independent oracles on 4-5 seeds only. Reviewers ran 6-13 targeted mutation spot checks. The PM accepted with criteria, a play-through and personas, with no multi-million-check oracles. The suite ends at 137 tests and about 0.6 s, against 128 tests and about 15 s at the start.
+- Lesson 2: targeted mutation spot checks still find real gaps without sweeps: #36 S1 (digit order unpinned) and #37 S1 (a rule unguarded by the chosen seeds). A seeded generator test only guards a rule if one of its seeds would actually break under the mutant. Choose the seeds on purpose.
+- Lesson 3: rework re-checks are scaled to the change. Rounds that touch only tests, comments or the README get a delta re-review (with the specific mutant re-run) and a suite plus smoke re-test. This replaces the iteration-7 rule "full re-run every round", which predates the strategy. Behaviour changes still get the full re-check.
+- Lesson 4: one spec question went to the PM before development (#36: can both forms apply?). The answer, mutually exclusive by definition, removed a branch of code and tests.
+- Lesson 5: delivering in sequence, and folding wording nits into the next issue on the same section, again avoided conflicts and avoided extra rounds (#35 nits went into #36, #36 N5 into #37).
+- Lesson 6: the lead verified every PM hand-off on GitHub (head, comment) before merging. No discrepancies.
+- Tech debt / carry-forwards:
+  - test code is about 1.1x the product code (above the ~1x guide; the reviewer judged it justified).
+  - findPointing on its own may return a step where a single already existed (documented; callers check singles first).
+  - The tester's and PM's headless play tools live in the session scratchpad, not the repo.
+- Concerns carried forward for Dirk:
+  - Pointing is taught but not counted, and every persona noticed (5/5). It is PM candidate 1.
+  - GitHub Pages is still not checked, and all user evidence is simulated.
+- Next-iteration candidates (PM, ordered):
+  1. Count pointing (own recognition, a tally line and definition, the finish text; plus the status-class testability carry-forward).
+  2. A clearer pointing hint.
+  3. More pointing practice on Tricky (two or more steps).
+  4. Uncounted-entry feedback v2.
+  5. Claiming, then pairs, each with a level.
+  6. Smaller items (mobile 2x2 level buttons, a middle hint level, unit wording, progress).
