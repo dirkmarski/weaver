@@ -111,3 +111,13 @@ None found (no D ids). Observation only: Hint on a completely filled but broken 
 No expectation of mine was wrong in the product comparisons. Two script mistakes of mine, fixed: I first tried to type into a given cell (r6c1), and my first screenshots were cut at 900 px height, so I re-took them full height.
 
 ---
+
+## Lead (round 2 and PR)
+- Developer round 2 (04869eb): README S1 wording and one added assertion for S2. No product file changed (`git diff 572cd18 04869eb -- sudoku.js index.html style.css` is empty).
+- Delta re-check by the lead:
+  - suite 143/143 in about 0.61 s;
+  - the S2 mutant (`[0]` to `.pop()` in `firstHolder`) on a scratch copy: 142 pass, 1 fail, so it is KILLED;
+  - the tester's page pins (ts50/pins.js, WT=wt-50): 7/7 PASS, with the Hint class "" and no marks.
+- Decision: the lead did the delta re-review instead of the reviewer. The round touches one README sentence and one assertion, and the only check the reviewer asked for (the mutant) was re-run.
+- N3 (nit, folded into #51): the new README sentence repeats itself ("clashes if its digit also appears in another cell... (the cells that share a digit with another cell...)"). Proposed for #51, which rewrites this section: "...in another cell of its row, column or box (givens included; Verify turns only your own values red)."
+- Gate: ready for PM acceptance at head 04869eb plus this log commit.
