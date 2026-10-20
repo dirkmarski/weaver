@@ -131,3 +131,10 @@ Delta 84fde41..2cd2a5c. Verdict: APPROVE.
 - S1: mutant 8 (drop 'pointing' from the creditEntry tally copy loop) now fails 1 test (142 pass, 1 fail). The clean head passes 143/143.
 - The new assertion is sound: r5c1=7 is a hidden single (box) after 7 is entered at r3c3 in the seed-1 wall.
 - N1 kept as decided.
+
+## Test round 2
+Tester: Claude Sonnet 5.5 (claude-sonnet-5-5). Code 8e9c2ae, log 2cd2a5c, detached worktree.
+- `node --test`: 143 pass, 0 fail, about 0.6 s.
+- Page smoke: own naked, own hidden (with unit) and own pointing (seed 1, seed 3) as expected and byte-identical to round 1; hinted pointing 0/1; seed 1 finish "0 on your own, 54 with a hint"; texts (a) and (b), tally block and 375 px fine.
+- One script check failed on a stale expectation (re-entry after clearing a hinted cell shows the own text, as noted in round 1); no behaviour change.
+- Verdict: PASS.
