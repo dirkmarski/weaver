@@ -36,3 +36,4 @@
 - 2026-10-20: #55 developer done (cb2d63c; 157 tests, ~2 s). Lead check passed; spec reading L1 (7f = after both clicks, as README) logged in the issue log. Reviewer and tester launched in parallel (wt-55-review, wt-55-test at 6d59cbc).
 - 2026-10-20: #55 review (approve, S1-S3 should-fix) and test (all ACs pass) done. Rework round 1 (tests/README only, L2) given to the developer; delta re-check by the lead.
 - 2026-10-20: #55 round 1 delta re-check by the lead found the signal cleanup racy (L3: Chrome survived one SIGTERM trial). Round 2 to the developer, then reviewer delta re-review of tests/chrome.js.
+- 2026-10-20: #55 round 2 (2e594f9) fixed the signal race (cause: node --test orphans its test child on a signal; EPIPE killed it silently). Lead trials 14/14 clean. Reviewer delta re-review of rounds 1-2 launched at 5868cdb.

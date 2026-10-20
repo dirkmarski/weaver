@@ -10,7 +10,7 @@ Last updated: 2026-10-20, lead session 4ecb9163-8db9-4624-9aa5-9c6e3ff52aab
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
 | Scoping | done | PM log 3fb00a7: #55 then #56 | PM |
-| #55 page tests | rework round 2 | developer fixes signal cleanup race (L3 in issue log); then reviewer delta re-review of chrome.js, lead re-check, PR, PM acceptance | developer |
+| #55 page tests | delta re-review | reviewer re-reviews rounds 1-2 at 5868cdb (wt-55-review); then PR and PM acceptance | reviewer |
 | #56 hint rings/key/badge | waiting | starts after #55 merges | - |
 
 ## Notes
