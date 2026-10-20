@@ -15,6 +15,7 @@ Iteration 13. Branch `issue-61-ring-clause-strike`. Session `5034fe53-a839-46a5-
 - Tests changed: pointingKey unit test (per form/count), new page test f1b (seeds 1, 76, 8, 44 literal clauses), f4 extended with the struck chip stops/colour/thickness guard (mutants 46-54% and #8a8a8a fail it), page f/f2b now call the helper with the hint.
 - Removed assertions (ratio room): unit test 'hintFor: any step other than 2 is the nudge; the grid is not changed' (nudge/explain kinds covered by the step 1 and step 2 hintFor tests; no-mutation by 'hintFor and findHiddenSingle do not mutate their input'); unit test 'hintFor: conflicts and a full grid still come before a hidden single' (covered by 'hintFor: conflicts come first...', 'hintFor: full grid without conflicts' and 'hintFor with hidden: conflict, full grid and no single...'); page f2 first-key match (the key's presence is covered by f, f1b and f2b).
 - Ratio: tests 1944 / product 1215 = 1.5999.
+- Rework round 1: removed the double blank line left by each test removal (sudoku.test.js now 1263 lines) and changed "about 2.3 px" to "about 2.2 px" in README and the style.css comment (tester measured 11.05 x 16.80 px = 2.22 px at 375). Tests 1942 / product 1215 = 1.598.
 
 ## Reviewer
 - Reviewer: Claude Sonnet 5.5 (claude-sonnet-5-5), head b982c38 vs main 44e3123. Did not read governance/LOG.md; read only the Lead section of this log. Own detached worktree; private TMPDIR.

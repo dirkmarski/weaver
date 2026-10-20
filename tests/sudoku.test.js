@@ -372,7 +372,6 @@ test('hintFor: step 2 explains with the digit list, "and" before the last', () =
   assert.strictEqual(h.text, 'Naked single: row 1, column 1 must be 5, because its row, column and box already contain 1, 2, 3, 4, 6, 7, 8 and 9.');
 });
 
-
 test('hintApplied: reward only for the hinted digit', () => {
   const h = hintFor(blank([4, 7]), 1);
   const d = String(SOLUTION[4][7]);
@@ -447,7 +446,6 @@ test('hintFor: a naked single is taught before a hidden single, even a later one
   assert.deepStrictEqual([h.r, h.c, h.digit], [1, 2, 2]);
   assert.strictEqual(h.unit, undefined);
 });
-
 
 test('hintFor: hidden single nudge text for box, row and column (1-based row and column)', () => {
   const box = hintFor(H_BOX, 1);
