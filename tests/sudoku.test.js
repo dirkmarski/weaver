@@ -558,6 +558,8 @@ const T0 = emptyTally();
 // Issue 31: the two "not counted" texts, byte for byte (R, C 1-based).
 const NOT_SINGLE = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d
   + '. It was not a naked single, a hidden single or a pointing step at this point, so it is not counted.';
+const CLASH = (r, c, d, u) => 'Entered: row ' + r + ', column ' + c + ' is ' + d + '. ' + d
+  + ' is already in this cell\'s ' + u + ', so it breaks the rules. It is not counted.';
 const BROKEN = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d
   + '. Some numbers break the rules, so it is not counted. Click Verify to see which.';
 
@@ -845,16 +847,23 @@ test('creditEntry (a): not a single, text byte for byte, nothing counted', () =>
   assert.strictEqual(creditEntry(T0, {}, null, H_BOX, 4, 5, '6').text, NOT_SINGLE(5, 6, 6));
 });
 
-test('creditEntry (a): a digit already in the row, column or box; digit 8, row and column 9', () => {
-  const g = clone(); g[8][8] = 0; // 8 is in row 9, so this entry clashes
-  const res = creditEntry(T0, {}, null, g, 8, 8, '8');
-  assert.strictEqual(res.text, NOT_SINGLE(9, 9, 8));
-  assert.deepStrictEqual(res.tally, emptyTally());
-  assert.deepStrictEqual(res.credited, {});
-  // The clash is not revealed: the same text as any other non-single, and no grid had a conflict before.
-  assert.strictEqual(findConflicts(g).length, 0);
-  for (const d of [1, 2, 3, 4, 5, 6, 7]) assert.strictEqual(creditEntry(T0, {}, null, g, 8, 8, String(d)).text, NOT_SINGLE(9, 9, d));
-  assert.strictEqual(creditEntry(T0, {}, null, g, 8, 8, '9').text.indexOf('Well spotted!'), 0); // the true digit is a naked single
+test('creditEntry (c): a digit already in the row, column or box says so; row, then column, then box', () => {
+  const g = clone(); g[8][8] = 0; // 1-8 are in row 9 (and some in the column or box too)
+  for (const d of [1, 2, 3, 4, 5, 6, 7, 8]) assert.strictEqual(creditEntry(T0, {}, null, g, 8, 8, String(d)).text, CLASH(9, 9, d, 'row'));
+  const e = Array.from({ length: 9 }, () => Array(9).fill(0));
+  e[0][1] = 5; e[4][0] = 6; e[1][1] = 7; e[2][2] = 9; // 5 and 6 are in row 1 and column 1; 7 in the box only
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '5').text, CLASH(1, 1, 5, 'row'));
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '6').text, CLASH(1, 1, 6, 'column'));
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '7').text, CLASH(1, 1, 7, 'box'));
+  e[2][1] = 3; e[5][0] = 3; // 3 is in the box and the column but not the row, with no conflict: the column is named
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '3').text, CLASH(1, 1, 3, 'column'));
+  e[0][4] = 6; // 6 now in the row and the column: the row is named
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '6').text, CLASH(1, 1, 6, 'row'));
+  const res = creditEntry(T0, {}, null, e, 0, 0, '7');
+  assert.deepStrictEqual([res.kind, res.tally, res.credited], ['notCounted', T0, {}]);
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '8').text, NOT_SINGLE(1, 1, 8)); // no clash: text (a)
+  e[8][8] = 7; e[7][7] = 7; // a conflict elsewhere: the clash entry gets text (b)
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '5').text, BROKEN(1, 1, 5));
 });
 
 test('creditEntry (b): the grid before the entry already breaks the rules', () => {
@@ -898,7 +907,7 @@ test('creditEntry: a credited cell re-entered with a non-single shows (a), count
   // a different digit in the hinted cell, or any digit in another cell while a hint shows
   const hint = hintFor(H_BOX, 1);
   assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '6').text, NOT_SINGLE(5, 6, 6));
-  assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '1').text, NOT_SINGLE(5, 6, 1));
+  assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '1').text, CLASH(5, 6, 1, 'row'));
 });
 
 // ---- Issue 36: Hint teaches pointing ----
@@ -978,7 +987,7 @@ test('pointing counted with a hint (first and second click), naked form and hidd
     }
   }
   const hint = hintFor(SEED1_WALL, 1);
-  assert.strictEqual(creditEntry(T0, {}, hint, SEED1_WALL, 2, 2, '3').text, NOT_SINGLE(3, 3, 3)); // another digit in the hinted cell
+  assert.strictEqual(creditEntry(T0, {}, hint, SEED1_WALL, 2, 2, '3').text, CLASH(3, 3, 3, 'row')); // another digit in the hinted cell
 });
 
 test('pointing on your own: the exact texts on the seed 1 and seed 3 walls; row and column wording', () => {
