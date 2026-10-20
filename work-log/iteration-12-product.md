@@ -174,3 +174,23 @@ Delivered and removed: #55 (page test harness, accepted at 0e699d5). #56 is remo
   - 320 px is out of scope. It is a known limit, added to candidate 6 (mobile) next to "the 375 px level buttons".
 - Issue #56 body updated (a section 3 note, AC3 and the Change log) and a comment added.
 - Assumption: a 2 px overlap keeps the neighbouring digit readable. This is based on the D = 5 shot at 375 px, where the notes touch and are still clearly legible.
+
+## Q3 on #56: Q2 badge criteria conflict at 375 px (2026-10-20)
+- Raised by the lead with the developer's measurements. With the unchanged chip (3 px side padding, 15.3-17.8 px wide, slot about 11.4 px), "no clipping" and "overlap <= 2 px" cannot both hold for D = 1, 3, 4, 6, 7, 9. A flush shift gives up to 5.1 px of overlap (D = 4).
+- Options: (A) keep the chip and raise the overlap allowance to about 5.5 px; (B) reduce the chip's side padding at narrow widths, not the font; (C) other.
+- Evidence (PM, own check): I injected CSS at runtime into a copy of the developer's measure2.js, in scratchpad/pm-it12/q3 (m3.js, r1.txt, r2.txt, p2.txt). Nothing was changed on the branch.
+  - Flush shift with 1 px padding at 375 px, columns 0/4/8, both kinds, two runs: worst overlap 1.08 px (D = 4), all others <= 0.14 px; worst edge -0.41 px; centre in slot for every D.
+  - With 2 px padding the overlap reaches 2.95 px, so 2 px is not enough.
+  - Screenshots row_375_cur.png, row_375_pad1.png and row_900_cur.png: neighbours are readable and the strike is visible on the narrow chip.
+- Decision: **B (padding only)**.
+  - Below 560 px viewport width the badge padding is 0 1px and edge badges sit flush inside the cell. 560 px is the width at which cells drop under 56 px (measured: 900/700/600 = 56, 560 = 55, 480 = 46, 375 = 35).
+  - The digit size, weight, colours, border and strike are unchanged, so the Q2 legibility reasoning (no shrinking of the digit) still holds.
+  - A was rejected: 5 px of a roughly 8 px glyph covered is too much to call "readable" across all D, and it would need a screenshot judgement for every D.
+- Criteria (AC3):
+  - 375 px: inside the cell's padding box with 1 px tolerance (raised from 0.5 because the prototype shows sub-pixel rounding of -0.41 px); centre in D's slot; overlap <= 2 px; 14 px / 800; side padding 1 px; a screenshot shows the neighbours readable.
+  - 520 px: D = 1/3/5 inside the cell (breakpoint guard).
+  - 900 px: as today, with 0 overlap. The existing ~1.5 px overflow of D = 3/6/9 onto the cell border is accepted, with no new inside-cell check.
+- Issue #56 body updated (section 3 note, AC3, Change log Q3) and a comment posted: https://github.com/dirkmarski/weaver/issues/56#issuecomment-6287097282
+- Concerns and assumptions:
+  - The narrow chip is a tall pill. I assume players still read it as the same badge. To confirm with the personas at acceptance; not a blocker.
+  - One measuring run gave a 25 px column 8, a one-off layout artefact that did not reproduce in three later runs (natural widths 34.7-36.8 px). The tester should check that the cell width is about 34-36 px when measuring.
