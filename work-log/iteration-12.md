@@ -38,3 +38,4 @@
 - 2026-10-20: #55 round 1 delta re-check by the lead found the signal cleanup racy (L3: Chrome survived one SIGTERM trial). Round 2 to the developer, then reviewer delta re-review of tests/chrome.js.
 - 2026-10-20: #55 round 2 (2e594f9) fixed the signal race (cause: node --test orphans its test child on a signal; EPIPE killed it silently). Lead trials 14/14 clean. Reviewer delta re-review of rounds 1-2 launched at 5868cdb.
 - 2026-10-20: #55 reviewer approved the delta at 5868cdb. PR #57 opened (head 0e699d5). PM acceptance launched on 0e699d5.
+- 2026-10-20: PM accepted #55 at 0e699d5 (PR comment verified on GitHub, by weaver-agents). PR #57 merged with a merge commit at the accepted sha: f55b6a8. Main: 157/157, 0 skipped. Issue #55 closed. main merged into iteration-12. #56: branch issue-56-hint-rings from f55b6a8, worktree wt-56, issue log started; developer next.
