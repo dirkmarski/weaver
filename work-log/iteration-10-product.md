@@ -59,3 +59,10 @@ Not chosen: rings on relevant digits only, trivial confinements, Tricky density,
 4. Claiming, then pairs, each with its level.
 5. Mobile layout (2x2 level buttons at 375 px), a middle hint level, progress across puzzles.
 Delivered or in flight and gone from this list: pointing hint clarity (#45), clash feedback (#46).
+
+## Acceptance of #45 (PR #47, head 63c13de; code 579c1db), run started 2026-10-20
+- Asked by the lead (session 0245eb9f-91d7-4bfe-b523-bbf5b80a2438). Delivery: developer 2 rounds, review APPROVE x2, test PASS x2, suite 143/143. D1 (badge covers pencil note 3 while the hint shows) flagged for my judgement.
+- `governance/LOG.md` NOT read.
+- Detached worktree scratchpad/pm-45 at 63c13de. PM scripts: scratchpad/pm-acc45/acc.js (both walls, both clicks, 900 and 375 px, then Verify; reuses the tester's ts45/lib.js for navigation only, I judge the output myself). Persona play tool: scratchpad/pm-play45/play.js (game A = seed 1 at hint 13, game B = seed 3 at hint 20; moves hint/verify/notes/rRcC=D; prints message, board and a 375 px screenshot). No solver in the tool.
+- Suite re-run by PM: 143/143, 0.59 s.
+- Progress: criteria 1-5 checked on the page (results below); README diff read; persona C session launched.
