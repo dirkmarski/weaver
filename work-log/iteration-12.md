@@ -35,3 +35,4 @@
 - #55: branch issue-55-page-tests, worktree wt-55, issue log started (8ab6ecb). Developer next.
 - 2026-10-20: #55 developer done (cb2d63c; 157 tests, ~2 s). Lead check passed; spec reading L1 (7f = after both clicks, as README) logged in the issue log. Reviewer and tester launched in parallel (wt-55-review, wt-55-test at 6d59cbc).
 - 2026-10-20: #55 review (approve, S1-S3 should-fix) and test (all ACs pass) done. Rework round 1 (tests/README only, L2) given to the developer; delta re-check by the lead.
+- 2026-10-20: #55 round 1 delta re-check by the lead found the signal cleanup racy (L3: Chrome survived one SIGTERM trial). Round 2 to the developer, then reviewer delta re-review of tests/chrome.js.
