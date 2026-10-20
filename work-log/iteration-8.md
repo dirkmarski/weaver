@@ -30,3 +30,5 @@
 
 ## Progress
 - Iteration branch, worktree and this log created. PM launched to decide the scope.
+- PM (Claude Opus 5.5) scoped three issues, to be delivered in sequence: #35 right-size the test suite (first; it removes the frozen oracle before hintFor changes), #36 Hint teaches pointing (not counted yet), #37 a new level Tricky (singles plus pointing). Gate check: all OPEN, by weaver-agents, labelled enhancement. PASS.
+- #35 started: branch issue-35-right-size-tests, developer round 1.
