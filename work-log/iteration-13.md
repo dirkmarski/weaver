@@ -1,0 +1,66 @@
+# Work Log: Iteration 13 (lead)
+
+- Lead: weaver-agents (lead agent, Claude Opus 5.5), session `5034fe53-a839-46a5-807a-40a5b44d5158`
+- Run type: "Deliver the next iteration"
+- Iteration branch: `iteration-13` (holds the iteration work logs and memory updates; merged by PR at the end)
+- Product manager work log: `work-log/iteration-13-product.md`
+- Session scratchpad: /private/tmp/claude-502/-Users-dirk-Code-weaver-team/5034fe53-a839-46a5-807a-40a5b44d5158/scratchpad
+
+## Gate check
+- 2026-10-21: Invoked to deliver the next iteration. Restart procedure followed: WIP says no active run (iteration 12 complete, iteration PR #59 merged at 4217479). GitHub agrees: no open issues or PRs. No iteration-13 log existed, so this is a fresh start, not a resume.
+- No changes in `governance/` or `.claude/` since 9e54939 (already applied in it12). governance/LOG.md not read.
+- Baseline on main (4217479): 166/166 tests (152 unit, 14 page), skipped 0, about 3.0 s.
+
+## Plan
+1. The PM scopes iteration 13 from memory/wiki/backlog.md (top: Tricky practice density, spike first) and writes the issue(s).
+2. Per issue: gate check, branch, per-issue log, developer, reviewer + tester in parallel, lead check, PR, PM acceptance, merge commit (no squash). Flow: memory/wiki/process.md.
+3. Close: wiki and WIP update with pruning, iteration PR merged.
+
+## Conventions
+- Commits and PRs: `[<agent>][session 5034fe53-a839-46a5-807a-40a5b44d5158] <message> (#N)`. Each agent adds a co-author trailer naming its own model and version.
+- No agent reads governance/LOG.md. Agents do not read the work log unless specifically needed.
+
+## Progress
+- 2026-10-21: iteration-13 branch and this log created. PM launched to scope.
+- 2026-10-21: PM scoped two issues (product log c3fe34d): #60 Tricky Hint prefers a useful pointing step (first), #61 ring clause wording and legible struck badge (second; its pins assume #60). PM chose Hint preference over denser generation (spike: retrying generation p50 364 ms, p90 865 ms, 3/50 fail; preference gives median 4 pointing lessons, first at entry 5, 0/300 stuck). PM confirmed no LOG.md reading and only two status reads of the work log.
+- Gate check #60 and #61: both open, authored by weaver-agents, label enhancement. Passed.
+- #60: branch issue-60-tricky-prefers-pointing from 4217479, worktree scratchpad/wt-60, issue log 55c44a6. Developer launched.
+- Concern noted (PM A1): a median of 4 pointing hints per Tricky puzzle may feel heavy; PM checks at acceptance with personas, fallback is a cap.
+- 2026-10-21: #60 developer done (head d1a1dfe, code 8b92cc5): `findPointing(grid, {useful: true})` + `isSingle`, `hintFor(..., level)`; page passes currentLevel. 168/168 tests, skipped 0; ratio 1929/1210 = 1.594x. Seeds 3000-3002: 2/4/4 pointing hints. Reviewer and tester launched in parallel (worktrees wt-60-rev, wt-60-test at d1a1dfe).
+- Lead read of the diff: only the page Hint call site passes the level; `solvableBy` (findPointing without options) and generation unchanged, so AC7 holds by construction. `isSingle` treats a cell as a single for any digit, which matches the issue's "not already a naked single or a hidden single".
+- 2026-10-21: #60 tester PASS, no defects (72b5a18): per-AC page checks, an independent oracle on Tricky seeds 1/3/17/42/77 (0 mismatches, never none), 1118 hintFor comparisons on other levels identical to main, 28 generated puzzles identical to main.
+- #60 reviewer approve (f2a66bc, branch head 0b1369d): 14 mutants, 13 killed; S1 should-fix: M6 (isSingle naked branch off) survives and is reachable. N1/N2 README nits (stale "no single, pointing" line; preference bullet silent on Tricky).
+- Rework round 1 (developer): S1 pin + N1 + N2. Tests/README only, so a delta re-check by the lead (re-run M6, suite, README read) per process.md.
+- 2026-10-21: #60 rework round 1 done (b5613fc): seed 26 pin for S1, README N1/N2. Lead delta re-check: M6 killed, 168/168, skipped 0, ratio 1.597x (5f13f84 logs it). PR #62 opened at 5f13f84; PM acceptance launched on that head (also asked to confirm #61 still fits #60's final behaviour).
+- 2026-10-21: PM accepted #60 at 5f13f84 (comment 6302619107): all 11 AC; 8,804 other-level comparisons identical; Tricky seeds 1-150 never stuck; personas rated the pointing load 3/5 "about right", so A1 is not confirmed and there is no cap. The PM tightened #61 AC 9 (ratio at most 1.6x; bounded removal of redundant assertions) in #61's Change log. The lead verified the head and the comment on GitHub and merged PR #62 with a merge commit at the accepted sha: 44e3123. #60 closed.
+- #61: gate check passed; branch issue-61-ring-clause-strike from 44e3123, worktree wt-61, issue log f97bf2e. Developer launched.
+- 2026-10-21: #61 developer done (head b982c38, code e681a74): `pointingKey(step, ringCount)` with form/unit `<where>`, shared `aDigit`, page passes the hint; strike band 44-56% #6b6b6b (2.26/2.72 px, 5.33:1; chosen over the example #595959 to keep the digit more legible where the band crosses it); f4 guard extended; new page test f1b pins the four literal clauses. 167/167, skipped 0. Ratio 1944/1215 = 1.5999 after removing two unit tests and one page assertion (claimed redundant). Reviewer and tester launched in parallel (wt-61-rev, wt-61-test), both told to verify each removal's remaining coverage.
+- Lead read of the diff: correct per spec. Nits held for the rework round: the removals left double blank lines (two free test lines), and the ring-clause return expression is dense.
+- 2026-10-21: #61 tester PASS (6853306): four key lines exact on the page; zero-ring position reached (seed 1 after 13 entries); independent strike measurement 2.22 px (375) / 2.69 px (1280), 5.33:1; chip geometry identical to main; 100 hidden-single texts identical; all three removals keep coverage of #45/#56/#60/#61 ACs. Ratio exactly 1.6000.
+- #61 reviewer APPROVE (420c64c, ce8c0fc; merge aa91f09; work log only, verified by the lead): 24 mutants, 21 killed; survivors C3 (11% band, equivalent for AC 6), C4 (off-centre band) and C5 (gradient direction): unguarded and not required by any AC, accepted. Removal verdicts all OK. Nits: double blank lines, f4 leaves classes on the live page (harmless).
+- Decision: rework round 1 limited to the double blank lines (2 lines of headroom back, 1.598x) and the "about 2.3 px" wording (measured 2.22 px) -> "about 2.2 px". C4/C5 not guarded: no AC requires them, and the ratio has no room. The dense `pointingKey` expression stays (the reviewer rated it concise). Tests/README/comment only, so the lead does the delta re-check.
+- 2026-10-21: #61 rework round 1 done (fec65d1). Lead delta re-check: 167/167, skipped 0, ratio 1942/1215 = 1.598x, old-strike mutant killed by f4 (logged in 24eec95). PR #63 opened at 24eec95; PM acceptance launched (colour #6b6b6b vs the example #595959 flagged for a PM decision; iteration verdict and final candidate list requested).
+- 2026-10-21: PM did NOT accept #61 at 24eec95 (PR #63 comment): AC 6 fails for D = 1. The chip width follows the glyph; the strike is 1.94 px for D = 1 at 375 px, and f4 measured only D = 5 while claiming "narrowest chip". Developer, tester, reviewer and lead all measured a single digit (the PM's own feasibility note too). AC 1-5 and 7-10 pass; #6b6b6b accepted. The PM recorded the AC 6 clarification ("for every digit 1-9", guard measures the narrowest chip) in the issue Change log; the lead verified the Change log and the PR comment on GitHub.
+- Rework round 2 (developer): band widened (PM suggests 43-57%), f4 guards the narrowest chip, README/comment numbers. This is a CSS behaviour change, so a full delta re-review and re-test follow (process.md), and the tester measures all digits at both widths.
+- Lesson candidate (for the close): a size criterion that depends on content (glyph width, text length) must be checked on the worst case, not on one sample; a test message that claims "narrowest" must be proven.
+- 2026-10-21: #61 rework round 2 done (c5851d9): band 43-57% #6b6b6b; per-digit strike at 375 px 2.27 (D = 1) to 2.71 px, at 1280 px 2.91 to 3.23 px; f4 loops over digits 1-9 and asserts the minimum; with the old band it fails at 1.9446 px. Ratio 1943/1215 = 1.599x. Full delta re-review and re-test launched (wt-61-rev2, wt-61-test2). Asked both to resolve the 375 px cell width (34 px now vs 36 px reported in round 1) and the tester to measure a real D = 1 badge from play.
+- 2026-10-21: #61 re-review of rework 2: APPROVE (1e35da7), no must/should-fix. The f4 loop really re-resolves the chip per digit (live chip widths 9.25 px for D = 1 to 11.83 px for D = 8 at 375 px); 14 mutants: the guard kills the old band and a 12.2% band; the weakened-guard pairs (loop from 2, Math.max, digit 5 only) survive only when combined with a bad band, which shows the guard depends on D = 1 and Math.min (nit: no `rows.length === 9` pin; no AC requires it and there is no ratio room). Cell width 34/35/36 px is environmental and does not affect the strike guard (the chip size does not depend on the cell).
+- CONCERN (safety, for Dirk): the reviewer reported that a failed `sed && export TMPDIR=$(mktemp -d)` chain left TMPDIR at its default, and a following `rm -rf $TMPDIR` ran against the system temp dir (/var/folders/.../T). The sandbox refused nearly all of it. Lead check afterwards: the system temp dir still exists with 208 entries, the session scratchpad and all worktrees are intact, the repo is clean. No project file touched. Mitigation for future prompts: tell agents to create private temp dirs with an explicit path under the scratchpad and never `rm -rf` a variable that could be unset or default (use `${VAR:?}`). Candidate for an agent-definition change, which is Dirk's to make (CHARTER: `.claude/` is his).
+- 2026-10-21: #61 rework 2 re-test PASS (db843ca): all nine digits measured by formula and by pixel, a real D = 1 badge at Tricky seed 32 (2.27 px at 375, 2.91 px at 1280); the 34 vs 36 px cell width is clientWidth vs border box, the same layout. Lead check at 99fb331: 167/167, a D = 1-only mutant (12.2% band) killed by f4. The PR body was updated with the rework-2 figures.
+- PM re-accepted #61 at 99fb331 (comment 6303141387) after re-checking AC 6, 8, 9 and 10 plus a 375 px look at real D = 1 badges. The lead verified the head and the comment, then merged PR #63 with a merge commit at the accepted sha: 9a2caf6. #61 closed.
+
+## Close-out
+- Main at 9a2caf6: 167 tests (151 unit, 16 page), skipped 0, about 3 s; ratio 1943/1215 = 1.599x.
+- PM iteration verdict: iteration 13 complete (product log, "Iteration 13 verdict").
+- Memory (lead), with pruning per governance/memory-architecture.md:
+  - product.md: the Tricky preference and its figures, the new ring clause and strike, an updated explanation-depth gap, and the mobile gap with the 36 x 58 px cells. The superseded it12 explanation-depth gap was replaced.
+  - architecture.md: file sizes, the new API (`findPointing {useful}`, `isSingle`, `hintFor` level, `pointingKey(step, n)`, `aDigit`), the wiring, test counts, the ratio rule and the f1b/f4 notes.
+  - lessons.md: worst-case content for size criteria (merged into the feasibility and visual-check entries rather than added), the circular page test (merged into the page-wiring entry), a mutant per predicate branch, listed removals for the ratio budget, the temp-dir safety rule. The wording-variant lesson was rewritten to its current form.
+  - process.md: the ratio rule, the temp-dir rule, the PM-rejection path.
+  - backlog.md: refreshed from the PM's final it13 list; delivered #60/#61 and the two quick wins dropped; new tech-debt nits from the #61 review; the safety concern added for Dirk.
+  - glossary.md: "useful pointing step". index.md: the snapshot basis.
+  - WIP reset to "no active run".
+- Retrospective:
+  - What worked: the PM's spike chose a cheap, effective change (#60). One rework round each for review findings. The lead's delta re-checks re-ran the key mutants. PM acceptance caught a real defect that four gates missed.
+  - What to improve: size criteria that depend on content were measured on one sample by everyone, the PM's own feasibility note included. That lesson is now in the wiki and in process.
+  - Concern for Dirk: the reviewer's TMPDIR `rm -rf` slip (sandbox-blocked, nothing lost). It is recorded in backlog.md "Open concerns for Dirk".

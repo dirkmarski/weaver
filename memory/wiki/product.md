@@ -25,23 +25,23 @@ Authoritative behaviour spec: `README.md`.
 
 - Grading discards a puzzle that the lower level's technique already solves. Generation is a few ms (Tricky tens of ms, up to a few hundred); a 1000 ms cap returns the best unique puzzle found with `capped: true`.
 - Tricky bands overlap Hard at 27-29 givens; givens are not shown to players (accepted, it8).
-- In sampled Tricky seeds a puzzle needs one or two pointing steps (seeds 1-10: 8 need one, 2 need two).
+- Tricky puzzles mostly need one pointing step to solve, but Hint prefers useful pointing there (#60): a player who follows Hint gets 2/4/6 pointing lessons per puzzle (p10/p50/p90, seeds 1-300), the first at about entry 5. Personas rated that load "about right" (it13).
 
 ## Techniques taught
 - Naked single: an empty cell where row, column and box leave one digit.
 - Hidden single: a digit with one possible cell in a box, row or column.
-- Pointing: a digit confined to one row/column within a box cannot go elsewhere in that line; this can create a single. Taught only when no single exists.
+- Pointing: a digit confined to one row/column within a box cannot go elsewhere in that line; this can create a single. On Easy, Medium and Hard taught only when no single exists; on Tricky a useful pointing step comes first (#60).
 
 ## Hint
 - Never fills a cell. Two clicks: first a nudge (target cell amber and focused, area tinted), then an explanation (digit named, marks added).
 - Pointing nudge says what the step does (#45): naked form "That means D cannot go in row R, column C, and only one other digit fits there now."; hidden form "Then look at U: D now has only one place left there." The hidden-form unit is tinted on both clicks.
 - Rings (second click, #56): a cell holding the key digit D gets a purple ring only if it rules out a "reason cell" (shares a row, column or box with it). Hidden single: the other empty cells of its unit. Pointing: the empty box cells that are not confined, plus in the hidden form the empty cells of U other than the target and removed cells. All qualifying rings are kept (PM D4); there may be none. Naked single: no rings.
-- Pointing explanation also marks confined box cells (dashed purple outline, purple D badge) and removed line cells (grey struck D badge, also on the target). The badge sits in D's own pencil-note slot (1 top-left ... 9 bottom-right); below 560 px its side padding is 1 px and edge badges sit flush inside the cell (touching a neighbour note by about 1 px at most at 375 px). 320 px is out of scope.
-- Key line (#56): under the status, plain and smaller, only during a pointing explanation: "Key: dashed purple = the only places for D in the box; struck grey D = D can no longer go there; purple ring = this D rules out other cells." (ring clause dropped when no ring shows).
+- Pointing explanation also marks confined box cells (dashed purple outline, purple D badge) and removed line cells (grey struck D badge, also on the target). The badge sits in D's own pencil-note slot (1 top-left ... 9 bottom-right); below 560 px its side padding is 1 px and edge badges sit flush inside the cell (touching a neighbour note by about 1 px at most at 375 px). 320 px is out of scope. The struck badge's diagonal band (#61) is #6b6b6b (5.3:1 on white), 43-57% of the chip's corner-to-corner gradient: at least 2.27 px at 375 px and 2.91 px at 1280 px; the chip width follows the glyph, so D = 1 is the thinnest.
+- Key line (#56): under the status, plain and smaller, only during a pointing explanation: "Key: dashed purple = the only places for D in the box; struck grey D = D can no longer go there; purple rings = Ds already placed that keep D out of W." One ring: "purple ring = a D (an 8) already placed that keeps D out of W." W (#61): naked form "the other cells of the box"; hidden form "the other cells of the box and of row/column N", or "of both boxes" when U is a box. The ring clause is dropped when no ring shows.
 - Box case (#56): when every empty box cell is confined, the explanation inserts " (the box has no other empty cells)" after "fits only in row/column L".
-- Priority: conflicts first (#50: names the clash, plain style: "Row R1, column C1 and row R2, column C2 both hold E in the same U. Change or clear one of them first, then click Hint again." plus " Other numbers break the rules too: click Verify to see which." when more than two cells clash), full grid message, then singles, then pointing, else "No naked single, hidden single or pointing step right now..."
+- Priority: conflicts first (#50: names the clash, plain style: "Row R1, column C1 and row R2, column C2 both hold E in the same U. Change or clear one of them first, then click Hint again." plus " Other numbers break the rules too: click Verify to see which." when more than two cells clash), full grid message, then (Tricky only, #60) a useful pointing step, i.e. one whose target is not already a naked or hidden single, then singles, then pointing, else "No naked single, hidden single or pointing step right now..."
 - Single preference: teaches the technique with the lower own-plus-hint count; on a tie naked on Easy, hidden on Medium/Tricky/Hard. A preferred hidden single is one that is not also a naked single.
-- Pointing target: boxes in reading order, digits 1-9, first step that creates a single; naked and hidden forms are mutually exclusive.
+- Pointing target: boxes in reading order, digits 1-9, first step that creates a single; naked and hidden forms are mutually exclusive. The Tricky useful step skips targets that are already singles and passes over a step with no other target (`findPointing(grid, {useful: true})`).
 - Entering the hinted digit shows "Well done! You applied ...". Any change to a value, Verify, New puzzle or a level choice removes the hint and its key line; notes changes keep them.
 
 ## Rewards and counts
@@ -56,7 +56,7 @@ Authoritative behaviour spec: `README.md`.
 - Re-entering a cleared hint-credited cell says "on your own" while the count stays "with a hint" (consistent with the README; wording candidate, it9).
 - Red flags appear only after Verify, by design (#31); the orange outline (#51) is the live clash mark. The app never says whether a digit matches the solution.
 - Slip wording (it11 acceptance of #50, personas): the extra sentence is misread when the third clashing cell is a given; a named pair may include a given that "change or clear" cannot apply to; the entry text and Hint can name different pairs for one slip; "stays uncounted" is read as "never counts". On the PM candidate list.
-- Explanation depth (it12 acceptance personas): "this D rules out other cells" reads oddly with two rings and does not say which cells; the struck badge's strike is faint on phones; the naked-form "only D or X" step is not shown. On the PM candidate list.
-- Mobile: at 375 px the four level buttons wrap (Hard alone on row 2) and long messages plus the key line take much vertical space; accepted for now.
+- Explanation depth (it13 acceptance personas): the grid does not show which cells a ring rules out; with "and of row N" players cannot tell which ring explains the box and which the row; the first pointing click feels thin; the same pointing fact filling several cells in a row feels samey; "(the box has no other empty cells)" reads like a single; the naked-form "only D or X" step is not shown. On the PM candidate list.
+- Mobile: at 375 px the four level buttons wrap (Hard alone on row 2), long messages plus the key line take much vertical space, grid cells are about 36 x 58 px (taller than wide, it13 PM), and struck grey vs purple is hard to tell apart on tinted cells; accepted for now.
 - Not live: no progress across puzzles; no technique beyond pointing (claiming, pairs not taught).
 - Evidence is simulated users only; GitHub Pages was never confirmed enabled (open question), so no real users.
