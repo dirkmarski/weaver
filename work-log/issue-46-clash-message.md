@@ -72,3 +72,9 @@
   - Hint showing: clash in another cell gives the clash text and clears the hint; clash in the hinted cell gives the clash text, not the reward, neutral, no highlight.
 - Suite: `node --test` 143/143, about 0.64 s wall.
 - Defects: none. Note: the unit-order mutant [row, box, column] (lead's L1) is covered on the page by the pinned 4@r2c1 check, not by a unit test.
+
+## Lead decision after round 1
+- Review (b72dc12): APPROVE, with S1 (L1 confirmed: a faithful [row, box, column] mutant survives with 0 failures; no unit test separates column from box) and N1 (README "does not say whether the digit is right" could read "matches the solution"). 13 mutants, 1 survivor (S1).
+- Test (e485cc4, merge 150cce5): 35/35 page checks PASS, no defects. That covers the three pinned texts, neutral style, (a), (b) with a self-clash, overwrite, clear, Notes on, the last cell, Verify still red, and a clash with a hint showing.
+- Round 2 scope: S1 (one assertion) and N1 (README wording). Both are taken: N1 is one phrase and makes the #31 statement exact next to the new clash text.
+- Re-check is delta-scaled, with no product-code change: the reviewer re-runs the S1 mutant and reads the N1 sentence; the lead runs the suite. No tester re-run: product code is identical to c4b48f4, which the tester ran on the page. Decided by the lead per the rework re-check rule.
