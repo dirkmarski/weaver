@@ -47,3 +47,29 @@
   - Test: 35/35 page checks PASS, no defects.
 - #46 round 2 (378bd85; tests and README only, product code identical to c4b48f4): S1 assertion and N1 wording. The lead verified the diff and the suite (143/143). The delta re-review is running. No tester re-run, because the product code is unchanged.
 - #46 round 2 delta re-review APPROVE (e78e488); lead check round 2 PASS. PR #48 opened (head 4be2898). Handed to the PM for acceptance.
+- #46 ACCEPTED by the PM (no conditions, head 4be2898; PR #48 issuecomment-6283519624; the first lookup of the comment got an HTTP 502, and the retry showed author weaver-agents and ACCEPTED). The lead verified the hand-off, added a log-only commit (9df6a1d) and merged with a merge commit: eed18f3 (parents 9b5779d, 9df6a1d). #46 closed. main: 143/143, about 0.59 s.
+- The PM confirmed that iteration 10 is complete from the product side.
+- Close-out: main merged into iteration-10 with `--no-ff` (b676032; no `pull --rebase` afterwards, per the it9 lesson).
+- Memory closed for the iteration:
+  - wiki refreshed: product (#45 and #46 behaviour, gaps), architecture (sizes, `confined`/`removed`, marks wiring, `notCounted` order), process (parallel worktrees), lessons (it10), backlog (the PM's end-of-it10 list), index snapshot;
+  - WIP reset to "no active run".
+
+## Outcome and lessons
+- Delivered:
+  - #45, the pointing hint:
+    - the naked-form nudge says what the step does to the target;
+    - the hidden-form nudge names and tints the unit;
+    - the second click marks the confined and removed cells.
+    - Persona C's it9 failure (typing the pointing digit) did not recur.
+  - #46: a neutral clash text that names the first of row, column, box holding the digit. It sits between texts (b) and (a). #31 still holds.
+- Code: sudoku.js 900 -> 929, style.css 94 -> 112, tests 1075 -> 1093 lines; 143 tests (unchanged count), about 0.59 s. The test ratio fell from 1.21x to 1.18x.
+- Rounds: two per issue. Round 2 was always small: tests, README, a behaviour-neutral split or a comment, re-checked by delta.
+- Lesson 1: the lead's own pre-review spotting of gaps (L1/L2 on both issues) was confirmed both times by reviewer mutants (#45 S1, #46 S1). Giving the reviewer the suspected mutant up front made the review faster and sharper.
+- Lesson 2: parallel review and test in separate detached worktrees, with pre-created log sections, merged cleanly twice (one auto-merge and one keep-both conflict that the tester resolved correctly).
+- Lesson 3: a test-and-README-only rework round needs no tester re-run once `git diff <code commit> <head>` shows the product files untouched (#46 round 2; the PM used the same check).
+- Lesson 4 (PM): mock-up choices can shift in play. The personas rejected red at the mock-up, but in play all three asked for a subtle marker.
+- Concerns for Dirk:
+  - All user evidence is still simulated (GitHub Pages unconfirmed).
+  - Test ratio 1.18x, above the ~1x guide but falling.
+  - Text (b) after a slip confuses personas: it predates this iteration and is now the top candidate.
+- Accepted limitation: D1, the pointing badge covers pencil note 3 while the hint shows. A fix idea is in backlog candidate 2.

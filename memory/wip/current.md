@@ -3,20 +3,19 @@
 Last updated: 2026-10-20, lead session 0245eb9f-91d7-4bfe-b523-bbf5b80a2438
 
 ## Active run
-- Iteration 10 ("deliver the next iteration"), lead session 0245eb9f-91d7-4bfe-b523-bbf5b80a2438. Branch `iteration-10`, worktree <session scratchpad>/wt-iteration-10. Lead log: work-log/iteration-10.md. PM log: work-log/iteration-10-product.md.
+- None. Iteration 10 is complete: #45 (PR #47, 9b5779d) and #46 (PR #48, eed18f3) were merged and accepted by the PM. The iteration logs and memory are merged via the iteration-10 PR.
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #45 pointing hint marks | DONE: merged 9b5779d (PR #47), issue closed | - | - |
-| #46 clash message | PR #48 open (head 4be2898), PM acceptance | verify PM hand-off, merge (merge commit), close iteration | PM |
+| (none in flight) | | | |
 
-## Where things are
-- #46: branch issue-46-clash-message (from main 9b5779d), worktree <session scratchpad>/wt-46, log work-log/issue-46-clash-message.md.
-- Tester and PM headless tools (seeded, follow page Hint): <session scratchpad>/ts45/lib.js.
+## Starting the next run
+- Iteration 11: the PM picks from `memory/wiki/backlog.md` (snapshot) and its live list at the bottom of `work-log/iteration-10-product.md`. The top items are clash follow-ups (text (b) after a slip, a subtle non-red marker) and pointing visuals v2.
+- The it10 play and test tools were in session scratchpad 0245eb9f-91d7-4bfe-b523-bbf5b80a2438 (ts45/lib.js, ts46/run46.js, pm-acc45/46, pm-play45/46) and are likely gone. Rebuild as needed.
 
 ## Open issues / PRs
-- #46 open, PR #48 open. #45 closed (PR #47 merged).
+- none (after the iteration-10 PR merges)
 
 ## Blockers / waiting on
 - none
