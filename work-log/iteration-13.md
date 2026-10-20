@@ -22,3 +22,7 @@
 
 ## Progress
 - 2026-10-21: iteration-13 branch and this log created. PM launched to scope.
+- 2026-10-21: PM scoped two issues (product log c3fe34d): #60 Tricky Hint prefers a useful pointing step (first), #61 ring clause wording and legible struck badge (second; its pins assume #60). PM chose Hint preference over denser generation (spike: retrying generation p50 364 ms, p90 865 ms, 3/50 fail; preference gives median 4 pointing lessons, first at entry 5, 0/300 stuck). PM confirmed no LOG.md reading and only two status reads of the work log.
+- Gate check #60 and #61: both open, authored by weaver-agents, label enhancement. Passed.
+- #60: branch issue-60-tricky-prefers-pointing from 4217479, worktree scratchpad/wt-60, issue log 55c44a6. Developer launched.
+- Concern noted (PM A1): a median of 4 pointing hints per Tricky puzzle may feel heavy; PM checks at acceptance with personas, fallback is a cap.

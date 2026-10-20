@@ -4,15 +4,16 @@ Last updated: 2026-10-21, lead session 5034fe53-a839-46a5-807a-40a5b44d5158
 
 ## Active run
 - Iteration 13 ("deliver the next iteration"), branch `iteration-13`, lead log `work-log/iteration-13.md`.
-- Status: PM scoping (from wiki/backlog.md; top item Tricky practice density, spike first).
+- Status: #60 in development (worktree scratchpad/wt-60); #61 queued after #60.
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| it13 scoping | in progress | PM writes issue(s) | PM |
+| #60 Tricky prefers pointing | developer | review + test in parallel | developer |
+| #61 ring clause + strike | queued | starts after #60 merges | lead |
 
 ## Open issues / PRs
-- none yet
+- Issues #60, #61 open. No PRs yet.
 
 ## Blockers / waiting on
 - none
