@@ -60,3 +60,24 @@ Not chosen now: cell highlighting on the own reward (C), pointing hint visuals (
 3. Uncounted-entry feedback v2 (B: N1 "reads like a checklist I failed"; B wants "may still be correct", which conflicts with #31's no-correctness rule. Revisit).
 4. Claiming, then pairs, each with its level.
 5. Mobile layout (2x2 level buttons, status layout; the tally block now has three lines); middle hint level; unit wording; progress across puzzles.
+
+## Acceptance of #42 (PR #43, head b7d8aea), run started 2026-10-20
+- Asked by the lead (session 48eaa449-33cf-461f-85bc-196e8d61fc39). Delivery: developer 2 rounds, review APPROVE x2, test PASS x2, suite 143/143.
+- Detached worktree scratchpad/pm-42 at b7d8aea. PM play tool: scratchpad/pm-play42/play.js (replays a session's moves on the real page in headless Chrome, seeded Math.random; prints board, status, tally). Navigation to the walls uses `hintFor` from the delivered sudoku.js (pm-play42/steps.js), only to know which cells to type; no oracle.
+- Suite re-run by PM: 143/143, 0.61 s.
+
+### Criteria, checked one by one by the PM (real page, headless Chrome, seeded)
+1. PASS. Seed 1, following the page's Hint: hint 13 is pointing (naked form) at r3c3; entering 7 shows "Well done! You applied pointing: row 3, column 3 is 7." and Pointing "0 on your own, 1 with a hint". Seed 3 hint 20 (hidden form, r5c5 = 1): same, explanation "...only cell in its column where 1 fits".
+2. PASS. Seed 1 wall (my own 12 singles, no hint): 7 at r3c3 shows the pinned own text byte for byte, Pointing "1 on your own, 0 with a hint". Seed 3 wall: 1 at r5c5 shows the pinned hidden-form text, Pointing 1/0.
+3. PASS. Wrong digit 4 at the seed 1 wall gives the new text (a), neutral, no count change. Precedence, chained steps and conflict are covered by targeted unit tests on hand-built grids (precedence test: findPointing reaches the same digit, classifyEntry still says naked/hidden). Conflict (b) on the real page was checked by the tester; not repeated.
+4. PASS. Clear + re-enter at r3c3 (seed 1) and r5c5 (seed 3): own text shown again, Pointing stays 1. Single counts behave as before (12 own singles counted on the way to the wall).
+5. PASS. Easy, Medium, Tricky and Hard: three lines at 0 with three grey definitions, on a fresh level.
+6. PASS. Seed 1 Tricky, page Hint followed for all 54 cells: "Puzzle solved! Techniques applied: 0 on your own, 54 with a hint." Block: Naked 0/30, Hidden 0/23, Pointing 0/1.
+7. PASS. Unit test covers reward / notCounted / '' and statusClass. On the page: own pointing reward class ok, colour rgb(26,127,55); text (a) no class, rgb(29,29,31).
+8. PASS. README word diff read: Pointing section (hinted count, own recognition and message), "not counted" (a), credited-cell rule incl. pointing, tally block (three lines, every level, pointing definition, six counts), finish text and O/H sums, API list (classifyEntry pointing result, emptyTally, creditEntry kind, statusClass, tallyLines, TECHNIQUE_DEFINITIONS). Every changed sentence matches what I saw in play.
+9. PASS. 143/143 in 0.61 s. New tests are targeted (fixed seeds 1 and 3, hand-built grids). No new sweeps or oracles. The seed 1-6 loop at tests line 541 predates this PR (iteration 8). The PR body lists rule -> test (full map in work-log/issue-42-count-pointing.md).
+- Behaviour the lead flagged, reproduced: clear a hint-credited pointing cell (seed 3 r5c5) and re-enter 1. The message says "Well spotted! ... on your own" while the block still shows Pointing "0 on your own, 1 with a hint". This is consistent with the credited-cell rule and the README (the same already happens for singles), so it is not a defect. Small wording mismatch, noted as a candidate.
+- PM navigation note: my first navigation used `hintFor(g, 2)` without the page's preferred technique, so one step differed from the page's Hint (an own naked single was counted). The page-Hint run (`follow`) was used for criteria 1 and 6.
+
+### Persona sessions (play tool only; sessions prepared by the PM: seed 1 Tricky at the pointing wall with 12 own singles, the same puzzle with 2 cells left, and a fresh Easy game)
+- Persona C: the own-pointing message explains why it worked, and the count going 0 -> 1 was visible. The finish "Puzzle solved! Techniques applied: 14 on your own, 40 with a hint." is easy to take in, and the block gives the breakdown. Pointing line on Easy: "doesn't bother me", keep it always shown (weak, 2/5). C now says the grey definitions are more noise than the 0 line. Confusing: the first pointing hint names the pointing digit (1) and the target cell, but the cell takes 7. C typed 1 there and got "not counted" with no clue. Top wish: the hint names the pointing digit and the answer digit separately. C also wants a wrong entry to be called wrong (conflicts with the #31 no-correctness rule; same as B's earlier wish). No defect found against #42.
