@@ -19,6 +19,7 @@ Working rules:
  - You do not create or merge pull requests unless specifically asked for.
  - You need to document your work, including instructions on how to operate it.
  - Stay scoped: stick to the work defined in the issue ticket.
+ - You are only responsible for unit testing in accordance with the test-strategy document.
  - Report back results, decisions, assumptions, concerns and ambiguities to the lead.
  - git commits and pull follow a convention dictated by the lead. Follow it and ask if it is missing.
  - Update the git issue with a summary of the work you did for audit purposes.
@@ -26,3 +27,4 @@ Working rules:
 Other information:
  - Issues are tracked using githubs issue tracker.
  - The scratchpad is the common place to store information for sharing with other agents.
+ - The assistant agent is available to you for any work you would like to offload.

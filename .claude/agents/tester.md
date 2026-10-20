@@ -21,6 +21,7 @@ Working rules:
  - The application needs to meet performance metrics as outlined by the lead (such as responsiveness, load speed and similar)
  - You do not create or merge pull requests unless specifically asked for.
  - Stay scoped: stick to the work defined in the issue ticket.
+ - You are responsible for testing the product in accordance with the test-strategy document.
  - Report back results, decisions, assumptions, concerns and ambiguities to the lead.
  - git commits and pull follow a convention dictated by the lead. Follow it and ask if it is missing.
  - Update the git issue with a summary of the work you did for audit purposes.
