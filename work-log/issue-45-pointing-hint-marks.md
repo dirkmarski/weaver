@@ -129,3 +129,14 @@
 - Tests: `node --test` 143/143 pass, about 0.59 s (no new test() block, one assertion).
 - S1 mutant `(s.unit === 'row' ? s.r : s.c) + 1` -> `s.r + 1`: BEFORE (old tests, mutated code) 143 pass, 0 fail (survives); AFTER (new tests) 142 pass, 1 fail (killed). Unmutated code with new tests: 143/143.
 - Line deltas: sudoku.js +11/-3, tests +2/-0, README +1/-1 (one line changed).
+
+## Test round 2 (tester, smoke)
+
+Head 579c1db. Result: PASS, no new defects. D1 remains the accepted known limitation.
+
+- `node --test`: 143 tests, 143 pass, 0 fail, about 0.59 s.
+- run1.js (criteria 1-5, pinned walls seed 1 hint 13 and seed 3 hint 20, widths 900 and 375): 36 checks ok, 0 FAIL, exit 0.
+- run2.js (clearing with pointing marks showing): 0 FAIL.
+- First-click text, one per unit kind, read on the page: row unit (seed 5 hint 7, "fits only in row 7 ... look at column 3"), column unit (seed 7 hint 7, "fits only in column 9 ... look at row 2"), box unit (seed 10 hint 26, "fits only in row 8 ... look at the box of rows 7-9 and columns 7-9"). Wording is grammatical and complete; target and tint are present.
+- No script expectation was wrong in round 1 or this round.
+- Tools: scratchpad ts45/ (run1.js, run2.js, c3.js). governance/LOG.md was not read.
