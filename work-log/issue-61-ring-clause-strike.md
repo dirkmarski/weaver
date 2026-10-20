@@ -44,7 +44,7 @@ Iteration 13. Branch `issue-61-ring-clause-strike`. Session `5034fe53-a839-46a5-
 | P2 | helper reads step.digit instead of pointDigit | killed: pointingKey unit, f1b |
 | C1 | stops 46-54 | killed: f4 |
 | C2 | colour #8a8a8a | killed: f4 |
-| C6 | colour #777 (3.9:1... below 4.5) | killed: f4 |
+| C6 | colour #777 (below 4.5:1) | killed: f4 |
 | C7 | hard stop broken (`#6b6b6b 56%`) | killed: f4 |
 | C3 | stops 44-55 (11%, still 2.07 px) | survived; equivalent for AC 6 (still >= 2 px) |
 | C4 | band 45-57 (off-centre) | survived; centring is not an AC and not guarded (nit) |
