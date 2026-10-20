@@ -98,3 +98,36 @@ All examples in #50 and #51 were run on a prototype (scratchpad copy of main wit
 6. Mobile layout (2x2 level buttons at 375 px; long messages on a phone), a middle hint level, progress across puzzles.
 
 Not wanted: instant red on a wrong or clashing entry (it10); counting entries made during a clash (it11, D2).
+
+## Acceptance of #50 (PR #52, head b45a64f)
+Own detached worktree <scratchpad>/wt-50-pm at b45a64f. Not read: governance/LOG.md (never), work-log beyond this file (not needed).
+
+### Per criterion (real page, Tricky seed 1, play tool pm-it11/play.js with WT=wt-50-pm; tester's ts50/pins.js)
+1. PASS. r4c1=6 -> "... already in this cell's box, at row 5, column 3 ..."; r1c2=4 -> row, r1c1; r7c2=2 -> column, r2c2; r2c1=4 -> column (also in box), r1c1; r3c7=9 -> row (also in box), r3c9.
+2. PASS. r4c1=6 then r7c2=6 -> text 1 (row, r7c8); r3c7=9 then r2c1=4 -> text 1 (column, r1c1).
+3. PASS. r4c1=6, r7c2=9 -> text 2 naming r4c1/r5c3 box; counts stay 0. Column pair (r2c2/r7c2) and row pair (r3c7/r3c9) also named correctly on the page.
+4. PASS. Page cases where P is a given (r2c2 before r7c2; r1c1 before r2c1) and column-vs-box / row-vs-box precedence correct. Unit tests cover row, column, box partners, column+box (column named), row+box (row named), first-holder-in-unit, box holder before column holder (column named).
+5. PASS. r1c2=4 (three cells) adds the extra sentence to text 2 and to Hint; two-cell clashes do not.
+6. PASS. Hint text 3 for r4c1/r5c3 and r1c1/r2c1 column; plain colour (class "", rgb(29,29,31) per pins), nothing highlighted (screenshot).
+7. PASS. r7c2=9 after clearing -> "Well spotted! ... naked single"; r2c1=7 on fresh grid -> unchanged "not a naked single..." text.
+8. PASS. Verify: only the player's 6 at r4c1 red, red message unchanged; overwrite r4c1 6->8 gives no message; Notes on: no new message; counts unchanged. Product diff touches only namedClash/firstHolder/cellName, hintFor conflict text, notCounted, Hint status class.
+9. PASS. Tester's pins 7/7 at b45a64f, and I re-ran all 7 with my own play tool: exact text match.
+10. PASS. README diff read sentence by sentence: Hint bullet, the three ordered not-counted texts, the named-clash definition, "not counted later either", summary sentence order, Files entries for namedClash and creditEntry. No contradiction found. Nit N3 (the named-clash definition repeats itself) stands; I agree with folding it into #51, which rewrites that section. Not a blocker: the sentence is accurate, only redundant.
+11. PASS. `node --test` 143/143, 0.61 s. Assertions added inside existing tests (no new blocks); tests +40/-21 (net +19) vs product +41/-12 (net +29).
+
+### Persona play on the product (b45a64f; prompt pm-it11/accept50-prompt.txt; play tool only, no scripts, solvers, source or README)
+- A (5 runs): ship, yes. Named cells correct. r2c1=5 (clashes with r8c1 in the column and r1c3 in the box): the entry text named r8c1 (column first), and Hint named r1c3/r2c1 (box, because P = r1c3 comes first in reading order), which surprised A. A read the extra sentence as false and "pressed Verify for nothing".
+- B (12 runs): ship, yes. Named cells correct. B says "Other numbers break the rules too" is false for r1c2=4 and "reads like a bug". B wants "and elsewhere" when an entry clashes in more than one unit, and says "change or clear one of them" cannot apply to a given. B confirmed on the page that counting resumes after the fix (r2c3=9, r1c9=1 counted on your own).
+- C (10 runs): ship, yes. Named cells correct. Hint naming one pair at a time "hid the second clash" (the extra sentence warned). C confirmed that counting resumes after the fix (r1c9=1 hidden single on your own). C finds "stays uncounted" could be read as "never"; C asks for a retype tip (D8 stands); the text is long.
+
+PM diagnosis of the "false" extra sentence (A, B): not a defect. I reproduced it on the page. r1c2=4 clashes with r1c1 (row) and with the given 4 at r6c2 (column), so three cells clash. r2c1=5 clashes with r8c1 and r1c3. The sentence is correct per spec (pinned example 5). The players miss it for two reasons. The third cell is a given, and Verify flags only the player's own values, so Verify shows nothing new. This is a real comprehension gap. The #51 outline (on every clashing cell, givens included) is the planned fix. I will check in #51 acceptance whether players still read the sentence as false once the outline shows.
+
+### Decision: ACCEPTED (#50, PR #52, head b45a64f)
+Criteria 1-11 pass, and personas 3/3 say ship. The open points are wording and visibility, not defects. N3 goes to #51, as the lead proposes.
+
+### New candidates (added to item 3, slip follow-ups)
+- Extra sentence wording: name the extra clash or say it involves a given (e.g. "row 1, column 2 also clashes elsewhere"); re-test after #51's outline first (A, B).
+- An entry clashing in two units: text 1 names only the first unit; say "and elsewhere" (B). Text 1 and Hint can name different pairs for the same slip (A).
+- When one of the pair is a given, say "clear your own number" rather than "change or clear one of them" (B).
+- Counting-resumes wording: "stays uncounted" read as "never" (C); retype tip (C, again; D8 stands for now).
+- Verify does not name cells (C).
