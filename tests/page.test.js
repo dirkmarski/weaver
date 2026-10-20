@@ -283,7 +283,7 @@ describe('page (headless Chrome)', () => {
         '  var td = p[0], d = p[1];' +
         '  td.classList.add("hint-confined"); td.setAttribute("data-d", d);' +
         '  var box = td.getBoundingClientRect(), a = getComputedStyle(td, "::after"), m = a.transform.match(/matrix\\(([^)]+)\\)/)[1].split(",").map(parseFloat);' +
-        '  var pl = box.left + td.clientLeft, pr = pl + td.clientWidth;' +
+        '  var pl = box.left + td.clientLeft, pr = box.right - (td.offsetWidth - td.clientLeft - td.clientWidth);' +
         '  var w = ["width", "paddingLeft", "paddingRight", "borderLeftWidth", "borderRightWidth"].reduce(function (n, k) { return n + parseFloat(a[k]); }, 0);' +
         '  var left = pl + parseFloat(a.left) + m[4];' +
         '  out.rows.push({ d: d, inL: left - pl, inR: pr - (left + w), pad: a.paddingLeft + " " + a.paddingRight });' +
@@ -300,6 +300,8 @@ describe('page (headless Chrome)', () => {
       r.rows.forEach((x) => {
         assert.strictEqual(x.pad, '1px 1px', 'badge ' + x.d + ' padding');
         assert.ok(x.inL >= -1 && x.inR >= -1, 'badge ' + x.d + ' outside the cell: ' + x.inL + ' / ' + x.inR);
+        // flush against its own edge (left rule for 1, right rule for 9), not merely inside the 1 px tolerance
+        assert.ok(Math.abs(x.d === 1 ? x.inL : x.inR) < 0.25, 'badge ' + x.d + ' not flush: ' + x.inL + ' / ' + x.inR);
       });
     } finally {
       await page.send('Emulation.clearDeviceMetricsOverride');
