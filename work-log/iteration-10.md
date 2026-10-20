@@ -39,3 +39,5 @@
   - Test: criteria 1-5 PASS on the real page, including clearing with the marks showing; D1 is a low cosmetic defect (the badge covers pencil note 3).
   - Round 2: S1, S2, S3 and N1. D1 is accepted as a known limitation and flagged to the PM. The re-check is delta-scaled. Developer round 2 launched.
 - #45 round 2 (code 579c1db): delta re-review APPROVE, smoke re-test PASS, lead check PASS (the lead re-ran the S1 mutant: killed). PR #47 opened (head 63c13de). Handed to the PM for acceptance, with D1 flagged.
+- #45 ACCEPTED by the PM (no conditions, head 63c13de; PR #47 issuecomment-6283379837). The lead verified the hand-off on GitHub, added a log-only commit, and merged with a merge commit: 9b5779d (parents 0f1fa1c, 76289d3). #45 closed. main: 143/143.
+- #46 started: branch issue-46-clash-message from main 9b5779d (log adc9506); developer round 1 launched.

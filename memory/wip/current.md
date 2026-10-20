@@ -8,14 +8,15 @@ Last updated: 2026-10-20, lead session 0245eb9f-91d7-4bfe-b523-bbf5b80a2438
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #45 pointing hint marks | PR #47 open (head 63c13de), PM acceptance | verify PM hand-off, merge (merge commit) | PM |
-| #46 clash message | waiting (after #45 merges) | branch from main, developer | lead |
+| #45 pointing hint marks | DONE: merged 9b5779d (PR #47), issue closed | - | - |
+| #46 clash message | developer round 1 | review + test, lead check, PR | developer |
 
 ## Where things are
-- #45: branch issue-45-pointing-hint-marks, worktree <session scratchpad>/wt-45, log work-log/issue-45-pointing-hint-marks.md.
+- #46: branch issue-46-clash-message (from main 9b5779d), worktree <session scratchpad>/wt-46, log work-log/issue-46-clash-message.md.
+- Tester and PM headless tools (seeded, follow page Hint): <session scratchpad>/ts45/lib.js.
 
 ## Open issues / PRs
-- #45, #46 open (issues). PR #47 (#45) open.
+- #46 open. #45 closed (PR #47 merged).
 
 ## Blockers / waiting on
 - none
