@@ -273,6 +273,39 @@ describe('page (headless Chrome)', () => {
     });
   });
 
+  it('f4. at 375 px the edge badges (1 left, 9 right) lie inside the cell and the chip padding is 1px; the viewport is restored', async () => {
+    await open('tricky', 5);
+    await page.send('Emulation.setDeviceMetricsOverride', { width: 375, height: 900, deviceScaleFactor: 1, mobile: false });
+    try {
+      const probe = '(function () {' +
+        'var tds = document.querySelectorAll("#sudoku td"), out = { cw: tds[0].clientWidth, rows: [] };' +
+        '[[tds[0], 1], [tds[8], 9]].forEach(function (p) {' +
+        '  var td = p[0], d = p[1];' +
+        '  td.classList.add("hint-confined"); td.setAttribute("data-d", d);' +
+        '  var box = td.getBoundingClientRect(), a = getComputedStyle(td, "::after"), m = a.transform.match(/matrix\\(([^)]+)\\)/)[1].split(",").map(parseFloat);' +
+        '  var pl = box.left + td.clientLeft, pr = pl + td.clientWidth;' +
+        '  var w = ["width", "paddingLeft", "paddingRight", "borderLeftWidth", "borderRightWidth"].reduce(function (n, k) { return n + parseFloat(a[k]); }, 0);' +
+        '  var left = pl + parseFloat(a.left) + m[4];' +
+        '  out.rows.push({ d: d, inL: left - pl, inR: pr - (left + w), pad: a.paddingLeft + " " + a.paddingRight });' +
+        '});' +
+        'return out; })()';
+      let r;
+      for (let i = 0; i < 100; i++) { // wait for the new width to lay out
+        r = await page.eval(probe);
+        if (r.cw >= 34 && r.cw <= 36) break;
+        await page.eval('document.querySelectorAll("#sudoku td").forEach(function (t) { t.classList.remove("hint-confined"); t.removeAttribute("data-d"); })');
+        await new Promise((x) => setTimeout(x, 20));
+      }
+      assert.ok(r.cw >= 34 && r.cw <= 36, 'cell width at 375 px: ' + r.cw);
+      r.rows.forEach((x) => {
+        assert.strictEqual(x.pad, '1px 1px', 'badge ' + x.d + ' padding');
+        assert.ok(x.inL >= -1 && x.inR >= -1, 'badge ' + x.d + ' outside the cell: ' + x.inL + ' / ' + x.inR);
+      });
+    } finally {
+      await page.send('Emulation.clearDeviceMetricsOverride');
+    }
+  });
+
   it('g. the N key and the Notes button toggle Notes; a digit with Notes on adds a note and no count', async () => {
     const { puzzle } = game('tricky', 5);
     const [p, q] = empties(puzzle);
