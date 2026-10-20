@@ -409,11 +409,18 @@
     return { naked: { own: 0, hint: 0 }, hidden: { own: 0, hint: 0 }, pointing: { own: 0, hint: 0 } };
   }
 
-  // The line for a judged entry that is not credited: (a) not a single, or (b) the grid
-  // just before the entry already breaks the rules. Never says whether the digit is right.
+  // The line for a judged entry that is not credited: (b) the grid just before the entry already
+  // breaks the rules (first), else (c) the digit is already in the cell's row, column or box (the
+  // first of those named), else (a) not a single. Never says whether the digit is right.
   function notCounted(grid, r, c, digit) {
     var where = 'Entered: row ' + (r + 1) + ', column ' + (c + 1) + ' is ' + digit + '. ';
     if (findConflicts(grid).length) return where + 'Some numbers break the rules, so it is not counted. Click Verify to see which.';
+    var cells = toFlat(grid), us = CELL_UNITS[r * 9 + c];
+    for (var k = 0; k < 3; k++) {
+      if (UNITS[us[k]].some(function (q) { return cells[q] === digit; })) {
+        return where + digit + ' is already in this cell\'s ' + UNIT_NAMES[k] + ', so it breaks the rules. It is not counted.';
+      }
+    }
     return where + 'It was not a naked single, a hidden single or a pointing step at this point, so it is not counted.';
   }
 
