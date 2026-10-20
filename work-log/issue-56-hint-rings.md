@@ -39,4 +39,13 @@
 ---
 
 ## Tester
-(pending)
+- 2026-10-20, tested head 8ac1f8b (product commit 31758fc). Scratch scripts: scratchpad/ts56/ (real page via tests/chrome.js launch, seeded Math.random).
+- Plan and results:
+  - AC1/AC4 pins on the real page (follow Hint from start for P(1,3,4,8,10); fresh second click for H(1-3)): rings, explanation text, key line, box-case parenthesis all match the issue table. An independent oracle (my own code, grid read from the page, reason cells derived from the text, not hintMarks) agrees with the page on all 8 pins. PASS.
+  - AC2: key absent on first click, singles' explain, conflict hint, "none" hint (hard seed 1); shown on pointing explain and kept on a further Hint click, on Notes toggle and on adding a note; cleared by value change, Verify, New puzzle, level choice; next Hint after a value change is a nudge with empty key. `#key` has no role / aria-live; `#status` keeps role=status; `#key` directly follows `#status`. PASS.
+  - AC3: screenshots and numeric badge-vs-slot overlap with all 9 notes in a confined and a removed cell, seeds 3 (D=1), 9 (D=5), 4 and 2 (D=9). At 900 px: badge overlaps only its own slot, nothing else. At 375 px: no note glyph is covered for D=1 and D=9, but the chip (13-16 px wide) is wider than a ~12 px slot in a ~37 px cell: D=5 touches notes 4 and 6 (glyph box overlap up to 5 px2), D=3/6/9 chips are clipped on the right cell edge. At 320 px glyph overlap up to 37 px2. PASS at 900, PASS-with-defect at 375 (D1 should-fix).
+  - AC5: origin/main vs branch on P(3), P(4), H(1), H(3): first click (status, tint, target, focus) identical; second click identical except P(4) status (the parenthesis); tally after entering the hinted digit identical. PASS.
+  - AC7: five mutants each killed (b dropped 3 fail; removed as reason 1; ring clause always 1; key not cleared 2; box case "confined > 1" 2); `git diff --exit-code` clean after each.
+  - Suite: `node --test` x3: 164 tests, 164 pass, 0 fail, 0 skipped, 2.23-2.26 s.
+- Defects: D1 (should-fix) badge chip wider than the note slot at narrow widths (375 px: D=5 touches notes 4/6, D=3/6/9 chip clipped at the right cell edge; 320 px: overlaps neighbours). Nit: pinned wording "a 8"/"a 9" (grammar), lead question Q1 already open.
+- Not checked: AC6 README wording (not in my scope list).
