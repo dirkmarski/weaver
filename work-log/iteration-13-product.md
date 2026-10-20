@@ -75,3 +75,22 @@ Not wanted: instant red on a wrong entry (it10); counting entries made during a 
   - Easy/Medium/Hard: 8804 hintFor comparisons (40 seeds each, follow Hint, both steps) identical to 4217479.
 - Page play-through (scratch play60.js, headless Chrome, real index.html): Tricky seed 7, 25 hinted entries: first hint a hidden single (no useful step at the start), pointing at entries 2, 8, 9, 22; each with the key line on the second click, "Well done! You applied pointing" and the pointing count +1; singles alternate as before. Medium seed 3, 8 hints: sequence identical to 4217479 (h, n, h, n, ...), no pointing.
 - Persona check launched (user-a, user-b, user-c; prompt scratchpad/pm-it13/acc60-prompt.txt; tool scratchpad/pm-it13/play/play.js only) on concern A1 (pointing load).
+
+### Persona check (user-a seed 1, user-b seed 7, user-c seed 12; about 31 entries each; all three confirmed: only play.js and its screenshots; no source, README, LOG.md, work logs, helper scripts or solvers; user-c used a one-line shell alias to call play.js, harmless)
+- Pointing hints met: A 5 (first at entry 0, then 10, 14, 23, 24); B 3 (entries 1, 8, 9); C 4 (entries 17, 18, 19, 25).
+- Pointing load: 3/5 from all three ("about right", "never felt drilled"). Understanding at the end: 4/5 from all three; each named a concrete case where the second-click marks and key line made it click. B then found a follow-on cell alone.
+- Comments: A found opening a fresh puzzle with pointing steep (visible singles were passed over) and two pointing steps in a row dense. A also read the existing "(the box has no other empty cells)" case as "really just a single". That is #45 behaviour, not changed by #60. B and C said the first click is thin (B saw no marks; the tint is light) or too long (C). B and C noticed the same pointing fact reused 2-3 times in a row ("samey"; C suggested "same 9 as before").
+
+## Decision D3: #60 accepted at 5f13f84dd7160d322f5b89450a6dd3ce64dfce65 (2026-10-21)
+- ACs 1-11 all pass (per-AC summary in the PR #62 comment). Gates: tester PASS, reviewer approve after one rework round, lead delta re-check.
+- A1 (pointing load) not confirmed: 3/5 from all three, so no cap. Keep the cap as a fallback only.
+- No spec change to #60.
+
+## Decision D4: ratio headroom goes to #61 (2026-10-21)
+- 1.597x leaves about 4 lines. #61 AC 9 is changed to "at most 1.6x". Room may come only from removing redundant assertions in the test files it touches, each listed with the test that still covers it, and the tester confirms coverage of #45/#56/#60/#61. Recorded in #61's Change log, with an issue comment. I chose this over a separate trim item: the issue that consumes the headroom pays for it, and the iteration stays at two issues.
+- #61 pins re-checked against #60's final behaviour (5f13f84): seeds 1, 76, 8 and 44 give exactly the listed steps, targets, forms, units and ring cells (2, 1, 3 and 2 rings). No other change to #61.
+
+## Candidate list changes (after #60 acceptance)
+- Item 2 (pointing reach): early first pointing via generation stays contingent. B and C met pointing early or mid-game; the late tail is still real (C: entry 17). A's "don't open with pointing" (1 of 3) is the opposite pull, so neither direction is warranted now; watch.
+- Item 3 (explanation depth), added: a stronger first-click signal for pointing (B, C; merges with "a clearer first-click case signal"); say when the same pointing fact gives another cell ("same 9 as before", B, C); the "(the box has no other empty cells)" case reads like a single (A).
+- Item 2: "prefer pointing" on Hard unchanged as a candidate.
