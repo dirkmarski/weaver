@@ -8,3 +8,10 @@
 
 ## Progress
 - 2026-10-20: Branch and log created. Developer round 1 launched.
+- Developer round 1 (Claude Sonnet 5.5): 44bff76 (sudoku.js, index.html), 095755a (tests) and f86f2c5 (README, with N5 and "two" fixed). Tricky band 27-31.
+  - Measurement (n=50 per level): Tricky max 207 ms, average 45.7 ms, 0 capped. Hard (now excluding pointing) max 27 ms, 0 capped.
+  - Tests 130 -> 136, 0.22 s -> 0.56 s.
+  - Tricky seeds 1-4 each contain exactly one pointing hint (seed 1: the 13th hint, r3c3=7, naked form; seed 3: the 20th hint, r5c5=1, hidden form).
+- Lead check: PASS. solvableBy 'pointing' calls findPointing (the same as Hint) only when no single made progress, which matches Hint's condition. LEVELS are wired tricky beyond singles and hard beyond pointing. 136/136 tests pass.
+  - Product points for the PM: (1) a Tricky puzzle needs exactly ONE pointing step in the sampled seeds; (2) the Tricky band 27-31 overlaps Hard 22-29 at 27-29.
+- Reviewer and tester launched in parallel.
