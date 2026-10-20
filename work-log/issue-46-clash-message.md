@@ -24,3 +24,22 @@
 - Rule -> test: new text and U order (row, column, box), row-and-column -> row: `creditEntry (c)`; (b) wins: same test, last assertion and the existing `creditEntry (b)`; (a) kept: `creditEntry (c)` digit 8 and existing (a) tests; neutral kind and no count change: `creditEntry (c)` and `statusClass` test.
 - Mutants (all killed): reversed unit order (2 failing), (b) check removed (3), box skipped (1).
 - Page (headless Chrome, seed 1 Tricky, fresh puzzle, harness `scratchpad/dev46/pg.js`): the three pinned entries give the exact pinned texts; status class '' (neutral); no `.conflict` cells; tally lines unchanged. With (3,1)=2 entered (grid now broken), entering 4 at (2,1) gives "Some numbers break the rules, so it is not counted. Click Verify to see which."
+
+## Lead check round 1 (head c4b48f4)
+- Developer: Claude Sonnet 5.5 per its trailer. Suite: 143/143, about 0.59 s. sudoku.js +7, tests +7.
+- Diff read:
+  - `notCounted` order is (b), then the clash text (loop over CELL_UNITS with UNIT_NAMES, no new search), then (a);
+  - the entry cell is empty when judged, so it cannot match itself;
+  - `kind`, tally and credit are untouched;
+  - README "not counted" section reordered (b), clash, (a); the "does not point out a clash" sentence is removed; the "Any change to a value" paragraph and the creditEntry sentence are updated. They read true.
+  - The old clash-as-(a) test was replaced; text (a) is still covered by "creditEntry (a): not a single".
+- PASS, with L1 for the reviewer to confirm: no unit test has a digit in the column AND the box but not the row. A unit-order mutant [row, box, column] probably survives. The issue pins exactly that case (4 at row 2, column 1 on seed 1).
+- Review and test round 1 launched in parallel on c4b48f4.
+
+## Review round 1 (reviewer)
+- (pending)
+
+<!-- separator: keep the review and test sections apart -->
+
+## Test round 1 (tester)
+- (pending)
