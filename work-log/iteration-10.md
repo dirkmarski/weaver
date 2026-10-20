@@ -25,3 +25,11 @@
 ## Progress
 - Iteration branch, worktree and this log created.
 - PM (product-manager agent) launched to scope iteration 10 (backlog snapshot + live list; personas and spike at its discretion).
+- PM (Claude Opus 5.5) scoped two issues, delivered in sequence (PM log 10ae4d6):
+  - #45 "Pointing hint: say what the step does to the target, tint the hidden-form unit, mark confined and removed cells" (first);
+  - #46 "Say why an entry is not counted when it clashes with a digit in its row, column or box" (second; both touch README and sudoku.js).
+  - The wording and marks were pre-reviewed by personas A, B and C on a mock-up. No spec questions are open.
+- Gate check: #45 and #46 are OPEN, by weaver-agents, label `enhancement`. PASS.
+- Decision D1: two issues is acceptable for "small": #46 is one text branch. They are delivered strictly in sequence; #46 branches from main after #45 merges.
+- Decision D2: for #45 the tester's real-page check (screenshots, 375 px) is the main gate for the marks, because UI wiring has no repo tests.
+- #45: branch issue-45-pointing-hint-marks (45f3e38), developer round 1 launched.

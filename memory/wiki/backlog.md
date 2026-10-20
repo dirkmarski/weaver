@@ -1,26 +1,19 @@
 # Backlog
 
-Owned by the PM; this is a snapshot as of the end of iteration 9. The PM's current list (bottom of the latest `work-log/iteration-N-product.md`) supersedes this page. The lead refreshes this snapshot after each iteration.
+Owned by the PM; this is a snapshot as of the iteration 10 scoping. The PM's current list (bottom of the latest `work-log/iteration-N-product.md`) supersedes this page. The lead refreshes this snapshot after each iteration.
 
 ## Product candidates (PM, ordered)
-1. Pointing hint clarity and visuals:
-   - name the answer digit separately from the pointing digit (in it9, C typed the pointing digit 1 into a cell that takes 7);
-   - mark the confined box cells and the removed cells;
-   - ring only the relevant digits;
-   - tint the unit in the hidden form;
-   - avoid trivial confinements as the example.
-2. Tricky practice density: at least 2 pointing steps per Tricky puzzle (measure generation time first). Hint preferring pointing on Tricky may go with this or with 5.
-3. Feedback on conflicting or wrong entries:
-   - B and C asked again in it9;
-   - needs a decision against the #31 rule that the app never says whether a digit is right (a conflict is a rule fact, so it may fit);
-   - includes "not counted" wording v2.
-4. Small wording items:
+In flight (iteration 10): #45 pointing hint clarity (target wording, hidden-form unit tint, confined/removed marks); #46 clash feedback on an entry (neutral text, no red; a rule fact, so it fits the #31 rule).
+1. Pointing visuals v2: rings only on the relevant digits (B: clutter); avoid trivial confinements as the example (2/12 walls in Tricky seeds 1-10).
+2. Tricky practice density: at least 2 pointing steps per Tricky puzzle (measure generation time first; seeds 1-10 had 12 walls). Hint preferring pointing on Tricky may go with this.
+3. Small wording items:
    - the re-entry message says "on your own" while the count stays "with a hint";
    - add "(see below)" to the finish text;
-   - fold away the grey definitions once a technique is learned (C finds them noisy).
-5. Claiming, then pairs, each with its level.
-6. Mobile layout (2x2 level buttons at 375 px), a middle hint level, progress across puzzles.
+   - fold away the grey definitions once a technique is learned (C).
+4. Claiming, then pairs, each with its level.
+5. Mobile layout (2x2 level buttons at 375 px), a middle hint level, progress across puzzles.
 
+Not wanted: instant red on a wrong or clashing entry (no persona asked for it in it10; red stays after Verify only).
 Delivered and gone from this list: count pointing (#42, it9).
 
 ## Open tech debt and carry-forwards
