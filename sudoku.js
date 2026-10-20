@@ -49,6 +49,46 @@
       .sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; });
   }
 
+  // Where `digit` already sits among the peers of cell p (flat index): { unit: 0|1|2 (row, column, box), q }
+  // for the first of the cell's row, column, box that holds it in a cell other than p, q being the first
+  // such cell in reading order; null if none.
+  function firstHolder(cells, p, digit) {
+    for (var k = 0; k < 3; k++) {
+      var q = UNITS[CELL_UNITS[p][k]].filter(function (x) { return x !== p && cells[x] === digit; })[0];
+      if (q !== undefined) return { unit: k, q: q };
+    }
+    return null;
+  }
+
+  function cellName(p) { return 'row ' + (Math.floor(p / 9) + 1) + ', column ' + (p % 9 + 1); }
+
+  // The clash named in the "not counted" and Hint texts, or null when no rule is broken: P is the first cell
+  // of findConflicts, Q its first holder (firstHolder). Returns { phrase, extra }: phrase is "row R1, column C1
+  // and row R2, column C2 both hold E in the same U" (P first, then Q, which comes later in reading order);
+  // extra is " Other numbers break the rules too: click Verify to see which." when more than two cells clash, else ''.
+  function namedClash(grid) {
+    var conflicts = findConflicts(grid);
+    if (!conflicts.length) return null;
+    var p = conflicts[0][0] * 9 + conflicts[0][1], cells = toFlat(grid), e = cells[p], h = firstHolder(cells, p, e);
+    return {
+      phrase: cellName(p) + ' and ' + cellName(h.q) + ' both hold ' + e + ' in the same ' + UNIT_NAMES[h.unit],
+      extra: conflicts.length > 2 ? ' Other numbers break the rules too: click Verify to see which.' : ''
+    };
+  }
+
+  // Flat indices (row * 9 + column), ascending, of every cell to outline: the cells findConflicts returns, givens included.
+  function clashCells(grid) {
+    return findConflicts(grid).map(function (p) { return p[0] * 9 + p[1]; });
+  }
+
+  var FIXED_TEXT = 'No numbers break the rules now. New entries are counted again.';
+
+  // The message for a value change from grid `before` to grid `after`: FIXED_TEXT when the change took the grid
+  // from at least one clash to none, else ''. (Only a clear or an overwrite can; completionFor takes precedence in the caller.)
+  function fixedMessage(before, after) {
+    return findConflicts(before).length && !findConflicts(after).length ? FIXED_TEXT : '';
+  }
+
   // Rules-only check; never compares against a stored solution.
   function verify(grid) {
     var empty = 0;
@@ -311,7 +351,9 @@
   // 0-based, technique is 'naked' | 'hidden' | 'pointing' and unit ('box' | 'row' | 'column') is set for hidden.
   function hintFor(grid, step, prefer) {
     if (findConflicts(grid).length) {
-      return { kind: 'conflict', text: 'Some numbers break the rules. Fix them first: click Verify to see which.' };
+      var clash = namedClash(grid);
+      return { kind: 'conflict', text: clash.phrase.charAt(0).toUpperCase() + clash.phrase.slice(1)
+        + '. Change or clear one of them first, then click Hint again.' + clash.extra };
     }
     if (verify(grid).complete) return { kind: 'full', text: 'Every cell is filled. Click Verify to check the grid.' };
     var s = prefer === 'hidden' ? findHiddenSingle(grid, { notNaked: true }) : null;
@@ -409,17 +451,17 @@
     return { naked: { own: 0, hint: 0 }, hidden: { own: 0, hint: 0 }, pointing: { own: 0, hint: 0 } };
   }
 
-  // The line for a judged entry that is not credited: (b) the grid just before the entry already
-  // breaks the rules (first), else (c) the digit is already in the cell's row, column or box (the
-  // first of those named), else (a) not a single. Never says whether the digit is right.
+  // The line for a judged entry that is not credited, in this order: (1) the digit is already in the cell's
+  // row, column or box (the first of those, and its first holder, named), else (2) the grid just before the
+  // entry already breaks the rules (the clash is named, see namedClash), else (3) not a technique.
+  // Never says whether the digit is right.
   function notCounted(grid, r, c, digit) {
     var where = 'Entered: row ' + (r + 1) + ', column ' + (c + 1) + ' is ' + digit + '. ';
-    if (findConflicts(grid).length) return where + 'Some numbers break the rules, so it is not counted. Click Verify to see which.';
-    var cells = toFlat(grid), us = CELL_UNITS[r * 9 + c];
-    for (var k = 0; k < 3; k++) {
-      if (UNITS[us[k]].some(function (q) { return cells[q] === digit; })) {
-        return where + digit + ' is already in this cell\'s ' + UNIT_NAMES[k] + ', so it breaks the rules. It is not counted.';
-      }
+    var h = firstHolder(toFlat(grid), r * 9 + c, digit), clash = namedClash(grid);
+    if (h) return where + digit + ' is already in this cell\'s ' + UNIT_NAMES[h.unit] + ', at ' + cellName(h.q) + ', so it breaks the rules. It is not counted.';
+    if (clash) {
+      return where + digit + ' is not in this cell\'s row, column or box, but ' + clash.phrase + ', so it is not counted. '
+        + 'Change or clear one of them first. Entries after that count again; this one stays uncounted.' + clash.extra;
     }
     return where + 'It was not a naked single, a hidden single or a pointing step at this point, so it is not counted.';
   }
@@ -704,16 +746,34 @@
       });
     }
 
+    // The one place an input's aria-label is built: position, then notes, then ", clashes" while outlined.
+    function relabel(inp) {
+      var digits = noteDigits(+inp.dataset.notes || 0);
+      inp.setAttribute('aria-label', inp.dataset.label + (digits.length ? ', notes ' + digits.join(' ') : '') +
+        (inp.parentNode.classList.contains('clash') ? ', clashes' : ''));
+    }
+
+    // Outlines exactly the clashing cells of `grid` (live state: not touched by clearResults, Verify or Hint).
+    function showClashes(grid) {
+      var set = clashCells(grid);
+      for (var q = 0; q < 81; q++) {
+        var td = table.rows[Math.floor(q / 9)].cells[q % 9], inp = inputs[Math.floor(q / 9)][q % 9];
+        td.classList.toggle('clash', set.indexOf(q) >= 0);
+        if (inp) relabel(inp);
+      }
+    }
+
     // Single write path for a cell: keeps the remembered value, notes and
     // their display in sync. Only a changed value clears the Verify results and any hint
     // (and entering the hinted digit shows the reward instead).
     function setCell(inp, cell) {
       var changed = inp.value !== cell.value || (inp.dataset.prev || '') !== cell.value;
+      var before = changed ? currentGrid() : null;
       // Judge a digit entered into a cell without a value, using the grid before the write.
       var credit = null;
       if (changed && !(inp.dataset.prev || '') && cell.value) {
         var pos = +inp.dataset.pos;
-        credit = creditEntry(tally, credited, hint, currentGrid(), Math.floor(pos / 9), pos % 9, cell.value);
+        credit = creditEntry(tally, credited, hint, before, Math.floor(pos / 9), pos % 9, cell.value);
       }
       inp.value = cell.value;
       inp.dataset.prev = cell.value;
@@ -722,9 +782,13 @@
       inp.parentNode.querySelectorAll('.notes span').forEach(function (s, i) {
         s.textContent = digits.indexOf(i + 1) < 0 ? '' : i + 1;
       });
-      inp.setAttribute('aria-label', inp.dataset.label + (digits.length ? ', notes ' + digits.join(' ') : ''));
+      relabel(inp);
       if (changed) {
         clearResults();
+        var after = currentGrid();
+        showClashes(after);
+        var fixed = fixedMessage(before, after);
+        if (fixed) { status.textContent = fixed; status.className = ''; }
         if (credit) {
           tally = credit.tally;
           credited = credit.credited;
@@ -734,7 +798,7 @@
         }
         // A value change that leaves a digit: announce a filled grid (grid and tally are after the change).
         // (the cell.value guard is defensive: an empty cell leaves a 0 in the grid, so completionFor is null anyway)
-        var done = cell.value ? completionFor(currentGrid(), tally) : null;
+        var done = cell.value ? completionFor(after, tally) : null;
         if (done) { status.textContent = done.text; status.className = done.kind === 'solved' ? 'ok' : 'fail'; }
       }
     }
@@ -874,7 +938,7 @@
       var res = hintFor(currentGrid(), hint ? 2 : 1, preferredTechnique(tally, currentLevel));
       clearResults();
       status.textContent = res.text;
-      status.className = res.kind === 'conflict' ? 'fail' : '';
+      status.className = '';
       if (res.kind !== 'nudge' && res.kind !== 'explain') return;
       hint = res;
       var marks = hintMarks(res, currentGrid());
@@ -914,7 +978,7 @@
     countSolutions: function (grid, limit) { return search(toFlat(grid), limit || 2); },
     solvableBy: function (grid, technique) { return solvableBy(toFlat(grid), technique); },
     LEVELS: LEVELS, isValidSolution: isValidSolution,
-    findConflicts: findConflicts, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
+    findConflicts: findConflicts, clashCells: clashCells, fixedMessage: fixedMessage, namedClash: namedClash, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
     findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, hintMarks: hintMarks, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
     classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, completionFor: completionFor, tallyLines: tallyLines, statusClass: statusClass,

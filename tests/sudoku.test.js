@@ -4,7 +4,7 @@ const assert = require('node:assert');
 const {
   isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle,
   preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, solvableBy,
-  seededRng, findPointing, hintMarks, statusClass
+  seededRng, findPointing, hintMarks, statusClass, clashCells, fixedMessage
 } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
@@ -313,14 +313,30 @@ test('findNakedSingle: PUZZLE fixture first naked single in reading order', () =
   assert.strictEqual(s.seen.length, 8);
 });
 
+const MORE = ' Other numbers break the rules too: click Verify to see which.'; // issue 50: added when more than two cells clash
+// 5s at the given 1-based [row, column] cells of an empty grid; the Hint text for it (5s are the only digits)
+const fives = (...cells) => { const g = Array.from({ length: 9 }, () => Array(9).fill(0)); cells.forEach(([r, c]) => { g[r - 1][c - 1] = 5; }); return g; };
+const HINT = (named, more) => named.charAt(0).toUpperCase() + named.slice(1) + '. Change or clear one of them first, then click Hint again.' + (more ? MORE : '');
+
 test('hintFor: conflicts come first, even on a full grid', () => {
   const g = clone(); g[0][0] = g[0][1];
   const h = hintFor(g, 1);
   assert.strictEqual(h.kind, 'conflict');
-  assert.strictEqual(h.text, 'Some numbers break the rules. Fix them first: click Verify to see which.');
+  assert.strictEqual(h.text, 'Row 1, column 1 and row 1, column 2 both hold ' + g[0][1] + ' in the same row. Change or clear one of them first, then click Hint again.' + MORE); // the copy also clashes in its column and box: more than two cells
   assert.strictEqual(hintFor(g, 2).kind, 'conflict');
   const g2 = blank([8, 8]); g2[0][0] = g2[0][1];
   assert.strictEqual(hintFor(g2, 1).kind, 'conflict');
+  // Named clash (issue 50): the partner is searched in P's row, then column, then box; the first holder in that unit is named
+  const named = (u, r2, c2) => 'row 1, column 1 and row ' + r2 + ', column ' + c2 + ' both hold 5 in the same ' + u;
+  assert.strictEqual(hintFor(fives([1, 1], [3, 1]), 1).text, HINT(named('column', 3, 1))); // partner in column and box: column
+  assert.strictEqual(hintFor(fives([1, 1], [1, 3]), 1).text, HINT(named('row', 1, 3))); // row and box: row
+  assert.strictEqual(hintFor(fives([1, 1], [1, 9]), 1).text, HINT(named('row', 1, 9))); // row only
+  assert.strictEqual(hintFor(fives([1, 1], [9, 1]), 1).text, HINT(named('column', 9, 1))); // column only
+  assert.strictEqual(hintFor(fives([1, 1], [2, 2]), 1).text, HINT(named('box', 2, 2))); // box only
+  assert.strictEqual(hintFor(fives([1, 1], [2, 2], [3, 1]), 1).text, HINT(named('column', 3, 1), true)); // the column holder, though a box holder comes first
+  assert.strictEqual(hintFor(fives([1, 1], [1, 3], [1, 9]), 1).text, HINT(named('row', 1, 3), true)); // two other holders in the row: the first one is named
+  const two = fives([2, 5], [9, 5]); two[0][0] = two[0][1] = 7; // P is the first clashing cell in reading order, whatever its digit
+  assert.strictEqual(hintFor(two, 1).text, HINT('row 1, column 1 and row 1, column 2 both hold 7 in the same row', true));
 });
 
 test('hintFor: full grid without conflicts', () => {
@@ -558,10 +574,12 @@ const T0 = emptyTally();
 // Issue 31: the two "not counted" texts, byte for byte (R, C 1-based).
 const NOT_SINGLE = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d
   + '. It was not a naked single, a hidden single or a pointing step at this point, so it is not counted.';
-const CLASH = (r, c, d, u) => 'Entered: row ' + r + ', column ' + c + ' is ' + d + '. ' + d
-  + ' is already in this cell\'s ' + u + ', so it breaks the rules. It is not counted.';
-const BROKEN = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d
-  + '. Some numbers break the rules, so it is not counted. Click Verify to see which.';
+const CLASH = (r, c, d, u, r2, c2) => 'Entered: row ' + r + ', column ' + c + ' is ' + d + '. ' + d
+  + ' is already in this cell\'s ' + u + ', at row ' + r2 + ', column ' + c2 + ', so it breaks the rules. It is not counted.';
+// Issue 50: the entry is fine but the grid before it is broken; `named` is the named clash, `more` adds the extra sentence.
+const BROKEN = (r, c, d, named, more) => 'Entered: row ' + r + ', column ' + c + ' is ' + d + '. ' + d
+  + ' is not in this cell\'s row, column or box, but ' + named + ', so it is not counted. Change or clear one of them first. '
+  + 'Entries after that count again; this one stays uncounted.' + (more ? MORE : '');
 
 test('creditEntry: with a hint, right cell and digit', () => {
   const hint = hintFor(H_BOX, 1);
@@ -849,21 +867,21 @@ test('creditEntry (a): not a single, text byte for byte, nothing counted', () =>
 
 test('creditEntry (c): a digit already in the row, column or box says so; row, then column, then box', () => {
   const g = clone(); g[8][8] = 0; // 1-8 are in row 9 (and some in the column or box too)
-  for (const d of [1, 2, 3, 4, 5, 6, 7, 8]) assert.strictEqual(creditEntry(T0, {}, null, g, 8, 8, String(d)).text, CLASH(9, 9, d, 'row'));
+  for (const d of [1, 2, 3, 4, 5, 6, 7, 8]) assert.strictEqual(creditEntry(T0, {}, null, g, 8, 8, String(d)).text, CLASH(9, 9, d, 'row', 9, SOLUTION[8].indexOf(d) + 1));
   const e = Array.from({ length: 9 }, () => Array(9).fill(0));
   e[0][1] = 5; e[4][0] = 6; e[1][1] = 7; e[2][2] = 9; // 5 and 6 are in row 1 and column 1; 7 in the box only
-  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '5').text, CLASH(1, 1, 5, 'row'));
-  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '6').text, CLASH(1, 1, 6, 'column'));
-  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '7').text, CLASH(1, 1, 7, 'box'));
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '5').text, CLASH(1, 1, 5, 'row', 1, 2));
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '6').text, CLASH(1, 1, 6, 'column', 5, 1));
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '7').text, CLASH(1, 1, 7, 'box', 2, 2));
   e[2][1] = 3; e[5][0] = 3; // 3 is in the box and the column but not the row, with no conflict: the column is named
-  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '3').text, CLASH(1, 1, 3, 'column'));
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '3').text, CLASH(1, 1, 3, 'column', 6, 1)); // the box holder (row 3, column 2) is not named
   e[0][4] = 6; // 6 now in the row and the column: the row is named
-  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '6').text, CLASH(1, 1, 6, 'row'));
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '6').text, CLASH(1, 1, 6, 'row', 1, 5));
   const res = creditEntry(T0, {}, null, e, 0, 0, '7');
   assert.deepStrictEqual([res.kind, res.tally, res.credited], ['notCounted', T0, {}]);
   assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '8').text, NOT_SINGLE(1, 1, 8)); // no clash: text (a)
-  e[8][8] = 7; e[7][7] = 7; // a conflict elsewhere: the clash entry gets text (b)
-  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '5').text, BROKEN(1, 1, 5));
+  e[8][8] = 7; e[7][7] = 7; // a conflict elsewhere: a clash of the entry itself still wins (issue 50)
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '5').text, CLASH(1, 1, 5, 'row', 1, 2));
 });
 
 test('creditEntry (b): the grid before the entry already breaks the rules', () => {
@@ -871,11 +889,12 @@ test('creditEntry (b): the grid before the entry already breaks the rules', () =
   g[0][0] = g[0][1]; // a clash elsewhere
   assert.ok(findConflicts(g).length > 0);
   // 9 would be a naked single without the clash
-  const res = creditEntry(T0, {}, null, g, 8, 8, '9');
-  assert.strictEqual(res.text, 'Entered: row 9, column 9 is 9. Some numbers break the rules, so it is not counted. Click Verify to see which.');
-  assert.strictEqual(res.tally, T0);
-  assert.deepStrictEqual(res.credited, {});
-  assert.strictEqual(creditEntry(T0, {}, null, g, 8, 8, '8').text, BROKEN(9, 9, 8));
+  const res = creditEntry(T0, {}, null, g, 8, 8, '9'), named = 'row 1, column 1 and row 1, column 2 both hold ' + g[0][1] + ' in the same row';
+  assert.strictEqual(res.text, BROKEN(9, 9, 9, named, true)); // the copy also clashes in its column and box: extra sentence
+  assert.deepStrictEqual([res.kind, res.tally, res.credited], ['notCounted', T0, {}]);
+  const pair = creditEntry(T0, {}, null, fives([1, 1], [1, 9]), 4, 4, '9'); // exactly two cells clash: no extra sentence
+  assert.strictEqual(pair.text, BROKEN(5, 5, 9, 'row 1, column 1 and row 1, column 9 both hold 5 in the same row'));
+  assert.strictEqual(creditEntry(T0, {}, null, g, 8, 8, '8').text, CLASH(9, 9, 8, 'row', 9, SOLUTION[8].indexOf(8) + 1)); // text 1 wins over a broken grid
   assert.strictEqual(creditEntry(T0, {}, null, H_BOX, 4, 5, '5').text.indexOf('Well spotted!'), 0); // control: no clash, rewarded
   // the hint's digit in the hinted cell is still "Well done!" (never (a) or (b))
   const clean = clone(); clean[4][4] = 0;
@@ -907,7 +926,7 @@ test('creditEntry: a credited cell re-entered with a non-single shows (a), count
   // a different digit in the hinted cell, or any digit in another cell while a hint shows
   const hint = hintFor(H_BOX, 1);
   assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '6').text, NOT_SINGLE(5, 6, 6));
-  assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '1').text, CLASH(5, 6, 1, 'row'));
+  assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '1').text, CLASH(5, 6, 1, 'row', 5, 4));
 });
 
 // ---- Issue 36: Hint teaches pointing ----
@@ -987,7 +1006,7 @@ test('pointing counted with a hint (first and second click), naked form and hidd
     }
   }
   const hint = hintFor(SEED1_WALL, 1);
-  assert.strictEqual(creditEntry(T0, {}, hint, SEED1_WALL, 2, 2, '3').text, CLASH(3, 3, 3, 'row')); // another digit in the hinted cell
+  assert.strictEqual(creditEntry(T0, {}, hint, SEED1_WALL, 2, 2, '3').text, CLASH(3, 3, 3, 'row', 3, 8)); // another digit in the hinted cell
 });
 
 test('pointing on your own: the exact texts on the seed 1 and seed 3 walls; row and column wording', () => {
@@ -1031,7 +1050,7 @@ test('classifyEntry pointing: chained steps, a wrong digit, a conflict, a filled
   assert.deepStrictEqual([first.technique, first.pointDigit], ['pointing', 5]);
   const conflict = WALL_ROW.map((row) => row.slice()); conflict[0][1] = 4;
   assert.strictEqual(classifyEntry(conflict, 0, 4, 7), null);
-  assert.strictEqual(creditEntry(T0, {}, null, conflict, 0, 4, '7').text, BROKEN(1, 5, 7));
+  assert.strictEqual(creditEntry(T0, {}, null, conflict, 0, 4, '7').text, BROKEN(1, 5, 7, 'row 1, column 2 and row 1, column 7 both hold 4 in the same row', true));
   assert.strictEqual(classifyEntry(WALL_ROW, 1, 0, 8), null); // filled cell
   assert.strictEqual(classifyEntry(WALL_ROW, 0, 4, 4), null); // 4 is already in row 1
 });
@@ -1090,4 +1109,36 @@ test("solvableBy 'pointing': one pointing step then singles is true; more than o
   assert.strictEqual(solvableBy(clone(), 'pointing'), true);
   const broken = emptyGrid(); broken[0] = [0, 1, 2, 3, 4, 5, 6, 7, 8]; broken[1][0] = 9; // cell (0,0) has no candidate
   assert.strictEqual(solvableBy(broken, 'pointing'), false);
+});
+
+// Clash outline and "fixed" message: pure decisions on the grid before and after a value change.
+const FIXED = 'No numbers break the rules now. New entries are counted again.';
+const withCells = (g, edits) => { const x = g.map((r) => r.slice()); edits.forEach(([r, c, v]) => { x[r][c] = v; }); return x; };
+
+test('clashCells: none on a clean grid; flat ascending indices incl. givens; three-cell clash lists all three', () => {
+  assert.deepStrictEqual(clashCells(PUZZLE), []);
+  // 5 at r0c2 repeats the given 5 at r0c0 (row); 5 at r5c2 is in the column of r0c2
+  assert.deepStrictEqual(clashCells(withCells(PUZZLE, [[0, 2, 5]])), [0, 2]);
+  assert.deepStrictEqual(clashCells(withCells(PUZZLE, [[0, 2, 5], [5, 2, 5]])), [0, 2, 47]);
+});
+
+test('fixedMessage: a clear or an overwrite that ends the last clash says so', () => {
+  const clash = withCells(PUZZLE, [[0, 2, 5]]);
+  assert.strictEqual(fixedMessage(clash, PUZZLE), FIXED);
+  assert.strictEqual(fixedMessage(clash, withCells(PUZZLE, [[0, 2, 4]])), FIXED);
+});
+
+test('fixedMessage: blank while a clash remains (three-cell clash, one fixed), with no clash before, and for an entry into an empty cell', () => {
+  const three = withCells(PUZZLE, [[0, 2, 5], [5, 2, 5]]);
+  assert.strictEqual(fixedMessage(three, withCells(PUZZLE, [[0, 2, 5]])), '');
+  assert.strictEqual(fixedMessage(PUZZLE, withCells(PUZZLE, [[0, 2, 4]])), '');
+  assert.strictEqual(fixedMessage(PUZZLE, PUZZLE), '');
+  assert.strictEqual(fixedMessage(withCells(PUZZLE, [[0, 2, 5]]), withCells(PUZZLE, [[0, 2, 5], [0, 3, 2]])), '');
+});
+
+test('fixedMessage with completionFor: a fix that fills the grid is decided by completionFor (it wins in the page)', () => {
+  const full = clone();
+  const before = withCells(full, [[0, 2, 5]]); // row 0 repeats 5, grid full
+  assert.strictEqual(fixedMessage(before, full), FIXED);
+  assert.strictEqual(completionFor(full, emptyTally()).kind, 'solved');
 });
