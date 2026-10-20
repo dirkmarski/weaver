@@ -17,3 +17,24 @@
 
 ## Progress
 - Branch and log created; developer round 1 launched.
+
+## Developer round 1 (Claude Sonnet 5.5, session 0245eb9f-91d7-4bfe-b523-bbf5b80a2438)
+- Did not read governance/LOG.md.
+- Changes:
+  - `pointingSteps` step now also carries `confined` (the box spots); `findPointing` and `pointingHint` pass `confined` and `removed` on, so no second search exists.
+  - New helper `boxName(b)`; `pointingClause` reuses it (also used for the hidden-form unit "the box of ..."). New first-click texts for both forms.
+  - `hintMarks`: the hidden unit (from `hint.unit`) joins `area` on both clicks; returns `confined`/`removed`, empty unless a pointing explain.
+  - UI: `hint-confined` / `hint-removed` classes plus `data-d` (the digit) on cells; CSS `::after` corner badge (bold on a white chip; purple D with dashed purple outline for confined; grey D with a diagonal strike for removed). `clearResults` also removes them, so they clear exactly with the other hint highlight.
+  - README: first-click texts, tint, second-click marks, clear sentences, `findPointing` and `hintMarks` fields. Tests updated and extended.
+- Decisions: the unit text for a box names the unit's own box (target's box), as pinned in the issue; badge sits top-right, chip style so it is not mistaken for pencil notes; a diagonal strike replaced `line-through` because a strike on a 14px digit is unreadable at 375 px.
+- Tests: `node --test` 143/143, about 0.6 s (no new test() blocks; assertions added to 4 existing ones).
+- Line counts (before -> after): sudoku.js 900 -> 910; style.css 94 -> 113 (index.html 40 unchanged); tests/sudoku.test.js 1075 -> 1086 (+11, product +10 js, +19 css).
+- Rule -> test:
+  1. naked text -> 'pointing, row line, naked form' (WALL_ROW text). Page check: seed 1 hint 13 text matches the pin exactly.
+  2. hidden text (row unit) -> 'pointing, column line, hidden form' (WALL_COL "row 4"); box unit -> 'unit is the box' (WALL_BOX); column unit not tested (same expression as row, mutant on the index was caught).
+  3. unit tint on both clicks -> 'hintMarks' test (WALL_COL, row 4 = 28-35 in area, target 27 not).
+  4. confined/removed -> findPointing deepStrictEqual on all three walls, hintMarks: WALL_ROW [0,1]/[4,5], WALL_COL [11,20]/[29]; empty on nudge and on singles.
+  5. clearing -> DOM only, checked by headless script (scratchpad dev45/run.js), no repo test.
+  6. API fields -> as 4, plus area check in 3.
+- Mutants tried (all killed): drop hidden unit from area; marks on nudge too; text number off by one; confined/removed swapped.
+- Real page (headless Chrome, seeded Math.random): seed 1 hint 13 and seed 3 hint 20, both widths 900 and 375: texts exact, tinted/confined/removed indices match the pins, marks clear on value change, Verify, New puzzle, level choice; survive a note. Screenshots in scratchpad/dev45/.
