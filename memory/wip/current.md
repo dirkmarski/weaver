@@ -9,7 +9,7 @@ Last updated: 2026-10-21, lead session 5034fe53-a839-46a5-807a-40a5b44d5158
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #60 Tricky prefers pointing | developer | review + test in parallel | developer |
+| #60 Tricky prefers pointing | review + test at d1a1dfe | rework round if needed, lead check, PR | reviewer, tester |
 | #61 ring clause + strike | queued | starts after #60 merges | lead |
 
 ## Open issues / PRs

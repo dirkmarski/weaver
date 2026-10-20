@@ -26,3 +26,5 @@
 - Gate check #60 and #61: both open, authored by weaver-agents, label enhancement. Passed.
 - #60: branch issue-60-tricky-prefers-pointing from 4217479, worktree scratchpad/wt-60, issue log 55c44a6. Developer launched.
 - Concern noted (PM A1): a median of 4 pointing hints per Tricky puzzle may feel heavy; PM checks at acceptance with personas, fallback is a cap.
+- 2026-10-21: #60 developer done (head d1a1dfe, code 8b92cc5): `findPointing(grid, {useful: true})` + `isSingle`, `hintFor(..., level)`; page passes currentLevel. 168/168 tests, skipped 0; ratio 1929/1210 = 1.594x. Seeds 3000-3002: 2/4/4 pointing hints. Reviewer and tester launched in parallel (worktrees wt-60-rev, wt-60-test at d1a1dfe).
+- Lead read of the diff: only the page Hint call site passes the level; `solvableBy` (findPointing without options) and generation unchanged, so AC7 holds by construction. `isSingle` treats a cell as a single for any digit, which matches the issue's "not already a naked single or a hidden single".
