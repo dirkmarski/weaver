@@ -36,3 +36,4 @@
 - D2: two issues is acceptable. They touch the same README section and the same `sudoku.js` text paths, so they are strictly sequential: #51 branches from main after #50 merges.
 - D3: #51 changes the README's "no live checking" stance (the outline is a live mark). The PM decided this and it is in scope by its criterion 9. The lead accepts it, and the reviewer must check the README sentences on that point.
 - #50: branch issue-50-name-clash (38d7381), per-issue log created, interpretation L0 recorded (the extra sentence goes on texts 2 and 3 only, per pinned example 6). Developer round 1 launched.
+- #50 developer round 1 (Claude Sonnet, head 572cd18): 143/143, about 0.6 s. Lead check PASS with point L1 (README wording "the cells Verify flags, givens included"). Review and test round 1 launched in parallel in detached worktrees wt-50-review and wt-50-test, at b045256.

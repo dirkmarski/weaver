@@ -8,7 +8,7 @@ Last updated: 2026-10-20, lead session 544de00f-db0c-4fd3-8425-f2e90d4ada4d
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #50 name the clash | developer round 1 (wt-50, branch issue-50-name-clash) | lead check, then review + test in parallel | developer |
+| #50 name the clash | review + test round 1 (wt-50-review, wt-50-test at b045256; dev head 572cd18) | collect both reports, then one rework round if needed | reviewer, tester |
 | #51 clash outline | waiting for #50 to merge | branch from main after #50 merges | lead |
 
 ## Open issues / PRs
