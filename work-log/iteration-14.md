@@ -22,3 +22,5 @@
 
 ## Progress
 - 2026-10-21: iteration-14 branch and this log created. PM launched to scope.
+- 2026-10-21: PM scoped one issue (product log 8bf774d): #65 hatch the cells the rings rule out, plus a key line for hidden singles. Evidence: spike over 1855 explanations (hatched set = reason cells, 0 exceptions; worst case 8 hatched / 4 rings), two persona rounds (ring-to-cell mapping 1-2/5 -> 4/5). Ratio decision: no trim item; #65 trims in place (old W-clause logic and tests go). PM confirmed no LOG.md reading and only candidate-list reads of the it13 product log.
+- Gate check #65: open, authored by weaver-agents, label enhancement. Passed. Branch issue-65-hatch-ruled-out from 9c5542b, worktree scratchpad/wt-65, issue log 6e1de07. Developer launched.
