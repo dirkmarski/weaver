@@ -63,3 +63,15 @@ Scripts (scratch, not in the repo): spike.js, prefer.js, gen.js, pin.js in the p
 7. Claiming, then pairs, each with its own level (personas rank last).
 Watch: test-to-product ratio 1.57x at 4217479; a trim item is added if it passes 1.6x.
 Not wanted: instant red on a wrong entry (it10); counting entries made during a clash (it11); retroactive counting after a fix (it11).
+
+## Acceptance of #60 (PR #62, head 5f13f84dd7160d322f5b89450a6dd3ce64dfce65), 2026-10-21
+- Read only: the issue log's Lead section (work-log/issue-60-tricky-prefers-pointing.md at 5f13f84) and the PR body. governance/LOG.md not read.
+- Own detached worktree: scratchpad/pm-it13/wt-acc-60 at 5f13f84. Baseline sudoku.js at 4217479 extracted to scratchpad/pm-it13/old/.
+- node --test: 168 pass, 0 fail, 0 skipped. Ratio: tests 1932 / product 1210 = 1.597x (matches the PR).
+- Independent check (scratch acc60.js, oracle = the spike's usefulPointing from spike.js, not the product code):
+  - Pins: seed 1 grid identical to the AC 1 string (27 givens); new nudge = pointing, box rows 1-3/columns 7-9, digit 2 in row 1, naked, r1c5 = 7; explain text and key line as today. Seed 2: findPointing = box 2, digit 4, row 3, hidden, r3c4 = 4; useful = null; Hint = hidden single r2c9 = 3, identical to 4217479. Seed 5: hidden single r1c1 = 7 (box), identical.
+  - Following Hint on Tricky seeds 1-150 and 3000-3002 (Tricky preference, each hinted digit entered via creditEntry): 0 mismatches against the oracle (pointing states) and against 4217479 (non-pointing states), 0 stuck, all "Well done! You applied pointing" texts and +1 hint counts correct. Pointing per puzzle p10/p50/p90 = 2/4/6, min 1, max 9. Seeds 3000-3002: 2/4/4.
+  - Generation: 153/153 Tricky puzzles identical to 4217479.
+  - Easy/Medium/Hard: 8804 hintFor comparisons (40 seeds each, follow Hint, both steps) identical to 4217479.
+- Page play-through (scratch play60.js, headless Chrome, real index.html): Tricky seed 7, 25 hinted entries: first hint a hidden single (no useful step at the start), pointing at entries 2, 8, 9, 22; each with the key line on the second click, "Well done! You applied pointing" and the pointing count +1; singles alternate as before. Medium seed 3, 8 hints: sequence identical to 4217479 (h, n, h, n, ...), no pointing.
+- Persona check launched (user-a, user-b, user-c; prompt scratchpad/pm-it13/acc60-prompt.txt; tool scratchpad/pm-it13/play/play.js only) on concern A1 (pointing load).
