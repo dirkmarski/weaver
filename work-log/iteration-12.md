@@ -28,3 +28,4 @@
 ## Progress
 - Iteration branch, worktree and this log created.
 - 2026-10-20: PM launched to scope iteration 12 from memory/wiki/backlog.md (personas at its discretion). Told: no LOG.md, no work-log reading unless needed, the pruning rule for its candidate list, and the DOM-test-harness tech-debt item as a candidate to weigh on its merits (lead does not decide scope).
+- 2026-10-20: Lead launched one no-op assistant call by mistake (prompt: reply "OK", no tools). It returned "OK" and touched nothing. Recorded for the audit trail only.
