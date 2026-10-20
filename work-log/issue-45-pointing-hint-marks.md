@@ -38,3 +38,21 @@
   6. API fields -> as 4, plus area check in 3.
 - Mutants tried (all killed): drop hidden unit from area; marks on nudge too; text number off by one; confined/removed swapped.
 - Real page (headless Chrome, seeded Math.random): seed 1 hint 13 and seed 3 hint 20, both widths 900 and 375: texts exact, tinted/confined/removed indices match the pins, marks clear on value change, Verify, New puzzle, level choice; survive a note. Screenshots in scratchpad/dev45/.
+
+## Lead check round 1 (head 332ef04)
+- Developer: Claude Sonnet 5.5 per its trailer. Two commits: 53e37f7 implementation, 332ef04 log line counts.
+- Suite: 143/143, about 0.61 s.
+- Diff read in full:
+  - `confined` is the `spots` that `pointingSteps` already computes, so there is no second search;
+  - `boxName` is extracted and reused;
+  - `hintMarks` gets the hidden-form unit through `hint.unit`;
+  - the marks are cleared in `clearResults` (the `[data-d]` selector);
+  - CSS: a `::after` badge, `td` is already `position: relative`.
+- Screenshot s1_h13 at 375 px, second click, viewed: the dashed purple confined cells and the white-chip badges are distinct from the grey notes. The struck "1" on the amber target is small but legible.
+- PASS, with points for review and test:
+  - L1: the clearing paths Verify, New puzzle and level choice were not observed with pointing marks showing (the developer saw a hidden-single hint there). The tester must check them with the marks showing.
+  - L2: the hidden-form column-unit first-click text is not asserted. The developer says an off-by-one mutant on the shared expression was caught; the reviewer should check.
+  - L3: the first-click text is a nested ternary on one long line (legibility, development practices). Reviewer's call.
+  - L4: badge readability on amber at 375 px. Tester and PM to check.
+- Tests +7 lines against +14 JS and +18 CSS: within the guide.
+- Review and test round 1 launched in parallel on 332ef04.
