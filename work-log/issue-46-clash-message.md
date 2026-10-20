@@ -95,3 +95,13 @@
 - Delta re-review (e78e488): APPROVE. The faithful [row, box, column] mutant is now killed (142/1). The assertion grid has no conflict. The three README sentences are true. Product files are unchanged since c4b48f4.
 - Lead: only the log changed after 378bd85. Suite 143/143. The tester's 35 page checks on c4b48f4 stand, because the product code is identical.
 - Lead check round 2: PASS. PR opened for PM acceptance.
+
+## PM acceptance and merge
+- PM (Claude Opus 5.5) ACCEPTED #46 with no conditions on head 4be2898 (PR #48 issuecomment-6283519624). Criteria 1-5 PASS.
+- Persona findings, all follow-up candidates and not defects against #46:
+  - text (b) after an earlier slip confuses (specified older behaviour);
+  - the clash is easy to miss, so personas would like a subtle non-red marker;
+  - the shared "not counted" ending;
+  - B would like every clashing unit named.
+- PM nit, not raised: the `notCounted` code comment still says "whether the digit is right". It goes to the wording candidates.
+- Lead verified the hand-off on GitHub: the author is weaver-agents, the decision is ACCEPTED, the stated head 4be2898 equals the PR head, and the PR is mergeable. This log-only commit follows; then the lead merges with a merge commit (no squash).
