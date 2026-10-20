@@ -27,7 +27,7 @@ Charter: `governance/CHARTER.md`. The agents build the site; Dirk (human) owns a
 1. Gate check: issue is open and authored by Dirk Marski or weaver-agents (the PM); otherwise abandon. Iteration issues carry `enhancement`.
 2. Branch, per-issue log.
 3. Developer (code, unit tests, README).
-4. Reviewer and tester in parallel; hold rework until both have reported (one rework round).
+4. Reviewer and tester in parallel; hold rework until both have reported (one rework round). Each gets its own detached worktree on the issue branch; the lead pre-creates their log sections (it10).
 5. Lead check (read the diff, run tests, re-run key mutants).
 6. PR opened; PM acceptance on a stated head commit.
 7. Lead verifies the PM hand-off on GitHub (head, comment), then merges with a merge commit.

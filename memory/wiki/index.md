@@ -1,14 +1,14 @@
 # Weaver wiki: index
 
 Durable facts and learnings about the weaver project. History of events lives in the work log (`work-log/`), not here.
-Snapshot basis: end of iteration 9 (main at 238d245, 143 tests passing).
+Snapshot basis: end of iteration 10 (main at eed18f3, 143 tests passing).
 
 ## Pages
 - [product.md](product.md): what weaver is today: levels, techniques taught, Hint, rewards and counts, known gaps.
 - [architecture.md](architecture.md): files, main exports of `sudoku.js`, how `index.html` wires them, tests, sizes.
 - [process.md](process.md): how the team works: run types, roles, branch/PR/commit conventions, per-issue flow.
-- [lessons.md](lessons.md): durable lessons from iterations 1-8, by theme (scoping, testing, review, coordination, tooling).
-- [backlog.md](backlog.md): PM candidate list and open tech debt (owned by the PM; snapshot at iteration 8 end).
+- [lessons.md](lessons.md): durable lessons from iterations 1-10, by theme (scoping, testing, review, coordination, tooling).
+- [backlog.md](backlog.md): PM candidate list and open tech debt (owned by the PM; snapshot at iteration 10 end).
 - [glossary.md](glossary.md): sudoku terms and project terms.
 
 ## How to use / maintain
