@@ -116,3 +116,10 @@ Tester: Claude Sonnet 5.5, session `48eaa449-33cf-461f-85bc-196e8d61fc39`. Verdi
 - N2 (split the own-text ternary in creditEntry): fold into round 2; it is cheap.
 - N1 (redundant filled-cell guard in singleAfterStep): **keep**. It is harmless and keeps the helper safe without relying on the callers' contract. No change.
 - Re-check scale (per the iteration-8 lesson): round 2 is a test plus a tiny legibility refactor, with no behaviour change. It gets a delta re-review (re-run mutant 8, read the N2 diff) and a re-test (suite plus the tester's existing run.js page smoke), not a full re-run.
+
+## Developer round 2
+Developer: Claude Sonnet 5.5, session `48eaa449-33cf-461f-85bc-196e8d61fc39`.
+- S1: in the re-entry test, after crediting pointing at (3,3)=7 on the seed 1 wall, a hidden single at (5,1)=7 (grid with the 7 entered) is credited with the returned tally; expects `pointing` still `{own: 1, hint: 0}` and `hidden` `{own: 1, hint: 0}`. (The seed 1 wall itself has no single, so the entered grid is used.)
+- Mutant (drop 'pointing' from the creditEntry tally copy loop): now fails the test (pointing 0/0 instead of 1/0). Restored.
+- N2: the own-text ternary in creditEntry is now an if/else with a named `unit`; texts byte-identical, no behaviour change.
+- `node --test`: 143/143 pass, 579 ms (no new test, one added assertion block).
