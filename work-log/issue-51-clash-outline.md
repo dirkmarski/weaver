@@ -11,6 +11,11 @@
 - Carried in from #50 (N3): the README named-clash sentence repeats itself. Replace "(the cells that share a digit with another cell of their row, column or box, givens included; Verify turns only your own values red)" with "(givens included; Verify turns only your own values red)".
 - Risk: the DOM wiring has no repo tests. The tester's headless page run, with mutant checks on the wiring (the outline survives Hint and Verify), is the main gate for criteria 2-6.
 - Developer round 1 launched.
+- Developer round 1 (head 84e7261): lead check PASS. The diff was read in full. 147/147 in about 0.59 s. The 375 px screenshots (dev51/) were inspected by the lead: the outline is visible with the focus ring and the red Verify fill; the Hint text is plain. The fixed message cannot be overwritten by the credit branch: credit applies only to entries into empty cells, which never end a clash.
+  - L1 (nit): the comment "// Rules-only check; never compares against a stored solution." now sits above `clashCells` instead of `verify`. Move it back.
+  - L2 (for review): `#sudoku td.clash.hint-confined` looks unreachable. Hint shows nothing while a clash exists, and any value change clears a showing hint, so a clash outline and a pointing hint mark can never be on screen together. The reviewer should confirm, and the rule should be dropped if so.
+  - Observation: the developer reports that headless Chrome needed its own sandbox disabled (a Chrome flag) to run.
+- Review and test round 1 launched in parallel, in detached worktrees wt-51-review and wt-51-test.
 
 ## Developer
 
