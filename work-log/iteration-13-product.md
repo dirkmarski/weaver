@@ -94,3 +94,39 @@ Not wanted: instant red on a wrong entry (it10); counting entries made during a 
 - Item 2 (pointing reach): early first pointing via generation stays contingent. B and C met pointing early or mid-game; the late tail is still real (C: entry 17). A's "don't open with pointing" (1 of 3) is the opposite pull, so neither direction is warranted now; watch.
 - Item 3 (explanation depth), added: a stronger first-click signal for pointing (B, C; merges with "a clearer first-click case signal"); say when the same pointing fact gives another cell ("same 9 as before", B, C); the "(the box has no other empty cells)" case reads like a single (A).
 - Item 2: "prefer pointing" on Hard unchanged as a candidate.
+
+## Acceptance of #61 (PR #63, head 24eec95dd357b0a286b225c7b61653235d4994d0), 2026-10-21
+- Read only: the issue log's Lead section (work-log/issue-61-ring-clause-strike.md at 24eec95) and the PR body. governance/LOG.md not read.
+- Own detached worktree: scratchpad/pm-it13/wt-acc-61 at 24eec95. node --test: 167 pass, 0 fail, 0 skipped. Ratio: tests 1942 / product 1215 = 1.598x (matches the PR; 2 lines of headroom to 1.6x).
+- Diff read in full (README, style.css, sudoku.js, tests). pointingKey(step, ringCount); shared aDigit(d) also used by the hidden-single text (text unchanged).
+- Real page (scratch play61.js, headless Chrome, index.html, dpr 2) at 375 px and 1280 px, Tricky seeds 1, 76, 8, 44, second Hint click: all four key lines exactly as AC 1-4 (seed 1 full line; 76/8/44 clause), ring counts 2/1/3/2. Play-through following Hint on Tricky seeds 7 and 12 at 375 px: clauses seen for 1 ring ("a 7", "a 1", "a 5", "a 9 ... both boxes") and 2+ rings (box; "and of row 2"; "and of column 6"); all grammatical and consistent with the form.
+- Removed tests: the three removals and their remaining coverage as listed in the PR are plausible (I checked the named surviving tests exist in sudoku.test.js / page.test.js); tester and reviewer confirmed.
+- Screenshots: tester's strike-main/new-375 and -1280: the new band is clearly visible on phone width; the digit stays readable above it.
+- **Finding F1 (AC 6 not met for D = 1):** the chip width follows the digit's glyph. Computed perpendicular thickness 0.12 x 2wh / sqrt(w^2 + h^2) from the computed ::after padding box (scratch chipw.js), 375 px: D1 1.94, D7 2.13, D2 2.22, others 2.26-2.32 px; 1280 px: D1 2.50, others 2.63-2.76 px. So D = 1 at phone width is 1.94 px < 2 px (Scope B: "at least 2 CSS px ... at both 375 px and 1280 px"). The developer and tester measured D = 2 only; page test f4 measures D = 5 while its message says "the narrowest chip". D = 1 pointing occurs in real play (seed 12). Feasibility (scratch copy feas61/): a 14% band (43%-57%) gives D1 2.27 px at 375 px, max 3.23 px at 1280 px.
+- Colour: #6b6b6b instead of the example #595959 is accepted (5.33:1 >= 4.5:1; the digit keeps about 2.4:1 against the band instead of 1.8:1, which matters more with a wider band).
+
+## Decision D5: #61 not accepted at 24eec95 (2026-10-21)
+- AC 1-5, 7, 9, 10 pass; AC 6 fails for D = 1 at 375 px (1.94 px); AC 8 must follow the fix (README/style.css say "12%", "at least 2 px", "about 2.2 px").
+- Required change (small): band >= 2 px for every digit 1-9 at 375 and 1280 px (suggest 43%-57%); f4 guards the narrowest chip (all digits 1-9, or D = 1) instead of D = 5; README and style.css numbers updated. Ratio must stay <= 1.6x (2 lines of headroom). Colour stays #6b6b6b.
+- Spec: AC 6 clarified "for every digit 1-9" and the guard to measure the narrowest chip (issue Change log + comment). My own Scope B feasibility note measured one chip only (11.4 px); that is where the gap came from. Lesson: give geometry for the worst-case content, not a sample.
+- Posted: PR #63 comment (not accepted, per-AC, the required change) and issue #61 comment. Issue body: AC 6 and the Change log were edited (before/after copies in scratchpad/pm-it13/issue61-acc-before.md and -after.md).
+
+### Persona check for #61 (user-a, 2 Tricky puzzles at 375 px, dpr 2, 8 pointing explanations; drove the page with its own small click/read/screenshot script; told not to read source, README, LOG.md or work logs and not to use a solver, and it reported none)
+- Box-form clause: 4/5 in both singular ("a 3 already placed that keeps 3 ...") and plural. It matched the rings on the grid.
+- "and of row 8" (hidden form): 3/5. The player could not tell which ring explains the box and which explains the row. This feeds explanation-depth item 3 (show or name which cells a ring rules out). It does not block #61, which is out of scope there.
+- Strike at phone width: 3/5. The stripe was visible but thin and the digit still readable. This supports the wider band from D5.
+- Other comments: the explanation is long on a phone ("so it must be N" first?); struck grey and purple can be hard to tell apart on the tinted cells; the key line does not mention the amber target. These go to candidates 3 and 6.
+
+## Iteration 13 verdict (product side), 2026-10-21
+- **Not yet complete.** #60 was accepted and merged. #61 needs one small rework (D5: strike band and f4 guard, README/style.css numbers). The iteration is complete once #61 is accepted on a new head and merged. I expect to re-run only AC 6/8/9/10 and a 375 px check.
+
+## Candidate list (PM, ordered, end of it13, for the lead's backlog snapshot)
+1. (it13, open) #61 rework: the strike is at least 2 px for every digit (D5). Then #61 is done.
+2. Explanation depth: show or name which cells a ring rules out (strongest signal so far; the "and of row N" clause got 3/5 in it13); a stronger first-click signal for pointing; "same D as before" when one pointing fact gives another cell; the "(the box has no other empty cells)" case reads like a single; why the naked-form target has only D or X; a key line for the hidden single; minimal rings.
+3. Pointing reach (watch, no action): early first pointing via generation (late tail, e.g. entry 17) against "don't open with pointing" (1 of 3); a cap on the preference only if load complaints appear (it13: 3/5, no cap); "prefer pointing" on Hard.
+4. Mobile: long messages and key line on a phone (conclusion first?); struck grey vs purple on the tinted cells; 375 px level buttons; hint badge at 320 px.
+5. Slip follow-ups (it11, small, wording-led): extra-clash sentence pointing at the outlines; a partial-fix message; two-unit clash naming; "clear your own number" when the pair includes a given; explain "counted"/"stays uncounted" and judge an overwrite; a marker on entries made during a clash; Hint/Verify naming one pair at a time.
+6. Small wording items: shared "not counted" ending; re-entering a hint-credited cell says "on your own"; "(see below)" in the finish text; fold away definitions once learned; heavy naked-single digit list.
+7. Long-term: a middle hint level; progress across puzzles; claiming, then pairs, each with its own level (personas rank last).
+Watch: test-to-product ratio 1.598x at 24eec95 (1942/1215; 2 lines of headroom). The #61 rework must keep it at or below 1.6x. The next issue that adds tests must either trim redundant assertions in the files it touches (as #61 did) or come with a separate trim item first. That decision is made when the next iteration is scoped.
+Not wanted: instant red on a wrong entry (it10); counting entries made during a clash (it11); retroactive counting after a fix (it11).
