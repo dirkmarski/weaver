@@ -90,3 +90,8 @@
 - (b) N1: the three changed README sentences (clash text, text (a), "Any change to a value" paragraph) now say "matches the solution". All are true: none of the messages says anything about the solution. No other README lines changed.
 - (c) `git diff c4b48f4 HEAD` on sudoku.js, index.html and style.css is empty: product code unchanged.
 - Verdict: APPROVE. No open findings (S1 and N1 closed).
+
+## Lead check round 2 (code 378bd85, branch tip e78e488)
+- Delta re-review (e78e488): APPROVE. The faithful [row, box, column] mutant is now killed (142/1). The assertion grid has no conflict. The three README sentences are true. Product files are unchanged since c4b48f4.
+- Lead: only the log changed after 378bd85. Suite 143/143. The tester's 35 page checks on c4b48f4 stand, because the product code is identical.
+- Lead check round 2: PASS. PR opened for PM acceptance.
