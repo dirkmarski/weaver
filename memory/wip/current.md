@@ -9,11 +9,11 @@ Last updated: 2026-10-21, lead session 5034fe53-a839-46a5-807a-40a5b44d5158
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #60 Tricky prefers pointing | review + test at d1a1dfe | rework round if needed, lead check, PR | reviewer, tester |
+| #60 Tricky prefers pointing | PR #62 at 5f13f84, PM acceptance | verify acceptance comment, merge with sha 5f13f84 | PM |
 | #61 ring clause + strike | queued | starts after #60 merges | lead |
 
 ## Open issues / PRs
-- Issues #60, #61 open. No PRs yet.
+- Issues #60, #61 open. PR #62 (#60) open at 5f13f84.
 
 ## Blockers / waiting on
 - none

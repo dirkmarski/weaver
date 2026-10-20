@@ -31,3 +31,4 @@
 - 2026-10-21: #60 tester PASS, no defects (72b5a18): per-AC page checks, an independent oracle on Tricky seeds 1/3/17/42/77 (0 mismatches, never none), 1118 hintFor comparisons on other levels identical to main, 28 generated puzzles identical to main.
 - #60 reviewer approve (f2a66bc, branch head 0b1369d): 14 mutants, 13 killed; S1 should-fix: M6 (isSingle naked branch off) survives and is reachable. N1/N2 README nits (stale "no single, pointing" line; preference bullet silent on Tricky).
 - Rework round 1 (developer): S1 pin + N1 + N2. Tests/README only, so a delta re-check by the lead (re-run M6, suite, README read) per process.md.
+- 2026-10-21: #60 rework round 1 done (b5613fc): seed 26 pin for S1, README N1/N2. Lead delta re-check: M6 killed, 168/168, skipped 0, ratio 1.597x (5f13f84 logs it). PR #62 opened at 5f13f84; PM acceptance launched on that head (also asked to confirm #61 still fits #60's final behaviour).
