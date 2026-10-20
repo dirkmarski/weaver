@@ -28,7 +28,7 @@
   - README: first-click texts, tint, second-click marks, clear sentences, `findPointing` and `hintMarks` fields. Tests updated and extended.
 - Decisions: the unit text for a box names the unit's own box (target's box), as pinned in the issue; badge sits top-right, chip style so it is not mistaken for pencil notes; a diagonal strike replaced `line-through` because a strike on a 14px digit is unreadable at 375 px.
 - Tests: `node --test` 143/143, about 0.6 s (no new test() blocks; assertions added to 4 existing ones).
-- Line counts (before -> after): sudoku.js 900 -> 910; style.css 94 -> 113 (index.html 40 unchanged); tests/sudoku.test.js 1075 -> 1086 (+11, product +10 js, +19 css).
+- Line counts (before -> after): sudoku.js 900 -> 914 (+14; net of comment lines about +9 code); style.css 94 -> 112 (+18); index.html 40 unchanged; tests/sudoku.test.js 1075 -> 1082 (+7). Tests are below 1x of the JS delta because the pinned values went into existing assertions; UI lines have no repo test.
 - Rule -> test:
   1. naked text -> 'pointing, row line, naked form' (WALL_ROW text). Page check: seed 1 hint 13 text matches the pin exactly.
   2. hidden text (row unit) -> 'pointing, column line, hidden form' (WALL_COL "row 4"); box unit -> 'unit is the box' (WALL_BOX); column unit not tested (same expression as row, mutant on the index was caught).
