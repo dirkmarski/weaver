@@ -101,3 +101,11 @@ Reviewer: Claude Sonnet 5.5 (claude-sonnet-5-5), session `48eaa449-33cf-461f-85b
 - N2: `creditEntry` builds the `where` string and the two texts inline; fine, but the long ternary line could be split for legibility.
 
 Formatting is clean. Nothing out of scope was added.
+
+## Test round 1 (head 3a84c1b)
+Tester: Claude Sonnet 5.5, session `48eaa449-33cf-461f-85bc-196e8d61fc39`. Verdict: PASS, no defects. Full result in the #42 comment.
+- `node --test`: 143/143, 588 ms.
+- Real page, headless Chrome (CDP, real key events, seeded Math.random): seed 1 hint 13 (hinted: unchanged "Well done!", Pointing 0/1; own: exact text, green, 1/0); seed 3 hint 20 (hinted and own, exact text); wrong digit -> text (a), neutral, no count change; conflict grid -> text (b); re-entry -> text again, no count change; seed 1 Hint to the end -> "0 on your own, 54 with a hint"; tally block 3 lines + 3 grey definitions at 0 on all four levels, hidden on picker; singles regression and Hint order unchanged; 375 px layout fine (screenshot `ts42-tools/layout375.png`).
+- Independent check on seeds 1 and 3 only: (3,3)=7 on seed 1 is pointing-only (candidates {1,7}, not hidden), (5,5)=1 on seed 3 is the hidden form after the row-9 pointing step.
+- Note: re-entry after clearing a hinted cell shows the own "Well spotted!" text (the hint is gone), count unchanged; consistent with the credited-cell rule.
+- Not retested: hidden-before-pointing precedence mutant (L1), left to the reviewer.
