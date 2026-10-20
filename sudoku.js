@@ -404,7 +404,7 @@
     } else if (step === 2) {
       var others = { box: 'row or column', row: 'column or box', column: 'row or box' }[s.unit];
       text = 'Hidden single: ' + where + ' must be ' + s.digit + ', because every other empty cell in its ' + s.unit
-        + ' already has ' + (s.digit === 8 ? 'an ' : 'a ') + s.digit + ' in its ' + others + '.';
+        + ' already has ' + aDigit(s.digit) + ' in its ' + others + '.';
     } else {
       text = 'Hint: ' + where + ' is a hidden single: in its ' + s.unit + ', one of the missing digits fits only in this cell. '
         + 'Check where each missing digit can go in the ' + s.unit + '. Click Hint again to see why.';
@@ -455,10 +455,15 @@
     return { area: area, target: p, digits: digits, confined: explain ? hint.confined : [], removed: explain ? hint.removed : [] };
   }
 
-  // The key line under a pointing explanation, for pointing digit d and the number of rings showing.
-  function pointingKey(d, ringCount) {
+  // 'an 8' or 'a D'.
+  function aDigit(d) { return (d === 8 ? 'an ' : 'a ') + d; }
+
+  // The key line under a pointing explanation. step is the pointing hint (pointDigit, form, unit, r, c); ringCount the rings showing.
+  function pointingKey(step, ringCount) {
+    var d = step.pointDigit, where = 'the other cells of ' + (step.unit === 'box' ? 'both boxes' : 'the box');
+    if (step.form === 'hidden' && step.unit !== 'box') where += ' and of ' + step.unit + ' ' + (step.unit === 'row' ? step.r + 1 : step.c + 1);
     return 'Key: dashed purple = the only places for ' + d + ' in the box; struck grey ' + d + ' = ' + d + ' can no longer go there'
-      + (ringCount ? '; purple ring = this ' + d + ' rules out other cells.' : '.');
+      + (ringCount ? '; purple ' + (ringCount > 1 ? 'rings = ' + d + 's already placed that keep ' : 'ring = ' + aDigit(d) + ' already placed that keeps ') + d + ' out of ' + where + '.' : '.');
   }
 
   // ---- Rewards: recognising naked and hidden singles the learner enters ----
@@ -995,7 +1000,7 @@
       [['confined', marks.confined], ['removed', marks.removed]].forEach(function (m) {
         m[1].forEach(function (q) { cellAt(q).classList.add('hint-' + m[0]); cellAt(q).setAttribute('data-d', res.pointDigit); });
       });
-      if (res.technique === 'pointing' && res.kind === 'explain') keyLine.textContent = pointingKey(res.pointDigit, marks.digits.length);
+      if (res.technique === 'pointing' && res.kind === 'explain') keyLine.textContent = pointingKey(res, marks.digits.length);
       inputs[res.r][res.c].focus();
     });
 

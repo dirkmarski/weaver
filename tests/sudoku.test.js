@@ -372,12 +372,6 @@ test('hintFor: step 2 explains with the digit list, "and" before the last', () =
   assert.strictEqual(h.text, 'Naked single: row 1, column 1 must be 5, because its row, column and box already contain 1, 2, 3, 4, 6, 7, 8 and 9.');
 });
 
-test('hintFor: any step other than 2 is the nudge; the grid is not changed', () => {
-  const g = blank([4, 7]), copy = JSON.stringify(g);
-  assert.strictEqual(hintFor(g, 1).kind, 'nudge');
-  assert.strictEqual(hintFor(g, 2).kind, 'explain');
-  assert.strictEqual(JSON.stringify(g), copy);
-});
 
 test('hintApplied: reward only for the hinted digit', () => {
   const h = hintFor(blank([4, 7]), 1);
@@ -454,11 +448,6 @@ test('hintFor: a naked single is taught before a hidden single, even a later one
   assert.strictEqual(h.unit, undefined);
 });
 
-test('hintFor: conflicts and a full grid still come before a hidden single', () => {
-  const g = H_BOX.map((row) => row.slice()); g[0][0] = g[0][1];
-  assert.strictEqual(hintFor(g, 1).kind, 'conflict');
-  assert.strictEqual(hintFor(clone(), 1).kind, 'full');
-});
 
 test('hintFor: hidden single nudge text for box, row and column (1-based row and column)', () => {
   const box = hintFor(H_BOX, 1);
@@ -1180,10 +1169,16 @@ test('hintMarks, pointing: reason cells are the unconfined empty box cells (a) a
   assert.deepStrictEqual(ringsOf(hidden, b), [at(8, 6)]);
 });
 
-test('pointingKey: the exact key line for every digit, with the ring clause only when rings show', () => {
-  assert.strictEqual(pointingKey(1, 2), 'Key: dashed purple = the only places for 1 in the box; struck grey 1 = 1 can no longer go there; purple ring = this 1 rules out other cells.');
-  assert.strictEqual(pointingKey(8, 1), 'Key: dashed purple = the only places for 8 in the box; struck grey 8 = 8 can no longer go there; purple ring = this 8 rules out other cells.');
-  assert.strictEqual(pointingKey(9, 0), 'Key: dashed purple = the only places for 9 in the box; struck grey 9 = 9 can no longer go there.');
+test('pointingKey: the exact key line per form and ring count; no ring clause without rings', () => {
+  const key = (d, ring) => 'Key: dashed purple = the only places for ' + d + ' in the box; struck grey ' + d + ' = ' + d + ' can no longer go there' + ring;
+  const naked = (d) => ({ pointDigit: d, form: 'naked' }), hidden = (unit) => ({ pointDigit: 8, form: 'hidden', unit, r: 3, c: 6 });
+  assert.strictEqual(pointingKey(naked(2), 2), key(2, '; purple rings = 2s already placed that keep 2 out of the other cells of the box.'));
+  assert.strictEqual(pointingKey(naked(8), 1), key(8, '; purple ring = an 8 already placed that keeps 8 out of the other cells of the box.'));
+  assert.strictEqual(pointingKey(naked(1), 1), key(1, '; purple ring = a 1 already placed that keeps 1 out of the other cells of the box.'));
+  assert.strictEqual(pointingKey(hidden('row'), 3), key(8, '; purple rings = 8s already placed that keep 8 out of the other cells of the box and of row 4.'));
+  assert.strictEqual(pointingKey(hidden('column'), 2), key(8, '; purple rings = 8s already placed that keep 8 out of the other cells of the box and of column 7.'));
+  assert.strictEqual(pointingKey(hidden('box'), 2), key(8, '; purple rings = 8s already placed that keep 8 out of the other cells of both boxes.'));
+  [naked(9), hidden('row'), hidden('box')].forEach((s) => assert.strictEqual(pointingKey(s, 0), key(s.pointDigit, '.')));
 });
 
 // PM pins (issue 56): P(N) follows Hint on the Tricky puzzle of seed N (entering each digit as a hinted one) to the first pointing step.

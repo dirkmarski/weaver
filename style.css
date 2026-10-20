@@ -98,7 +98,7 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 #tally p { margin: 0.25rem 0; font-size: 0.95rem; }
 #tally .definition { margin: 0 auto 0.75rem; max-width: 28rem; font-size: 0.8rem; color: #595959; }
 
-/* Pointing explanation: the digit D (data-d) is badged in its own pencil-note slot (1 top-left ... 9 bottom-right, the centre of that third of the cell) of the box cells where it fits (dashed purple outline) and of the line cells that lose it (grey, struck through by a diagonal). The badge is bold on a white chip, unlike the grey pencil notes. Below 560 px the cell is narrower than the chip plus a note slot: the chip's side padding drops to 1px (same 14px digit) and a badge in a left or right edge slot sits flush against the cell's inner edge, so it is never clipped and still lies in its own slot (middle slots stay centred). */
+/* Pointing explanation: the digit D (data-d) is badged in its own pencil-note slot (1 top-left ... 9 bottom-right, the centre of that third of the cell) of the box cells where it fits (dashed purple outline) and of the line cells that lose it (grey, struck through by a diagonal #6b6b6b band: 12% of the gradient line, about 2.3 px thick at 375 px and 2.7 px at 1280 px, 5.3:1 against the chip's white; the digit is text, so it stays above the band). The badge is bold on a white chip, unlike the grey pencil notes. Below 560 px the cell is narrower than the chip plus a note slot: the chip's side padding drops to 1px (same 14px digit) and a badge in a left or right edge slot sits flush against the cell's inner edge, so it is never clipped and still lies in its own slot (middle slots stay centred). */
 #sudoku td[data-d="1"], #sudoku td[data-d="4"], #sudoku td[data-d="7"] { --x: 16.667%; }
 #sudoku td[data-d="2"], #sudoku td[data-d="5"], #sudoku td[data-d="8"] { --x: 50%; }
 #sudoku td[data-d="3"], #sudoku td[data-d="6"], #sudoku td[data-d="9"] { --x: 83.333%; }
@@ -121,7 +121,7 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
   pointer-events: none;
 }
 #sudoku td.hint-confined::after { color: #6a1fb5; border: 1px solid #6a1fb5; }
-#sudoku td.hint-removed::after { color: #333; border: 1px solid #595959; background: linear-gradient(to top right, #fff 46%, #8a8a8a 46% 54%, #fff 54%); }
+#sudoku td.hint-removed::after { color: #333; border: 1px solid #595959; background: linear-gradient(to top right, #fff 44%, #6b6b6b 44% 56%, #fff 56%); }
 @media (max-width: 559px) {
   #sudoku td.hint-confined::after, #sudoku td.hint-removed::after { padding: 0 1px; }
   #sudoku td[data-d="1"]::after, #sudoku td[data-d="4"]::after, #sudoku td[data-d="7"]::after { left: 0; transform: translate(0, -50%); }
