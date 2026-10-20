@@ -55,4 +55,21 @@
 ---
 
 ## Tester
-(pending)
+Tested head 6d59cbc (detached worktree; Node v24.21.0, Chrome 155, macOS). Targeted checks only, no sweeps.
+
+Plan and results:
+- AC1 PASS: `node --test` (no path) 157 tests, 157 pass, 0 fail; duration 2.02 / 2.00 / 2.18 s (limit 10 s). Without Chrome 0.61 s.
+- AC2 PASS: `CHROME_PATH=/nonexistent node --test` and `WEAVER_NO_CHROME=1 node --test`: all 10 page tests print as skipped (`﹣ ... # page tests skipped: CHROME_PATH does not exist: /nonexistent` / `# page tests skipped: WEAVER_NO_CHROME is set`); summary `tests 157, pass 147, fail 0, skipped 10`; exit 0. Visible in the counts.
+- AC3 PASS: with TMPDIR pointed at a private dir, no weaver-chrome-* dir and no Chrome process after a normal run, after a forced failing assertion (fail 1, exit 1), and after an uncaught page error in a script using the helper. Gap (nit): SIGTERM of the node process (and by the same logic SIGINT) skips the `exit` handler and leaves the detached Chrome and its profile dir behind.
+- AC4 PASS, each mutant on sudoku.js, then reverted (`git diff --exit-code sudoku.js` clean each time); tip passes without them. Only page tests failed in each case (unit tests unaffected):
+  - (i) fixedMessage write moved after completionFor write: fails `e. a fix that fills the last cell shows "Puzzle solved!"...`
+  - (ii) clash outline cleared in clearResults: fails `c/d. a clash is outlined, Verify marks only the own cell, ...`
+  - (iii) clearResults skipped on a value change: fails `f. a pointing hint shows its marks on both clicks; ...` (only test)
+  - (iv) hint-confined/hint-removed dropped from the class cleanup: fails `f. ...` (only test)
+- AC5 PASS: seeding test passes (seed 5). Independent oracle (ts55/oracle.js, own mulberry32 injected, not the test's extraction): seeds 3, 17, 101: page Tricky givens == generatePuzzle(seededRng(seed)).puzzle, and != the seed+1 puzzle. Planted `seededRng(n + 1)` in the test's seed script: seeding test fails (plus 8 others that depend on the seed); reverted.
+- AC7 PASS: `git diff --exit-code origin/main -- index.html style.css sudoku.js` clean.
+- Real-page check: one CDP Page.captureScreenshot after click Tricky + Hint: styled page (style.css in document.styleSheets, collapsed grid, hint target/area colours drawn). Harness drives the real page.
+- README: checked the 0.6 s (measured 0.61) and ~2 s figures; fine.
+- Scenarios: seeding, a, b (naked and hidden), c/d, e, f (read as "after both clicks", lead L1), g, h each exist and assert what the issue lists. Notes: a's "no outline" is only checked after a Hint, not after a clash; f does not assert a separate "ring" class beyond hint-digit.
+
+Defects: none must-fix. Should-fix/nit: (1) nit: signal exit leaves Chrome and profile (above). (2) nit: scenario a does not check that New puzzle clears a clash outline.
