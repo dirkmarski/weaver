@@ -32,3 +32,9 @@
 - Iteration branch, worktree and this log created. PM launched to decide the scope.
 - PM (Claude Opus 5.5) scoped three issues, to be delivered in sequence: #35 right-size the test suite (first; it removes the frozen oracle before hintFor changes), #36 Hint teaches pointing (not counted yet), #37 a new level Tricky (singles plus pointing). Gate check: all OPEN, by weaver-agents, labelled enhancement. PASS.
 - #35 started: branch issue-35-right-size-tests, developer round 1.
+- #35: developer round 1. Lead check passed. Review APPROVE (nits N1-N3, folded into #36). Test PASS. PR #38 **PM ACCEPTED**, no conditions. Merged with a merge commit (4c3e30b). Tests 128 -> 123, ~14.9 s -> ~0.22 s, test lines 2025 -> 1041.
+- #36: PM clarification (the forms are mutually exclusive). Developer round 1. Lead check passed. Review APPROVE (S1: the digit order was unpinned). Test PASS (4 seeds, 375 px).
+  - Round 2 (test, comment and README only) got a proportionate re-review and re-test. This deliberately re-scopes the iteration-7 "full re-run every round" lesson to fit the test strategy.
+  - PR #39 **PM ACCEPTED**, no conditions; personas could explain pointing in their own words. Merged (12f4a63).
+  - The uncounted "Well done!" was noticed by all personas. Counting pointing is PM candidate 1 for iteration 9.
+- #37 started: branch issue-37-tricky-level, developer round 1.
