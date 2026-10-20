@@ -62,7 +62,7 @@ const read = () => page.eval(`(function () {
   var tds = [].slice.call(document.querySelectorAll('#sudoku td')), st = document.getElementById('status');
   function at(c) { return tds.map(function (t, i) { return t.classList.contains(c) ? i : -1; }).filter(function (i) { return i >= 0; }); }
   var a = document.activeElement;
-  return { status: st.textContent, cls: st.className, picker: !document.getElementById('picker').hidden, game: !document.getElementById('game').hidden,
+  return { status: st.textContent, key: document.getElementById('key').textContent, cls: st.className, picker: !document.getElementById('picker').hidden, game: !document.getElementById('game').hidden,
     tallyShown: !document.getElementById('tally').hidden, level: document.getElementById('level').textContent,
     tally: ['tally-naked', 'tally-hidden', 'tally-pointing'].map(function (id) { return document.getElementById(id).textContent; }),
     notes: document.getElementById('notes').textContent, pressed: document.getElementById('notes').getAttribute('aria-pressed'),
@@ -74,7 +74,7 @@ const read = () => page.eval(`(function () {
     given: tds.map(function (t) { return t.classList.contains('given') ? +t.textContent : 0; }),
     active: a && a.dataset ? a.dataset.pos : null };
 })()`);
-const noHint = (s) => ['target', 'area', 'digit', 'confined', 'removed', 'dattr'].forEach((k) => assert.deepStrictEqual(s[k], [], k));
+const noHint = (s) => { assert.strictEqual(s.key, ''); ['target', 'area', 'digit', 'confined', 'removed', 'dattr'].forEach((k) => assert.deepStrictEqual(s[k], [], k)); };
 const TALLY0 = ['Naked single: 0 on your own, 0 with a hint', 'Hidden single: 0 on your own, 0 with a hint', 'Pointing: 0 on your own, 0 with a hint'];
 
 describe('page (headless Chrome)', () => {
@@ -92,6 +92,17 @@ describe('page (headless Chrome)', () => {
       }
     }
     return null;
+  });
+
+  // The singles played on the page, so that the next hint is a pointing step.
+  const pointing = pick('tricky', (p, sol) => {
+    const grid = p.map((row) => row.slice()), typed = [];
+    for (let s; (s = S.findNakedSingle(grid) || S.findHiddenSingle(grid)); ) {
+      grid[s.r][s.c] = sol[s.r][s.c];
+      typed.push([s.r * 9 + s.c, String(sol[s.r][s.c])]);
+    }
+    const step = S.findPointing(grid);
+    return step ? { typed, grid, step } : null;
   });
 
   it('seeding: the page Tricky puzzle for a seed equals generatePuzzle with seededRng', async () => {
@@ -183,16 +194,7 @@ describe('page (headless Chrome)', () => {
   });
 
   it('f. a pointing hint shows its marks on both clicks; notes keep them, a value change removes them', async () => {
-    // Play the singles on the page, so the next hint is a pointing step.
-    const { seed, g, extra } = pick('tricky', (p, sol) => {
-      const grid = p.map((row) => row.slice()), typed = [];
-      for (let s; (s = S.findNakedSingle(grid) || S.findHiddenSingle(grid)); ) {
-        grid[s.r][s.c] = sol[s.r][s.c];
-        typed.push([s.r * 9 + s.c, String(sol[s.r][s.c])]);
-      }
-      const step = S.findPointing(grid);
-      return step ? { typed, grid, step } : null;
-    });
+    const { seed, g, extra } = pointing;
     const { typed, grid, step } = extra;
     const target = step.r * 9 + step.c;
     await open('tricky', seed);
@@ -201,12 +203,13 @@ describe('page (headless Chrome)', () => {
     let s = await read();
     assert.deepStrictEqual(s.target, [target]);
     assert.ok(s.area.length > 0 && !s.area.includes(target));
-    assert.deepStrictEqual([s.confined, s.removed, s.dattr], [[], [], []]);
+    assert.deepStrictEqual([s.confined, s.removed, s.dattr, s.key], [[], [], [], '']);
     await click('#hint');
     s = await read();
     const marks = S.hintMarks(S.hintFor(grid, 2), grid);
     assert.deepStrictEqual([s.target, s.confined, s.removed], [[target], step.confined, step.removed]);
     assert.deepStrictEqual(s.digit, marks.digits);
+    assert.strictEqual(s.key, S.pointingKey(step.pointDigit, marks.digits.length)); // the key line (kept by the notes change below)
     assert.deepStrictEqual(s.dattr, step.confined.concat(step.removed).sort((x, y) => x - y));
     assert.ok(s.dvals.every((d) => d === String(step.pointDigit)));
     const other = empties(g.puzzle).filter((p) => !typed.some((t) => t[0] === p) && p !== target)[0];
@@ -218,6 +221,42 @@ describe('page (headless Chrome)', () => {
     await keys([[target, 'N'], [other, String(g.solution[Math.floor(other / 9)][other % 9])]]); // a value: removes it
     s = await read();
     noHint(s);
+  });
+
+  it('f2. the key line is gone after Verify; a naked/hidden explanation and the first click have none', async () => {
+    const { seed, extra } = pointing;
+    await open('tricky', seed);
+    await keys(extra.typed);
+    await click('#hint');
+    await click('#hint');
+    assert.match((await read()).key, /^Key: dashed purple = the only places for \d in the box; struck grey /);
+    await click('#verify');
+    noHint(await read());
+    const p = pick('tricky', (pz) => S.findHiddenSingle(pz));
+    await open('tricky', p.seed);
+    await click('#hint');
+    await click('#hint');
+    const s = await read();
+    assert.ok(s.status.startsWith('Hidden single') || s.status.startsWith('Naked single'));
+    assert.deepStrictEqual([s.key, s.dattr], ['', []]);
+  });
+
+  it('f3. the badge sits in the note slot of its digit (1 top-left, 5 centre, 9 bottom-right)', async () => {
+    await open('tricky', 5);
+    // Put a purple badge for D on one cell and compare its centre with the centre of the cell's own note slot D.
+    const centres = await page.eval('(function () {' +
+      'var td = document.querySelector("#sudoku td"), out = [];' +
+      'td.classList.add("hint-confined");' +
+      '[1, 5, 9].forEach(function (d) {' +
+      '  td.setAttribute("data-d", d);' +
+      '  var box = td.getBoundingClientRect(), after = getComputedStyle(td, "::after"), slot = td.querySelectorAll(".notes span")[d - 1].getBoundingClientRect();' +
+      '  out.push([parseFloat(after.left) + box.left + td.clientLeft - slot.left - slot.width / 2, parseFloat(after.top) + box.top + td.clientTop - slot.top - slot.height / 2, after.transform]);' +
+      '});' +
+      'return out; })()');
+    centres.forEach(([dx, dy, transform], i) => {
+      assert.ok(Math.abs(dx) < 1.5 && Math.abs(dy) < 1.5, 'slot ' + [1, 5, 9][i] + ': centre off by ' + dx + ', ' + dy);
+      assert.notStrictEqual(transform, 'none');
+    });
   });
 
   it('g. the N key and the Notes button toggle Notes; a digit with Notes on adds a note and no count', async () => {

@@ -4,7 +4,7 @@ const assert = require('node:assert');
 const {
   isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle,
   preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, solvableBy,
-  seededRng, findPointing, hintMarks, statusClass, clashCells, fixedMessage
+  seededRng, findPointing, hintMarks, pointingKey, statusClass, clashCells, fixedMessage
 } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
@@ -960,7 +960,7 @@ test('pointing, column line, hidden form: the earlier digit 6 step in the same b
   assert.strictEqual(hintFor(WALL_COL, 1).text, 'Hint: try pointing. ' + BOX_INTRO + '8 fits only in column 3, so it cannot go anywhere else in column 3. '
     + 'Then look at row 4: 8 now has only one place left there. Click Hint again to see why.');
   const two = hintFor(WALL_COL, 2);
-  assert.strictEqual(two.text, 'Pointing: in the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3, '
+  assert.strictEqual(two.text, 'Pointing: in the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3 (the box has no other empty cells), ' // issue 56: every empty box cell is confined
     + 'so 8 cannot go in column 3 outside that box. ' + 'That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
   assert.deepStrictEqual([two.r, two.c, two.digit, two.unit], [3, 0, 8, 'row']);
   assert.ok(hintFor(WALL_UNIT_COL, 1).text.includes(' Then look at column 3: 6 now has only one place left there.')); // column unit names the column, not the row
@@ -1084,10 +1084,10 @@ test('hintMarks: tint and marked digits for pointing (box and line, pointing dig
   assert.deepStrictEqual(nudge.area.slice().sort((a, b) => a - b), [0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 18, 19, 20]); // box 1 and row 1, not the target
   assert.strictEqual(nudge.target, 4);
   assert.deepStrictEqual(nudge.digits, []);
-  assert.deepStrictEqual(explain.digits, [25, 74]); // the two 3s, though the naked target takes 7
+  assert.deepStrictEqual(explain.digits, [74]); // issue 56: of the two 3s only r9c3 shares a unit with a reason cell (r2c8, box cell not confined); r3c8 (25) rules out nothing there
   assert.deepStrictEqual([nudge.confined, nudge.removed, explain.confined, explain.removed], [[], [], [0, 1], [4, 5]]); // marks on explain only
   const hidden = hintMarks(hintFor(WALL_COL, 2), WALL_COL);
-  assert.deepStrictEqual([hidden.target, hidden.digits, hidden.confined, hidden.removed], [27, [4, 43, 55], [11, 20], [29]]);
+  assert.deepStrictEqual([hidden.target, hidden.digits, hidden.confined, hidden.removed], [27, [43], [11, 20], [29]]); // issue 56: of the three 8s only r5c8 shares a unit with a reason cell (row 4); r1c5 and r7c2 do not (P(8) shape)
   [1, 2].forEach((step) => { // the hidden-form unit (row 4) is tinted on both clicks, the target is not
     const area = hintMarks(hintFor(WALL_COL, step), WALL_COL).area;
     assert.ok([28, 29, 30, 31, 32, 33, 34, 35].every((q) => area.includes(q)) && !area.includes(27));
@@ -1097,6 +1097,87 @@ test('hintMarks: tint and marked digits for pointing (box and line, pointing dig
   assert.deepStrictEqual([naked.area.length, naked.digits], [20, []]); // row, column and box minus the cell; no purple for naked
   const single = hintMarks(hintFor(H_BOX, 2), H_BOX);
   assert.deepStrictEqual([single.area.length, single.target], [8, 41]);
+});
+
+// ---- Issue 56: rings only on digits that matter, key line, box case ----
+
+// A grid that is empty but for the given [r, c, digit] cells (0-based), and a hand-made explain hint with the given fields.
+const put = (...cells) => { const g = emptyGrid(); cells.forEach(([r, c, v]) => { g[r][c] = v; }); return g; };
+const at = (r, c) => 9 * r + c;
+const explainOf = (fields) => Object.assign({ kind: 'explain' }, fields);
+const ringsOf = (fields, g) => hintMarks(explainOf(fields), g).digits;
+// A box 0 pointing step: confined r0c1 and r0c2 (row 0), removed r0c5.
+const BOX0_ROW = { technique: 'pointing', box: 0, line: 'row', index: 0, pointDigit: 7, confined: [1, 2], removed: [5], r: 0, c: 5 };
+const fillBox0 = (...open) => { // box 0 filled with 1s (not the pointing digit), except the open [r, c] cells
+  const g = emptyGrid();
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) g[r][c] = open.some((o) => o[0] === r && o[1] === c) ? 0 : 1;
+  return g;
+};
+
+test('hintMarks, hidden single: a D rings only if it shares a unit with another empty cell of the unit; one that blocks only the target does not', () => {
+  // Row 1 is the unit and r1c1 the target; the other empty cells are r1c2 and r1c3.
+  const g = put([0, 3, 1], [0, 4, 2], [0, 5, 3], [0, 6, 4], [0, 7, 6], [0, 8, 8], [5, 1, 5], [8, 8, 5], [6, 0, 5]);
+  // 5 at r6c2 shares column 2 with r1c2 and is ringed; 5 at r9c9 touches neither empty cell and 5 at r7c1 is in the target's column only.
+  assert.deepStrictEqual(ringsOf({ technique: 'hidden', unit: 'row', r: 0, c: 0, digit: 5 }, g), [at(5, 1)]);
+});
+
+test('hintMarks, pointing: reason cells are the unconfined empty box cells (a) and, in the hidden form, the unit cells besides target and removed (b)', () => {
+  // a only (naked form): r2c1 is an empty box cell that is not confined. 7 at r2c9 (its row) and r6c1 (its column) ring;
+  // 7 at r9c2 shares a column with a confined cell only.
+  const a = fillBox0([0, 1], [0, 2], [1, 0]); a[1][8] = 7; a[5][0] = 7; a[8][1] = 7;
+  assert.deepStrictEqual(ringsOf(BOX0_ROW, a), [at(1, 8), at(5, 0)]);
+  // no reason cell (every empty box cell is confined): no rings, whatever the 7s
+  const none = fillBox0([0, 1], [0, 2]); none[5][1] = 7; none[8][2] = 7;
+  assert.deepStrictEqual(ringsOf(BOX0_ROW, none), []);
+  // b only (hidden form): box 0 is all confined (column 3); target r6c1, unit row 6 with the removed cell r6c3 and one other empty cell r6c7.
+  // 7 at r9c7 shares column 7 with it: ringed; 7 at r9c8 touches no reason cell; 7 at r9c3 shares column 3 with the removed cell only.
+  const b = fillBox0([0, 2], [1, 2], [2, 2]); b[5] = [0, 1, 0, 2, 3, 4, 0, 5, 6]; b[8][6] = 7; b[8][7] = 7; b[8][2] = 7;
+  const hidden = { technique: 'pointing', box: 0, line: 'column', index: 2, pointDigit: 7, confined: [2, 11, 20], removed: [at(5, 2)], r: 5, c: 0, unit: 'row', digit: 7 };
+  assert.deepStrictEqual(ringsOf(hidden, b), [at(8, 6)]);
+});
+
+test('pointingKey: the exact key line, with the ring clause only when rings show', () => {
+  assert.strictEqual(pointingKey(1, 2), 'Key: dashed purple = the only places for 1 in the box; struck grey 1 = a 1 can no longer go there; purple ring = a 1 that rules out other cells.');
+  assert.strictEqual(pointingKey(9, 0), 'Key: dashed purple = the only places for 9 in the box; struck grey 9 = a 9 can no longer go there.');
+});
+
+// PM pins (issue 56): P(N) follows Hint on the Tricky puzzle of seed N (entering each digit as a hinted one) to the first pointing step.
+function pointingState(seed) {
+  const g = generatePuzzle('tricky', { rng: seededRng(seed) }).puzzle.map((r) => r.slice()), tally = emptyTally();
+  for (let h; (h = hintFor(g, 2, preferredTechnique(tally, 'tricky'))).technique !== 'pointing'; ) { tally[h.technique].hint++; g[h.r][h.c] = h.digit; }
+  return { g, h: hintFor(g, 2, preferredTechnique(tally, 'tricky')) };
+}
+const cells = (...rc) => rc.map(([r, c]) => at(r - 1, c - 1)); // 1-based [row, column] to flat
+
+test('issue 56 pins P(1), P(3), P(4), P(8), P(10): rings, key line and the box-case sentence', () => {
+  const pin = (seed, rings, parenthesis) => {
+    const { g, h } = pointingState(seed), m = hintMarks(h, g);
+    assert.deepStrictEqual(m.digits, rings, 'P(' + seed + ') rings');
+    assert.strictEqual(h.text.includes(' (the box has no other empty cells), so '), parenthesis, 'P(' + seed + ') box case');
+    return { h, m };
+  };
+  pin(1, cells([5, 2], [9, 6]), false);
+  pin(3, cells([2, 3], [7, 8]), false);
+  pin(10, cells([6, 6], [7, 7], [8, 1], [9, 4]), false);
+  const p4 = pin(4, [], true), p8 = pin(8, cells([5, 8]), true);
+  assert.strictEqual(p4.h.text, 'Pointing: in the box of rows 7-9 and columns 4-6, the digit 9 fits only in column 5 (the box has no other empty cells), so 9 cannot go in column 5 outside that box. '
+    + 'Row 4, column 5 could only take 9 or 7, so it must be 7.');
+  assert.deepStrictEqual(p4.m.confined.concat(p4.m.removed), cells([8, 5], [9, 5], [4, 5], [5, 5], [6, 5]));
+  assert.strictEqual(p8.h.text, 'Pointing: in the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3 (the box has no other empty cells), so 8 cannot go in column 3 outside that box. '
+    + 'That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
+  // first click, "Well done!" and own-pointing ("Well spotted!") texts carry no parenthesis, box case or not
+  const { g, h } = pointingState(4), first = hintFor(g, 1, 'hidden');
+  assert.ok(!first.text.includes('no other empty cells') && first.text.includes('fits only in column 5, so it cannot go anywhere else in column 5.'));
+  assert.strictEqual(hintApplied(h, '7'), 'Well done! You applied pointing: row 4, column 5 is 7.');
+  assert.strictEqual(creditEntry(emptyTally(), {}, null, WALL_COL, 3, 0, '8').text,
+    'Well spotted! You applied pointing on your own: in the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3, so row 4, column 1 is 8.');
+});
+
+test('issue 56 pins H(2), H(3): hidden single rings drop the digits that rule out nothing (r9c8 stays: redundant rings are kept)', () => {
+  const hidden = (seed) => { const g = generatePuzzle('tricky', { rng: seededRng(seed) }).puzzle; return hintMarks(hintFor(g, 2, 'hidden'), g).digits; };
+  assert.deepStrictEqual(hidden(2), cells([1, 4], [5, 7], [6, 2], [7, 3]));
+  assert.deepStrictEqual(hidden(3), cells([2, 4], [3, 3], [9, 8]));
+  assert.deepStrictEqual(hidden(1), cells([4, 5], [5, 2], [6, 8], [9, 6])); // unchanged
 });
 
 // ---- Issue 37: solvableBy 'pointing' ----

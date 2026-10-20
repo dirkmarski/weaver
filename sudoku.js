@@ -317,9 +317,12 @@
   }
 
   // The hintFor result for a pointing step (see findPointing).
-  function pointingHint(s, step) {
+  function pointingHint(s, step, grid) {
     var line = s.line + ' ' + (s.index + 1), d = s.pointDigit;
     var box = pointingClause(s);
+    // The box has no empty cell outside the confined cells: the clause then says so (an explain only).
+    var empties = UNITS[s.box * 3 + 2].filter(function (q) { return grid[Math.floor(q / 9)][q % 9] === 0; });
+    if (step === 2 && empties.length === s.confined.length) box += ' (the box has no other empty cells)';
     var text;
     if (step === 2) {
       text = 'Pointing: in ' + box + ', so ' + d + ' cannot go in ' + line + ' outside that box. ';
@@ -368,7 +371,7 @@
     }
     if (!s) {
       s = findPointing(grid);
-      if (s) return pointingHint(s, step);
+      if (s) return pointingHint(s, step, grid);
       return { kind: 'none', text: 'No naked single, hidden single or pointing step right now. At this point the puzzle needs another technique.' };
     }
     var where = 'row ' + (s.r + 1) + ', column ' + (s.c + 1);
@@ -401,10 +404,14 @@
   }
 
   // The cells a showing hint marks, as flat indices: { area: tinted cells (not the target),
-  // target, digits: cells holding the hint's digit, only on explain, confined, removed: a pointing
+  // target, digits: the ringed cells, only on explain (see below), confined, removed: a pointing
   // explain's box cells where the digit fits and line cells that lose it (else empty) } for a hintFor
   // result of kind nudge/explain. Tint: a naked single's row, column and box; a hidden single's unit;
-  // a pointing step's box and line, plus its hidden-form unit. Marked digits: a hidden single's, or the pointing digit.
+  // a pointing step's box and line, plus its hidden-form unit. Ringed digits (ascending), for D = the hidden single's
+  // digit or the pointing digit: a cell holding D that shares a row, column or box with a reason cell (an empty cell
+  // that D's rings help to rule out). Reason cells: a hidden single's: the other empty cells of its unit; pointing's: the
+  // empty box cells that are not confined and, in the hidden form, the empty cells of the hidden unit other than the target
+  // and the removed cells. None for a naked single.
   function hintMarks(hint, grid) {
     var p = hint.r * 9 + hint.c, units, pointing = hint.technique === 'pointing';
     var hidden = hint.unit ? [CELL_UNITS[p][UNIT_NAMES.indexOf(hint.unit)]] : [];
@@ -412,9 +419,29 @@
     else units = hint.technique === 'hidden' ? hidden : CELL_UNITS[p];
     var area = [], digits = [], d = pointing ? hint.pointDigit : hint.technique === 'hidden' ? hint.digit : 0;
     units.forEach(function (u) { UNITS[u].forEach(function (q) { if (q !== p && area.indexOf(q) < 0) area.push(q); }); });
-    for (var q = 0; d && hint.kind === 'explain' && q < 81; q++) if (grid[Math.floor(q / 9)][q % 9] === d) digits.push(q);
     var explain = pointing && hint.kind === 'explain';
+    var reasons = [];
+    function addReasons(cells, skip) {
+      cells.forEach(function (x) { if (x !== p && grid[Math.floor(x / 9)][x % 9] === 0 && skip.indexOf(x) < 0) reasons.push(x); });
+    }
+    if (d && hint.kind === 'explain') {
+      if (pointing) {
+        addReasons(UNITS[hint.box * 3 + 2], hint.confined);
+        addReasons(hidden.length ? UNITS[hidden[0]] : [], hint.removed);
+      } else addReasons(UNITS[hidden[0]], []);
+      for (var q = 0; q < 81; q++) {
+        if (grid[Math.floor(q / 9)][q % 9] !== d) continue;
+        var mine = CELL_UNITS[q];
+        if (reasons.some(function (x) { return CELL_UNITS[x].some(function (u) { return mine.indexOf(u) >= 0; }); })) digits.push(q);
+      }
+    }
     return { area: area, target: p, digits: digits, confined: explain ? hint.confined : [], removed: explain ? hint.removed : [] };
+  }
+
+  // The key line under a pointing explanation, for pointing digit d and the number of rings showing.
+  function pointingKey(d, ringCount) {
+    return 'Key: dashed purple = the only places for ' + d + ' in the box; struck grey ' + d + ' = a ' + d + ' can no longer go there'
+      + (ringCount ? '; purple ring = a ' + d + ' that rules out other cells.' : '.');
   }
 
   // ---- Rewards: recognising naked and hidden singles the learner enters ----
@@ -704,6 +731,7 @@
   function render() {
     var table = document.getElementById('sudoku');
     var status = document.getElementById('status');
+    var keyLine = document.getElementById('key');
     var button = document.getElementById('verify');
     var picker = document.getElementById('picker');
     var game = document.getElementById('game');
@@ -733,6 +761,7 @@
     // Clears the status line, the Verify flags and any showing hint.
     function clearResults() {
       hint = null;
+      keyLine.textContent = '';
       status.textContent = '';
       status.className = '';
       // data-d is always set together with hint-confined / hint-removed, so [data-d] finds those cells too.
@@ -949,6 +978,7 @@
       [['confined', marks.confined], ['removed', marks.removed]].forEach(function (m) {
         m[1].forEach(function (q) { cellAt(q).classList.add('hint-' + m[0]); cellAt(q).setAttribute('data-d', res.pointDigit); });
       });
+      if (res.technique === 'pointing' && res.kind === 'explain') keyLine.textContent = pointingKey(res.pointDigit, marks.digits.length);
       inputs[res.r][res.c].focus();
     });
 
@@ -980,7 +1010,7 @@
     LEVELS: LEVELS, isValidSolution: isValidSolution,
     findConflicts: findConflicts, clashCells: clashCells, fixedMessage: fixedMessage, namedClash: namedClash, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
-    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, hintMarks: hintMarks, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
+    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, hintMarks: hintMarks, pointingKey: pointingKey, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
     classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, completionFor: completionFor, tallyLines: tallyLines, statusClass: statusClass,
     TECHNIQUE_DEFINITIONS: TECHNIQUE_DEFINITIONS
   };
