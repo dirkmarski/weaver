@@ -41,6 +41,7 @@ Only lessons still valid. "it" = iteration, "#" = issue. Evidence is in `work-lo
 
 ## Tooling
 - `gh pr edit` fails (the token lacks the read:org scope). Use `gh api -X PATCH repos/dirkmarski/weaver/pulls/N -F body=@file`; merge with `gh api -X PUT repos/dirkmarski/weaver/pulls/N/merge -f merge_method=merge` (it9).
+- Never `git pull --rebase` after merging main into a branch: it flattens the merge and duplicates main's commits. Use `git pull --no-rebase` there (it9 incident, fixed before merge).
 - Several agents share the iteration worktree. Each must `git add <own file>` only, never `-A`. A `git pull --rebase` fails while another agent has unstaged edits, so commit first, or push without pulling when the remote has nothing new (it9).
 - Test tools can be reused across rounds and by the PM if they stay in the session scratchpad (ts42-tools reused for the round 2 re-test, it9). A script expectation that encodes an earlier misunderstanding shows up as a false FAIL; the tester must say so (it9).
 - `gh pr merge` can fail with "not mergeable" right after a push while GitHub computes mergeability; retry (it2).
