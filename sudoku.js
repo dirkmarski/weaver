@@ -247,7 +247,7 @@
   }
 
   // Which technique Hint should teach next: the one applied less so far (own and
-  // hint counts together). On a tie: 'naked' on easy, 'hidden' on medium and hard.
+  // hint counts together). On a tie: 'naked' on easy, 'hidden' on the other levels.
   function preferredTechnique(tally, level) {
     var n = tally.naked.own + tally.naked.hint, h = tally.hidden.own + tally.hidden.hint;
     if (h < n) return 'hidden';
@@ -450,7 +450,8 @@
     // technique: what removal keeps solvable; beyond: technique the puzzle must NOT be solvable by
     easy:   { min: 36, max: 40, technique: 'naked',   beyond: null },     // naked singles only
     medium: { min: 30, max: 35, technique: 'singles', beyond: 'naked' },  // needs hidden singles
-    hard:   { min: 22, max: 29, technique: null,      beyond: 'singles' } // unique, needs more than singles
+    tricky: { min: 27, max: 31, technique: 'pointing', beyond: 'singles' }, // needs pointing
+    hard:   { min: 22, max: 29, technique: null,      beyond: 'pointing' } // unique, needs more than pointing
   };
   var TIME_CAP_MS = 1000; // generation never runs past this (click-to-render must stay < 2 s)
 
@@ -495,7 +496,8 @@
 
   // Can the puzzle be completed using only the given technique?
   // 'naked': cells with a single candidate. 'singles': also digits with only
-  // one possible cell in a row, column or box (hidden singles).
+  // one possible cell in a row, column or box (hidden singles). 'pointing': singles, and when
+  // none is left one findPointing step (the one Hint teaches), placing the single it makes.
   function solvableBy(cells, technique) {
     var g = cells.slice(), progress = true, p, d;
     while (progress) {
@@ -506,7 +508,7 @@
         if (mask === 0) return false;
         if (bitCount(mask) === 1) { g[p] = Math.log2(mask); progress = true; }
       }
-      if (technique === 'singles') {
+      if (technique !== 'naked') {
         for (var u = 0; u < 27; u++) {
           var unit = UNITS[u];
           for (d = 1; d <= 9; d++) {
@@ -514,6 +516,10 @@
             if (spots.length === 1) { g[spots[0]] = d; progress = true; }
           }
         }
+      }
+      if (!progress && technique === 'pointing') {
+        var step = findPointing(toGrid(g));
+        if (step) { g[step.r * 9 + step.c] = step.digit; progress = true; }
       }
     }
     return g.indexOf(0) < 0;
@@ -541,7 +547,7 @@
     return toGrid(out);
   }
 
-  // Generate a puzzle for 'easy' | 'medium' | 'hard'.
+  // Generate a puzzle for 'easy' | 'medium' | 'tricky' | 'hard'.
   // options: { rng: () => [0,1), maxMs: time cap }.
   // Returns { level, puzzle, solution, givens, capped, attempts } (9x9 arrays, 0 = empty).
   // The puzzle always has exactly one solution. Normally it also meets the

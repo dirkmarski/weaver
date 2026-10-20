@@ -3,7 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const S = require('../sudoku.js');
 
-const LEVELS = ['easy', 'medium', 'hard'];
+const LEVELS = ['easy', 'medium', 'tricky', 'hard'];
 const flat = (g) => g.flat();
 const givens = (g) => flat(g).filter((v) => v).length;
 const N = 10; // puzzles per level in the batch tests
@@ -19,7 +19,10 @@ function batch(level, n, seedBase) {
   return out;
 }
 const batches = {};
-LEVELS.forEach((l, i) => { batches[l] = batch(l, N, 1000 * (i + 1)); });
+// Hard uses seeds 1-10: under the mutant LEVELS.hard.beyond = 'singles', seeds 3 and 8 give a
+// pointing-solvable puzzle, so the "hard is not solvable by pointing" test below can fail.
+const SEED_BASE = { easy: 1000, medium: 2000, tricky: 3000, hard: 1 };
+LEVELS.forEach((l) => { batches[l] = batch(l, N, SEED_BASE[l]); });
 
 test('generated full grid is valid, and varies with the seed', () => {
   const a = S.generateSolution(S.seededRng(1));
@@ -70,8 +73,35 @@ test('medium is NOT solvable by naked singles alone', () => {
   for (const r of batches.medium) assert.strictEqual(S.solvableBy(r.puzzle, 'naked'), false);
 });
 
-test('hard is NOT solvable by naked + hidden singles', () => {
-  for (const r of batches.hard) assert.strictEqual(S.solvableBy(r.puzzle, 'singles'), false);
+test('tricky is solvable by singles plus pointing but NOT by singles alone', () => {
+  for (const r of batches.tricky) {
+    assert.ok(S.solvableBy(r.puzzle, 'pointing'));
+    assert.strictEqual(S.solvableBy(r.puzzle, 'singles'), false);
+  }
+});
+
+test('hard is graded against pointing', () => {
+  assert.strictEqual(S.LEVELS.hard.beyond, 'pointing');
+});
+
+test('hard is NOT solvable by singles plus pointing (so not by singles either)', () => {
+  for (const r of batches.hard) assert.strictEqual(S.solvableBy(r.puzzle, 'pointing'), false);
+});
+
+test('tricky: following Hint, entering each hinted digit, solves the puzzle and never returns none', () => {
+  for (const r of batches.tricky.slice(0, 3)) {
+    const g = r.puzzle.map((row) => row.slice());
+    let pointing = 0;
+    for (let n = 0; n < 81 && g.flat().includes(0); n++) {
+      const h = S.hintFor(g, 1);
+      assert.strictEqual(h.kind, 'nudge');
+      if (h.technique === 'pointing') pointing++;
+      assert.strictEqual(h.digit, r.solution[h.r][h.c]);
+      g[h.r][h.c] = h.digit;
+    }
+    assert.deepStrictEqual(g, r.solution);
+    assert.ok(pointing > 0);
+  }
 });
 
 test('normal generation is not capped', () => {

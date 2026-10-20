@@ -3,7 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const {
   isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle,
-  preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle,
+  preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, solvableBy,
   seededRng, findPointing, hintMarks
 } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
@@ -733,10 +733,11 @@ test('preferredTechnique: all-zero tally follows the level', () => {
   assert.strictEqual(preferredTechnique(emptyTally(), 'easy'), 'naked');
   assert.strictEqual(preferredTechnique(emptyTally(), 'medium'), 'hidden');
   assert.strictEqual(preferredTechnique(emptyTally(), 'hard'), 'hidden');
+  assert.strictEqual(preferredTechnique(emptyTally(), 'tricky'), 'hidden');
 });
 
 test('preferredTechnique: the technique with the lower count wins on every level', () => {
-  for (const level of ['easy', 'medium', 'hard']) {
+  for (const level of ['easy', 'medium', 'tricky', 'hard']) {
     assert.strictEqual(preferredTechnique(tallyOf(2, 1, 1, 0), level), 'hidden', 'N>H ' + level);
     assert.strictEqual(preferredTechnique(tallyOf(0, 0, 0, 3), level), 'naked', 'H>N ' + level);
   }
@@ -972,4 +973,16 @@ test('hintMarks: tint and marked digits for pointing (box and line, pointing dig
   assert.deepStrictEqual([naked.area.length, naked.digits], [20, []]); // row, column and box minus the cell; no purple for naked
   const single = hintMarks(hintFor(H_BOX, 2), H_BOX);
   assert.deepStrictEqual([single.area.length, single.target], [8, 41]);
+});
+
+// ---- Issue 37: solvableBy 'pointing' ----
+
+test("solvableBy 'pointing': one pointing step then singles is true; more than one is false; full grid true; broken grid false", () => {
+  assert.strictEqual(solvableBy(WALL_ROW, 'pointing'), true);  // one step (naked form), then singles
+  assert.strictEqual(solvableBy(WALL_COL, 'pointing'), true);  // one step (hidden form), then singles
+  assert.strictEqual(solvableBy(WALL_ROW, 'singles'), false);
+  assert.strictEqual(solvableBy(WALL_BOX, 'pointing'), false); // stuck again after two steps
+  assert.strictEqual(solvableBy(clone(), 'pointing'), true);
+  const broken = emptyGrid(); broken[0] = [0, 1, 2, 3, 4, 5, 6, 7, 8]; broken[1][0] = 9; // cell (0,0) has no candidate
+  assert.strictEqual(solvableBy(broken, 'pointing'), false);
 });
