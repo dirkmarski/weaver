@@ -2,10 +2,15 @@
 
 ## Entries (newest first)
 
+### Lessons accrete into process unless memory is pruned
+- **Seen:** 2026-10-20
+- **Means:** Regular pruning is essential to avoid bloat and pollution. Each iteration's lesson becomes the next iteration's step, and curated memory carries it forward more reliably than the work logs did. In iteration 11 the wiki's lessons drove three rounds of user checks in scoping, and scoping cost tripled. It is the same mechanism as the test growth in iteration 7.
+- **Response:** Add pruning into the memory architecture.
+
 ### Simple instructions were very effective
 - **Seen:** 2026-10-20
 - **Means:** A seven-line test strategy and one line in each of three definitions changed how the whole team tests within one iteration. The first piece of work the team chose was to right-size its own test suite (2,025 to 1,041 lines of tests, 15 s to 0.6 s), and no role brute-forced its checks.
-- **Response:** 
+- **Response:** None.
 
 ### Testing grows out of proportion to the product
 - **Seen:** 2026-10-19
