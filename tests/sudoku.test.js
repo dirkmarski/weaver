@@ -1031,6 +1031,9 @@ test('creditEntry pointing: re-entry shows the text again and changes no count; 
   const hinted = creditEntry(first.tally, first.credited, hintFor(SEED1_WALL, 1), SEED1_WALL, 2, 2, '7');
   assert.deepStrictEqual([hinted.text, hinted.tally], ['Well done! You applied pointing: row 3, column 3 is 7.', first.tally]);
   assert.deepStrictEqual(preferredTechnique(first.tally, 'tricky'), preferredTechnique(T0, 'tricky')); // pointing does not steer Hint
+  const after = SEED1_WALL.map((row) => row.slice()); after[2][2] = 7;
+  const next = creditEntry(first.tally, first.credited, null, after, 4, 0, '7'); // a hidden single after the pointing entry
+  assert.deepStrictEqual([next.tally.pointing, next.tally.hidden], [{ own: 1, hint: 0 }, { own: 1, hint: 0 }]); // pointing survives the copy
 });
 
 test('statusClass: reward is green (ok); not counted and not judged are neutral', () => {

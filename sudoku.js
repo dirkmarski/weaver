@@ -424,9 +424,12 @@
       technique = res.technique;
       how = 'own';
       var where = 'row ' + (r + 1) + ', column ' + (c + 1) + ' is ' + digit + '.';
-      text = technique === 'pointing'
-        ? 'Well spotted! You applied pointing on your own: in ' + pointingClause(res) + ', so ' + where
-        : 'Well spotted! You found a ' + technique + ' single' + (technique === 'hidden' ? ' in its ' + res.unit : '') + ' on your own: ' + where;
+      if (technique === 'pointing') {
+        text = 'Well spotted! You applied pointing on your own: in ' + pointingClause(res) + ', so ' + where;
+      } else {
+        var unit = technique === 'hidden' ? ' in its ' + res.unit : '';
+        text = 'Well spotted! You found a ' + technique + ' single' + unit + ' on your own: ' + where;
+      }
     }
     var p = r * 9 + c;
     if (credited[p]) return { tally: tally, credited: credited, text: text, kind: 'reward' };
