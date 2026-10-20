@@ -1,0 +1,136 @@
+# Iteration 12: product manager log
+
+- PM: product-manager agent (Claude Opus 5.5, claude-opus-5-5), session `4ecb9163-8db9-4624-9aa5-9c6e3ff52aab`
+- Worktree: `<session scratchpad>/wt-iteration-12` (branch iteration-12). Scratch tools: `<session scratchpad>/pm-it12/`.
+- Rules confirmed: governance/LOG.md not read; work log not read except my own it11 product log tail (needed for the harness/acceptance context of the candidate list); memory/wiki not edited (changes proposed to the lead).
+- Inputs: memory/wiki/backlog.md, product.md, lessons.md (Scoping), governance/context/product-strategy.md (unchanged: educate, teach techniques progressively, reward learning; small increments with early user testing), test-strategy.md, development-practices.md, README.md (behaviour spec), governance/memory-architecture.md (pruning rule).
+
+## Scoping
+
+### Candidate review (2026-10-20)
+- Candidate 1 (pointing visuals v2) has been "next" since it10 and was deferred in it11 for slip recovery, which shipped. It teaches the newest technique, which is the strategy's core (teach techniques progressively).
+- Own observation on the page (main 9e54939, Tricky seeds 1-6 followed by Hint to the first pointing step, tools pm-it12/play.js and topoint.js):
+  - Rings mark every D in the grid. Only some of them explain the step. Seed 3 (hidden form, box rows 7-9 cols 1-3, D=1): rings r1c7 r2c3 r4c9 r7c8; only r2c3 (column 3) and r7c8 (row 7) rule 1 out of the box's other cells. Seed 1: 5 rings, 2 relevant. Seed 4: 3 rings, none relevant.
+  - Seed 4 (naked form, box rows 7-9 cols 4-6, D=9): the box's only empty cells are r8c5 and r9c5, so the confinement is "trivial" (all other box cells are filled). Rings there are pure noise.
+  - No legend on screen for the dashed purple outline and the struck grey badge.
+- Prototype (pm-it12/proto, a copy of the page; not product code): rings only on Ds that share a row, column or box with a "reason cell" (an empty box cell outside the confined line; in the hidden form also an empty cell of U other than the target and the removed cells); a key line under the message on the pointing explanation (three wordings A/B/C; the ring clause only when rings exist); the badge sits in D's own pencil-note slot.
+- Pin data (pm-it12/pins.js; `generatePuzzle('tricky', {rng: seededRng(N)})`, then Hint followed with the level preference and the hint tally until the first pointing step; old rings = main, new rings = prototype rule). The page with Math.random seeded by the same mulberry32 gives the same puzzles (checked on seed 3).
+  - seed 1 naked, box 7 column 3, D=1, target r3c3=7: old r1c9 r4c5 r5c2 r6c8 r9c6, new r5c2 r9c6
+  - seed 3 hidden (column), box 7 row 9, D=1, target r5c5=1: old r1c7 r2c3 r4c9 r7c8, new r2c3 r7c8
+  - seed 4 naked, box 8 column 5, D=9, target r4c5=7: old r2c6 r3c3 r7c2, new none (box's only empty cells are r8c5, r9c5)
+  - seed 5 hidden (column), box 8 row 7, D=6, target r9c3=6: old r1c8 r5c7 r8c9, new r1c8 r8c9
+  - seed 6 hidden (row), box 3 column 7, D=9, target r4c5=9: old r1c4 r7c1 r9c8, new r1c4 r9c8
+  - seed 7 hidden (row), box 9 column 9, D=2, target r2c2=2: old r5c7 r6c5, new r5c7
+  - seed 8 hidden (row), box 1 column 3, D=8, target r4c1=8: old r1c5 r5c8 r7c2, new r5c8
+  - seed 9 naked, box 2 row 1, D=5, target r1c7=2: old r2c2 r5c1, new r2c2
+  - seed 10 hidden (row), box 4 column 2, D=2, target r1c8=2: old and new r6c6 r7c7 r8c1 r9c4 (all relevant)
+  - 9 of 10 seeds drop at least one irrelevant ring; seed 4 drops all three.
+
+### DOM test harness (tech-debt candidate), considered on its merits
+- For: development-practices.md says "unit testing for all code"; the page wiring (about 270 lines in render()) has no repo tests. In it11, 8 of 15 #51 mutants were caught only by scratchpad page scripts, which are lost each session and rebuilt by the tester and by me (I rebuilt pm-it12/play.js today). A repo harness makes those checks durable and reusable by the developer, reviewer, tester and PM.
+- Against: no user-visible value; adds test code (ratio already 1.15x vs a ~1x guide); needs Chrome on the machine (not a package, but an external tool); slows `node --test`.
+- Design constraints if taken: Node built-ins only (fetch, WebSocket, child_process), real index.html in headless Chrome via CDP, seeded Math.random, skip visibly when Chrome is not found, a small targeted set of scenarios (test strategy: golden path, edge, error; no sweeps).
+
+### Persona round 1 (play check: main vs prototype; prompt pm-it12/round1-prompt.txt; no scripts, source, README or LOG.md, confirmed)
+- A: prefers NEW rings, never missed a removed ring (s1, s3). Key line: B clearest ("only places", "by the box"); A's ring clause "vague", C's "the reason" cryptic. Badge in note slot: mildly prefers it, matters little. s4 (trivial confinement): poor example, "looks like plain elimination"; wants it said: "only two cells are left in this box, both in column 5". Naked form: the "could only take 1 or 7" step has no visual (text only). Fresh seed 23: no pointing in 6 hinted moves. Ranking: relevant rings > key line (B) > s4 wording > badge.
+- Data (pm-it12/trivial.js, Tricky seededRng 1-40, Hint followed to the end): 46 pointing steps, 13 of them (28%) "box-trivial": every empty cell of the box is a confined cell, so no Ds outside the box are needed for the confinement (seeds 4, 8, 14 x2, 20, 23, 24 x2, 27, 30, 35, 38, 40). Too common to avoid by reordering; the plan is to say it plainly in the explanation instead.
+- C: prefers NEW rings ("each remaining ring has a job"), never missed one; s4 cleaner without rings. Key line: B clearest, but "ruled out there by the box" is slightly off (the struck cells are outside the box): suggests "because of the box"; C's "purple 1" is ambiguous with the ringed 1s. Badge in note slot: slight plus; struck 9 "looks like a smudge". s4: poor-to-OK; add "the 9 in this box can only be in these two cells, which are both in column 5". Missing: why the naked-form target "could only take 1 or 7" (no marks). Fresh seeds 23 and 31: no pointing seen in ~30 moves (supports candidate 2, Tricky density). Hidden-single rings are many (same noise as pointing). Ranking: relevant rings > key line B (fixed) > naked-form other-candidate visuals > badge.
+- B: prefers NEW rings, recomputed by hand and never missed one. Key line: A's ring clause best, B's "only places" strongest phrase, B's "by the box" off (same as C), C misleading; suggests A plus B's "only". s4 poor: "the only two empty cells left in this box are both in column 5, so the box's 9 goes in one of them". Unprompted: the same noise on hidden-single explanations (seed 23 r2c4=3 rings r6c3 uselessly; seed 31 r7c8=1 rings r2c3 r3c6 r5c1, only r1c7 r4c9 needed): wants the filter there too. Badge: position nice, size is the bigger issue. No pointing in about 80 moves over seeds 23 and 31. Wants messages to name the ringed and struck cells. Ranking: relevant rings (incl. hidden singles) > key line A+B > naming cells / better example than s4 > badge.
+
+### Round 1 synthesis
+- Relevant rings: 3/3 first priority; 0 missing rings reported over 9 session checks. Hidden-single rings raised by B (strongly) and C: same rule, same function (`hintMarks`); in scope.
+- Key line: B's "only places" (A, C, B) + A's ring clause (B), without "by the box" (B, C). Merged wording goes to round 2.
+- Box-trivial steps (28% of steps): 3/3 call s4 a poor example; all three ask for the text to say the box has no other empty cells. Wording, not avoidance (reordering would also change the hint order spec). Two variants go to round 2.
+- Badge in the note slot: mild plus 3/3, low priority; it also fixes the accepted it10 D1 (badge covers pencil note 3). Kept, small. Badge size: noted, not scoped.
+- Not scoped (to candidates): visuals or text for why the naked-form target has only D or X left (A, C); naming the ringed/struck cells in the text (B, C); Tricky practice density: in fresh play none of the three met a pointing hint in 6-45 moves (seeds 23, 31); the first pointing step comes after ~6-22 hinted entries (pins). Strong evidence for candidate 2; next iteration.
+
+### Decision D1: the page test harness enters scope, delivered first (#55)
+- Development practices require unit tests for all code; the wiring has none, and the page scripts are rebuilt every session (it11: 8 of 15 mutants page-only). Delivering it first means the pointing issue's tester and I use repo page tests instead of rebuilding scratch tools, and the new key line and badge get durable page tests.
+- Kept lean: Node built-ins only, real page, seeded Math.random, visible skip without Chrome, about 10-15 scenarios, four named mutants to kill, `node --test` under 10 s. No product change. Risk: test-code ratio grows (1.15x today); accepted for the coverage gain, reviewer to check leanness.
+- Hidden-single rings pins (fresh Tricky seededRng(N), Hint twice, tie prefers hidden): seed 1 row, r1c9=1: unchanged r4c5 r5c2 r6c8 r9c6; seed 2 row, r2c9=3: r1c4 r4c5 r5c7 r6c2 r7c3 -> r1c4 r5c7 r6c2 r7c3; seed 3 box, r1c9=5: r2c4 r3c3 r4c6 r8c1 r9c8 -> r2c4 r3c3 r9c8.
+- Persona round 2 launched on the updated prototype (merged key wording, hidden-single filter, box-trivial wording B1 vs B2): prompt pm-it12/round2-prompt.txt.
+
+### Persona round 2 (prototype v2; prompt pm-it12/round2-prompt.txt)
+- A (text output only, no screenshots): key line clear and correct; would say "blocks" instead of "rules out". Box-trivial: B2 better ("leads with the fact, reason in brackets"; B1's "there" vague). Hidden-single rings: none missing; r9c8 "borderline" (it blocks r2c8, which r2c4 also blocks). Wants a key line on the hidden-single explanation too. Notes that the unit tint covers givens (existing behaviour since it5; not a defect). Ship with B2.
+- C: explanation and key correct and clear. Wording: two "=" signs awkward, try "struck grey 1: a 1 can no longer go there"; "rules out other cells" could be "rules out cells in the box" (not accurate for hidden-form rings in U; not taken). Box-trivial: B2 ("same pattern as other pointing hints"). Hidden-single rings: none missing, none useless (r9c8 redundant but valid); "much cleaner". Ship with B2.
+- B: key line clear and correct (checked each mark against the board); change "= D can no longer go there" to "= a D can no longer go there" (C said the same). Box-trivial: B2 (B1 never says why it is 9 rather than the box's other missing digit). Hidden-single rings: none missing; r9c8 redundant, wants a minimal set. Nothing confusing; ship with B2.
+
+### Round 2 decisions
+- D2: box-trivial wording B2 (3/3): when every empty cell of the pointing box is a confined cell, the explanation's first sentence gets " (the box has no other empty cells)" after "fits only in row L". First click unchanged.
+- D3: key line "Key: dashed purple = the only places for D in the box; struck grey D = a D can no longer go there; purple ring = a D that rules out other cells." (B and C: "a D"; A's "blocks" not taken, 1/3, "rules out" is the wording of the hint texts). Ring clause only when at least one ring shows.
+- D4: rings are "all relevant", not a minimal set (B wants minimal, A borderline, C calls the redundant ring valid). A minimal set is ambiguous (several minimal sets, needs tie rules) and every ring kept does block a cell that matters. Candidate list keeps "minimal rings" as a later refinement.
+- Not taken now: a key line for the hidden-single explanation (A only) -> candidates.
+
+## Scope of iteration 12 (decided 2026-10-20)
+Deliver in this order:
+1. #55 Page tests in the repo: drive the real page in headless Chrome from node --test. No product change. Its 8 named scenarios include the it11 M13 precedence case, and 4 named mutants must be killed.
+2. #56 Hint explanation: ring only the digits that matter, add a key line for pointing, and put the badge in its note slot. It also adds the box-case parenthesis (D2), the key wording (D3) and the all-relevant rings (D4). It has 8 pinned states (P1, P3, P4, P8, P10, H1-H3) with exact texts. Its page tests go into the #55 harness.
+
+Rationale: the strategy is to teach techniques progressively. The pointing explanation is the newest lesson, and players found it noisy: in round 1, all three ranked relevant rings first. Two rounds with the personas settled the wording, and #56 has no open behaviour questions. #55 comes first because #56's tester and the acceptance would otherwise rebuild page tools again. Development practices also require tests for all code.
+
+Not in scope, and why:
+- Tricky practice density. The evidence is strong: no pointing hint in about 30-80 fresh moves per player. But it needs a generation-time spike first (lessons: "design spike with data"). It is the top candidate for it13.
+- Visuals for the naked-form "only D or X" step and naming cells in the text. These are bigger design questions.
+- Avoiding box-case steps. 28% of steps are box cases, so they are explained instead of avoided.
+
+### Risks and open points for development and testing
+- #55 needs Chrome on the machine (macOS path; `CHROME_PATH`) and may need `--no-sandbox` (lessons, Tooling). The tester must prove the visible skip path. If the harness pushes `node --test` past 10 s, flag it to the PM, do not just raise the limit.
+- #55 adds test code against a test-to-product ratio of 1.15x already. The reviewer checks that it stays lean.
+- #56 pins depend on the generator and Hint order staying unchanged in this iteration. #55 does not touch them. If a pin and the rule disagree, the issue says to stop and ask the PM.
+- #56 section 1 changes `hintMarks().digits`, so existing assertions on it will change. The issue asks for them to be listed, so the reviewer can tell expected changes from regressions.
+- Badge-in-slot is CSS. The harness can check computed position or classes, but the tester should still take a 375 px screenshot.
+- Persona evidence is simulated, and GitHub Pages is still unconfirmed (open concern for Dirk).
+
+## Proposed wiki changes (for the lead; I did not edit memory/wiki)
+- backlog.md:
+  - Replace candidate 1 with the list below.
+  - Move "UI wiring has no repo tests" from tech debt to "in it12 scope (#55)".
+  - Mark the it10 D1 badge-over-note-3 debt as "fixed by #56" once it is accepted.
+- product.md:
+  - Update the Hint section after #56 is accepted: the ring rule, the key line, the badge slot and the box-case parenthesis.
+  - Remove the "Pointing visuals v2 open" gap.
+- lessons.md (Scoping): one new lesson. A play check comparing current and prototype on the same replayed session, with switchable wording variants (VERSION/HASH), settled rings, key wording and the box-case text in two short rounds. A persona also raised an unprompted extension in round 1 (B: hidden-single rings), which round 2 confirmed. Merge it into the existing "play check" lesson rather than adding a new bullet.
+- lessons.md (Tooling): pm-it12/play.js is a replay-based play tool. Each command replays the session in headless Chrome, so a persona can switch version and wording mid-session. topoint.js and pins.js follow Hint to the first pointing step. Like the it11 entry, these are rebuilt each session and superseded by #55 once it lands.
+
+## Candidate list (PM, ordered, during iteration 12)
+Pruning rule (governance/memory-architecture.md, Dirk, 9e54939): drop delivered items, merge related ones into broader entries and discard items that are no longer relevant. Do not let the list grow. Applied below: pointing visuals v2 is folded into #56 or into item 2. Slip items 3a-3g are compressed into one item. The wording items are merged into item 4.
+
+In scope for it12: #55 (page test harness) and #56 (relevant rings for hidden single and pointing, key line, badge in note slot, box-case wording).
+
+1. **Tricky practice density** (next, it13). Fresh-play evidence in it12: none of the three players met a pointing hint in 6-45 moves. The first pointing step comes after 6-22 hinted entries.
+   - Spike first: measure the generation time for "at least 2 pointing steps", and how early the first one comes.
+   - Then decide between denser puzzles and Hint preferring pointing on Tricky.
+2. **Explanation depth, pointing and singles.** Merges the rest of "pointing visuals v2" and the it12 round asks:
+   - show why the naked-form target has only D or X left (A, C);
+   - name the ringed and struck cells in the text (B, C);
+   - a key line on the hidden-single explanation (A);
+   - minimal rings rather than all relevant ones (B; D4);
+   - a larger or more legible struck badge (B, C);
+   - a clearer first-click case signal.
+3. **Slip follow-ups**, merged from it11 3a-3g. These are wording-led and small, so they can ride along:
+   - the extra-clash sentence should point at the outlines rather than at Verify, which does not flag givens;
+   - a message for a partial fix;
+   - an entry clashing in two units, where the entry text and Hint name different pairs;
+   - "clear your own number" when the pair includes a given;
+   - explain "counted" and the meaning of "stays uncounted", and judge an overwrite;
+   - a marker on entries made during a clash (not retroactive);
+   - Hint and Verify name one pair at a time.
+4. **Small wording items:**
+   - the shared "not counted" ending;
+   - re-entering a hint-credited cell says "on your own";
+   - "(see below)" in the finish text;
+   - fold away the definitions once they are learned;
+   - the heavy naked-single digit list (A).
+5. **Claiming, then pairs**, each with its own level. Ranked last by the personas.
+6. **Mobile and long-term:**
+   - the 375 px level buttons;
+   - long messages on a phone;
+   - a middle hint level;
+   - progress across puzzles.
+
+Not wanted:
+- instant red on a wrong or clashing entry (it10);
+- counting entries made during a clash (it11);
+- retroactive counting after a fix (it11).
+
+Delivered and removed: none yet in it12. #55 and #56 are removed from this list when they are accepted.
