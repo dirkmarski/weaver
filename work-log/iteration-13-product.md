@@ -130,3 +130,33 @@ Not wanted: instant red on a wrong entry (it10); counting entries made during a 
 7. Long-term: a middle hint level; progress across puzzles; claiming, then pairs, each with its own level (personas rank last).
 Watch: test-to-product ratio 1.598x at 24eec95 (1942/1215; 2 lines of headroom). The #61 rework must keep it at or below 1.6x. The next issue that adds tests must either trim redundant assertions in the files it touches (as #61 did) or come with a separate trim item first. That decision is made when the next iteration is scoped.
 Not wanted: instant red on a wrong entry (it10); counting entries made during a clash (it11); retroactive counting after a fix (it11).
+
+## Re-acceptance of #61 (PR #63, head 99fb331f628969eba10063c4813bfaf958706243), 2026-10-21
+- Read only: the issue log's Lead section (work-log/issue-61-ring-clause-strike.md at 99fb331) and the PR body. governance/LOG.md not read. No other work log read.
+- Own detached worktree: scratchpad/pm-it13/wt-acc-99 at 99fb331. The old wt-acc-61 was removed. Chrome ran with a private TMPDIR under scratchpad/pm-it13/tmp99.
+- Diff since 24eec95: style.css gradient stops 44/56 -> 43/57 and its comment; one README sentence; page test f4 loops over the digits 1-9 and asserts the thinnest; work log.
+- AC 6: pass. Formula from the computed ::after box (scratch chipw.js, now set to 14%): 375 px D1 2.27, D7 2.49, the others 2.58-2.71 px; 1280 px 2.91-3.23 px. The colour is still #6b6b6b (5.33:1). Mutant: the old 44-56% band fails f4 with "thinnest of the digits 1-9: 1.94 px".
+- AC 8: pass. README "14% ... at least about 2.2 px at 375 px and 2.9 px at 1280 px, thinnest for D = 1". The style.css comment agrees.
+- AC 9: pass. 1943 / 1215 = 1.599x.
+- AC 10: pass. node --test 167/167, 0 skipped.
+- AC 1-5 spot check: seeds 1/76/8/44 are exact at 375 and 1280 px. The play-through clauses for seeds 7 and 12 are the same as at 24eec95.
+- 375 px look (scratch d1look.js, dpr 3; crops in scratchpad/pm-it13/out99/): real struck D = 1 badges at Tricky seed 12 entry 18 (naked form, "purple ring = a 1 ...") and seed 32 entry 0 (hidden form, "... and of row 1"). The band is clearly visible and the 1 is readable above it.
+- Observation (not #61; main 44e3123 has the same layout): at 375 px every cell is about 36 x 58 px, so the grid is taller than it is wide. Added to candidate 4 (Mobile).
+
+## Decision D6: #61 accepted at 99fb331f628969eba10063c4813bfaf958706243 (2026-10-21)
+- ACs 1-10 all pass (AC 7 unchanged since 24eec95, as the tester confirmed). Gates: re-review APPROVE, re-test PASS, the lead's check, and my own re-check above.
+- Posted: PR #63 comment "Accepted at 99fb331..." and an issue #61 comment. No spec change.
+
+## Iteration 13 verdict (product side, final), 2026-10-21
+- **Complete once PR #63 is merged.** #60 (pointing on Tricky) was accepted at 5f13f84 and is merged. #61 (ring clause and strike) was accepted at 99fb331 after two rework rounds; the second came from my AC 6 finding.
+- Lesson kept: give feasibility and geometry figures for the worst-case content (narrowest glyph), not a sample.
+
+## Candidate list (PM, ordered, final for it13, for the lead's backlog snapshot)
+1. Explanation depth: show or name which cells a ring rules out (strongest signal; "and of row N" got 3/5 in it13); a stronger first-click signal for pointing; "same D as before" when one pointing fact gives another cell; the "(the box has no other empty cells)" case reads like a single; why the naked-form target has only D or X; a key line for the hidden single; minimal rings.
+2. Mobile: long messages and key line on a phone (conclusion first?); struck grey vs purple on the tinted cells; grid cells about 36 x 58 px at 375 px (grid taller than wide; new in it13, pre-existing); 375 px level buttons; hint badge at 320 px.
+3. Pointing reach (watch, no action): early first pointing via generation (late tail) against "don't open with pointing"; a cap on the preference only if load complaints appear; "prefer pointing" on Hard.
+4. Slip follow-ups (it11, small, wording-led): extra-clash sentence pointing at the outlines; a partial-fix message; two-unit clash naming; "clear your own number" when the pair includes a given; explain "counted"/"stays uncounted" and judge an overwrite; a marker on entries made during a clash; Hint/Verify naming one pair at a time.
+5. Small wording items: shared "not counted" ending; re-entering a hint-credited cell says "on your own"; "(see below)" in the finish text; fold away definitions once learned; heavy naked-single digit list.
+6. Long-term: a middle hint level; progress across puzzles; claiming, then pairs, each with its own level (personas rank last).
+Watch: test-to-product ratio 1.599x at 99fb331 (1943/1215; about 1 line of headroom to 1.6x). The next issue that adds tests must either trim redundant assertions in the files it touches (as #61 did) or come with a separate trim item first. That is decided when it14 is scoped.
+Not wanted: instant red on a wrong entry (it10); counting entries made during a clash (it11); retroactive counting after a fix (it11).
