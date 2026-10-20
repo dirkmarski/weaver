@@ -81,3 +81,21 @@ Not chosen now: cell highlighting on the own reward (C), pointing hint visuals (
 
 ### Persona sessions (play tool only; sessions prepared by the PM: seed 1 Tricky at the pointing wall with 12 own singles, the same puzzle with 2 cells left, and a fresh Easy game)
 - Persona C: the own-pointing message explains why it worked, and the count going 0 -> 1 was visible. The finish "Puzzle solved! Techniques applied: 14 on your own, 40 with a hint." is easy to take in, and the block gives the breakdown. Pointing line on Easy: "doesn't bother me", keep it always shown (weak, 2/5). C now says the grey definitions are more noise than the 0 line. Confusing: the first pointing hint names the pointing digit (1) and the target cell, but the cell takes 7. C typed 1 there and got "not counted" with no clue. Top wish: the hint names the pointing digit and the answer digit separately. C also wants a wrong entry to be called wrong (conflicts with the #31 no-correctness rule; same as B's earlier wish). No defect found against #42.
+- Persona B: found the seed 1 pointing step by hand. The own message "is exactly the elimination I had reasoned out", and the count rise was visible straight away. Re-entry kept the count at 1. "Not counted" after a correct 9 found by a pair argument felt "clear and fair, not a scolding". The finish "14 on your own, 40 with a hint" is clear and matches the block. Wishes: flag a conflicting entry at once ("7 is already in column 3"); the finish could add "(see below)"; Hint should prefer pointing when it is available; on Easy the Pointing line "reads like a to-do item" (B has moved away from the always-shown view B argued for at scoping). PM check of B's points: the 26 -> 27 naked-hint step B read as a double count is one hinted entry counted once (14 + 40 = 54 cells, consistent). No "!" before Verify is the #31 rule. Hint offering a single before pointing is by design (B's 9 at r9c8 probably opened that single). None of this is a defect against #42.
+- Easy Pointing line: C (who wanted to hide it) now says keep it always shown (weak, 2/5). B (who wanted it always shown) now finds it a little to-do-like. Split and weak both ways. KEEP as built; revisit only if real users raise it.
+
+## Decision: #42 ACCEPTED (head b7d8aea), 2026-10-20
+- All 9 criteria pass on PM checks. Both personas found the own-pointing reward right and the count visible. No defects. No conditions.
+- Comment: https://github.com/dirkmarski/weaver/pull/43#issuecomment-6282762346
+- I do not merge (lead).
+- Iteration 9 is COMPLETE from the product side once the lead merges PR #43 (single-issue iteration).
+- Process note: my first log commit (53fd7f8) went in before this section because a `git pull --rebase` with unstaged changes failed in a chained command. No harm; this commit completes it.
+- Worktree scratchpad/pm-42 removed after acceptance. Play tool kept in scratchpad/pm-play42.
+
+## Next-iteration candidates (ordered, end of iteration 9)
+1. Pointing hint clarity and visuals: the first click names the pointing digit and the target cell, and C typed the pointing digit (1) into a cell that takes 7. Name the answer digit apart from the pointing digit (or say "1 is removed from this cell"). Also: mark the confined box cells and the removed cells, show rings only on relevant digits, and avoid trivial confinements.
+2. Tricky practice density: at least 2 pointing steps per Tricky puzzle.
+3. Feedback on wrong/conflicting entries: B and C asked again (B: "7 is already in column 3"). This conflicts with the #31 no-correctness rule; a decision is needed (a conflict is a rule fact, not a correctness reveal, so this may be acceptable). Also covers uncounted-entry wording v2.
+4. Small wording: re-entry of a hint-credited cell says "on your own" while the count stays "with a hint". Finish text "(see below)" (B). Grey definitions feel noisy once learned (C: collapse after the first puzzle?).
+5. Claiming, then pairs, each with its level. Hint preferring pointing on Tricky when available (B) belongs here or with 2.
+6. Mobile layout; middle hint level; progress across puzzles.
