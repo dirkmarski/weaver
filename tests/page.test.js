@@ -66,7 +66,7 @@ const read = () => page.eval(`(function () {
     tallyShown: !document.getElementById('tally').hidden, level: document.getElementById('level').textContent,
     tally: ['tally-naked', 'tally-hidden', 'tally-pointing'].map(function (id) { return document.getElementById(id).textContent; }),
     notes: document.getElementById('notes').textContent, pressed: document.getElementById('notes').getAttribute('aria-pressed'),
-    clash: at('clash'), target: at('hint-target'), area: at('hint-area'), digit: at('hint-digit'), confined: at('hint-confined'), removed: at('hint-removed'),
+    clash: at('clash'), target: at('hint-target'), area: at('hint-area'), hatched: at('hint-hatched'), digit: at('hint-digit'), confined: at('hint-confined'), removed: at('hint-removed'),
     dattr: tds.map(function (t, i) { return t.hasAttribute('data-d') ? i : -1; }).filter(function (i) { return i >= 0; }),
     dvals: tds.filter(function (t) { return t.hasAttribute('data-d'); }).map(function (t) { return t.getAttribute('data-d'); }),
     conflict: tds.map(function (t, i) { return t.querySelector('input.conflict') ? i : -1; }).filter(function (i) { return i >= 0; }),
@@ -74,7 +74,7 @@ const read = () => page.eval(`(function () {
     given: tds.map(function (t) { return t.classList.contains('given') ? +t.textContent : 0; }),
     active: a && a.dataset ? a.dataset.pos : null };
 })()`);
-const noHint = (s) => { assert.strictEqual(s.key, ''); ['target', 'area', 'digit', 'confined', 'removed', 'dattr'].forEach((k) => assert.deepStrictEqual(s[k], [], k)); };
+const noHint = (s) => { assert.strictEqual(s.key, ''); ['target', 'area', 'hatched', 'digit', 'confined', 'removed', 'dattr'].forEach((k) => assert.deepStrictEqual(s[k], [], k)); };
 const TALLY0 = ['Naked single: 0 on your own, 0 with a hint', 'Hidden single: 0 on your own, 0 with a hint', 'Pointing: 0 on your own, 0 with a hint'];
 
 describe('page (headless Chrome)', () => {
@@ -94,7 +94,7 @@ describe('page (headless Chrome)', () => {
     return null;
   });
 
-  // The singles played on the page, so that the next hint is a pointing step (optionally one whose ring count satisfies `ok`).
+  // The singles played on the page, so that the next hint is a pointing step (optionally one whose hatched count satisfies `ok`).
   const pointingState = (ok) => pick('tricky', (p, sol) => {
     const grid = p.map((row) => row.slice()), typed = [];
     for (let s; (s = S.findNakedSingle(grid) || S.findHiddenSingle(grid)); ) {
@@ -102,7 +102,7 @@ describe('page (headless Chrome)', () => {
       typed.push([s.r * 9 + s.c, String(sol[s.r][s.c])]);
     }
     const step = S.findPointing(grid);
-    return step && ok(S.hintMarks(S.hintFor(grid, 2), grid).digits.length) ? { typed, grid, step } : null;
+    return step && ok(S.hintMarks(S.hintFor(grid, 2), grid).hatched.length) ? { typed, grid, step } : null;
   });
   const pointing = pointingState(() => true);
   const noRings = pointingState((n) => n === 0);
@@ -210,8 +210,8 @@ describe('page (headless Chrome)', () => {
     s = await read();
     const marks = S.hintMarks(S.hintFor(grid, 2), grid);
     assert.deepStrictEqual([s.target, s.confined, s.removed], [[target], step.confined, step.removed]);
-    assert.deepStrictEqual(s.digit, marks.digits);
-    assert.strictEqual(s.key, S.pointingKey(S.hintFor(grid, 2), marks.digits.length)); // the key line (kept by the notes change below)
+    assert.deepStrictEqual([s.digit, s.hatched], [marks.digits, marks.hatched]);
+    assert.strictEqual(s.key, S.hintKey(S.hintFor(grid, 2), marks.hatched.length)); // the key line (kept by the notes change below)
     assert.deepStrictEqual(s.dattr, step.confined.concat(step.removed).sort((x, y) => x - y));
     assert.ok(s.dvals.every((d) => d === String(step.pointDigit)));
     const other = empties(g.puzzle).filter((p) => !typed.some((t) => t[0] === p) && p !== target)[0];
@@ -238,19 +238,29 @@ describe('page (headless Chrome)', () => {
     assert.strictEqual(s.tally[2], 'Pointing: 0 on your own, 1 with a hint');
   });
 
-  it('f1b. the key line ring clause on the page, by form: seeds 1 and 76 naked, 8 hidden row, 44 hidden box (2 rings, 1 ring, 3, 2)', async () => {
-    for (const [seed, rings, clause] of [[1, 2, 'purple rings = 2s already placed that keep 2 out of the other cells of the box.'], [76, 1, 'purple ring = an 8 already placed that keeps 8 out of the other cells of the box.'],
-      [8, 3, 'purple rings = 8s already placed that keep 8 out of the other cells of the box and of row 4.'], [44, 2, 'purple rings = 7s already placed that keep 7 out of the other cells of both boxes.']]) {
-      await open('tricky', seed);
-      await click('#hint');
-      await click('#hint');
-      const s = await read();
-      assert.ok(s.key.endsWith('go there; ' + clause), seed + ': ' + s.key);
-      assert.strictEqual(s.digit.length, rings);
-    }
+  it('f1b. pins on the page: P1 pointing (hatched cells, key line, stripe and tint layers) and P3 hidden single (hatched, key line, a value change clears both)', async () => {
+    const all = (...rc) => rc.map(([r, c]) => (r - 1) * 9 + c - 1);
+    await open('tricky', 8);
+    await click('#hint');
+    let s = await read();
+    assert.deepStrictEqual([s.hatched, s.key], [[], '']); // the first click hatches nothing
+    await click('#hint');
+    s = await read();
+    assert.deepStrictEqual(s.hatched, all([1, 3], [2, 2], [4, 8], [4, 9]));
+    assert.strictEqual(s.key, 'Key: dashed purple = the only places for 8 in the box; struck grey 8 = this step rules 8 out there; hatched = a purple ring rules 8 out there (an 8 already in the same row, column or box).');
+    const bg = await page.eval('getComputedStyle(document.querySelectorAll("#sudoku td")[2]).backgroundImage'); // r1c3, hatched
+    assert.ok(bg.includes('repeating-linear-gradient(135deg, rgba(106, 31, 181, 0.3)') && bg.includes('linear-gradient(rgba(255, 179, 0, 0.3), rgba(255, 179, 0, 0.3))'), bg);
+    await open('medium', 4);
+    await click('#hint');
+    await click('#hint');
+    s = await read();
+    assert.deepStrictEqual(s.hatched, all([1, 7], [1, 8], [1, 9], [2, 9], [3, 8]));
+    assert.strictEqual(s.key, 'Key: hatched = a purple ring rules 4 out there (a 4 already in the same row, column or box).');
+    await keys([[all([2, 8])[0], '1']]); // a value: removes the hatching and the key line
+    noHint(await read());
   });
 
-  it('f2. the key line is gone after Verify; a naked/hidden explanation and the first click have none', async () => {
+  it('f2. the key line is gone after Verify; a hidden single has the hatched key line, a naked single none', async () => {
     const { seed, extra } = pointing;
     await open('tricky', seed);
     await keys(extra.typed);
@@ -264,10 +274,10 @@ describe('page (headless Chrome)', () => {
     await click('#hint');
     const s = await read();
     assert.ok(s.status.startsWith('Hidden single') || s.status.startsWith('Naked single'));
-    assert.deepStrictEqual([s.key, s.dattr], ['', []]);
+    assert.deepStrictEqual([s.key.startsWith('Key: hatched = '), s.dattr], [s.status.startsWith('Hidden single'), []]);
   });
 
-  it('f2b. with no ring the key line has no ring clause (and none is ringed)', async () => {
+  it('f2b. with no ring and no reason cell the key line has no hatched clause (and none is hatched)', async () => {
     const { seed, extra } = noRings;
     await open('tricky', seed);
     await keys(extra.typed);
@@ -275,8 +285,8 @@ describe('page (headless Chrome)', () => {
     await click('#hint');
     const s = await read();
     assert.deepStrictEqual(s.digit, []);
-    assert.strictEqual(s.key, S.pointingKey(S.hintFor(extra.grid, 2), 0));
-    assert.ok(s.key.endsWith('go there.') && !s.key.includes('purple ring'));
+    assert.deepStrictEqual(s.hatched, []);
+    assert.ok(s.key.endsWith('out there.') && !s.key.includes('hatched'));
   });
 
   it('f3. the badge sits in the note slot of its digit, for every digit 1-9 (1 top-left, 5 centre, 9 bottom-right)', async () => {
