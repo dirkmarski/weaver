@@ -37,3 +37,8 @@
 - D3: #51 changes the README's "no live checking" stance (the outline is a live mark). The PM decided this and it is in scope by its criterion 9. The lead accepts it, and the reviewer must check the README sentences on that point.
 - #50: branch issue-50-name-clash (38d7381), per-issue log created, interpretation L0 recorded (the extra sentence goes on texts 2 and 3 only, per pinned example 6). Developer round 1 launched.
 - #50 developer round 1 (Claude Sonnet, head 572cd18): 143/143, about 0.6 s. Lead check PASS with point L1 (README wording "the cells Verify flags, givens included"). Review and test round 1 launched in parallel in detached worktrees wt-50-review and wt-50-test, at b045256.
+- #50 round 1:
+  - Review (f29b027): APPROVE with changes; S1 (README "cells Verify flags" is false), S2 (Q-last-holder mutant survives; the lead confirmed it), N1, N2.
+  - Test (e1c04c3): criteria 1-9 PASS on the page, no defects.
+- #50 round 2 (04869eb): README and one assertion only. Lead delta re-check: the mutant is killed, 143/143, page pins 7/7. N3 (README sentence repeats itself) is folded into #51.
+- PR #52 opened (head b45a64f). PM acceptance launched on b45a64f.
