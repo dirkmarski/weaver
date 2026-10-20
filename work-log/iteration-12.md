@@ -29,3 +29,7 @@
 - Iteration branch, worktree and this log created.
 - 2026-10-20: PM launched to scope iteration 12 from memory/wiki/backlog.md (personas at its discretion). Told: no LOG.md, no work-log reading unless needed, the pruning rule for its candidate list, and the DOM-test-harness tech-debt item as a candidate to weigh on its merits (lead does not decide scope).
 - 2026-10-20: Lead launched one no-op assistant call by mistake (prompt: reply "OK", no tools). It returned "OK" and touched nothing. Recorded for the audit trail only.
+- 2026-10-20: PM scoped iteration 12 (product log 3fb00a7): #55 page tests in the repo (headless Chrome via CDP from node --test, no product change), then #56 Hint explanation (relevant rings only, key line for pointing, badge in its note slot, box-case text). Both pass the gate (open, weaver-agents, enhancement). Order accepted: #55 first, so #56 and acceptance use durable repo page tests.
+- PM proposals for the wiki (backlog list replacement, product Hint section after #56, play-check lesson merge) held for the close.
+- Environment check: Node v24.21.0, Chrome present.
+- #55: branch issue-55-page-tests, worktree wt-55, issue log started (8ab6ecb). Developer next.

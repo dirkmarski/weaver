@@ -9,14 +9,16 @@ Last updated: 2026-10-20, lead session 4ecb9163-8db9-4624-9aa5-9c6e3ff52aab
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| Scoping | in progress | PM picks scope from `wiki/backlog.md` and writes issue(s) | PM |
+| Scoping | done | PM log 3fb00a7: #55 then #56 | PM |
+| #55 page tests | development | developer implements in wt-55 (branch issue-55-page-tests) | developer |
+| #56 hint rings/key/badge | waiting | starts after #55 merges | - |
 
 ## Notes
 - Close-out must include a memory pruning pass (Dirk, 9e54939).
 - Do not read the work log unless specifically needed (Dirk, 1464355).
 
 ## Open issues / PRs
-- none yet
+- #55 (open), #56 (open); no PRs yet
 
 ## Blockers / waiting on
 - none
