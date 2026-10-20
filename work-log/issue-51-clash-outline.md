@@ -114,3 +114,4 @@ Tools (scratchpad/ts51/, see its README.md): `pins51.js`, `suite51.js` (106 page
   - N5: the README Verify bullet notes that the outline includes givens.
   - N2 and N4: no change.
 - Re-check (delta; the round is behaviour-neutral): the lead runs `node --test`, ts51/pins51.js and ts51/suite51.js. The tester's page run otherwise stands.
+- Round 2 (developer): S1 dropped the unreachable `td.clash.hint-confined` rule and fixed CSS/README wording; S2 Files entry names `td.clash`; N1 comment back above `verify`; N3 single before-grid in `setCell`; N5 README givens clause. Behaviour-neutral.

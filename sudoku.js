@@ -76,7 +76,6 @@
     };
   }
 
-  // Rules-only check; never compares against a stored solution.
   // Flat indices (row * 9 + column), ascending, of every cell to outline: the cells findConflicts returns, givens included.
   function clashCells(grid) {
     return findConflicts(grid).map(function (p) { return p[0] * 9 + p[1]; });
@@ -90,6 +89,7 @@
     return findConflicts(before).length && !findConflicts(after).length ? FIXED_TEXT : '';
   }
 
+  // Rules-only check; never compares against a stored solution.
   function verify(grid) {
     var empty = 0;
     for (var r = 0; r < 9; r++) for (var c = 0; c < 9; c++) if (!grid[r][c]) empty++;
@@ -768,13 +768,13 @@
     // (and entering the hinted digit shows the reward instead).
     function setCell(inp, cell) {
       var changed = inp.value !== cell.value || (inp.dataset.prev || '') !== cell.value;
+      var before = changed ? currentGrid() : null;
       // Judge a digit entered into a cell without a value, using the grid before the write.
       var credit = null;
       if (changed && !(inp.dataset.prev || '') && cell.value) {
         var pos = +inp.dataset.pos;
-        credit = creditEntry(tally, credited, hint, currentGrid(), Math.floor(pos / 9), pos % 9, cell.value);
+        credit = creditEntry(tally, credited, hint, before, Math.floor(pos / 9), pos % 9, cell.value);
       }
-      var before = changed ? currentGrid() : null;
       inp.value = cell.value;
       inp.dataset.prev = cell.value;
       inp.dataset.notes = cell.notes;
