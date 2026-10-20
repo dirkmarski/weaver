@@ -10,8 +10,8 @@
 - [x] `governance/LOG.md` NOT read (as instructed).
 - [x] Design spike for "Make Hard teachable" (PM prototypes scratchpad/pm-proto8/spike.js, walk.js).
 - [x] Scope decided (see Decision).
-- [ ] Issues raised on GitHub.
-- [ ] Log committed and pushed.
+- [x] Issues raised (label enhancement): #35, #36, #37. Bodies: scratchpad/pm-proto8/issue-tests.md, issue-pointing.md, issue-tricky.md. Delivery-order comments posted on each.
+- [x] Log committed and pushed.
 
 ## Starting point (2026-10-20)
 main = 6807c23. Iteration 7 output on top of iteration 6: Hint prefers the less-applied single (#30), "not counted" messages (#31). No open issues.
@@ -59,3 +59,18 @@ Not chosen, and why:
 
 ## Progress
 - 2026-10-20: context read, spike run, scope decided. Next: write the issues (bodies in scratchpad/pm-proto8/issue-*.md), create them, record numbers here, commit and push.
+- 2026-10-20: issues created:
+  - #35 Right-size the test suite to the test strategy (remove the frozen oracle and sweeps, no product change)
+  - #36 Hint teaches pointing when there is no single (not counted yet)
+  - #37 New level Tricky: solvable by singles plus pointing (Hard then needs more)
+  Order: #35 -> #36 -> #37, sequential (#36 changes hintFor that the frozen tests pin; #37 reuses the #36 pointing definition). Hand-off to the lead.
+- Product decisions pinned in #36: pointing only at the wall (singles keep priority); search order box -> digit; target = first new single in reading order; both forms (naked/hidden) taught; box named by its row/column ranges (no box numbering convention); "Well done! You applied pointing" with NO count; new "none" text; #31 README nits folded in.
+- Product decisions pinned in #37: level name "Tricky" between Medium and Hard; "solvable by singles plus pointing" = following Hint solves it; Hard additionally excludes such puzzles; givens band measured by the developer (cap rule: <= 1/50 capped).
+- Acceptance approach (per test strategy): criteria one by one, short play.js golden path + key edges, README changed sentences, personas for #36/#37 (not #35). No PM oracles or sweeps.
+- Next PM step: acceptance of #35 when relaunched. A play tool will be needed for persona sessions (iteration-7 play.js lived in another session's scratchpad; ask the assistant to rebuild a minimal one if it is not available).
+
+## Next-iteration candidates (ordered, start of iteration 8)
+1. Count pointing: own recognition in classifyEntry, a "Pointing" tally line + definition, finish text "Techniques applied", text (a) mentions pointing. Fold in the status-class testability carry-forward.
+2. Uncounted-entry feedback v2 (B, C).
+3. Claiming (and later pairs) with their levels.
+4. Hint example quality; middle hint level; mobile status layout; unit wording; progress across puzzles.
