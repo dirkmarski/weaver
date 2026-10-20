@@ -11,7 +11,7 @@ Last updated: 2026-10-20, lead session 4ecb9163-8db9-4624-9aa5-9c6e3ff52aab
 |---|---|---|---|
 | Scoping | done | PM log 3fb00a7: #55 then #56 | PM |
 | #55 page tests | done | merged f55b6a8 (PR #57) | - |
-| #56 hint rings/key/badge | rework round 1b | developer: badge CSS per Q3; then reviewer + tester re-check of round 1 (560b21b) + 1b | developer |
+| #56 hint rings/key/badge | re-review + re-test | reviewer and tester at fc76f9d (rounds 1 + 1b); then PR, PM acceptance (personas on the narrow chip) | reviewer, tester |
 
 ## Notes
 - Close-out must include a memory pruning pass (Dirk, 9e54939).
