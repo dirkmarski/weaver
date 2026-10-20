@@ -129,3 +129,13 @@
 - Tests: `node --test` 143/143 pass, about 0.59 s (no new test() block, one assertion).
 - S1 mutant `(s.unit === 'row' ? s.r : s.c) + 1` -> `s.r + 1`: BEFORE (old tests, mutated code) 143 pass, 0 fail (survives); AFTER (new tests) 142 pass, 1 fail (killed). Unmutated code with new tests: 143/143.
 - Line deltas: sudoku.js +11/-3, tests +2/-0, README +1/-1 (one line changed).
+
+## Review round 2 (reviewer, delta)
+
+Verdict: APPROVE. Delta 6a111e8..579c1db; I did not read governance/LOG.md.
+- S1: WALL_UNIT_COL is hidden form, unit column, target r9c3 (index 8,2: row and column differ); text says "column 3". Mutant `s.c` -> `s.r` in the unit name: killed (1 fail).
+- S2: split of `pointingHint` into `tail` / `unitName` is behaviour-neutral (same strings, same conditions). Mutants: naked/hidden switch inverted killed (3 fail); box unit via `s.box` killed (1 fail); `unit === 'box'` -> `'row'` killed (2 fail).
+- S3: README `hintFor` sentence is true (the return object carries `confined` and `removed`).
+- N1: comment is accurate (line 879 is the only place setting data-d, together with hint-confined / hint-removed).
+- Product code: only the pointingHint refactor and the comment changed. `node --test`: 143/143 pass.
+- Findings: none.
