@@ -106,3 +106,15 @@
   - D1 (low, cosmetic): the corner badge sits in the top-right slot, which is also where pencil note 3 is drawn, so a user's note 3 in a marked cell is hidden under the chip while the hint shows (screenshots overlap_s3_h20_w375_c2.png, overlap_s3_h20_w900_c2.png: notes 3, 6, 9 typed, only 6 and 9 visible in marked cells). Notes themselves are kept; it clears with the hint.
 - Observations (not defects): rings still show every D on the board (out of scope, B's clutter concern); the struck chip on the amber target is the least legible mark.
 - Screenshots: `<session scratchpad>/ts45/` s1_h13_w{900,375}_c{1,2}.png, s3_h20_w{900,375}_c{1,2}.png, notes_s{1,3}_*_w{900,375}_c2.png, overlap_*.png, boxunit_s10_h26_c2.png, rowunit_*.png.
+
+## Lead decision after round 1
+- Review (f125c8c): APPROVE with S1 (column-unit hidden text unasserted; mutant "column unit uses s.r" survives), S2 (split the ~270-character nested ternary), S3 (README `hintFor` field list lacks confined/removed), N1 (comment on the `[data-d]` coupling in clearResults), N2 (long comment, accepted). 16 mutants, 2 survivors: S1, and the clearResults selector (DOM only, covered by the tester's run2).
+- Test (6421be9, merge 034224b): criteria 1-5 PASS on the real page, including all clearing paths with the pointing marks showing (L1 closed) and readability at 375 px (L4 acceptable). The unit kinds row, column and box were seen on seeds 5-12.
+  - D1 (low, cosmetic): the badge covers the top-right pencil note (3) while the hint shows. The note is kept and reappears when the hint clears.
+- Round 2 scope: S1, S2, S3, N1. N2 is kept as is.
+- D1 is ACCEPTED as a known limitation, not fixed in this issue:
+  - every corner of a cell is a note slot, so any badge position hides one note;
+  - the hint is transient and the note is not lost;
+  - criterion 4 ("must not look like the user's notes") is met.
+  - Flagged to the PM for the acceptance judgement; if the PM wants it changed, it becomes a follow-up candidate.
+- Re-check is delta-scaled (tests, README, comments plus a behaviour-neutral refactor): the reviewer re-runs the S1 mutant and checks the S2 split; the tester runs the suite and a smoke re-run of run1.js.
