@@ -244,11 +244,13 @@
   // without D where D now fits in one cell, so it is D. Returns { box, line: 'row' | 'column',
   // index, pointDigit, confined, removed (flat indices of the cells where the digit fitted in the box
   // and in the line outside it), form: 'naked' | 'hidden', r, c, digit, unit (hidden only) }, all numbers
-  // 0-based, or null. Grid-based, notes ignored.
-  function findPointing(grid) {
-    var cells = toFlat(grid), hit = null;
+  // 0-based, or null. Grid-based, notes ignored. options.useful: true skips targets that are already a naked
+  // or hidden single before the step (a step with no other target is passed over).
+  function findPointing(grid, options) {
+    var cells = toFlat(grid), hit = null, useful = !!(options && options.useful);
     pointingSteps(cells, function (step) {
       for (var p = 0; p < 81 && !hit; p++) {
+        if (useful && isSingle(cells, p)) continue;
         var res = singleAfterStep(cells, p, step.removed, step.pointDigit);
         if (res) {
           hit = res; hit.r = Math.floor(p / 9); hit.c = p % 9;
@@ -276,6 +278,18 @@
         if (removed.length && fn({ box: b, line: vertical ? 'column' : 'row', index: index, pointDigit: d, confined: spots, removed: removed })) return;
       }
     }
+  }
+
+  // Is the empty cell p a naked or hidden single (of any digit) as the grid stands?
+  function isSingle(cells, p) {
+    if (cells[p]) return false;
+    var used = usedMask(cells, p);
+    if (bitCount(used >> 1) === 8) return true;
+    for (var d = 1; d <= 9; d++) {
+      if (used & (1 << d)) continue;
+      for (var k = 0; k < 3; k++) if (spotsFor(cells, UNITS[CELL_UNITS[p][k]], d).length === 1) return true;
+    }
+    return false;
   }
 
   // Is the empty cell p a single once digit d is removed from the cells `removed` (see
@@ -348,18 +362,21 @@
   // What Hint says for a grid. step 1 = nudge, step 2 = explain (only used when
   // a single or pointing step is found). A naked single is taught before a hidden single, unless
   // prefer === 'hidden' and a hidden single that is not a naked single exists. With no single, a pointing step
-  // (findPointing) is taught; its result adds technique 'pointing', form, box, line, index, pointDigit. Returns
+  // (findPointing) is taught; on level 'tricky' a useful pointing step (findPointing with useful: true) comes
+  // before any single; its result adds technique 'pointing', form, box, line, index, pointDigit. Returns
   // { kind, technique, unit, r, c, digit, text } where kind is
   // 'conflict' | 'full' | 'none' | 'nudge' | 'explain'. For the last two, r/c are
   // 0-based, technique is 'naked' | 'hidden' | 'pointing' and unit ('box' | 'row' | 'column') is set for hidden.
-  function hintFor(grid, step, prefer) {
+  function hintFor(grid, step, prefer, level) {
     if (findConflicts(grid).length) {
       var clash = namedClash(grid);
       return { kind: 'conflict', text: clash.phrase.charAt(0).toUpperCase() + clash.phrase.slice(1)
         + '. Change or clear one of them first, then click Hint again.' + clash.extra };
     }
     if (verify(grid).complete) return { kind: 'full', text: 'Every cell is filled. Click Verify to check the grid.' };
-    var s = prefer === 'hidden' ? findHiddenSingle(grid, { notNaked: true }) : null;
+    var s = level === 'tricky' ? findPointing(grid, { useful: true }) : null;
+    if (s) return pointingHint(s, step, grid);
+    s = prefer === 'hidden' ? findHiddenSingle(grid, { notNaked: true }) : null;
     var technique = 'hidden';
     if (!s) {
       s = findNakedSingle(grid);
@@ -387,7 +404,7 @@
     } else if (step === 2) {
       var others = { box: 'row or column', row: 'column or box', column: 'row or box' }[s.unit];
       text = 'Hidden single: ' + where + ' must be ' + s.digit + ', because every other empty cell in its ' + s.unit
-        + ' already has ' + (s.digit === 8 ? 'an ' : 'a ') + s.digit + ' in its ' + others + '.';
+        + ' already has ' + aDigit(s.digit) + ' in its ' + others + '.';
     } else {
       text = 'Hint: ' + where + ' is a hidden single: in its ' + s.unit + ', one of the missing digits fits only in this cell. '
         + 'Check where each missing digit can go in the ' + s.unit + '. Click Hint again to see why.';
@@ -438,10 +455,15 @@
     return { area: area, target: p, digits: digits, confined: explain ? hint.confined : [], removed: explain ? hint.removed : [] };
   }
 
-  // The key line under a pointing explanation, for pointing digit d and the number of rings showing.
-  function pointingKey(d, ringCount) {
+  // 'an 8' or 'a D'.
+  function aDigit(d) { return (d === 8 ? 'an ' : 'a ') + d; }
+
+  // The key line under a pointing explanation. step is the pointing hint (pointDigit, form, unit, r, c); ringCount the rings showing.
+  function pointingKey(step, ringCount) {
+    var d = step.pointDigit, where = 'the other cells of ' + (step.unit === 'box' ? 'both boxes' : 'the box');
+    if (step.form === 'hidden' && step.unit !== 'box') where += ' and of ' + step.unit + ' ' + (step.unit === 'row' ? step.r + 1 : step.c + 1);
     return 'Key: dashed purple = the only places for ' + d + ' in the box; struck grey ' + d + ' = ' + d + ' can no longer go there'
-      + (ringCount ? '; purple ring = this ' + d + ' rules out other cells.' : '.');
+      + (ringCount ? '; purple ' + (ringCount > 1 ? 'rings = ' + d + 's already placed that keep ' : 'ring = ' + aDigit(d) + ' already placed that keeps ') + d + ' out of ' + where + '.' : '.');
   }
 
   // ---- Rewards: recognising naked and hidden singles the learner enters ----
@@ -964,7 +986,7 @@
 
     // Hint: step 1 unless a hint is already showing, then step 2.
     document.getElementById('hint').addEventListener('click', function () {
-      var res = hintFor(currentGrid(), hint ? 2 : 1, preferredTechnique(tally, currentLevel));
+      var res = hintFor(currentGrid(), hint ? 2 : 1, preferredTechnique(tally, currentLevel), currentLevel);
       clearResults();
       status.textContent = res.text;
       status.className = '';
@@ -978,7 +1000,7 @@
       [['confined', marks.confined], ['removed', marks.removed]].forEach(function (m) {
         m[1].forEach(function (q) { cellAt(q).classList.add('hint-' + m[0]); cellAt(q).setAttribute('data-d', res.pointDigit); });
       });
-      if (res.technique === 'pointing' && res.kind === 'explain') keyLine.textContent = pointingKey(res.pointDigit, marks.digits.length);
+      if (res.technique === 'pointing' && res.kind === 'explain') keyLine.textContent = pointingKey(res, marks.digits.length);
       inputs[res.r][res.c].focus();
     });
 

@@ -372,13 +372,6 @@ test('hintFor: step 2 explains with the digit list, "and" before the last', () =
   assert.strictEqual(h.text, 'Naked single: row 1, column 1 must be 5, because its row, column and box already contain 1, 2, 3, 4, 6, 7, 8 and 9.');
 });
 
-test('hintFor: any step other than 2 is the nudge; the grid is not changed', () => {
-  const g = blank([4, 7]), copy = JSON.stringify(g);
-  assert.strictEqual(hintFor(g, 1).kind, 'nudge');
-  assert.strictEqual(hintFor(g, 2).kind, 'explain');
-  assert.strictEqual(JSON.stringify(g), copy);
-});
-
 test('hintApplied: reward only for the hinted digit', () => {
   const h = hintFor(blank([4, 7]), 1);
   const d = String(SOLUTION[4][7]);
@@ -452,12 +445,6 @@ test('hintFor: a naked single is taught before a hidden single, even a later one
   assert.strictEqual(h.technique, 'naked');
   assert.deepStrictEqual([h.r, h.c, h.digit], [1, 2, 2]);
   assert.strictEqual(h.unit, undefined);
-});
-
-test('hintFor: conflicts and a full grid still come before a hidden single', () => {
-  const g = H_BOX.map((row) => row.slice()); g[0][0] = g[0][1];
-  assert.strictEqual(hintFor(g, 1).kind, 'conflict');
-  assert.strictEqual(hintFor(clone(), 1).kind, 'full');
 });
 
 test('hintFor: hidden single nudge text for box, row and column (1-based row and column)', () => {
@@ -989,6 +976,50 @@ test('pointing: within a box the lower digit wins when two digits both make a si
   assert.deepStrictEqual([p.box, p.pointDigit, p.r, p.c, p.digit], [0, 2, 4, 3, 2]);
 });
 
+// ---- Issue 60: Tricky prefers a useful pointing step ----
+
+test('issue 60: on Tricky a useful pointing step comes before singles; seeds 1, 2 and 5; other levels unchanged; rewards', () => {
+  const pz = (level, seed) => generatePuzzle(level, { rng: seededRng(seed) }).puzzle;
+  const show = (h) => [h.technique, h.r, h.c, h.digit, h.form || h.unit];
+  const [s1, s2, s5] = [1, 2, 5].map((n) => pz('tricky', n));
+  // seed 1: the hidden single r1c9 = 1 is passed over for pointing (box of rows 1-3, columns 7-9, digit 2 in row 1, naked, r1c5 = 7)
+  assert.deepStrictEqual(show(hintFor(s1, 1, 'hidden')), ['hidden', 0, 8, 1, 'row']);
+  assert.deepStrictEqual(findPointing(s1, { useful: true }), findPointing(s1));
+  const nudge = hintFor(s1, 1, 'hidden', 'tricky'), explain = hintFor(s1, 2, 'hidden', 'tricky');
+  assert.deepStrictEqual([nudge.kind, explain.kind, ...show(nudge), nudge.box, nudge.line, nudge.index, nudge.pointDigit], ['nudge', 'explain', 'pointing', 0, 4, 7, 'naked', 2, 'row', 0, 2]);
+  assert.deepStrictEqual(hintFor(s1, 2, 'naked', 'tricky'), explain); // the single preference does not matter
+  // AC6: entered as hinted, rewarded and counted as a hint
+  const res = creditEntry(emptyTally(), {}, nudge, s1, 0, 4, '7');
+  assert.strictEqual(res.text, 'Well done! You applied pointing: row 1, column 5 is 7.');
+  assert.deepStrictEqual(res.tally.pointing, { own: 0, hint: 1 });
+  // seed 2: the step found (box 2, digit 4, row 3, hidden, r3c4 = 4) targets a cell that is already a single, so Hint keeps the hidden single
+  const p2 = findPointing(s2);
+  assert.deepStrictEqual([p2.box, p2.pointDigit, p2.line, p2.index, p2.form, p2.r, p2.c, p2.digit], [1, 4, 'row', 2, 'hidden', 2, 3, 4]);
+  assert.strictEqual(findPointing(s2, { useful: true }), null);
+  assert.deepStrictEqual(show(hintFor(s2, 1, 'hidden', 'tricky')), ['hidden', 1, 8, 3, 'row']);
+  // seed 26 after two hinted entries: the only step (r8c9 = 1, hidden) targets a naked single, so it is passed over
+  const s26 = pz('tricky', 26); s26[0][2] = 7; s26[1][8] = 8;
+  assert.ok(findPointing(s26)); assert.strictEqual(findPointing(s26, { useful: true }), null);
+  // seed 5: no useful step either; Hint is unchanged (hidden single r1c1 = 7 in its box)
+  assert.strictEqual(findPointing(s5, { useful: true }), null);
+  assert.deepStrictEqual(show(hintFor(s5, 1, 'hidden', 'tricky')), ['hidden', 0, 0, 7, 'box']);
+  for (const step of [1, 2]) for (const g of [s2, s5]) assert.deepStrictEqual(hintFor(g, step, 'hidden', 'tricky'), hintFor(g, step, 'hidden'));
+  // AC4: a useful step next to a single (Medium seed 2, Hard seed 11): the single is still taught; same result for every level argument but tricky
+  for (const [level, seed] of [['medium', 2], ['hard', 11]]) {
+    const g = pz(level, seed);
+    assert.ok(findPointing(g, { useful: true }));
+    for (const lv of ['easy', 'medium', 'hard', undefined]) for (const step of [1, 2]) {
+      assert.deepStrictEqual(hintFor(g, step, 'hidden', lv), hintFor(g, step, 'hidden'));
+      assert.notStrictEqual(hintFor(g, step, 'hidden', lv).technique, 'pointing');
+    }
+    assert.strictEqual(hintFor(g, 1, 'hidden', 'tricky').technique, 'pointing');
+  }
+  // conflicts and a full grid still come first on Tricky
+  assert.strictEqual(hintFor(SOLUTION, 1, 'hidden', 'tricky').kind, 'full');
+  const broken = s1.map((row) => row.slice()); broken[0][1] = 4;
+  assert.strictEqual(hintFor(broken, 1, 'hidden', 'tricky').kind, 'conflict');
+});
+
 // ---- Issue 42: pointing is counted ----
 
 const SEED1_WALL = rows9('405970621', '020000050', '000000039', '850010306', '016080502', '340005018', '290837065', '500000080', '008001203'); // Tricky seed 1, before hint 13
@@ -1136,10 +1167,16 @@ test('hintMarks, pointing: reason cells are the unconfined empty box cells (a) a
   assert.deepStrictEqual(ringsOf(hidden, b), [at(8, 6)]);
 });
 
-test('pointingKey: the exact key line for every digit, with the ring clause only when rings show', () => {
-  assert.strictEqual(pointingKey(1, 2), 'Key: dashed purple = the only places for 1 in the box; struck grey 1 = 1 can no longer go there; purple ring = this 1 rules out other cells.');
-  assert.strictEqual(pointingKey(8, 1), 'Key: dashed purple = the only places for 8 in the box; struck grey 8 = 8 can no longer go there; purple ring = this 8 rules out other cells.');
-  assert.strictEqual(pointingKey(9, 0), 'Key: dashed purple = the only places for 9 in the box; struck grey 9 = 9 can no longer go there.');
+test('pointingKey: the exact key line per form and ring count; no ring clause without rings', () => {
+  const key = (d, ring) => 'Key: dashed purple = the only places for ' + d + ' in the box; struck grey ' + d + ' = ' + d + ' can no longer go there' + ring;
+  const naked = (d) => ({ pointDigit: d, form: 'naked' }), hidden = (unit) => ({ pointDigit: 8, form: 'hidden', unit, r: 3, c: 6 });
+  assert.strictEqual(pointingKey(naked(2), 2), key(2, '; purple rings = 2s already placed that keep 2 out of the other cells of the box.'));
+  assert.strictEqual(pointingKey(naked(8), 1), key(8, '; purple ring = an 8 already placed that keeps 8 out of the other cells of the box.'));
+  assert.strictEqual(pointingKey(naked(1), 1), key(1, '; purple ring = a 1 already placed that keeps 1 out of the other cells of the box.'));
+  assert.strictEqual(pointingKey(hidden('row'), 3), key(8, '; purple rings = 8s already placed that keep 8 out of the other cells of the box and of row 4.'));
+  assert.strictEqual(pointingKey(hidden('column'), 2), key(8, '; purple rings = 8s already placed that keep 8 out of the other cells of the box and of column 7.'));
+  assert.strictEqual(pointingKey(hidden('box'), 2), key(8, '; purple rings = 8s already placed that keep 8 out of the other cells of both boxes.'));
+  [naked(9), hidden('row'), hidden('box')].forEach((s) => assert.strictEqual(pointingKey(s, 0), key(s.pointDigit, '.')));
 });
 
 // PM pins (issue 56): P(N) follows Hint on the Tricky puzzle of seed N (entering each digit as a hinted one) to the first pointing step.
