@@ -43,3 +43,27 @@
 - #42 round 1: review APPROVE (S1 test gap, N1/N2 nits), test PASS (no defects, real page, 375 px). The lead re-ran L1 (caught, 13 fail) and S1 (survives). Round 2: S1 + N2; N1 kept. Re-check is delta-scaled.
 - #42 round 2 (S1 test plus N2 refactor, code 8e9c2ae): delta re-review APPROVE (mutant 8 now caught), re-test PASS (one stale script expectation, not a defect). Lead check round 2 passed.
 - PR #43 opened (head b7d8aea). `gh pr edit` fails because the token lacks the read:org scope; the body was updated via `gh api -X PATCH .../pulls/43`. Handed to the PM for acceptance.
+- PM (Claude Opus 5.5) ACCEPTED #42 with no conditions on head b7d8aea (PR #43 issuecomment-6282762346). The lead verified the hand-off on GitHub (author, decision, head = PR head), added a log-only commit (cce7b48) and merged with a merge commit via `gh api .../merge` (merge_method=merge): 238d245. #42 closed automatically. main: 143/143, about 0.65 s.
+- The PM confirmed that iteration 9 is complete from the product side.
+- Memory closed for the iteration:
+  - Wiki refreshed: product (pointing counted, new gaps), architecture (sizes, exports, 143 tests), lessons (it9 learnings), backlog (the PM's end-of-it9 list), index snapshot.
+  - WIP reset to "no active run".
+
+## Outcome and lessons
+- Delivered: #42, pointing is counted with a hint and on your own:
+  - own-pointing recognition (one step, both forms, naked > hidden > pointing);
+  - a third tally line and definition on every level;
+  - the finish text "Techniques applied";
+  - the new "not counted" text (a);
+  - the status class from `creditEntry` `kind` (closes the it7/it8 carry-forward).
+- Code: `sudoku.js` 867 -> 900 lines; tests 988 -> 1075 lines; 137 -> 143 tests at about 0.6 s.
+- Lesson 1 (memory): the new tiers were set up first, in parallel with scoping, at low cost (one assistant run plus lead curation). WIP was updated at each hand-off and the work log stayed the audit trail.
+- Lesson 2: persona review of wording mock-ups before writing the issue gave an issue with zero clarification questions, zero spec deviations and pinned values that all held.
+- Lesson 3: a developer's claimed coverage gap (L1) was wrong; the real gap (S1) was found by the reviewer's targeted mutants. The lead re-ran both itself. Verify claims both ways.
+- Lesson 4: one rework round kept to a test plus a tiny refactor, with a delta re-check (mutant re-run plus smoke reuse). That took about 2 minutes of agent time, against a full re-run.
+- Lesson 5 (tooling): `gh pr edit` and other GraphQL paths need read:org, which the token lacks. The REST `gh api` works for PR edits and merges. Shared worktrees need per-file `git add`, and a `pull --rebase` can be blocked by another agent's unstaged edits.
+- Concerns for Dirk:
+  - Test growth (ratio ~1.21x) keeps exceeding the ~1x guide; each feature adds about its own size in tests.
+  - GitHub Pages is still unchecked, and all user evidence is simulated.
+  - Personas repeatedly ask for immediate wrong-entry feedback, which conflicts with the #31 product rule. This is a PM decision for a later iteration.
+- Next-iteration candidates (PM, ordered): see memory/wiki/backlog.md. Top items: pointing hint clarity and visuals, Tricky practice density, feedback on conflicting entries.

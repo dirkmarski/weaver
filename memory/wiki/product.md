@@ -10,7 +10,7 @@ Authoritative behaviour spec: `README.md`.
 - Pencil-mark Notes (button or `N` key, starts Off each puzzle); notes ignored by Verify and Hint.
 - Keyboard: arrow keys jump to the nearest non-given cell in that direction, no wrapping.
 - Verify: rules-only check (no stored answer), shows repeated digits in red, counts empty cells.
-- Auto message when the grid is full: green "Puzzle solved! Singles applied: O on your own, H with a hint." or red pointer to Verify on a conflict.
+- Auto message when the grid is full: green "Puzzle solved! Techniques applied: O on your own, H with a hint." (sums of all three techniques) or red pointer to Verify on a conflict.
 - Nothing is stored between page loads.
 
 ## Levels
@@ -38,12 +38,16 @@ Authoritative behaviour spec: `README.md`.
 - Entering the hinted digit shows "Well done! You applied ...". Any change to a value removes the hint; notes changes keep it.
 
 ## Rewards and counts
-- Entering a digit (Notes off) into an empty cell is judged: naked single, else hidden single (box, row, column checked in that order), else a neutral "not counted" message (also when the grid before the entry has conflicts).
-- "Well spotted!" for own finds, "Well done!" for hinted ones. Block under the status shows "Naked single: N on your own, M with a hint" and the same for hidden, each with a grey definition.
+- Entering a digit (Notes off) into an empty cell is judged: naked single, else hidden single (box, row, column checked in that order), else pointing on your own (ONE pointing step makes the entered digit a single in that cell, naked or hidden form; chained steps are not recognised), else a neutral "not counted" message (also when the grid before the entry has conflicts). (#42, it9)
+- "Well spotted!" for own finds (own pointing names the step: "...in the box of rows R1-R2 and columns C1-C2, the digit D fits only in row L, so row R, column C is V."), "Well done!" for hinted ones. Hinted pointing is counted too.
+- Block under the status shows three lines, Naked single, Hidden single and Pointing ("N on your own, M with a hint"), each with a grey definition, on every level, always visible.
+- Status colour comes from `creditEntry`'s `kind` (reward = green, "not counted" = neutral).
 - Each cell counts once per puzzle; counts never go down; reset on choosing a level.
 
 ## Known product gaps
-- Pointing is taught but not counted: no tally line, no definition, not in the finish text, no "Well spotted" for own pointing. All 5 personas noticed (it8). Finish text says "Singles applied" only.
+- Pointing hint wording: the first click names the pointing digit and the target cell, and a persona typed the pointing digit instead of the answer (it9, C).
+- Re-entering a cleared hint-credited cell says "on your own" while the count stays "with a hint" (consistent with the README; wording candidate, it9).
+- No live feedback on a wrong or conflicting entry (red only after Verify, by design since #31); personas keep asking (it8, it9).
 - Pointing hint visuals are coarse: rings on all cells with the digit, confined cells not marked, trivial confinements can appear.
 - Mobile 375 px: the four level buttons wrap (Hard alone on row 2); accepted.
 - Not live: no progress across puzzles; no technique beyond pointing (claiming, pairs not taught).

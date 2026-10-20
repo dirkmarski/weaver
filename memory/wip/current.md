@@ -3,19 +3,19 @@
 Last updated: 2026-10-20, lead session 48eaa449-33cf-461f-85bc-196e8d61fc39
 
 ## Active run
-- Run type: deliver the next iteration (iteration 9)
-- Iteration branch: `iteration-9`, worktree `<scratchpad>/wt-iteration-9`. It holds the work logs and `memory/`, and is merged by PR at the end.
-- Logs: `work-log/iteration-9.md` (lead), `work-log/iteration-9-product.md` (PM)
+- None. Iteration 9 is complete: #42 was merged (PR #43, 238d245) and PM accepted. The iteration logs and memory are merged via the iteration-9 PR.
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| Memory setup (wiki + WIP) | wiki seeded (50db9f9) | end of iteration: review session learnings, refresh product/backlog pages | lead |
-| Iteration 9 scope | done: one issue, #42 count pointing | - | PM |
-| #42 count pointing | rounds 1-2 done; review APPROVE, test PASS; PR #43 open at head b7d8aea | PM acceptance on PR #43; then the lead verifies the hand-off on GitHub and merges (merge commit) | PM |
+| (none in flight) | | | |
 
-## Open issues / PRs in this run
-- #42 (OPEN), PR #43 (OPEN, head b7d8aea), branch `issue-42-count-pointing`, worktree `<scratchpad>/wt-42`, log `work-log/issue-42-count-pointing.md`
+## Starting the next run
+- Iteration 10: the PM picks from `memory/wiki/backlog.md` (snapshot) and its live list at the bottom of `work-log/iteration-9-product.md`.
+- Play/test tools from it9 were in session scratchpad 48eaa449-... (ts42-tools, pm-play42) and are likely gone. Rebuild as needed.
+
+## Open issues / PRs
+- none
 
 ## Blockers / waiting on
 - none
