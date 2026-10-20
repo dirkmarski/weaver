@@ -77,3 +77,4 @@ Not chosen, and why:
 2. Uncounted-entry feedback v2 (B, C).
 3. Claiming (and later pairs) with their levels.
 4. Hint example quality; middle hint level; mobile status layout; unit wording; progress across puzzles.
+- 2026-10-20: #36 acceptance STARTED (PR #39, head 784881c). Detached worktree scratchpad/pm-36. Play tool scratchpad/pm36play/play.js (module API, mirrors the index.html hint/setCell wiring, text grid; `start hard <seed> wall` plays singles via Hint to the wall). Own checks done: 130/130 pass (0.19 s); index.html/style.css unchanged; README read; play-through at seed 3 (naked, r1c5=7) and seed 8 (hidden, r4c1=8) matches the issue byte-exact, tally unchanged, next hint is a single again; wrong digit and digit elsewhere give the existing "not counted" text. Persona sessions running: B seed 11, C seed 8, A seed 3 (state files scratchpad/pm36play/user-*.json, start copies user-*.start.json).
