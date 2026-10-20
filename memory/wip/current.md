@@ -11,10 +11,11 @@ Last updated: 2026-10-20, lead session 48eaa449-33cf-461f-85bc-196e8d61fc39
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
 | Memory setup (wiki + WIP) | wiki seeded (50db9f9) | end of iteration: review session learnings, refresh product/backlog pages | lead |
-| Iteration 9 scope | PM scoping | PM returns the issue numbers and order | PM |
+| Iteration 9 scope | done: one issue, #42 count pointing | - | PM |
+| #42 count pointing | developer round 1 | reviewer + tester in parallel | developer |
 
 ## Open issues / PRs in this run
-- none yet
+- #42 (OPEN), branch `issue-42-count-pointing`, worktree `<scratchpad>/wt-42`, log `work-log/issue-42-count-pointing.md`
 
 ## Blockers / waiting on
 - none
