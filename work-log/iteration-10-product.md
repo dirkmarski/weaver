@@ -53,7 +53,7 @@ Not chosen: rings on relevant digits only, trivial confinements, Tricky density,
 - Both: suite fast, no sweeps, test lines about 1x product lines.
 
 ## Next-iteration candidates (ordered, after scoping iteration 10)
-1. Pointing visuals v2: rings only on the relevant digits (B: clutter); avoid trivial confinements as the example (2/12 walls in seeds 1-10). Revisit after #45 acceptance.
+1. Pointing visuals v2: rings only on the relevant digits (B at scoping, C at #45 acceptance: "slightly busy"); a short legend for the dashed/struck marks (C); D1: draw the badge in D's own note slot; avoid trivial confinements as the example (2/12 walls in seeds 1-10); optionally make the first-click case signal more explicit (C).
 2. Tricky practice density: at least 2 pointing steps per Tricky puzzle (measure generation time first; seeds 1-10 had 12 walls, so most puzzles have one). Hint preferring pointing on Tricky (B, it9) may go with this.
 3. Small wording: re-entry of a hint-credited cell says "on your own" while the count stays "with a hint"; finish text "(see below)"; fold away grey definitions once learned (C).
 4. Claiming, then pairs, each with its level.
@@ -66,3 +66,33 @@ Delivered or in flight and gone from this list: pointing hint clarity (#45), cla
 - Detached worktree scratchpad/pm-45 at 63c13de. PM scripts: scratchpad/pm-acc45/acc.js (both walls, both clicks, 900 and 375 px, then Verify; reuses the tester's ts45/lib.js for navigation only, I judge the output myself). Persona play tool: scratchpad/pm-play45/play.js (game A = seed 1 at hint 13, game B = seed 3 at hint 20; moves hint/verify/notes/rRcC=D; prints message, board and a 375 px screenshot). No solver in the tool.
 - Suite re-run by PM: 143/143, 0.59 s.
 - Progress: criteria 1-5 checked on the page (results below); README diff read; persona C session launched.
+
+### Criteria, checked one by one by the PM (real page, seeded, 900 and 375 px)
+1. PASS. Seed 1 hint 13: the first-click text matches the pin byte for byte.
+2. PASS. Seed 3 hint 20: the text matches the pin byte for byte. The column and box unit texts are asserted in tests (WALL_UNIT_COL, WALL_BOX).
+3. PASS. On seed 3, the area on both clicks is box 6 plus row 9 plus column 5 (4, 13, 22, 31, 49, 58, 67, 76); the target 40 is amber and not tinted. The seed 1 tint (box plus column 3) is unchanged.
+4. PASS. Click 1 has no marks. Click 2 matches the pins: seed 1 confined [56, 65], removed [11, 20]; seed 3 confined [72, 73], removed [75, 76]; data-d = 1 on exactly those cells. The rings hold 1 and the click-2 text is unchanged. Screenshots (pm-acc45/s{1,3}_w{900,375}_c{1,2}.png): the dashed purple outline and the white-chip badges read clearly at 375 px; the struck 1 on the amber target is the smallest mark but legible; none looks like a pencil note (also checked in ts45/overlap_s3_h20_w375_c2.png).
+5. PASS (pm-acc45/c5.js). A note in a confined cell keeps everything (2/2/4/14/1). A value change, Verify and New puzzle clear everything. Hint again after the value change shows no stale marks. The tester covered the level choice (run2).
+6. PASS. The tests pin confined/removed on WALL_ROW, WALL_COL and WALL_BOX; both are empty on the nudge and on singles (H_BOX); the area includes 28-35 on both clicks. The reviewer confirmed there is no second search (confined = the `spots` from `pointingSteps`).
+7. PASS. README word diff read: first-click texts (both forms, U values), unit tint, second-click marks (they match the CSS and what I saw), the clearing sentences, and the findPointing/hintFor/hintMarks fields. Everything is true; the old tint sentence was extended correctly.
+8. PASS. Assertions were added to existing tests, plus one wall constant (WALL_UNIT_COL). No sweeps, no loops. Suite 143/143, 0.59 s.
+
+### Persona C (play tool only, 375 px, both walls)
+- Game A (naked): from the first click C worked out 7 at r3c3 (it ruled out everything but 1 and 7, then the pointing removes 1). C did not type the pointing digit, which is the it9 failure, now fixed. Process note: C did not enter the answer before the second click as asked, but stated it first; the second click confirmed it.
+- Game B (hidden): from the first click C found 1 at r5c5 and called it "a fair nudge", which "still left me real work". This answers my scoping concern that the hidden-form first click would give the answer away: not observed.
+- Second click: C understood both steps from the marks. The badges were "small but legible" at 375 px; the struck 1 is the hardest to read ("could pass for a pencil note" at a glance; the white chip and the diagonal set it apart). On D1: "I wouldn't mind". Clutter: "slightly busy" in B. C would remove the far-away purple rings first (candidate 1).
+- Wishes: a short legend for the dashed and struck marks; first-click wording that states the case more plainly. C's reading: "only one other digit fits" implies a different digit, and "1 now has only one place left" implies the pointing digit, but C still had to infer the case.
+- C's "oddity" (a Hint after entering the answer moves on to the next step) is by design: the hint clears on a value change.
+
+### Scoping risks
+- Clutter on click 2: present, acceptable. The fix is rings on relevant digits only (candidate 1).
+- Badge readability at 375 px: OK (my screenshots and C).
+- Hidden-form first click giving too much away: not observed (C).
+
+### D1 judgement
+ACCEPTED as a known limitation, not a merge blocker. The hint is transient, the note is kept and comes back, criterion 4 is met, and C does not mind. Follow-up idea (low): draw the badge in the slot of D's own note (each digit has a fixed note position), so it can only cover the user's note of the same digit, which says the same thing. It goes into candidate 1, not a separate issue.
+
+## Decision: #45 ACCEPTED (head 63c13de, code 579c1db), 2026-10-20
+- All 8 criteria pass on PM checks; no defects against #45; D1 accepted; no conditions.
+- Comment: https://github.com/dirkmarski/weaver/pull/47#issuecomment-6283379837
+- I do not merge (lead). Next: #46 after the lead merges #45 and launches it.
