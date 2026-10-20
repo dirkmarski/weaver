@@ -1010,6 +1010,9 @@ test('issue 60: on Tricky a useful pointing step comes before singles; seeds 1, 
   assert.deepStrictEqual([p2.box, p2.pointDigit, p2.line, p2.index, p2.form, p2.r, p2.c, p2.digit], [1, 4, 'row', 2, 'hidden', 2, 3, 4]);
   assert.strictEqual(findPointing(s2, { useful: true }), null);
   assert.deepStrictEqual(show(hintFor(s2, 1, 'hidden', 'tricky')), ['hidden', 1, 8, 3, 'row']);
+  // seed 26 after two hinted entries: the only step (r8c9 = 1, hidden) targets a naked single, so it is passed over
+  const s26 = pz('tricky', 26); s26[0][2] = 7; s26[1][8] = 8;
+  assert.ok(findPointing(s26)); assert.strictEqual(findPointing(s26, { useful: true }), null);
   // seed 5: no useful step either; Hint is unchanged (hidden single r1c1 = 7 in its box)
   assert.strictEqual(findPointing(s5, { useful: true }), null);
   assert.deepStrictEqual(show(hintFor(s5, 1, 'hidden', 'tricky')), ['hidden', 0, 0, 7, 'box']);

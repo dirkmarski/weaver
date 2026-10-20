@@ -13,6 +13,7 @@ Iteration 13. Branch `issue-60-tricky-prefers-pointing`. Session `5034fe53-a839-
 - Tests: one new unit test (seeds 1, 2, 5, Medium seed 2 and Hard seed 11 for AC4, rewards, conflict/full order); generator Hint-following test adapted (Tricky preference, tally); page: f2 re-pointed to a seed with no useful step, new f1 (seed 1 end to end). Seeds 3000-3002 give 2, 4, 4 pointing hints.
 - Results: `node --test`: 168 pass, 0 fail, 0 skipped. Lines: tests 1929 vs product 1210 (sudoku.js 1040, index.html 41, style.css 129) = 1.594x (under 1.6x).
 - README: Pointing "When", Tricky row, `findPointing` and `hintFor` entries.
+- Rework round 1: S1 fixed with a 3-line pin in the issue 60 unit test (seed 26 after hinted entries r1c3=7, r2c9=8: the step r8c9=1 targets a naked single, so `findPointing(useful)` is null). M6 (`bitCount(used >> 1) === 8` -> false): before, survived; after, the issue 60 test fails (167 pass, 1 fail); reverted, 168 pass. N1/N2 fixed in README (Hint intro; technique-preference Order bullet). Tests 1932 / product 1210 = 1.597x (under 1.6x).
 
 ## Reviewer
 - Reviewer: Claude Sonnet 5.5 (claude-sonnet-5-5), detached worktree at d1a1dfe. Did not read governance/LOG.md; read only the Lead section of this log.
