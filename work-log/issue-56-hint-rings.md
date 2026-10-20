@@ -20,6 +20,8 @@
 - Points passed to reviewer/tester: (1) is the key line cleared on New puzzle and on choosing a level (do those paths call `clearResults`?); (2) Hint click with a non-pointing result after a pointing explain (key line cleared first?); (3) reason cells: the hidden-form check relies on `hint.unit` being absent for the naked form; (4) box-case count equality (empties == confined) is equivalent to "all empties confined" only because confined is a subset of the box's empties; (5) badge chip ~18.8 px vs slot ~18.67 px.
 - Lead question Q1 to the PM (wording): the pinned key text "a D" gives "a 8" (and "a 8 that rules out other cells"); "an 8" is grammatical. Asked the PM to decide; review and test proceed in parallel and any wording change rides in the rework round.
 
+- 2026-10-20: PM answer to Q1 (option C, issue body edited with a change log, comment 6286832562): key template "Key: dashed purple = the only places for D in the box; struck grey D = D can no longer go there; purple ring = this D rules out other cells." (ring clause dropped when no rings). Goes into the rework round with the reviewer/tester findings.
+
 ## Developer
 - 2026-10-20: Implemented #56 as specified. No pin disagreed with the rule.
 - Product: `hintMarks` ring rule (reason cells, helper `addReasons`); `pointingKey(digit, ringCount)` (exported); box-case parenthesis in `pointingHint` (now takes the grid; first click and `pointingClause`, so "Well spotted!", unchanged); `<p id="key">` below the status line (not a live region), set on a pointing explain in the Hint handler and cleared in `clearResults`; badge in D's note slot by CSS (`--x`/`--y` per `data-d`, `left/top` + `translate(-50%, -50%)`).
