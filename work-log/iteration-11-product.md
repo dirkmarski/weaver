@@ -150,3 +150,32 @@ Tools: my play tool pm-it11/play.js (WT=wt-51-pm; PERSONA=1 hides the CLASH line
 
 ### PM play-through
 Tricky seed 1: slip r4c1=6 (outline on both 6s), r7c2=9 (not counted, outline stays), clear r4c1 -> "No numbers break the rules now. New entries are counted again.", then r1c9=1 -> "Well spotted! ... hidden single ... on your own", hidden single count 1. Hint then works normally. Medium seed 2: own-vs-own clash r1c1=5/r1c2=5, Verify reds both, overwrite r1c2=7 -> fixed message at 375 px. Matches the issue.
+
+### Persona play on the product (ab7f260; prompt pm-it11/accept51-prompt.txt; play tool with PERSONA=1 so the outline is judged from screenshots only; no scripts, solvers, source or README)
+- A (about 10 runs): ship, yes. 5 at r1c2 outlined r1c2, r1c3 (row) and r4c2 (column); the r4c2 mark makes "Other numbers break the rules too" true, and A can see which cell. A did not find it false anywhere. The dashed orange is distinct from the red Verify fill, which stacks on it. A says the fixed message did not show after an overwrite with 7. I could not reproduce this: r1c2=5 then r1c2=7 (also with Hint or Verify in between) shows the fixed message on the page. Most likely A typed 7 into another cell. Not a defect. The "Error: given" A hit is my play tool refusing to type into a given (by design).
+- B (about 10 runs): ship, yes. Every mark was correct, givens included (r1c1, r6c2, r8c1, r3c8). The extra sentence read as true in every run and dropped out when only the named pair was left. The next correct entry after the fix counted ("Hidden single: 1 on your own"). Gap: the text names the row pair while the grid also marks the column partner r6c2.
+- C (about 10 runs): ship, yes. Marks accurate. With the outline showing, "click Verify to see which" feels redundant. After a partial fix (one of two slips cleared) the message line goes blank while a mark remains, which is "a little confusing".
+- None of the three could compare the outline with the amber Hint target in play. This is expected: Hint marks nothing during a clash. The simulated screenshot covers criterion 5.
+
+The #50 gap is closed. In #50 acceptance, A and B read "Other numbers break the rules too" as false because the third cell was a given. With the outline, all three now see the third cell (r6c2 or r4c2), and none read the sentence as false. Remaining wording points: it points to Verify, which does not flag givens (C, redundant); it does not say the extra cell is a given (C, A).
+
+### Decision: ACCEPTED (#51, PR #53, head ab7f260)
+Criteria 1-10 pass on the real page. Pins match exactly, the suite gives 106/106 and the unit tests 147/147. Personas 3/3 say ship, and no defect was found. A's overwrite observation did not reproduce. Not merged by me (the lead merges).
+
+## Updated candidate list (PM, ordered, end of iteration 11)
+Iteration 11 shipped slip recovery: #50 (clashing cells named in the entry text and in Hint, Hint during a clash in plain text) and #51 (dashed orange outline on every clashing cell while the clash lasts, givens included; "No numbers break the rules now. New entries are counted again." on the fix). Red stays Verify-only.
+1. Pointing visuals v2: rings only on the digits that matter; a one-line key for the dashed and struck marks; badge in D's own note slot; avoid trivial confinements; clearer first-click case signal. Ranked second by B and C in it11; it is next now that slip recovery has shipped.
+2. Tricky practice density: at least 2 pointing steps per Tricky puzzle (measure generation time first); Hint preferring pointing on Tricky (A ranked it second).
+3. Slip follow-ups (small, wording-led; can ride along with 1 or 2):
+   a. Extra-clash sentence: now that the outline shows every clashing cell, replace "click Verify to see which" (Verify does not flag givens) with wording that points at the outlined cells or says the extra cell is a given (A, B, C across #50 and #51).
+   b. Partial fix: after fixing one of two clashes the message goes blank while outlines remain; consider "Some numbers still break the rules (outlined)" (B, C).
+   c. An entry clashing in two units: text 1 names only the first unit (B); text 1 and Hint can name different pairs for the same slip (A).
+   d. When one of the named pair is a given, say "clear your own number" rather than "change or clear one of them" (B).
+   e. Judge an overwrite into a cell (B); say what "counted" means and that "stays uncounted" is not "never" (A, B, C); retype tip (C; D8 stands for now: overpromises and invites count farming).
+   f. Marker on entries made during a clash; credit a correct entry made during a clash after the fix (A, B; D2/D6 stand: not retroactive).
+   g. Hint names only one clashing pair at a time (A, B, C); Verify does not name cells (C).
+4. Small wording items: clash and non-technique texts share the "not counted" ending; re-entering a hint-credited cell says "on your own" while the count stays "with a hint"; the finish text "(see below)"; fold away the definitions once learned (C).
+5. Claiming, then pairs, each with its level (ranked last by A, B and C for now: "recover from a mistake before learning something new", B).
+6. Mobile layout (2x2 level buttons at 375 px; long messages on a phone, the after-slip text runs to about 6 lines), a middle hint level, progress across puzzles.
+
+Not wanted: instant red on a wrong or clashing entry (it10); counting entries made during a clash (it11, D2); retroactive counting after a fix (D6).
