@@ -11,14 +11,14 @@ Last updated: 2026-10-20, lead session 4ecb9163-8db9-4624-9aa5-9c6e3ff52aab
 |---|---|---|---|
 | Scoping | done | PM log 3fb00a7: #55 then #56 | PM |
 | #55 page tests | done | merged f55b6a8 (PR #57) | - |
-| #56 hint rings/key/badge | rework round 2 (tests only) | developer pins flush edge in f4 (R1); lead delta check (mutant c6), PR, PM acceptance | developer |
+| #56 hint rings/key/badge | PM acceptance | PR #58, head e444eb1; then verify PR comment and merge with sha | PM |
 
 ## Notes
 - Close-out must include a memory pruning pass (Dirk, 9e54939).
 - Do not read the work log unless specifically needed (Dirk, 1464355).
 
 ## Open issues / PRs
-- #56 (open); #55 closed (PR #57 merged)
+- #56 (open, PR #58); #55 closed (PR #57 merged)
 
 ## Blockers / waiting on
 - none
