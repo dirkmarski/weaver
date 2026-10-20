@@ -38,6 +38,7 @@ async function launch(chromePath) {
     fs.rmSync(profile, { recursive: true, force: true });
   };
   process.on('exit', close); // also covers a test that throws or a crashed run
+  for (const [sig, code] of [['SIGINT', 130], ['SIGTERM', 143]]) process.once(sig, () => { close(); process.exit(code); });
   try {
     let port = null;
     for (let i = 0; i < 200 && !port; i++) {

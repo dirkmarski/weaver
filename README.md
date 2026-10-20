@@ -81,7 +81,7 @@ Each puzzle is a random complete grid with cells removed in random order; a cell
 Generation typically takes a few milliseconds (Tricky: tens of milliseconds, up to a few hundred). An internal time cap (1000 ms) guarantees click-to-render stays well under 2 seconds; if it were ever hit, the best valid unique puzzle found so far (fewest givens) is returned and the result has `capped: true` (it could then have more givens than the band or be easier than the level). `generatePuzzle` results also report `attempts`.
 
 ## Test
-Requires Node 18+ (no packages needed):
+Requires Node 18+ (22+ for the page tests; no packages needed):
 
     node --test            # (on newer Node versions, observed on Node 24, "node --test tests/" is treated as a path and fails)
 
@@ -92,7 +92,7 @@ The page tests (`tests/page.test.js`) load the real `index.html` in one headless
     CHROME_PATH=/path/to/chrome node --test
     WEAVER_NO_CHROME=1 node --test     # page tests skipped, unit tests only
 
-Later UI work adds its page checks to `tests/page.test.js`. Chrome and its temporary profile are removed when the run ends, also after a failed test.
+Later UI work adds its page checks to `tests/page.test.js`. Chrome and its temporary profile are removed when the run ends, also after a failed test or on Ctrl-C / SIGTERM.
 
 ## Files
 - `index.html`, `style.css` - page and styling (`td.clash`: the orange clash outline)

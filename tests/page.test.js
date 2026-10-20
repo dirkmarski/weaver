@@ -13,14 +13,17 @@ const ROOT = path.join(__dirname, '..');
 const found = findChrome(process.env);
 
 // mulberry32 taken from the product source, so the page's Math.random is exactly seededRng(n).
-const SRC = fs.readFileSync(path.join(ROOT, 'sudoku.js'), 'utf8').match(/function seededRng\([\s\S]*?\n  \}/)[0];
-const SEED_SCRIPT = '(function () { ' + SRC + '; window.__seed = function (n) { Math.random = seededRng(n); }; window.__seed(1); })();';
+function seedScript() {
+  const m = fs.readFileSync(path.join(ROOT, 'sudoku.js'), 'utf8').match(/function seededRng\([\s\S]*?\n  \}/);
+  if (!m) throw new Error('tests/page.test.js: seededRng not found in sudoku.js (its layout changed); update the extraction');
+  return '(function () { ' + m[0] + '; window.__seed = function (n) { Math.random = seededRng(n); }; window.__seed(1); })();';
+}
 
 let page;
 before(async () => {
   if (found.skip) return;
   page = await launch(found.path);
-  await page.send('Page.addScriptToEvaluateOnNewDocument', { source: SEED_SCRIPT });
+  await page.send('Page.addScriptToEvaluateOnNewDocument', { source: seedScript() });
 });
 after(() => { if (page) page.close(); });
 
@@ -40,8 +43,14 @@ const empties = (puzzle) => puzzle.flatMap((row, r) => row.map((v, c) => (v ? -1
 // Fresh page, seeded, level chosen with a real click.
 async function open(level, seed) {
   await page.eval('window.__stale = true');
-  await page.send('Page.navigate', { url: pathToFileURL(path.join(ROOT, 'index.html')).href });
-  for (let i = 0; i < 200 && !(await page.eval('!window.__stale && !!window.Sudoku')); i++) await new Promise((r) => setTimeout(r, 10));
+  const nav = await page.send('Page.navigate', { url: pathToFileURL(path.join(ROOT, 'index.html')).href });
+  if (nav.errorText) throw new Error('page did not load: ' + nav.errorText);
+  let loaded = false;
+  for (let i = 0; i < 200 && !loaded; i++) {
+    loaded = await page.eval('!window.__stale && !!window.Sudoku');
+    if (!loaded) await new Promise((r) => setTimeout(r, 10));
+  }
+  if (!loaded) throw new Error('page did not load');
   await page.eval('window.__seed(' + seed + ')');
   if (level) await click('[data-level=' + level + ']');
 }
@@ -61,15 +70,30 @@ const read = () => page.eval(`(function () {
     dattr: tds.map(function (t, i) { return t.hasAttribute('data-d') ? i : -1; }).filter(function (i) { return i >= 0; }),
     dvals: tds.filter(function (t) { return t.hasAttribute('data-d'); }).map(function (t) { return t.getAttribute('data-d'); }),
     conflict: tds.map(function (t, i) { return t.querySelector('input.conflict') ? i : -1; }).filter(function (i) { return i >= 0; }),
-    givenConflict: document.querySelectorAll('.given.conflict, .given .conflict').length,
+    givenConflict: document.querySelectorAll('.given.conflict').length,
     given: tds.map(function (t) { return t.classList.contains('given') ? +t.textContent : 0; }),
-    active: a && a.dataset ? a.dataset.pos : null, html: document.body.innerHTML };
+    active: a && a.dataset ? a.dataset.pos : null };
 })()`);
 const noHint = (s) => ['target', 'area', 'digit', 'confined', 'removed', 'dattr'].forEach((k) => assert.deepStrictEqual(s[k], [], k));
 const TALLY0 = ['Naked single: 0 on your own, 0 with a hint', 'Hidden single: 0 on your own, 0 with a hint', 'Pointing: 0 on your own, 0 with a hint'];
 
 describe('page (headless Chrome)', () => {
   const it = (name, fn) => base(name, { skip: found.skip || false }, fn); // each test shows as skipped, with the reason
+  // A digit that a given in its row already holds: seed, cell, digit, and the given's position.
+  const clashing = pick('tricky', (p, sol) => {
+    for (const pos of empties(p)) {
+      const r = Math.floor(pos / 9), c = pos % 9;
+      if (!p[r].slice(0, c).includes(0)) continue; // not the first input of its row
+      for (let k = 0; k < 9; k++) {
+        if (!p[r][k] || p[r][k] === sol[r][c]) continue;
+        const grid = p.map((row) => row.slice());
+        grid[r][c] = p[r][k];
+        if (S.clashCells(grid).length === 2) return { pos, digit: p[r][k], given: r * 9 + k }; // exactly this pair clashes
+      }
+    }
+    return null;
+  });
+
   it('seeding: the page Tricky puzzle for a seed equals generatePuzzle with seededRng', async () => {
     await open('tricky', 5);
     const flat = (await read()).given;
@@ -88,6 +112,13 @@ describe('page (headless Chrome)', () => {
     s = await read();
     assert.deepStrictEqual([s.picker, s.game, s.tallyShown, s.status, s.cls, s.clash], [true, false, false, '', '', []]);
     noHint(s);
+    const { seed, extra } = clashing;
+    await open('tricky', seed);
+    await keys([[extra.pos, String(extra.digit)]]);
+    assert.strictEqual((await read()).clash.length, 2);
+    await click('#new-puzzle');
+    await click('[data-level=tricky]');
+    assert.deepStrictEqual((await read()).clash, []);
   });
 
   it('b. an own naked single is green and the tally goes up by 1', async () => {
@@ -108,20 +139,6 @@ describe('page (headless Chrome)', () => {
     assert.match(s.status, /^Well spotted!/);
     assert.strictEqual(s.cls, 'ok');
     assert.deepStrictEqual(s.tally, [TALLY0[0], 'Hidden single: 1 on your own, 0 with a hint', TALLY0[2]]);
-  });
-
-  // A digit that a given in its row already holds: seed, cell, digit, and the given's position.
-  const clashing = pick('tricky', (p, sol) => {
-    for (const pos of empties(p)) {
-      const r = Math.floor(pos / 9), c = pos % 9;
-      for (let k = 0; k < 9; k++) {
-        if (!p[r][k] || p[r][k] === sol[r][c]) continue;
-        const grid = p.map((row) => row.slice());
-        grid[r][c] = p[r][k];
-        if (S.clashCells(grid).length === 2) return { pos, digit: p[r][k], given: r * 9 + k }; // exactly this pair clashes
-      }
-    }
-    return null;
   });
 
   it('c/d. a clash is outlined, Verify marks only the own cell, Hint clears the red, clearing the slip clears the outline', async () => {
@@ -189,15 +206,15 @@ describe('page (headless Chrome)', () => {
     s = await read();
     const marks = S.hintMarks(S.hintFor(grid, 2), grid);
     assert.deepStrictEqual([s.target, s.confined, s.removed], [[target], step.confined, step.removed]);
-    assert.deepStrictEqual(s.digit, marks.digit || marks.digits);
+    assert.deepStrictEqual(s.digit, marks.digits);
     assert.deepStrictEqual(s.dattr, step.confined.concat(step.removed).sort((x, y) => x - y));
     assert.ok(s.dvals.every((d) => d === String(step.pointDigit)));
     const other = empties(g.puzzle).filter((p) => !typed.some((t) => t[0] === p) && p !== target)[0];
-    const before = { ...s, status: undefined, html: undefined };
+    const before = { ...s, status: undefined };
     await keys([[target, 'N'], [other, '3']]); // Notes on, then a note: keeps the hint
     s = await read();
     assert.strictEqual(s.notes, 'Notes: On');
-    assert.deepStrictEqual({ ...s, status: undefined, html: undefined, notes: before.notes, pressed: before.pressed }, before);
+    assert.deepStrictEqual({ ...s, status: undefined, notes: before.notes, pressed: before.pressed }, before);
     await keys([[target, 'N'], [other, String(g.solution[Math.floor(other / 9)][other % 9])]]); // a value: removes it
     s = await read();
     noHint(s);
@@ -240,11 +257,10 @@ describe('page (headless Chrome)', () => {
     await open('tricky', 5);
     for (const [m, expected] of [[jump, String(jump.to)], [edge, String(edge.p)]]) {
       await page.eval('document.querySelector("input[data-pos=\\"' + m.p + '\\"]").focus()');
-      const before = await read();
+      const before = await page.eval('document.body.innerHTML');
       await keys([[m.p, m.k]]);
-      const after = await read();
-      assert.strictEqual(after.active, expected);
-      assert.strictEqual(after.html, before.html);
+      assert.strictEqual((await read()).active, expected);
+      assert.strictEqual(await page.eval('document.body.innerHTML'), before);
     }
   });
 
