@@ -2,10 +2,15 @@
 
 ## Entries (newest first)
 
+### Simple instructions were very effective
+- **Seen:** 2026-10-20
+- **Means:** A seven-line test strategy and one line in each of three definitions changed how the whole team tests within one iteration. The first piece of work the team chose was to right-size its own test suite (2,025 to 1,041 lines of tests, 15 s to 0.6 s), and no role brute-forced its checks.
+- **Response:** 
+
 ### Testing grows out of proportion to the product
 - **Seen:** 2026-10-19
 - **Means:** Testing is getting out of control. Each iteration's lessons become the next iteration's quality gates, and nothing ever removes one. By iteration 7 the product manager's acceptance of one small hint change ran 168,872 automated checks, which is off the charts for an app like this. Cost per iteration went from about $3.60 to $13.55 over seven iterations. Nothing in the definitions or the context mentions cost or proportion, so the team has no reason to stop.
-- **Response:** Pending: set a proportion or cost lever before the next iteration.
+- **Response:** Added a test strategy (`governance/context/test-strategy.md`) and pointed the developer, tester and product manager at it. See [Simple instructions were very effective](#simple-instructions-were-very-effective).
 
 ### The lead's agent list cascades to the whole team
 - **Seen:** 2026-10-19
