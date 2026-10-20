@@ -30,6 +30,8 @@
 
 - 2026-10-20: Rework round 1 (560b21b): items 1-4 done (Q1 text, S1 zero-ring page test f2b, N1 D=1..9 loop, N2/N3 README); 165 tests, 0 skipped; S1/N1 mutants and AC7 five killed. Item 5 (D1) stopped as instructed: at 375 px, unchanged chip, the no-clip rule and the <= 2 px overlap limit are mutually exclusive for D = 1, 3, 4, 6, 7, 9 (flush-to-edge overlap 2.58-5.11 px); D = 8 is ~2.1 px with no shift possible. Centre-in-slot holds after a flush shift. style.css unchanged so far. Lead Q3 to the PM with the measurement table (developer report; scripts dev56/measure*.js).
 
+- 2026-10-20: Round 1b (55b63d6): badge CSS per Q3 (media query < 560 px: padding 0 1px; edge digits flush left/right). Developer measurements at 375 px: worst edge -0.16 px, worst overlap 1.11 px (D=4); 520 px worst edge -0.47 px; 900 px byte-identical measurement to main. Page test f4 (375 px, D=1/9 inside the padding box, padding 1px, waits for layout). Lead check: product delta read (CSS block, pointingKey text only); 166/166 x2, 0 skipped, ~2.5 s. Reviewer and tester re-check rounds 1 + 1b in full (behaviour change), worktrees moved to the new head.
+
 ## Developer
 - 2026-10-20: Implemented #56 as specified. No pin disagreed with the rule.
 - Product: `hintMarks` ring rule (reason cells, helper `addReasons`); `pointingKey(digit, ringCount)` (exported); box-case parenthesis in `pointingHint` (now takes the grid; first click and `pointingClause`, so "Well spotted!", unchanged); `<p id="key">` below the status line (not a live region), set on a pointing explain in the Hint handler and cleared in `clearResults`; badge in D's note slot by CSS (`--x`/`--y` per `data-d`, `left/top` + `translate(-50%, -50%)`).
