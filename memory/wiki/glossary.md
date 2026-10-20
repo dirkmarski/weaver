@@ -25,11 +25,13 @@
 - **Named clash**: the one clashing pair (P, Q) and unit U named in the not-counted text and in Hint during a clash (`namedClash`, #50).
 - **Clash outline**: the dashed orange `td.clash` mark on every clashing cell while the clash lasts; the only live mark (#51).
 - **Fixed message**: "No numbers break the rules now. New entries are counted again.", shown when a value change ends the last clash (#51).
-- **Hint mark / ring**: amber target, tinted area, purple ring and digit on cells holding the key digit.
+- **Hint mark / ring**: amber target, tinted area; on the explanation, a purple ring and digit on cells holding the key digit that rule out a reason cell (#56).
+- **Reason cell**: an empty cell a ring helps to rule out (hidden single: other empty cells of its unit; pointing: non-confined empty box cells and, in the hidden form, the hidden unit's other empty cells except removed ones).
+- **Confined / removed**: pointing explanation marks: the box cells where D fits (dashed purple, purple badge) and the line cells that lose D (struck grey badge). The badge sits in D's note slot.
+- **Key line**: the `#key` legend under the status during a pointing explanation (`pointingKey`, #56).
+- **Page tests**: `tests/page.test.js`, the real page in headless Chrome via `tests/chrome.js` (#55); skipped with a reason without Chrome.
 - **Persona (user-a/b/c)**: simulated user agents used by the PM for scoping and acceptance; not real users.
-- **Play tool**: headless text-grid driver of the game logic (in a session scratchpad), used for persona sessions and acceptance.
-- **wallreset**: play-tool setup that pre-plays singles to the wall and then resets the tally.
-- **Frozen oracle**: old test file `tests/frozen-sudoku-e81999c.js` comparing against a frozen copy of the logic; removed in #35.
+- **Play tool**: the PM's headless replay driver of the real page (session scratchpad), used for persona sessions and acceptance; it can switch prototype and wording variants.
 - **Mutation spot check**: a deliberate small break of the code to see whether a test fails; used by the reviewer and developer.
 - **Gate**: a check before work moves on (issue gate, lead check, PM acceptance).
 - **Iteration branch**: `iteration-N`, holds the work logs, merged by PR at the end.

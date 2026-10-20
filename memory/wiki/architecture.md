@@ -2,42 +2,42 @@
 
 Static site, no dependencies, no build. Plain ES5-style JS in an IIFE.
 
-## Files (end of iteration 11)
+## Files (end of iteration 12)
 | File | Lines | Role |
 |---|---|---|
-| `index.html` | 40 | page skeleton: picker (4 `data-level` buttons), `#game` (table, Verify, Hint, Notes, New puzzle), `#status`, `#tally` |
-| `style.css` | 116 | styling, box shading, hint/conflict classes, pointing corner badges (`::after` with `attr(data-d)`), `td.clash` dashed orange outline (offset -7px under `:focus-within`) |
-| `sudoku.js` | 993 (~47 KB) | pure logic exported for Node and as `window.Sudoku`, plus the browser `render()` UI |
-| `tests/sudoku.test.js` | 1144 | unit tests on hand-built grids |
+| `index.html` | 41 | page skeleton: picker (4 `data-level` buttons), `#game` (table, Verify, Hint, Notes, New puzzle), `#status` (role=status), `#key` (key line, plain `<p>`, not a live region), `#tally` |
+| `style.css` | 129 | styling, box shading, hint/conflict classes, `td.clash` dashed orange outline, pointing badges (`::after` with `attr(data-d)`) placed in D's note slot via `--x`/`--y` per `data-d`; below 560 px the chip's side padding is 1 px and edge badges sit flush inside the cell |
+| `sudoku.js` | 1023 | pure logic exported for Node and as `window.Sudoku`, plus the browser `render()` UI |
+| `tests/sudoku.test.js` | 1226 | unit tests on hand-built grids |
 | `tests/generator.test.js` | 151 | generator tests |
+| `tests/page.test.js` | 367 | page tests: the real `index.html` in one headless Chrome (#55, it12) |
+| `tests/chrome.js` | 100 | test helper only: finds Chrome, launches it, CDP over the global WebSocket, cleanup |
 | `tests/fixture.js` | 27 | a valid grid and puzzle, fixture only |
 
-Product code is about 1149 lines; tests about 1322 (ratio ~1.15, above the ~1x guide but falling: it11 added +68 product and +51 test lines, mostly by extending existing tests).
+Product code 1193 lines; tests 1871 (ratio ~1.57x, guide ~1x). The jump from 1.15x is the page harness (#55, no product lines). PM trigger: a trim item if it passes 1.6x.
 
 ## Exports of `sudoku.js` (the `api` object)
-- Generation: `generatePuzzle(level, {rng, maxMs})` -> `{level, puzzle, solution, givens, attempts, capped?}`; `generateSolution(rng)`; `seededRng(seed)`; `countSolutions(grid, limit)`; `solvableBy(grid, 'naked'|'singles'|'pointing')`; `LEVELS` (givens band, `technique`, `beyond`).
+- Generation: `generatePuzzle(level, {rng, maxMs})` -> `{level, puzzle, solution, givens, attempts, capped?}`; `generateSolution(rng)`; `seededRng(seed)` (mulberry32); `countSolutions(grid, limit)`; `solvableBy(grid, 'naked'|'singles'|'pointing')`; `LEVELS`.
 - Validation: `isValidSolution`, `findConflicts` (all clashing cells, givens included), `verify`, `sanitizeDigit`, `buildGrid(puzzle, values)`.
-- Clashes (it11): `namedClash(grid)` -> `null` or `{phrase, extra}` (#50; built on internal `firstHolder(cells, p, digit)` -> `{unit, q}`, first of row/column/box holding the digit in another cell, first holder in reading order; `cellName(p)`); `clashCells(grid)` -> flat indices of the `findConflicts` cells; `fixedMessage(before, after)` -> the "No numbers break the rules now..." text when the change went from a clash to none, else `''` (#51).
-- Navigation: `nextCell(puzzle, r, c, dir)` next editable cell or `null`.
-- Notes: `applyEntry(cell, key, notesMode)` pure cell transition; `noteDigits(mask)`.
-- Hints: `findNakedSingle`, `findHiddenSingle(grid, {notNaked})`, `findPointing` (does not check singles first; built on the internal `pointingSteps` enumerator, whose steps carry `confined` and `removed` cells, and `singleAfterStep` check, which `classifyEntry` reuses for own pointing; result includes `confined`, `removed`), `preferredTechnique(tally, level)`, `hintFor(grid, step, prefer)` -> `{kind, technique, r, c, digit, text, ...}`, `hintApplied`, `hintMarks(hint, grid)` -> `{area, target, digits, confined, removed}` (confined/removed only on a pointing explain; area includes the hidden-form unit). Internal `boxName(b)` gives "the box of rows R1-R2 and columns C1-C2".
-- Rewards: `classifyEntry` (naked > hidden > pointing), `emptyTally` (naked, hidden, pointing), `creditEntry(tally, credited, hint, grid, r, c, value)` -> `{tally, credited, text, kind}` (not-counted text via internal `notCounted`: own clash naming unit and holder > broken grid naming the clash (`namedClash`) > not a technique; #50), `statusClass(kind)`, `tallyLines` (heading + 3 lines), `TECHNIQUE_DEFINITIONS` (naked, hidden, pointing).
+- Clashes: `namedClash(grid)` -> `null` or `{phrase, extra}`; `clashCells(grid)`; `fixedMessage(before, after)`.
+- Navigation: `nextCell(puzzle, r, c, dir)`. Notes: `applyEntry(cell, key, notesMode)`, `noteDigits(mask)`.
+- Hints: `findNakedSingle`, `findHiddenSingle(grid, {notNaked})`, `findPointing` (does not check singles first; built on internal `pointingSteps` and `singleAfterStep`), `preferredTechnique(tally, level)`, `hintFor(grid, step, prefer)`, `hintApplied`, `pointingKey(digit, ringCount)` (key line text; ring clause only if ringCount > 0), `hintMarks(hint, grid)` -> `{area, target, digits, confined, removed}`.
+  - `digits` (explain only): cells holding D that share a unit with a reason cell. Reason cells: hidden single = the other empty cells of its unit; pointing = empty box cells not confined, plus (hidden form, `hint.unit` set) empty cells of the hidden unit other than the target and the removed cells. None for a naked single. All qualifying rings kept (PM D4).
+  - Internal `pointingHint(s, step, grid)` adds " (the box has no other empty cells)" on step 2 when every empty box cell is confined.
+- Rewards: `classifyEntry` (naked > hidden > pointing), `emptyTally`, `creditEntry(...)` -> `{tally, credited, text, kind}`, `statusClass(kind)`, `tallyLines`, `TECHNIQUE_DEFINITIONS`.
 - Completion: `completionFor(grid, tally)` -> solved / conflict / `null`.
 - Cell indices in marks and `credited` are flat `9*r + c`; r/c in results are 0-based.
 
 ## How index.html wires it
-- `sudoku.js` is loaded at the end of `body`; `render()` finds elements by id and builds the table of `<input>` cells.
-- Picker buttons call `choose(level)` -> `generatePuzzle`; `newPuzzle` resets state. Per-cell `keydown`/`input` handlers call `nextCell`, `applyEntry`, `sanitizeDigit`.
-- Value change (`setCell`, the single write path): grid `before` captured before the write and passed to `creditEntry`; after the write `clearResults`, `showClashes(after)` (toggles `td.clash`, relabels), `fixedMessage(before, after)`, then the credit text, then `completionFor` (wins when the grid is full); `showTally` redraws counts and definitions.
-- The clash outline is live state: `clearResults` (used by Verify, Hint, value changes) never touches `td.clash`; `choose`/`newPuzzle` rebuild the table. `relabel(inp)` is the only aria-label builder (position, notes, ", clashes").
-- The Hint status line is always plain (`className = ''`), also for `kind: 'conflict'` (#50).
-- Hint button: `hintFor(grid, step, preferredTechnique(...))`, then `hintMarks` adds CSS classes `hint-target`, `hint-area`, `hint-digit`, and on a pointing explain `hint-confined` / `hint-removed` plus `data-d` (the digit for the badge). `clearResults` removes them all (selector includes `[data-d]`). Verify adds `conflict`.
-- Tally block (`#tally`) shows naked, hidden and pointing lines with definitions. The status class is `statusClass(credit.kind)`.
-- UI wiring (DOM) has no repo tests; it is checked by headless scripts held in session scratchpads (open tech debt).
+- `sudoku.js` loads at the end of `body`; `render()` finds elements by id and builds the table of `<input>` cells.
+- Picker buttons call `choose(level)`; `newPuzzle` resets state. Per-cell `keydown`/`input` handlers call `nextCell`, `applyEntry`, `sanitizeDigit`.
+- Value change (`setCell`, the single write path): `before` grid -> `creditEntry`; then `clearResults`, `showClashes(after)`, `fixedMessage`, the credit text, then `completionFor` (wins when the grid is full); `showTally`.
+- `clearResults` (Verify, Hint, value changes, `choose`, `newPuzzle`) clears the status, the key line, red flags and all hint classes/`data-d`; never `td.clash`. Notes changes do not call it, so a hint and its key line survive them.
+- Hint button: `clearResults`, then `hintFor(...)`, `hintMarks` adds `hint-target`, `hint-area`, `hint-digit`, and on a pointing explain `hint-confined`/`hint-removed` plus `data-d`, and sets `#key` to `pointingKey(D, digits.length)`.
+- `relabel(inp)` is the only aria-label builder (position, notes, ", clashes").
 
 ## Tests
-- Run: `node --test` from the repo root (Node 18+). On Node 24, `node --test tests/` fails (path treated as a module); use no argument.
-- 147 tests, about 0.6 s total (end of it11; #50 added only assertions, #51 four tests for `clashCells`/`fixedMessage`).
-- `sudoku.test.js` covers validation/verify, input, notes, next-cell, hints (naked, hidden, preference, pointing), rewards, completion, definitions, `solvableBy`. Mostly hand-built grids plus a few fixed seeds.
-- `generator.test.js` covers, with at most 10 seeded puzzles per level: validity, uniqueness, givens bands, technique, determinism, timing.
-- Seeds are chosen on purpose: a generator test guards a rule only if one of its seeds fails under the mutant (it8, #37).
+- Run `node --test` from the repo root (on Node 24 `node --test tests/` fails). 166 tests (152 unit, 14 page), about 2.5 s with Chrome, 0.6 s without.
+- Page tests (#55): one headless Chrome per file; `Math.random` seeded by injecting `seededRng`'s source (regex-extracted from `sudoku.js`, guarded by a seeding assertion); keydown on cell inputs and real button clicks; DOM-only reads; no test hooks in product code. Chrome via `CHROME_PATH` or default macOS/Linux paths; `WEAVER_NO_CHROME=1` or a missing Chrome gives a visible skip with a reason (page evidence must show skipped = 0). Cleanup on normal end, failure, Ctrl-C/SIGTERM and the orphaned test child (EPIPE listeners, ppid watchdog); not after `kill -9`.
+- Narrow-width page checks use `Emulation.setDeviceMetricsOverride` (headless Chrome's window has a ~500 px minimum), wait for layout to settle (check the cell width), and clear the override in `finally`.
+- Seeds are chosen on purpose: a seeded test guards a rule only if one of its seeds fails under the mutant.
