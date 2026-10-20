@@ -9,7 +9,7 @@ Last updated: 2026-10-20, lead session 0245eb9f-91d7-4bfe-b523-bbf5b80a2438
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
 | #45 pointing hint marks | DONE: merged 9b5779d (PR #47), issue closed | - | - |
-| #46 clash message | review + test round 1 (code c4b48f4) | collect both reports, decide rework | reviewer, tester |
+| #46 clash message | round 2 (378bd85) delta re-review | lead check, PR, PM acceptance | reviewer |
 
 ## Where things are
 - #46: branch issue-46-clash-message (from main 9b5779d), worktree <session scratchpad>/wt-46, log work-log/issue-46-clash-message.md.

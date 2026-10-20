@@ -42,3 +42,7 @@
 - #45 ACCEPTED by the PM (no conditions, head 63c13de; PR #47 issuecomment-6283379837). The lead verified the hand-off on GitHub, added a log-only commit, and merged with a merge commit: 9b5779d (parents 0f1fa1c, 76289d3). #45 closed. main: 143/143.
 - #46 started: branch issue-46-clash-message from main 9b5779d (log adc9506); developer round 1 launched.
 - #46 developer round 1 (Claude Sonnet 5.5) done, code head c4b48f4: 143/143, sudoku.js +7, tests +7. Lead check PASS with L1 (the column-before-box order is probably untested). Review and test round 1 launched in parallel.
+- #46 round 1:
+  - Review: APPROVE with S1 (L1 confirmed: the column-before-box mutant survived) and nit N1 (README "matches the solution").
+  - Test: 35/35 page checks PASS, no defects.
+- #46 round 2 (378bd85; tests and README only, product code identical to c4b48f4): S1 assertion and N1 wording. The lead verified the diff and the suite (143/143). The delta re-review is running. No tester re-run, because the product code is unchanged.
