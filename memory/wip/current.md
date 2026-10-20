@@ -1,26 +1,22 @@
 # WIP: current
 
-Last updated: 2026-10-21, lead session 5034fe53-a839-46a5-807a-40a5b44d5158
+Last updated: 2026-10-21, lead session c0f6ffb1-d246-448a-942e-3cfd5baa05e4
 
 ## Active run
-- None once the iteration-13 PR merges. Iteration 13 is complete; both issues were accepted by the PM and merged:
-  - #60 Tricky Hint prefers a useful pointing step: PR #62, merged in 44e3123.
-  - #61 clearer ring clause and a legible strike: PR #63, merged in 9a2caf6 (accepted on the second try, after the per-digit strike rework).
-- If the iteration-13 PR is still open on restart: verify it on GitHub and merge it with a merge commit (it only holds work logs and memory).
+- Iteration 14 ("deliver the next iteration"), branch `iteration-14`, lead log `work-log/iteration-14.md`.
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| (none in flight) | | | |
+| it14 scoping | PM scoping from wiki/backlog.md | PM writes issue(s) and product log | product-manager |
 
-## Starting the next run
-- Iteration 14: the PM picks from `memory/wiki/backlog.md` (end-of-it13 snapshot). Top: explanation depth (show or name which cells a ring rules out), then mobile.
-- The test ratio is at 1.599x (about 1 line of headroom): the PM decides at scoping whether a trim item comes first or the next issue trims in place.
-- Put the temp-dir safety rule in every agent prompt (explicit dirs under the scratchpad; never `rm -rf` a possibly unset variable). See wiki/process.md.
-- Do not read the work log unless specifically needed (Dirk, 1464355). Prune memory at each close (Dirk, 9e54939).
+## Notes for a restart
+- Scratchpad (this session): /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/<session id>/scratchpad (moved under /tmp/wvr by Dirk's run-task change 9c5542b).
+- Test ratio 1.599x (about 1 line of headroom to the PM's 1.6x cap).
+- Temp-dir safety rule in every agent prompt; no agent reads governance/LOG.md; do not read the work log unless needed.
 
 ## Open issues / PRs
-- none (after the iteration-13 PR merges)
+- none yet
 
 ## Blockers / waiting on
 - none
