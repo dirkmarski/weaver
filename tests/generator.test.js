@@ -19,7 +19,10 @@ function batch(level, n, seedBase) {
   return out;
 }
 const batches = {};
-LEVELS.forEach((l, i) => { batches[l] = batch(l, N, 1000 * (i + 1)); });
+// Hard uses seeds 1-10: under the mutant LEVELS.hard.beyond = 'singles', seeds 3 and 8 give a
+// pointing-solvable puzzle, so the "hard is not solvable by pointing" test below can fail.
+const SEED_BASE = { easy: 1000, medium: 2000, tricky: 3000, hard: 1 };
+LEVELS.forEach((l) => { batches[l] = batch(l, N, SEED_BASE[l]); });
 
 test('generated full grid is valid, and varies with the seed', () => {
   const a = S.generateSolution(S.seededRng(1));
@@ -75,6 +78,10 @@ test('tricky is solvable by singles plus pointing but NOT by singles alone', () 
     assert.ok(S.solvableBy(r.puzzle, 'pointing'));
     assert.strictEqual(S.solvableBy(r.puzzle, 'singles'), false);
   }
+});
+
+test('hard is graded against pointing', () => {
+  assert.strictEqual(S.LEVELS.hard.beyond, 'pointing');
 });
 
 test('hard is NOT solvable by singles plus pointing (so not by singles either)', () => {
