@@ -5,3 +5,8 @@ Tiered approach:
  - WIP structure: work in progress memory structure, divided by activities and work streams. This is a fast access memory to help navigate the activities and what is next.
  - Worklog: historic record of everything that happened. Not to be used as WIP, but rather diagnosis and audit trails. Do not read the worklog unless specifically needed.
  - Session: the agent's current context.
+
+In order to efficiently manage memory, regular pruning is essential. This should include:
+ - Removing and / or combining duplicate or related items.
+ - Compressing multiple similar items into a single, broader entry.
+ - Discarding or archiving items that are no longer relevant.
