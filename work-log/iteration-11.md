@@ -42,3 +42,5 @@
   - Test (e1c04c3): criteria 1-9 PASS on the page, no defects.
 - #50 round 2 (04869eb): README and one assertion only. Lead delta re-check: the mutant is killed, 143/143, page pins 7/7. N3 (README sentence repeats itself) is folded into #51.
 - PR #52 opened (head b45a64f). PM acceptance launched on b45a64f.
+- #50 ACCEPTED by the PM on b45a64f; the comment and head were verified on GitHub. PR #52 merged with a merge commit: 7e23b26. Issue #50 is closed; main 143/143. The PM's new candidates (slip follow-ups: wording of the extra sentence, pairs including a given, "stays uncounted") are in its product log 6497e51.
+- #51: gate PASS (OPEN, weaver-agents, enhancement). Branch issue-51-clash-outline from 7e23b26 (log 8a8c13f). N3 from #50 carried in. Developer round 1 launched.
