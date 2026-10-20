@@ -211,7 +211,7 @@ describe('page (headless Chrome)', () => {
     const marks = S.hintMarks(S.hintFor(grid, 2), grid);
     assert.deepStrictEqual([s.target, s.confined, s.removed], [[target], step.confined, step.removed]);
     assert.deepStrictEqual(s.digit, marks.digits);
-    assert.strictEqual(s.key, S.pointingKey(step.pointDigit, marks.digits.length)); // the key line (kept by the notes change below)
+    assert.strictEqual(s.key, S.pointingKey(S.hintFor(grid, 2), marks.digits.length)); // the key line (kept by the notes change below)
     assert.deepStrictEqual(s.dattr, step.confined.concat(step.removed).sort((x, y) => x - y));
     assert.ok(s.dvals.every((d) => d === String(step.pointDigit)));
     const other = empties(g.puzzle).filter((p) => !typed.some((t) => t[0] === p) && p !== target)[0];
@@ -238,13 +238,24 @@ describe('page (headless Chrome)', () => {
     assert.strictEqual(s.tally[2], 'Pointing: 0 on your own, 1 with a hint');
   });
 
+  it('f1b. the key line ring clause on the page, by form: seeds 1 and 76 naked, 8 hidden row, 44 hidden box (2 rings, 1 ring, 3, 2)', async () => {
+    for (const [seed, rings, clause] of [[1, 2, 'purple rings = 2s already placed that keep 2 out of the other cells of the box.'], [76, 1, 'purple ring = an 8 already placed that keeps 8 out of the other cells of the box.'],
+      [8, 3, 'purple rings = 8s already placed that keep 8 out of the other cells of the box and of row 4.'], [44, 2, 'purple rings = 7s already placed that keep 7 out of the other cells of both boxes.']]) {
+      await open('tricky', seed);
+      await click('#hint');
+      await click('#hint');
+      const s = await read();
+      assert.ok(s.key.endsWith('go there; ' + clause), seed + ': ' + s.key);
+      assert.strictEqual(s.digit.length, rings);
+    }
+  });
+
   it('f2. the key line is gone after Verify; a naked/hidden explanation and the first click have none', async () => {
     const { seed, extra } = pointing;
     await open('tricky', seed);
     await keys(extra.typed);
     await click('#hint');
     await click('#hint');
-    assert.match((await read()).key, /^Key: dashed purple = the only places for \d in the box; struck grey /);
     await click('#verify');
     noHint(await read());
     const p = pick('tricky', (pz) => S.findHiddenSingle(pz) && !S.findPointing(pz, { useful: true })); // Tricky teaches a useful pointing step first
@@ -264,7 +275,7 @@ describe('page (headless Chrome)', () => {
     await click('#hint');
     const s = await read();
     assert.deepStrictEqual(s.digit, []);
-    assert.strictEqual(s.key, S.pointingKey(extra.step.pointDigit, 0));
+    assert.strictEqual(s.key, S.pointingKey(S.hintFor(extra.grid, 2), 0));
     assert.ok(s.key.endsWith('go there.') && !s.key.includes('purple ring'));
   });
 
@@ -286,7 +297,7 @@ describe('page (headless Chrome)', () => {
     });
   });
 
-  it('f4. at 375 px the edge badges (1 left, 9 right) lie inside the cell and the chip padding is 1px; the viewport is restored', async () => {
+  it('f4. at 375 px the edge badges (1 left, 9 right) lie inside the cell, the chip padding is 1px and the struck chip is legible; the viewport is restored', async () => {
     await open('tricky', 5);
     await page.send('Emulation.setDeviceMetricsOverride', { width: 375, height: 900, deviceScaleFactor: 1, mobile: false });
     try {
@@ -316,6 +327,13 @@ describe('page (headless Chrome)', () => {
         // flush against its own edge (left rule for 1, right rule for 9), not merely inside the 1 px tolerance
         assert.ok(Math.abs(x.d === 1 ? x.inL : x.inR) < 0.25, 'badge ' + x.d + ' not flush: ' + x.inL + ' / ' + x.inR);
       });
+      const rows = await page.eval('(function () { var td = document.querySelectorAll("#sudoku td")[1], out = []; td.classList.add("hint-removed");' +
+        'for (var d = 1; d <= 9; d++) { td.setAttribute("data-d", d); var a = getComputedStyle(td, "::after"); out.push([a.backgroundImage, parseFloat(a.width) + parseFloat(a.paddingLeft) + parseFloat(a.paddingRight), parseFloat(a.height) + parseFloat(a.paddingTop) + parseFloat(a.paddingBottom)]); } return out; })()');
+      const [, rgb, from, to] = rows[0][0].match(/rgb\(255, 255, 255\) [\d.]+%, rgb\((\d+, \d+, \d+)\) ([\d.]+)%, rgb\([\d, ]+\) ([\d.]+)%/);
+      const lin = rgb.split(', ').map((v) => (v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+      assert.ok(1.05 / (0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2] + 0.05) >= 4.5, 'strike contrast: rgb(' + rgb + ')');
+      const thin = Math.min(...rows.map(([, w, h]) => (to - from) / 100 * 2 * w * h / Math.hypot(w, h)));
+      assert.ok(thin >= 2, 'strike thickness at 375 px, thinnest of the digits 1-9: ' + thin + ' px at stops ' + from + '-' + to);
     } finally {
       await page.send('Emulation.clearDeviceMetricsOverride');
     }
