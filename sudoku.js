@@ -77,6 +77,19 @@
   }
 
   // Rules-only check; never compares against a stored solution.
+  // Flat indices (row * 9 + column), ascending, of every cell to outline: the cells findConflicts returns, givens included.
+  function clashCells(grid) {
+    return findConflicts(grid).map(function (p) { return p[0] * 9 + p[1]; });
+  }
+
+  var FIXED_TEXT = 'No numbers break the rules now. New entries are counted again.';
+
+  // The message for a value change from grid `before` to grid `after`: FIXED_TEXT when the change took the grid
+  // from at least one clash to none, else ''. (Only a clear or an overwrite can; completionFor takes precedence in the caller.)
+  function fixedMessage(before, after) {
+    return findConflicts(before).length && !findConflicts(after).length ? FIXED_TEXT : '';
+  }
+
   function verify(grid) {
     var empty = 0;
     for (var r = 0; r < 9; r++) for (var c = 0; c < 9; c++) if (!grid[r][c]) empty++;
@@ -733,6 +746,23 @@
       });
     }
 
+    // The one place an input's aria-label is built: position, then notes, then ", clashes" while outlined.
+    function relabel(inp) {
+      var digits = noteDigits(+inp.dataset.notes || 0);
+      inp.setAttribute('aria-label', inp.dataset.label + (digits.length ? ', notes ' + digits.join(' ') : '') +
+        (inp.parentNode.classList.contains('clash') ? ', clashes' : ''));
+    }
+
+    // Outlines exactly the clashing cells of `grid` (live state: not touched by clearResults, Verify or Hint).
+    function showClashes(grid) {
+      var set = clashCells(grid);
+      for (var q = 0; q < 81; q++) {
+        var td = table.rows[Math.floor(q / 9)].cells[q % 9], inp = inputs[Math.floor(q / 9)][q % 9];
+        td.classList.toggle('clash', set.indexOf(q) >= 0);
+        if (inp) relabel(inp);
+      }
+    }
+
     // Single write path for a cell: keeps the remembered value, notes and
     // their display in sync. Only a changed value clears the Verify results and any hint
     // (and entering the hinted digit shows the reward instead).
@@ -744,6 +774,7 @@
         var pos = +inp.dataset.pos;
         credit = creditEntry(tally, credited, hint, currentGrid(), Math.floor(pos / 9), pos % 9, cell.value);
       }
+      var before = changed ? currentGrid() : null;
       inp.value = cell.value;
       inp.dataset.prev = cell.value;
       inp.dataset.notes = cell.notes;
@@ -751,9 +782,13 @@
       inp.parentNode.querySelectorAll('.notes span').forEach(function (s, i) {
         s.textContent = digits.indexOf(i + 1) < 0 ? '' : i + 1;
       });
-      inp.setAttribute('aria-label', inp.dataset.label + (digits.length ? ', notes ' + digits.join(' ') : ''));
+      relabel(inp);
       if (changed) {
         clearResults();
+        var after = currentGrid();
+        showClashes(after);
+        var fixed = fixedMessage(before, after);
+        if (fixed) { status.textContent = fixed; status.className = ''; }
         if (credit) {
           tally = credit.tally;
           credited = credit.credited;
@@ -763,7 +798,7 @@
         }
         // A value change that leaves a digit: announce a filled grid (grid and tally are after the change).
         // (the cell.value guard is defensive: an empty cell leaves a 0 in the grid, so completionFor is null anyway)
-        var done = cell.value ? completionFor(currentGrid(), tally) : null;
+        var done = cell.value ? completionFor(after, tally) : null;
         if (done) { status.textContent = done.text; status.className = done.kind === 'solved' ? 'ok' : 'fail'; }
       }
     }
@@ -943,7 +978,7 @@
     countSolutions: function (grid, limit) { return search(toFlat(grid), limit || 2); },
     solvableBy: function (grid, technique) { return solvableBy(toFlat(grid), technique); },
     LEVELS: LEVELS, isValidSolution: isValidSolution,
-    findConflicts: findConflicts, namedClash: namedClash, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
+    findConflicts: findConflicts, clashCells: clashCells, fixedMessage: fixedMessage, namedClash: namedClash, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
     findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, hintMarks: hintMarks, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
     classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, completionFor: completionFor, tallyLines: tallyLines, statusClass: statusClass,

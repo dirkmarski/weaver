@@ -79,6 +79,10 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 #sudoku .notes span { display: flex; align-items: center; justify-content: center; }
 #notes[aria-pressed="true"] { background: #1a4fd0; color: #fff; font-weight: 600; }
 
+/* Clash: dashed orange outline on the td of every clashing cell (givens too) while the clash lasts; not red, amber or purple, no fill. It sits further in (-7px) under the blue focus ring (on the input) and the purple dashed confined outline, so they do not hide each other. */
+#sudoku td.clash { outline: 3px dashed #d9480f; outline-offset: -4px; }
+#sudoku td.clash:focus-within, #sudoku td.clash.hint-confined { outline-offset: -7px; }
+
 /* Hint: tint over a naked single's row, column and box (a hidden single: its unit only; a pointing hidden form adds the unit of the single); the target is amber with a ring that stays visible under the focus outline. */
 #sudoku td.hint-area { background-image: linear-gradient(rgba(255, 179, 0, 0.3), rgba(255, 179, 0, 0.3)); }
 #sudoku td.hint-target { background: #ffc83d; box-shadow: inset 0 0 0 6px #e08a00; }
