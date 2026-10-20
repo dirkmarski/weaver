@@ -47,3 +47,8 @@
 - #51 developer round 1 (Claude Sonnet 5.5, head 84e7261): 147/147, about 0.59 s; pins 7/7 and the #50 pins 7/7 on the page.
   - Lead check PASS with L1 (displaced `verify` comment) and L2 (probably unreachable `td.clash.hint-confined` rule). The lead inspected the 375 px screenshots.
   - Review and test round 1 launched in parallel (wt-51-review, wt-51-test at 3075d5d).
+- #51 round 1:
+  - Review (1a20a8b): APPROVE with changes (S1 dead CSS = L2, S2 Files, nits).
+  - Test (f2410b3): criteria 1-8 and 10 PASS on the page, no defects; DOM mutants caught.
+  - The lead confirmed that M13 (completion precedence) is killed by the tester's page suite.
+  - Round 2 (behaviour-neutral) launched; the lead runs the delta re-check.
