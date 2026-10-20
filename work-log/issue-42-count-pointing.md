@@ -138,3 +138,9 @@ Tester: Claude Sonnet 5.5 (claude-sonnet-5-5). Code 8e9c2ae, log 2cd2a5c, detach
 - Page smoke: own naked, own hidden (with unit) and own pointing (seed 1, seed 3) as expected and byte-identical to round 1; hinted pointing 0/1; seed 1 finish "0 on your own, 54 with a hint"; texts (a) and (b), tally block and 375 px fine.
 - One script check failed on a stale expectation (re-entry after clearing a hinted cell shows the own text, as noted in round 1); no behaviour change.
 - Verdict: PASS.
+
+## Lead check, round 2 (head 9df30a3)
+- Delta read (8e9c2ae): one assertion plus an if/else refactor. 143/143, about 0.59 s.
+- Delta re-review: APPROVE; mutant 8 now caught (1 fail); the assertion is sound (r5c1=7 is a genuine hidden single in its box).
+- Re-test: PASS. The single script FAIL is the tester's stale expectation, not a defect. Clearing a hinted cell removes the hint (README: any value change removes the hint), so re-entering is judged as an own entry, shows "Well spotted!" and changes no count. This matches the credited-cell rule and was already recorded in round 1.
+- Lead verdict: satisfied against the issue. Open the PR for PM acceptance.
