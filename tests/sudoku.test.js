@@ -4,7 +4,7 @@ const assert = require('node:assert');
 const {
   isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle,
   preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, solvableBy,
-  seededRng, findPointing, hintMarks, statusClass
+  seededRng, findPointing, hintMarks, statusClass, clashCells, fixedMessage
 } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
@@ -1109,4 +1109,36 @@ test("solvableBy 'pointing': one pointing step then singles is true; more than o
   assert.strictEqual(solvableBy(clone(), 'pointing'), true);
   const broken = emptyGrid(); broken[0] = [0, 1, 2, 3, 4, 5, 6, 7, 8]; broken[1][0] = 9; // cell (0,0) has no candidate
   assert.strictEqual(solvableBy(broken, 'pointing'), false);
+});
+
+// Clash outline and "fixed" message: pure decisions on the grid before and after a value change.
+const FIXED = 'No numbers break the rules now. New entries are counted again.';
+const withCells = (g, edits) => { const x = g.map((r) => r.slice()); edits.forEach(([r, c, v]) => { x[r][c] = v; }); return x; };
+
+test('clashCells: none on a clean grid; flat ascending indices incl. givens; three-cell clash lists all three', () => {
+  assert.deepStrictEqual(clashCells(PUZZLE), []);
+  // 5 at r0c2 repeats the given 5 at r0c0 (row); 5 at r5c2 is in the column of r0c2
+  assert.deepStrictEqual(clashCells(withCells(PUZZLE, [[0, 2, 5]])), [0, 2]);
+  assert.deepStrictEqual(clashCells(withCells(PUZZLE, [[0, 2, 5], [5, 2, 5]])), [0, 2, 47]);
+});
+
+test('fixedMessage: a clear or an overwrite that ends the last clash says so', () => {
+  const clash = withCells(PUZZLE, [[0, 2, 5]]);
+  assert.strictEqual(fixedMessage(clash, PUZZLE), FIXED);
+  assert.strictEqual(fixedMessage(clash, withCells(PUZZLE, [[0, 2, 4]])), FIXED);
+});
+
+test('fixedMessage: blank while a clash remains (three-cell clash, one fixed), with no clash before, and for an entry into an empty cell', () => {
+  const three = withCells(PUZZLE, [[0, 2, 5], [5, 2, 5]]);
+  assert.strictEqual(fixedMessage(three, withCells(PUZZLE, [[0, 2, 5]])), '');
+  assert.strictEqual(fixedMessage(PUZZLE, withCells(PUZZLE, [[0, 2, 4]])), '');
+  assert.strictEqual(fixedMessage(PUZZLE, PUZZLE), '');
+  assert.strictEqual(fixedMessage(withCells(PUZZLE, [[0, 2, 5]]), withCells(PUZZLE, [[0, 2, 5], [0, 3, 2]])), '');
+});
+
+test('fixedMessage with completionFor: a fix that fills the grid is decided by completionFor (it wins in the page)', () => {
+  const full = clone();
+  const before = withCells(full, [[0, 2, 5]]); // row 0 repeats 5, grid full
+  assert.strictEqual(fixedMessage(before, full), FIXED);
+  assert.strictEqual(completionFor(full, emptyTally()).kind, 'solved');
 });
