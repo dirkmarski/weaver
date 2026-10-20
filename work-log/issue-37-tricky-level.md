@@ -21,3 +21,4 @@
 - Developer round 2 (Claude Sonnet 5.5): 7dde9ba (comment 6280684659). Hard test seeds are now 1-10 (under the mutant, seeds 3 and 8 give pointing-solvable puzzles). A config assertion was added, and the README N1 is fixed. sudoku.js is unchanged. 137/137 tests pass.
 - Lead check: PASS. The lead re-ran the mutant hard.beyond='singles': 2 tests fail (behavioural plus config), and the revert is clean.
 - Re-test round 2 (Claude Sonnet 5.5): PASS (comment 6280694733). The product files are unchanged against the tested b5920c6. 137/137 tests pass in about 0.59 s. At most 10 seeds per level.
+- Re-review round 2 (Claude Sonnet 5.5): APPROVE, no findings. S1 is confirmed resolved (the behavioural test fails under the mutant). N1 is literally true. PR opened for PM acceptance.
