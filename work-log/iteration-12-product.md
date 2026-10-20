@@ -110,6 +110,7 @@ Not in scope, and why:
 - lessons.md (Tooling): pm-it12/play.js is a replay-based play tool. Each command replays the session in headless Chrome, so a persona can switch version and wording mid-session. topoint.js and pins.js follow Hint to the first pointing step. Like the it11 entry, these are rebuilt each session and superseded by #55 once it lands.
 
 ## Candidate list (PM, ordered, during iteration 12)
+(Superseded by the updated list at the end of this log, after the #56 acceptance.)
 Pruning rule (governance/memory-architecture.md, Dirk, 9e54939): drop delivered items, merge related ones into broader entries and discard items that are no longer relevant. Do not let the list grow. Applied below: pointing visuals v2 is folded into #56 or into item 2. Slip items 3a-3g are compressed into one item. The wording items are merged into item 4.
 
 In scope for it12: #55 (page test harness) and #56 (relevant rings for hidden single and pointing, key line, badge in note slot, box-case wording).
@@ -195,7 +196,7 @@ Delivered and removed: #55 (page test harness, accepted at 0e699d5). #56 is remo
   - The narrow chip is a tall pill. I assume players still read it as the same badge. To confirm with the personas at acceptance; not a blocker.
   - One measuring run gave a 25 px column 8, a one-off layout artefact that did not reproduce in three later runs (natural widths 34.7-36.8 px). The tester should check that the cell width is about 34-36 px when measuring.
 
-## Acceptance #56 (PR #58), 2026-10-20: in progress at e444eb1
+## Acceptance #56 (PR #58), 2026-10-20: ACCEPTED at e444eb1
 - Rules confirmed: governance/LOG.md not read; I read only work-log/issue-56-hint-rings.md (evidence) and my own log; memory/wiki not edited.
 - Own detached worktree scratchpad/wt-56-pm at e444eb1 (branch issue-56-hint-rings). Node v24.21.0, Chrome on macOS.
 - `node --test` x2: 166/166 pass, 0 fail, **0 skipped**, 2.50 s.
@@ -206,3 +207,89 @@ Delivered and removed: #55 (page test harness, accepted at 0e699d5). #56 is remo
 - AC5: the changed existing assertions in the diff are exactly the listed ones (two `digits` lists, the P(8)-shape text, page `noHint` / test f additions).
 - Ratio: tests 1871 / product 1193 lines = 1.57x.
 - Persona check launched (A, B, C; prompt pm-it12/acc56-prompt.txt): narrow chip at 375 px and the "this D rules out other cells" clause (P(3) and P(8)).
+
+### Persona check at acceptance (A, B, C; prompt pm-it12/acc56-prompt.txt; rules confirmed by all three: only play.js and its screenshots, no source, README, LOG.md, helper scripts or solvers; A and C copied one screenshot with cp, which is harmless)
+- Narrow chip at 375 px (P(3), notes 1-9 in r9c1, r9c2, r9c4, r9c5): 3/3 read every other note. The tightest are the "2" and "3" beside the chip, crowded but legible. 3/3 read the tall pill as the same mark as at 900 px, and nothing is clipped or broken. My Q3 assumption (players read the narrow chip as the same badge) is confirmed.
+- 3/3: the strike on the grey chip is faint at phone size, and it reads like "a 1 in a white box". This was raised before at 900 px (round 1, C: "a smudge"; B and C asked for a more legible struck badge). It is not caused by #56: the gradient strike is unchanged, the chip is just narrower. It goes on candidate 2 with a phone focus. Not a blocker.
+- "purple ring = this D rules out other cells": 3/3 found it true, and B and C traced the ruled-out cells correctly (P(8): r5c8 rules out r4c7-r4c9; P(3): r2c3 covers column 3 and r7c8 covers row 7). 3/3 found it vague because it does not say which cells. A and B found the singular "this 1" odd when two rings show, which partly disproves my Q1 assumption. B suggested "a placed D that blocks other cells". That keeps an article ("a placed 8"), avoids "a 8" and works for one ring or several.
+- "Would not ship": A and C, both for the vague ring clause and the faint phone strike; B: nothing blocking.
+
+### Verdict and reasoning
+- **ACCEPTED at e444eb1.** AC1-AC7 pass (table in the PR comment). The suite shows 0 skipped, so the page evidence counts.
+- I am not sending it back for the persona points:
+  - They do not breach the spec. The key text is exactly the Q1 text, and the strike is unchanged.
+  - The clause is correct, and 3/3 traced it.
+  - "Which cells" is the larger "name the cells / show the blocked cells" design question already on candidate 2.
+  - Another full rework, review and test round for a wording polish is poor value against shipping the relevant rings that all three ranked first.
+- Follow-up decision: the ring-clause wording ("a placed D that rules out other cells", one wording for any number of rings) and the phone strike become the first, small sub-items of candidate 2. They can ride with the next UI issue.
+
+### Answers to the lead
+- AC3 "900 px position within 0.5 px of today's": yes, the tester's reading is what I meant. When I wrote Q2/Q3, "today" meant the slot placement on the branch as tested at 8ac1f8b (900 px passed then). It did not mean main's corner, which section 3 replaces. Lesson: name a commit, not "today", in criteria written mid-issue.
+- L2, the left-edge rule mutant: agreed, it is equivalent within scope. It only acts below about 340 px, and 320 px is out of scope. It stays with the 320 px item in candidate 5 (mobile).
+- Ratio 1.57x (1871 / 1193): below the 1.6x trigger, so there is no trim item yet. The trigger stays: if the next issue pushes the ratio past 1.6x, the PM adds a trim/leanness review item. The reviewer keeps checking leanness on each UI issue.
+- Skipped = 0: my two runs and the developer, reviewer and tester runs all show 166/166, 0 skipped.
+
+- PR comment: https://github.com/dirkmarski/weaver/pull/58#issuecomment-6287453721. Not merged by me. Worktree wt-56-pm removed after the check. pm-it12/play.js now emulates a true viewport below 500 px (WIDTH), and play.js.bak keeps the old version.
+
+### Proposed wiki changes after #56 (for the lead; I did not edit memory/wiki)
+- product.md, Hint section:
+  - rings only on digits that share a unit with a reason cell (hidden single and pointing; all relevant, D4);
+  - the pointing key line, with the ring clause only when rings show;
+  - the badge in D's note slot, with the narrow rule below 560 px;
+  - the box-case parenthesis.
+  - Remove the "pointing visuals v2" gap.
+- backlog.md:
+  - replace the candidate list with the one below;
+  - mark the it10 D1 debt (badge over note 3) as fixed by #56.
+- lessons.md (Scoping):
+  - Criteria written mid-issue should name a commit, not "today". "As today" in AC3 meant the branch at 8ac1f8b, not main.
+  - When a wording fix changes grammar (Q1 "this D"), check it in the plural case too (two rings) before you decide.
+- lessons.md (Tooling): headless Chrome has a minimum window width of about 500 px. For true phone widths, use Emulation.setDeviceMetricsOverride (as tests/page.test.js f4 and pm-it12/play.js now do).
+
+## Candidate list (PM, ordered, after #56 acceptance, 2026-10-20)
+Pruning rule (governance/memory-architecture.md): drop delivered items, merge related ones, discard the irrelevant.
+- Applied: #55 and #56 are delivered and dropped (#56 accepted, merge pending).
+- The #56 acceptance persona points are merged into item 2. The phone strike is merged into item 2's struck-badge entry, not added to mobile.
+- The old item 6 (mobile) is now item 5, because the old item 5 (claiming/pairs) moves down to 6.
+
+1. **Tricky practice density** (next, it13).
+   - Fresh play in it12: none of the three players met a pointing hint in 6-45 moves, and the first pointing step comes after 6-22 hinted entries.
+   - Spike first: the generation time for "at least 2 pointing steps", and how early the first one comes. Then choose between denser puzzles and Hint preferring pointing on Tricky.
+2. **Explanation depth, pointing and singles.**
+   - Quick wins first:
+     - (a) ring-clause wording, one form for any number of rings, e.g. "purple ring = a placed D that rules out other cells" (A, B at #56 acceptance; "this 1" reads oddly with two rings);
+     - (b) a more legible struck badge, especially on phones (3/3 at #56 acceptance; B and C in round 1).
+   - Then:
+     - say or show which cells a ring rules out (3/3 at acceptance), and name the ringed and struck cells in the text (B, C);
+     - show why the naked-form target has only D or X left (A, C);
+     - a key line on the hidden-single explanation (A);
+     - minimal rings (B; D4);
+     - a clearer first-click case signal.
+3. **Slip follow-ups** (from it11, small and wording-led):
+   - the extra-clash sentence should point at the outlines;
+   - a partial-fix message;
+   - two-unit clash naming;
+   - "clear your own number" when the pair includes a given;
+   - explain "counted" / "stays uncounted" and judge an overwrite;
+   - a marker on entries made during a clash;
+   - Hint/Verify naming one pair at a time.
+4. **Small wording items:**
+   - the shared "not counted" ending;
+   - re-entering a hint-credited cell says "on your own";
+   - "(see below)" in the finish text;
+   - fold away the definitions once learned;
+   - the heavy naked-single digit list.
+5. **Mobile and long-term:**
+   - the 375 px level buttons;
+   - the hint badge at 320 px (#56 Q2 limit; the left-edge rule only acts below about 340 px, L2);
+   - long messages and key line on a phone (C: a lot of vertical space);
+   - a middle hint level;
+   - progress across puzzles.
+6. **Claiming, then pairs**, each with its own level. Ranked last by the personas.
+
+Watch (not an item): the test-to-product ratio is 1.57x. A trim item is added if it passes 1.6x.
+
+Not wanted:
+- instant red on a wrong entry (it10);
+- counting entries made during a clash (it11);
+- retroactive counting after a fix (it11).
