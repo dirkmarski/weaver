@@ -104,6 +104,31 @@ Mutants (run on a scratch copy; none committed)
 | 23 | Hint handler keeps the old key through clearResults | SURVIVED, unreachable: with a hint showing the grid is unchanged, so the Hint result is again the pointing explain; no test possible |
 
 
+### Re-review rounds 1 + 1b
+- 2026-10-20, head fc76f9d (rework 560b21b, 55b63d6). Verdict: approve with one should-fix (R1). `node --test` x3: 166 tests, 0 fail, 0 skipped, ~2.5 s.
+- Resolved: S1 (f2b; `pointingKey(d, 1)` and `pointingKey(d, marks.digits)` now killed), N1 (f3 loops 1-9; my mutant #7 killed), N2, N3 (README names the key line and `#key`). Q1 text matches the issue character for character in `pointingKey` (sudoku.js:442), the unit test (1, 8 with ring; 9 without) and the README quote; the page tests use the helper.
+- CSS (Q3): `@media (max-width: 559px)` is last in the file; selectors have the same specificity as the base rules (id + td + class/attribute + ::after), so the later media rule wins. `left: auto; right: 0` for 3/6/9 is needed and correct (base `left: var(--x)` is overridden; `right` alone would be ignored). `translate(0, -50%)` keeps the vertical centring for rows 1/3 (top: var(--y) is untouched); only the horizontal -50% is dropped. Both kinds (confined/removed) are covered by the shared padding selector; removed also covers hint-target + hint-removed (the badge rules do not depend on the amber background). No dead rules. The 560 boundary is the media query itself (max-width 559 px).
+- README: key text, badge narrow-screen rule and Well-done line match behaviour. "may touch a neighbouring note by up to about 1 px": developer worst overlap is 1.11 px (D = 4), so "about 1 px" is acceptable (1.1); the AC limit is 2 px.
+- Page test f4: waits for layout (cell width 34-36 px, up to 100 x 20 ms, then asserts the width), viewport override cleared in `finally`, later tests call `open` anew so nothing leaks; 25 lines, lean enough.
+
+Findings
+- should-fix R1 (tests/page.test.js f4, the `x.inL >= -1 && x.inR >= -1` assertion): the right-edge rule is not guarded. With the whole `data-d` 3/6/9 media rule removed, D = 9 sits at inR = -0.59 px, inside the 1 px tolerance, so f4 passes (mutant c6, survived). The developer's "right-edge rule removed" mutant must have been a different edit. With the rule the badge is flush (inR = 0, inL = 0). Fix: for these two flush badges assert the edge gap within 0.1-0.25 px of 0 (`Math.abs(x.inL) < 0.25` for D = 1 and `Math.abs(x.inR) < 0.25` for D = 9), or at least inR >= -0.3 for D = 9. One-line change, keeps "flush" as the contract.
+- nit R2: the breakpoint (559 vs 560) and the exact flush offset are not page-tested (max-width 599 and 500 both survive). This is the tester's measurement territory (PM AC3: 900/520/375 px bounding-box measurement): the tester should include 560-599 px (unchanged from today: padding 0 3px) and 559 px. A page test for it would cost another viewport case; not recommended.
+
+Mutants (scratch copies under scratchpad/rev56/, none committed)
+| # | Mutant | Result |
+|---|---|---|
+| 7 | `--x` dropped for 4 | killed (1) |
+| 8 | `pointingKey(d, 1)` | killed (1) |
+| 8b | `pointingKey(d, marks.digits)` | killed (1) |
+| c1 | max-width 599 instead of 559 | SURVIVED (tester measurement) |
+| c2 | max-width 500 | SURVIVED (tester measurement at 520/375) |
+| c3 | edge transform kept as translate(-50%, -50%) | killed (f4) |
+| c4 | narrow padding 3px | killed (f4) |
+| c6 | right-edge (3/6/9) rule removed | SURVIVED: see R1 |
+| c7 | right: 4px | SURVIVED (inside tolerance; tester measurement) |
+| c8 | left: 4px | SURVIVED (inside tolerance; tester measurement) |
+
 ---
 
 ## Tester
