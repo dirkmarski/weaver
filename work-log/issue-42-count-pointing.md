@@ -62,3 +62,42 @@ Headless Chrome, page driven on Tricky seed 1 (Math.random seeded like `seededRn
 - Diff read (sudoku.js, index.html): `findPointing` was split into `pointingSteps` + `singleAfterStep` and reused by `classifyEntry`, with no duplication (PM point 2 met). The `findPointing` loop semantics are preserved (the filled-cell skip moved into `singleAfterStep`). Hinted pointing is now counted; the status class comes from `statusClass(kind)`, and the regex is gone. Chained steps are excluded by construction (one step applied to the current grid).
 - Concern L1 (criterion 3): the developer reports no test pins **hidden before pointing** precedence (a mutant that tries pointing before hidden would survive). The reviewer is asked to confirm; if it survives, it is a must-fix.
 - PASS to review and test in parallel.
+
+## Review round 1
+Reviewer: Claude Sonnet 5.5 (claude-sonnet-5-5), session `48eaa449-33cf-461f-85bc-196e8d61fc39`. Head 3a84c1b. Posted as an issue comment.
+**Verdict: APPROVE** (no must-fix; one should-fix, a test gap).
+
+**Checked**
+1. Recognition: `classifyEntry` tries naked, hidden, then `pointingSteps` in findPointing order and accepts the first step whose `singleAfterStep` for the entered cell equals the entered digit. Both forms, first-in-order, chained steps (one step applied to the grid as it is) and the null cases (conflict, filled cell, digit in unit, invalid digit) match the issue. `findPointing` keeps its loop semantics (first step, first target in reading order); `hintFor`/`pointingHint` output is unchanged (`pointingClause` is shared). No duplication: both callers use `pointingSteps` + `singleAfterStep`.
+2. Counting: hinted and own pointing in `creditEntry`, re-entry (text again, no count, kind `reward`), `emptyTally`, `completionFor` sums, `tallyLines`, the definition, text (a), `kind`, `statusClass` and the index.html wiring are correct. Text (b) unchanged.
+3. L1: the hidden-before-pointing mutant is CAUGHT (4 failures), as is pointing-before-naked-and-hidden (4). The developer's note was wrong on this: the precedence test pins both.
+5. README: every changed sentence checked against the code; no stale text found ("not counted yet", "Singles applied", "two lines" and the old (a) text are gone).
+6. Tests are targeted, on pinned literal walls, with no sweeps or oracles; the rule -> test mapping holds. 143 pass in about 0.6 s.
+
+**Mutation spot checks (15, on a detached worktree, restored and removed)**
+| # | Mutant | Result |
+|---|---|---|
+| 1 | pointing tried before hidden | caught, 4 fail |
+| 2 | pointing tried before naked and hidden | caught, 4 fail |
+| 3 | entered digit ignored | caught, 1 fail |
+| 4 | completionFor drops pointing | caught, 2 fail |
+| 5 | tallyLines pointing own/hint swapped | caught, 1 fail |
+| 6 | statusClass inverted | caught, 1 fail |
+| 7 | re-entry returns kind '' | caught, 1 fail |
+| 8 | creditEntry tally copy loop drops `pointing` | **SURVIVED, 0 fail** |
+| 9 | hidden form ignores the removed cells | caught, 8 fail |
+| 10 | hidden unit order row-first in singleAfterStep | caught, 1 fail |
+| 11 | clause row/column number off by one | caught, 3 fail |
+| 12 | findPointing takes the last target cell | caught, 5 fail |
+| 13 | own credit booked as hint | caught, 7 fail |
+| 14 | `if (cells[p]) return null` removed from singleAfterStep | survived (redundant guard, see nit) |
+| 15 | extra acceptance of step digit as entry digit | caught, 1 fail |
+
+**Should-fix**
+- S1 (mutant 8): no test carries a pointing count through a later credit. In the real code the copy loop keeps `pointing`; if it were dropped, any single credited after a pointing entry would reset the Pointing count to 0 and nothing fails. Add a short assertion, e.g. in the re-entry test: credit pointing on SEED1_WALL, then credit a naked or hidden single on another cell with that tally and expect `pointing: {own: 1, hint: 0}` and the single's count 1 (or two pointing entries giving 2).
+
+**Nits**
+- N1: the `if (cells[p]) return null;` guard in `singleAfterStep` is redundant (callers never pass a filled cell that can qualify; `removed` holds only empty cells and `spotsFor` skips filled cells). Dropping it saves a line; keeping it is harmless.
+- N2: `creditEntry` builds the `where` string and the two texts inline; fine, but the long ternary line could be split for legibility.
+
+Formatting is clean. Nothing out of scope was added.
