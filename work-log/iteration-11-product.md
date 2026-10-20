@@ -131,3 +131,22 @@ Criteria 1-11 pass, and personas 3/3 say ship. The open points are wording and v
 - When one of the pair is a given, say "clear your own number" rather than "change or clear one of them" (B).
 - Counting-resumes wording: "stays uncounted" read as "never" (C); retype tip (C, again; D8 stands for now).
 - Verify does not name cells (C).
+
+## Acceptance of #51 (PR #53, head ab7f260)
+Own detached worktree <scratchpad>/wt-51-pm at ab7f260 (product code unchanged since 4afbc19). Not read: governance/LOG.md (never), work-log beyond this file (not needed).
+Tools: my play tool pm-it11/play.js (WT=wt-51-pm; PERSONA=1 hides the CLASH line for personas), tester's ts51/steps.js, pins51.js, suite51.js, shots51.js (my screenshots: <scratchpad>/pm-it11/acc51/).
+
+### Per criterion (real page)
+1. PASS. r4c1=6 -> outline r4c1, r5c3 (given); r1c2=4 -> r1c1, r1c2, r6c2 (two givens); r9c1=1 during another clash -> four cells; Medium seed 2 r1c1=5, r1c2=5 -> both own cells. No other cell outlined.
+2. PASS. Trace r4c1=6, r7c2=9, Notes on, note in r4c3, Notes off, focus, ArrowRight, ArrowDown, Verify, Hint, Hint, another entry: outline r4c1, r5c3 at every step; Verify red on r4c1 only, cleared by Hint, outline kept.
+3. PASS. Clear r4c1 or overwrite with 8 -> no outline; r4c1=6, r1c2=4, clear r4c1 -> r1c1, r1c2, r6c2 remain (only r4c1, r5c3 lose it).
+4. PASS. New puzzle and level:medium after a clash -> no outline, blank message.
+5. PASS. Screenshots at 900 and 375 (alone, focus, Verify red + focus, multi, Hint click, simulated Hint target + pointing marks): dashed orange visible on givens and own blue digits, over the red fill and inside the blue focus ring; distinct from amber target and dashed purple confined cells. The Hint-target combination can only be simulated (Hint marks nothing during a clash); accepted, as the README says.
+6. PASS. ", clashes" on editable outlined cells only (r4c1; not on given r5c3); removed with the outline. Suite c6 checks (notes kept, suffix after notes) pass.
+7. PASS. Fixed message on clear and on overwrite, plain; blank while a clash remains; completion wins on a fill (suite c7a/c7b); replaced by next value change, Verify, Hint.
+8. PASS. All 7 pinned examples re-run with my own play tool: outlines and texts match exactly; tester's pins51 7/7 at ab7f260.
+9. PASS. README diff read sentence by sentence: Verify bullet notes givens are outlined; clash text "not turned red ... outlined in orange"; "only live mark"; Hint never clears the outline; full-grid text; "Apart from these messages and the orange clash outline there is no live checking; red flags appear only after Verify"; new "Clash outline" and "Clash fixed" bullets; Files entries for td.clash, clashCells, fixedMessage. N3 from #50 folded (the redundant parenthesis removed). No contradiction found.
+10. PASS. `node --test` 147/147 (0.6 s); unit tests for clashCells (clean, two-cell incl. given, three-cell) and fixedMessage (clear, overwrite, clash remains, no clash before, entry into empty cell, fill decided by completionFor). Tester's page suite suite51 re-run by me: 106/106.
+
+### PM play-through
+Tricky seed 1: slip r4c1=6 (outline on both 6s), r7c2=9 (not counted, outline stays), clear r4c1 -> "No numbers break the rules now. New entries are counted again.", then r1c9=1 -> "Well spotted! ... hidden single ... on your own", hidden single count 1. Hint then works normally. Medium seed 2: own-vs-own clash r1c1=5/r1c2=5, Verify reds both, overwrite r1c2=7 -> fixed message at 375 px. Matches the issue.
