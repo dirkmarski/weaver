@@ -10,6 +10,9 @@
 - Interpretation L0: the extra sentence ("Other numbers break the rules too...") is added to texts 2 (entry during a clash) and 3 (Hint), not to text 1 (the entry clashes itself). Pinned example 6 settles this: four cells clash there and text 1 has no extra sentence. Passed to the developer and recorded here.
 - The test-ratio guide (about 1.18x, guide ~1x) asks for existing test blocks to be extended.
 - Developer round 1 launched.
+- Developer round 1 (head 572cd18): lead check PASS. The diff was read in full. 143/143 in about 0.61 s. Pinned examples re-run: 7/7. `findConflicts` includes givens, and the box cells in `UNITS` are in reading order, so P and Q follow the definition.
+  - L1 (for review): the README says "the cells Verify flags, givens included", but Verify turns only the player's values red. Wording to be judged by the reviewer.
+- Review and test round 1 launched in parallel, in detached worktrees wt-50-review and wt-50-test.
 
 ## Developer
 
