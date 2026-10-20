@@ -14,3 +14,4 @@
   - One Chrome per file; cleanup of process and temp profile on failure paths.
   - Total `node --test` under 10 s; report figure. Keep the harness lean (test ratio already ~1.15x).
   - Mutants (i)-(iv) in requirement 8 are the tester's acceptance evidence.
+- 2026-10-20: Developer launched on #55 (worktree wt-55). Brief: spec is the issue; Node built-ins only; visible skip; one Chrome per file with cleanup; seeding assertion; DOM-only reads, no product change; lean; 3 timing runs; self-check mutants (i)-(iv); stop and ask on spec conflicts.
