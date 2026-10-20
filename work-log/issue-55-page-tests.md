@@ -16,6 +16,11 @@
   - Mutants (i)-(iv) in requirement 8 are the tester's acceptance evidence.
 - 2026-10-20: Developer launched on #55 (worktree wt-55). Brief: spec is the issue; Node built-ins only; visible skip; one Chrome per file with cleanup; seeding assertion; DOM-only reads, no product change; lean; 3 timing runs; self-check mutants (i)-(iv); stop and ask on spec conflicts.
 
+- 2026-10-20: Developer delivered cb2d63c: tests/chrome.js (78), tests/page.test.js (263, 10 tests), README. Lead check: 157/157 pass, 2.0-2.4 s wall over two runs; no Chrome process left. Product files unchanged (diff stat).
+- Lead decision L1 (spec reading): requirement 7f "Hint, both clicks, on a pointing step: ... classes present" is read as "after both clicks", matching the README: the first click shows target and area; confined, removed, ring and data-d appear on the explain (second click). Not a scope change; told to the PM at acceptance.
+- Points passed to the reviewer: regex extraction of seededRng from sudoku.js (indentation-dependent; seeding assertion is the guard); page-load wait loop gives up silently after 2 s; `read()` returns an unused-looking `html` field; mutants (iii) and (iv) each rest on one test; test ratio 1.15x -> 1.45x (inherent to a harness with no product change; PM accepted the harness scope knowing the ratio).
+- Reviewer and tester launched in parallel, each in its own detached worktree on issue-55-page-tests (wt-55-review, wt-55-test).
+
 ## Developer
 - Files: `tests/chrome.js` (77 lines: Chrome lookup, launch, minimal DevTools client over global WebSocket/fetch), `tests/page.test.js` (about 265 lines, 10 page tests); README Test section and Files list. `index.html`, `style.css`, `sudoku.js` unchanged.
 - Seeding: the injected script (`Page.addScriptToEvaluateOnNewDocument`) is built from the `seededRng` source text taken from `sudoku.js` by regex, so mulberry32 is not copied by hand. The page runs `Math.random = seededRng(n)` via a test-only `window.__seed` set by that injected script (no product hook). One seeding test compares the page's Tricky puzzle (read from the given cells) with `generatePuzzle('tricky', {rng: seededRng(5)}).puzzle`.
@@ -25,3 +30,11 @@
 - Spec readings: the pointing marks `hint-confined`/`hint-removed`/`data-d` appear on the second click only (README: "on a pointing explain only"); the first click shows target and area. Scenario e uses an overwrite (a clash can only end by clear or overwrite) on an already full grid.
 - Figures: `node --test` 157 tests (147 before + 10 page tests), about 2.0 s with Chrome (3 runs: 2.06, 2.03, 2.02 s wall), 0.63 s before. Test code 1322 -> 1662 lines against 1149 product lines (1.15x -> 1.45x).
 - Mutant self-check (reverted, never committed): (i) killed by e; (ii) killed by c/d; (iii) killed by f; (iv) killed by f. Each run: 1 fail, no failure at the tip.
+
+## Reviewer
+(pending)
+
+---
+
+## Tester
+(pending)
