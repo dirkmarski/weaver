@@ -28,7 +28,8 @@
 - **Hint mark / ring**: amber target, tinted area; on the explanation, a purple ring and digit on cells holding the key digit that rule out a reason cell (#56).
 - **Reason cell**: an empty cell a ring helps to rule out (hidden single: other empty cells of its unit; pointing: non-confined empty box cells and, in the hidden form, the hidden unit's other empty cells except removed ones).
 - **Confined / removed**: pointing explanation marks: the box cells where D fits (dashed purple, purple badge) and the line cells that lose D (struck grey badge). The badge sits in D's note slot.
-- **Key line**: the `#key` legend under the status during a pointing explanation (`pointingKey`, #56).
+- **Key line**: the `#key` legend under the status during a pointing explanation (`pointingKey`, #56; ring clause reworded in #61).
+- **Useful pointing step**: a pointing step whose target is not already a naked or hidden single; on Tricky Hint teaches it before singles (#60).
 - **Page tests**: `tests/page.test.js`, the real page in headless Chrome via `tests/chrome.js` (#55); skipped with a reason without Chrome.
 - **Persona (user-a/b/c)**: simulated user agents used by the PM for scoping and acceptance; not real users.
 - **Play tool**: the PM's headless replay driver of the real page (session scratchpad), used for persona sessions and acceptance; it can switch prototype and wording variants.

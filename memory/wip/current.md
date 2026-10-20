@@ -3,19 +3,24 @@
 Last updated: 2026-10-21, lead session 5034fe53-a839-46a5-807a-40a5b44d5158
 
 ## Active run
-- Iteration 13 ("deliver the next iteration"), branch `iteration-13`, lead log `work-log/iteration-13.md`.
-- Status: #60 merged (PR #62, 44e3123). #61: PM did not accept 24eec95 (strike < 2 px for D = 1); rework round 2 in development, then re-review + re-test, then PM re-acceptance (AC 6, 8, 9, 10 + a 375 px look). Then the iteration close.
+- None once the iteration-13 PR merges. Iteration 13 is complete; both issues were accepted by the PM and merged:
+  - #60 Tricky Hint prefers a useful pointing step: PR #62, merged in 44e3123.
+  - #61 clearer ring clause and a legible strike: PR #63, merged in 9a2caf6 (accepted on the second try, after the per-digit strike rework).
+- If the iteration-13 PR is still open on restart: verify it on GitHub and merge it with a merge commit (it only holds work logs and memory).
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #61 ring clause + strike | rework round 2 (developer) | re-review + re-test the delta, lead check, PM re-acceptance | developer |
+| (none in flight) | | | |
+
+## Starting the next run
+- Iteration 14: the PM picks from `memory/wiki/backlog.md` (end-of-it13 snapshot). Top: explanation depth (show or name which cells a ring rules out), then mobile.
+- The test ratio is at 1.599x (about 1 line of headroom): the PM decides at scoping whether a trim item comes first or the next issue trims in place.
+- Put the temp-dir safety rule in every agent prompt (explicit dirs under the scratchpad; never `rm -rf` a possibly unset variable). See wiki/process.md.
+- Do not read the work log unless specifically needed (Dirk, 1464355). Prune memory at each close (Dirk, 9e54939).
 
 ## Open issues / PRs
-- #61 open, PR #63 at 24eec95. #60 closed, PR #62 merged.
+- none (after the iteration-13 PR merges)
 
 ## Blockers / waiting on
 - none
-
-## Notes
-- Do not read the work log unless specifically needed (Dirk, 1464355). Prune memory at each close (Dirk, 9e54939).
