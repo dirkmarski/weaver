@@ -22,3 +22,4 @@
 - Lead check: PASS. The lead re-ran the mutant hard.beyond='singles': 2 tests fail (behavioural plus config), and the revert is clean.
 - Re-test round 2 (Claude Sonnet 5.5): PASS (comment 6280694733). The product files are unchanged against the tested b5920c6. 137/137 tests pass in about 0.59 s. At most 10 seeds per level.
 - Re-review round 2 (Claude Sonnet 5.5): APPROVE, no findings. S1 is confirmed resolved (the behavioural test fails under the mutant). N1 is literally true. PR opened for PM acceptance.
+- PR #40: **PM ACCEPTED** at 542a5db with no conditions (comment 6280786479), verified on GitHub by the lead. Personas B and C: Tricky feels like the next step after Medium, and both explained pointing. Lead points judged: one pointing step per puzzle is enough to meet the technique but not to practise it (a later candidate); the givens overlap is acceptable; the 375 px wrap is acceptable (a mobile candidate). Merged with a merge commit (no squash).
