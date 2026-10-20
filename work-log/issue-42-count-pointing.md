@@ -123,3 +123,11 @@ Developer: Claude Sonnet 5.5, session `48eaa449-33cf-461f-85bc-196e8d61fc39`.
 - Mutant (drop 'pointing' from the creditEntry tally copy loop): now fails the test (pointing 0/0 instead of 1/0). Restored.
 - N2: the own-text ternary in creditEntry is now an if/else with a named `unit`; texts byte-identical, no behaviour change.
 - `node --test`: 143/143 pass, 579 ms (no new test, one added assertion block).
+
+## Review round 2 (reviewer)
+
+Delta 84fde41..2cd2a5c. Verdict: APPROVE.
+- N2 is a pure refactor (byte-identical texts) and legible.
+- S1: mutant 8 (drop 'pointing' from the creditEntry tally copy loop) now fails 1 test (142 pass, 1 fail). The clean head passes 143/143.
+- The new assertion is sound: r5c1=7 is a hidden single (box) after 7 is entered at r3c3 in the seed-1 wall.
+- N1 kept as decided.
