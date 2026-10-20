@@ -34,3 +34,6 @@
 
 ## Progress
 - Iteration branch, worktree and this log created.
+- Memory: `memory/README.md` and `memory/wip/current.md` committed (8a6ca83). The assistant (Sonnet) drafted 7 wiki pages from the iteration 1-8 logs and the code. The lead reviewed them and fixed two process.md lines: models now come from the agent frontmatter, not the logs, and the gate check accepts issues by Dirk Marski or weaver-agents. Committed as 50db9f9.
+  - Assistant notes kept as facts: tests 1166 lines vs product 999 (1.17x, today's count, not the post-#35 1041); runner reports 137 tests (125 `test(` calls; subtests account for the rest); Tricky needs 1-2 pointing steps on seeds 1-10.
+  - Curation note for later: lessons.md holds a few process rules (hand-off verification, full session id). They stay there for now, cross-referenced from process.md if they grow.

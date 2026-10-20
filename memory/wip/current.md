@@ -10,7 +10,7 @@ Last updated: 2026-10-20, lead session 48eaa449-33cf-461f-85bc-196e8d61fc39
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| Memory setup (wiki + WIP) | wiki draft being seeded by the assistant | lead reviews the draft, moves it to memory/wiki/, commits | lead |
+| Memory setup (wiki + WIP) | wiki seeded (50db9f9) | end of iteration: review session learnings, refresh product/backlog pages | lead |
 | Iteration 9 scope | PM scoping | PM returns the issue numbers and order | PM |
 
 ## Open issues / PRs in this run
