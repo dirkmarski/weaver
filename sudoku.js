@@ -202,7 +202,8 @@
   // the target is the first such cell in reading order. Naked form: a removed cell where only
   // D and X fitted, so it is X. Hidden form: a box, row or column (tried in that order)
   // without D where D now fits in one cell, so it is D. Returns { box, line: 'row' | 'column',
-  // index, pointDigit, form: 'naked' | 'hidden', r, c, digit, unit (hidden only) }, all numbers
+  // index, pointDigit, confined, removed (flat indices of the cells where the digit fitted in the box
+  // and in the line outside it), form: 'naked' | 'hidden', r, c, digit, unit (hidden only) }, all numbers
   // 0-based, or null. Grid-based, notes ignored.
   function findPointing(grid) {
     var cells = toFlat(grid), hit = null;
@@ -212,6 +213,7 @@
         if (res) {
           hit = res; hit.r = Math.floor(p / 9); hit.c = p % 9;
           hit.box = step.box; hit.line = step.line; hit.index = step.index; hit.pointDigit = step.pointDigit;
+          hit.confined = step.confined; hit.removed = step.removed;
         }
       }
       return hit;
@@ -219,8 +221,8 @@
     return hit;
   }
 
-  // Calls fn({ box, line, index, pointDigit, removed }) for each pointing step (see findPointing:
-  // boxes in reading order, digits 1-9; removed = the cells of the line outside the box that lose
+  // Calls fn({ box, line, index, pointDigit, confined, removed }) for each pointing step (see findPointing:
+  // boxes in reading order, digits 1-9; confined = the box cells where the digit fits; removed = the cells of the line outside the box that lose
   // the digit) until fn returns something truthy.
   function pointingSteps(cells, fn) {
     for (var b = 0; b < 9; b++) {
@@ -231,7 +233,7 @@
         if (!vertical && !spots.every(function (q) { return Math.floor(q / 9) === Math.floor(spots[0] / 9); })) continue;
         var index = vertical ? spots[0] % 9 : Math.floor(spots[0] / 9);
         var removed = spotsFor(cells, UNITS[index * 3 + (vertical ? 1 : 0)], d).filter(function (q) { return spots.indexOf(q) < 0; });
-        if (removed.length && fn({ box: b, line: vertical ? 'column' : 'row', index: index, pointDigit: d, removed: removed })) return;
+        if (removed.length && fn({ box: b, line: vertical ? 'column' : 'row', index: index, pointDigit: d, confined: spots, removed: removed })) return;
       }
     }
   }
@@ -263,11 +265,15 @@
     return level === 'easy' ? 'naked' : 'hidden';
   }
 
-  // "the box of rows R1-R2 and columns C1-C2, the digit D fits only in row L" for a pointing step.
+  // "the box of rows R1-R2 and columns C1-C2" for box b (0-8).
+  function boxName(b) {
+    var r = 3 * Math.floor(b / 3), c = 3 * (b % 3);
+    return 'the box of rows ' + (r + 1) + '-' + (r + 3) + ' and columns ' + (c + 1) + '-' + (c + 3);
+  }
+
+  // "the box of ..., the digit D fits only in row L" for a pointing step.
   function pointingClause(s) {
-    var rows = 'rows ' + (3 * Math.floor(s.box / 3) + 1) + '-' + (3 * Math.floor(s.box / 3) + 3);
-    var cols = 'columns ' + (3 * (s.box % 3) + 1) + '-' + (3 * (s.box % 3) + 3);
-    return 'the box of ' + rows + ' and ' + cols + ', the digit ' + s.pointDigit + ' fits only in ' + s.line + ' ' + (s.index + 1);
+    return boxName(s.box) + ', the digit ' + s.pointDigit + ' fits only in ' + s.line + ' ' + (s.index + 1);
   }
 
   // The hintFor result for a pointing step (see findPointing).
@@ -281,11 +287,19 @@
         ? 'Row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' could only take ' + d + ' or ' + s.digit + ', so it must be ' + s.digit + '.'
         : 'That leaves row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' as the only cell in its ' + s.unit + ' where ' + d + ' fits, so it must be ' + d + '.';
     } else {
-      text = 'Hint: try pointing. In ' + box + ', so it cannot go anywhere else in ' + line + '. Use that to find the digit for row '
-        + (s.r + 1) + ', column ' + (s.c + 1) + '. Click Hint again to see why.';
+      var tail;
+      if (s.form === 'naked') {
+        tail = 'That means ' + d + ' cannot go in row ' + (s.r + 1) + ', column ' + (s.c + 1) + ', and only one other digit fits there now.';
+      } else {
+        var unitName = s.unit === 'box'
+          ? boxName(3 * Math.floor(s.r / 3) + Math.floor(s.c / 3))
+          : s.unit + ' ' + ((s.unit === 'row' ? s.r : s.c) + 1);
+        tail = 'Then look at ' + unitName + ': ' + d + ' now has only one place left there.';
+      }
+      text = 'Hint: try pointing. In ' + box + ', so it cannot go anywhere else in ' + line + '. ' + tail + ' Click Hint again to see why.';
     }
     return { kind: step === 2 ? 'explain' : 'nudge', technique: 'pointing', form: s.form, unit: s.unit, box: s.box, line: s.line, index: s.index,
-      pointDigit: d, r: s.r, c: s.c, digit: s.digit, text: text };
+      pointDigit: d, confined: s.confined, removed: s.removed, r: s.r, c: s.c, digit: s.digit, text: text };
   }
 
   // What Hint says for a grid. step 1 = nudge, step 2 = explain (only used when
@@ -345,17 +359,20 @@
   }
 
   // The cells a showing hint marks, as flat indices: { area: tinted cells (not the target),
-  // target, digits: cells holding the hint's digit, only on explain } for a hintFor result
-  // of kind nudge/explain. Tint: a naked single's row, column and box; a hidden single's unit;
-  // a pointing step's box and line. Marked digits: a hidden single's, or the pointing digit.
+  // target, digits: cells holding the hint's digit, only on explain, confined, removed: a pointing
+  // explain's box cells where the digit fits and line cells that lose it (else empty) } for a hintFor
+  // result of kind nudge/explain. Tint: a naked single's row, column and box; a hidden single's unit;
+  // a pointing step's box and line, plus its hidden-form unit. Marked digits: a hidden single's, or the pointing digit.
   function hintMarks(hint, grid) {
-    var p = hint.r * 9 + hint.c, units;
-    if (hint.technique === 'pointing') units = [hint.box * 3 + 2, hint.index * 3 + (hint.line === 'row' ? 0 : 1)];
-    else units = hint.technique === 'hidden' ? [CELL_UNITS[p][UNIT_NAMES.indexOf(hint.unit)]] : CELL_UNITS[p];
-    var area = [], digits = [], d = hint.technique === 'pointing' ? hint.pointDigit : hint.technique === 'hidden' ? hint.digit : 0;
+    var p = hint.r * 9 + hint.c, units, pointing = hint.technique === 'pointing';
+    var hidden = hint.unit ? [CELL_UNITS[p][UNIT_NAMES.indexOf(hint.unit)]] : [];
+    if (pointing) units = [hint.box * 3 + 2, hint.index * 3 + (hint.line === 'row' ? 0 : 1)].concat(hidden);
+    else units = hint.technique === 'hidden' ? hidden : CELL_UNITS[p];
+    var area = [], digits = [], d = pointing ? hint.pointDigit : hint.technique === 'hidden' ? hint.digit : 0;
     units.forEach(function (u) { UNITS[u].forEach(function (q) { if (q !== p && area.indexOf(q) < 0) area.push(q); }); });
     for (var q = 0; d && hint.kind === 'explain' && q < 81; q++) if (grid[Math.floor(q / 9)][q % 9] === d) digits.push(q);
-    return { area: area, target: p, digits: digits };
+    var explain = pointing && hint.kind === 'explain';
+    return { area: area, target: p, digits: digits, confined: explain ? hint.confined : [], removed: explain ? hint.removed : [] };
   }
 
   // ---- Rewards: recognising naked and hidden singles the learner enters ----
@@ -669,8 +686,10 @@
       hint = null;
       status.textContent = '';
       status.className = '';
-      table.querySelectorAll('.hint-target, .hint-area, .hint-digit').forEach(function (el) {
-        el.classList.remove('hint-target', 'hint-area', 'hint-digit');
+      // data-d is always set together with hint-confined / hint-removed, so [data-d] finds those cells too.
+      table.querySelectorAll('.hint-target, .hint-area, .hint-digit, [data-d]').forEach(function (el) {
+        el.classList.remove('hint-target', 'hint-area', 'hint-digit', 'hint-confined', 'hint-removed');
+        el.removeAttribute('data-d');
       });
       table.querySelectorAll('.conflict').forEach(function (el) {
         el.classList.remove('conflict');
@@ -856,6 +875,9 @@
       marks.area.forEach(function (q) { cellAt(q).classList.add('hint-area'); });
       cellAt(marks.target).classList.add('hint-target');
       marks.digits.forEach(function (q) { cellAt(q).classList.add('hint-digit'); });
+      [['confined', marks.confined], ['removed', marks.removed]].forEach(function (m) {
+        m[1].forEach(function (q) { cellAt(q).classList.add('hint-' + m[0]); cellAt(q).setAttribute('data-d', res.pointDigit); });
+      });
       inputs[res.r][res.c].focus();
     });
 
