@@ -225,6 +225,19 @@ describe('page (headless Chrome)', () => {
     noHint(s);
   });
 
+  it('f1. Tricky prefers a useful pointing step: seed 1 first click nudges pointing, the hinted digit is rewarded and counted', async () => {
+    await open('tricky', 1);
+    await click('#hint');
+    let s = await read();
+    assert.deepStrictEqual([s.target, s.status.startsWith('Hint: try pointing. In the box of rows 1-3 and columns 7-9, the digit 2 fits only in row 1')], [[4], true]);
+    await click('#hint');
+    assert.ok((await read()).status.endsWith('Row 1, column 5 could only take 2 or 7, so it must be 7.'));
+    await keys([[4, '7']]);
+    s = await read();
+    assert.strictEqual(s.status, 'Well done! You applied pointing: row 1, column 5 is 7.');
+    assert.strictEqual(s.tally[2], 'Pointing: 0 on your own, 1 with a hint');
+  });
+
   it('f2. the key line is gone after Verify; a naked/hidden explanation and the first click have none', async () => {
     const { seed, extra } = pointing;
     await open('tricky', seed);
@@ -234,7 +247,7 @@ describe('page (headless Chrome)', () => {
     assert.match((await read()).key, /^Key: dashed purple = the only places for \d in the box; struck grey /);
     await click('#verify');
     noHint(await read());
-    const p = pick('tricky', (pz) => S.findHiddenSingle(pz));
+    const p = pick('tricky', (pz) => S.findHiddenSingle(pz) && !S.findPointing(pz, { useful: true })); // Tricky teaches a useful pointing step first
     await open('tricky', p.seed);
     await click('#hint');
     await click('#hint');

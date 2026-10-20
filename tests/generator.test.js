@@ -88,20 +88,24 @@ test('hard is NOT solvable by singles plus pointing (so not by singles either)',
   for (const r of batches.hard) assert.strictEqual(S.solvableBy(r.puzzle, 'pointing'), false);
 });
 
-test('tricky: following Hint, entering each hinted digit, solves the puzzle and never returns none', () => {
+test('tricky: following Hint (Tricky preference), entering each hinted digit, solves the puzzle and never returns none', () => {
+  let most = 0;
   for (const r of batches.tricky.slice(0, 3)) {
-    const g = r.puzzle.map((row) => row.slice());
+    const g = r.puzzle.map((row) => row.slice()), tally = S.emptyTally();
     let pointing = 0;
     for (let n = 0; n < 81 && g.flat().includes(0); n++) {
-      const h = S.hintFor(g, 1);
+      const h = S.hintFor(g, 1, S.preferredTechnique(tally, 'tricky'), 'tricky');
       assert.strictEqual(h.kind, 'nudge');
       if (h.technique === 'pointing') pointing++;
+      tally[h.technique].hint++;
       assert.strictEqual(h.digit, r.solution[h.r][h.c]);
       g[h.r][h.c] = h.digit;
     }
     assert.deepStrictEqual(g, r.solution);
     assert.ok(pointing > 0);
+    most = Math.max(most, pointing);
   }
+  assert.ok(most >= 2); // seeds 3000-3002 give 2, 4 and 4 pointing hints
 });
 
 test('normal generation is not capped', () => {
