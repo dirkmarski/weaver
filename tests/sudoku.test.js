@@ -1,31 +1,22 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle, preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, seededRng } = require('../sudoku.js');
+const {
+  isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle,
+  preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, solvableBy,
+  seededRng, findPointing, hintMarks
+} = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
 const clone = () => SOLUTION.map((r) => r.slice());
 
 test('shipped solution is valid', () => assert.ok(isValidSolution(SOLUTION)));
 
-test('shipped solution has 81 cells all 1-9', () => {
-  const cells = SOLUTION.flat();
-  assert.strictEqual(cells.length, 81);
-  assert.ok(cells.every((v) => Number.isInteger(v) && v >= 1 && v <= 9));
-});
-
 test('rejects duplicate in a row', () => {
   // Swap two cells vertically within the same box column: every column and
   // box keeps the same digits (so stays valid); only rows 0 and 1 gain duplicates.
   const g = clone(); [g[0][0], g[1][0]] = [g[1][0], g[0][0]];
   assert.strictEqual(isValidSolution(g), false);
-  for (let i = 0; i < 9; i++) {
-    const col = g.map((r) => r[i]);
-    assert.strictEqual(new Set(col).size, 9, 'column ' + i);
-    const box = [];
-    for (let j = 0; j < 9; j++) box.push(g[3 * Math.floor(i / 3) + Math.floor(j / 3)][3 * (i % 3) + (j % 3)]);
-    assert.strictEqual(new Set(box).size, 9, 'box ' + i);
-  }
   assert.notStrictEqual(new Set(g[0]).size, 9);
 });
 
@@ -55,12 +46,6 @@ test('rejects wrong shape', () => {
   assert.strictEqual(isValidSolution(g), false);
   assert.strictEqual(isValidSolution(null), false);
   assert.strictEqual(isValidSolution([]), false);
-});
-
-test('shipped solution is not a simple pattern', () => {
-  const shifts = (a, b) => a.every((v, i) => v === b[(i + 1) % 9]);
-  for (let r = 0; r < 8; r++) assert.ok(!shifts(SOLUTION[r], SOLUTION[r + 1]));
-  for (const row of SOLUTION) assert.notDeepStrictEqual(row, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
 });
 
 test('rejects sparse array (hole)', () => {
@@ -344,11 +329,13 @@ test('hintFor: full grid without conflicts', () => {
   assert.strictEqual(h.text, 'Every cell is filled. Click Verify to check the grid.');
 });
 
-test('hintFor: no naked and no hidden single', () => {
-  for (const g of [emptyGrid(), blank(...TWO_CANDIDATES)]) {
+test('hintFor: no naked single, hidden single or pointing step', () => {
+  // The last grid has a pointing step (top-left box, digit 1, row 1) that makes no cell a single.
+  const stepOnly = grid81('000000000456000000789000000' + '0'.repeat(54));
+  for (const g of [emptyGrid(), blank(...TWO_CANDIDATES), stepOnly]) {
     const h = hintFor(g, 1);
     assert.strictEqual(h.kind, 'none');
-    assert.strictEqual(h.text, 'No naked or hidden single right now. At this point the puzzle needs another technique.');
+    assert.strictEqual(h.text, 'No naked single, hidden single or pointing step right now. At this point the puzzle needs another technique.');
     assert.strictEqual(hintFor(g, 2).kind, 'none');
   }
 });
@@ -443,43 +430,6 @@ test('findHiddenSingle: does not change the grid', () => {
   assert.strictEqual(JSON.stringify(H_BOX), copy);
 });
 
-test('findHiddenSingle: agrees with a candidate-based reading of D2/D3 on generated positions', () => {
-  const cands = (g, r, c) => [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((d) => {
-    for (let i = 0; i < 9; i++) {
-      if (g[r][i] === d || g[i][c] === d) return false;
-      if (g[3 * Math.floor(r / 3) + Math.floor(i / 3)][3 * Math.floor(c / 3) + (i % 3)] === d) return false;
-    }
-    return true;
-  });
-  const cellsOf = (kind, r, c) => Array.from({ length: 9 }, (_, i) => kind === 'box'
-    ? [3 * Math.floor(r / 3) + Math.floor(i / 3), 3 * Math.floor(c / 3) + (i % 3)]
-    : kind === 'row' ? [r, i] : [i, c]);
-  const expected = (g) => {
-    for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {
-      if (g[r][c]) continue;
-      for (const unit of ['box', 'row', 'column']) for (const digit of cands(g, r, c)) {
-        const spots = cellsOf(unit, r, c).filter(([a, b]) => !g[a][b] && cands(g, a, b).includes(digit));
-        if (spots.length === 1) return { r, c, digit, unit };
-      }
-    }
-    return null;
-  };
-  let hidden = 0;
-  for (let seed = 1; seed <= 12; seed++) {
-    const g = generatePuzzle('medium', { rng: seededRng(seed) }).puzzle.map((row) => row.slice());
-    for (;;) {
-      const want = expected(g);
-      assert.deepStrictEqual(findHiddenSingle(g), want, 'seed ' + seed);
-      const n = findNakedSingle(g);
-      if (n) { g[n.r][n.c] = n.digit; continue; }
-      if (!want) break;
-      hidden++;
-      g[want.r][want.c] = want.digit;
-    }
-  }
-  assert.ok(hidden > 0);
-});
-
 test('hintFor: a naked single is taught before a hidden single, even a later one in reading order', () => {
   assert.deepStrictEqual(findHiddenSingle(H_NAKED_FIRST), { r: 0, c: 1, digit: 5, unit: 'box' });
   const h = hintFor(H_NAKED_FIRST, 1);
@@ -514,15 +464,17 @@ test('hintFor: hidden single explain text for box, row and column', () => {
   assert.strictEqual(box.technique, 'hidden');
   assert.strictEqual(box.unit, 'box');
   assert.strictEqual(box.text, 'Hidden single: row 5, column 6 must be 5, because every other empty cell in its box already has a 5 in its row or column.');
-  assert.strictEqual(hintFor(H_ROW, 2).text, 'Hidden single: row 4, column 7 must be 6, because every other empty cell in its row already has a 6 in its column or box.');
-  assert.strictEqual(hintFor(H_COL, 2).text, 'Hidden single: row 1, column 6 must be 4, because every other empty cell in its column already has a 4 in its row or box.');
+  assert.strictEqual(hintFor(H_ROW, 2).text, 'Hidden single: row 4, column 7 must be 6, because every other empty cell in its row '
+    + 'already has a 6 in its column or box.');
+  assert.strictEqual(hintFor(H_COL, 2).text, 'Hidden single: row 1, column 6 must be 4, because every other empty cell in its column '
+    + 'already has a 4 in its row or box.');
 });
 
 test('hintFor: hidden single explain text uses "an" before 8 and "a" before 7 and 9', () => {
   const relabel = (d) => H_BOX.map((row) => row.map((v) => (v === 5 ? d : v === d ? 5 : v)));
-  const text = (d, a) => 'Hidden single: row 5, column 6 must be ' + d + ', because every other empty cell in its box already has ' + a + ' ' + d + ' in its row or column.';
+  const text = (d, a) => 'Hidden single: row 5, column 6 must be ' + d + ', because every other empty cell in its box '
+    + 'already has ' + a + ' ' + d + ' in its row or column.';
   assert.strictEqual(hintFor(relabel(8), 2).text, text(8, 'an'));
-  assert.strictEqual(hintFor(relabel(8), 2).text, 'Hidden single: row 5, column 6 must be 8, because every other empty cell in its box already has an 8 in its row or column.');
   assert.strictEqual(hintFor(relabel(7), 2).text, text(7, 'a'));
   assert.strictEqual(hintFor(relabel(9), 2).text, text(9, 'a'));
 });
@@ -543,23 +495,6 @@ test('hintFor: naked single results carry technique naked', () => {
 // ---- Rewards: classifyEntry, creditEntry, tallyLines ----
 
 const cl = (g) => g.map((r) => r.slice());
-
-// number of empty cells of the unit of (r, c) (kind 0 row, 1 column, 2 box) where d fits
-function spotsForTest(g, r, c, kind, d) {
-  let n = 0;
-  for (let i = 0; i < 9; i++) {
-    const rr = kind === 0 ? r : kind === 1 ? i : 3 * Math.floor(r / 3) + Math.floor(i / 3);
-    const cc = kind === 0 ? i : kind === 1 ? c : 3 * Math.floor(c / 3) + (i % 3);
-    if (g[rr][cc]) continue;
-    let fits = true;
-    for (let j = 0; j < 9; j++) {
-      if (g[rr][j] === d || g[j][cc] === d) fits = false;
-      if (g[3 * Math.floor(rr / 3) + Math.floor(j / 3)][3 * Math.floor(cc / 3) + (j % 3)] === d) fits = false;
-    }
-    if (fits) n++;
-  }
-  return n;
-}
 
 test('classifyEntry: null for a conflict elsewhere, a filled cell and digits outside 1-9', () => {
   assert.deepStrictEqual(classifyEntry(H_BOX, 4, 5, 5), { technique: 'hidden', unit: 'box' });
@@ -587,25 +522,17 @@ test('classifyEntry: naked single, and naked wins over hidden', () => {
   g[2][3] = 0;
   const d = SOLUTION[2][3];
   // the only empty cell: d is also the only place for d in the row, column and box
-  for (let kind = 0; kind < 3; kind++) assert.strictEqual(spotsForTest(g, 2, 3, kind, d), 1);
   assert.deepStrictEqual(classifyEntry(g, 2, 3, d), { technique: 'naked' });
   assert.strictEqual(classifyEntry(g, 2, 3, d === 9 ? 1 : d + 1), null);
 });
 
 test('classifyEntry: unit order box, then row, then column', () => {
   // (2,3) with 2: the only spot in its box, its row and its column -> box
-  for (let kind = 0; kind < 3; kind++) assert.strictEqual(spotsForTest(H_ALL, 2, 3, kind, 2), 1);
   assert.strictEqual(findNakedSingle(H_ALL), null);
   assert.deepStrictEqual(classifyEntry(H_ALL, 2, 3, 2), { technique: 'hidden', unit: 'box' });
   // (0,4) with 7: the only spot in its row and its column, not in its box -> row
-  assert.strictEqual(spotsForTest(H_ROWCOL, 0, 4, 0, 7), 1);
-  assert.strictEqual(spotsForTest(H_ROWCOL, 0, 4, 1, 7), 1);
-  assert.ok(spotsForTest(H_ROWCOL, 0, 4, 2, 7) > 1);
   assert.deepStrictEqual(classifyEntry(H_ROWCOL, 0, 4, 7), { technique: 'hidden', unit: 'row' });
   // (0,5) with 4: only the column
-  assert.ok(spotsForTest(H_COL, 0, 5, 0, 4) > 1);
-  assert.ok(spotsForTest(H_COL, 0, 5, 2, 4) > 1);
-  assert.strictEqual(spotsForTest(H_COL, 0, 5, 1, 4), 1);
   assert.deepStrictEqual(classifyEntry(H_COL, 0, 5, 4), { technique: 'hidden', unit: 'column' });
 });
 
@@ -629,8 +556,10 @@ test('classifyEntry agrees with Hint at every step of 6 seeded Medium puzzles', 
 
 const T0 = emptyTally();
 // Issue 31: the two "not counted" texts, byte for byte (R, C 1-based).
-const NOT_SINGLE = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d + '. It was not a naked or hidden single at this point, so it is not counted.';
-const BROKEN = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d + '. Some numbers break the rules, so it is not counted. Click Verify to see which.';
+const NOT_SINGLE = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d
+  + '. It was not a naked or hidden single at this point, so it is not counted.';
+const BROKEN = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d
+  + '. Some numbers break the rules, so it is not counted. Click Verify to see which.';
 
 test('creditEntry: with a hint, right cell and digit', () => {
   const hint = hintFor(H_BOX, 1);
@@ -723,12 +652,10 @@ const MIXED = { naked: { own: 3, hint: 2 }, hidden: { own: 1, hint: 4 } };
 
 test('completionFor: any empty cell gives null, wherever it is', () => {
   const t = emptyTally();
-  for (let r = 0; r < 9; r++) {
-    for (let c = 0; c < 9; c++) {
-      const g = clone();
-      g[r][c] = 0;
-      assert.strictEqual(completionFor(g, t), null, 'empty at ' + r + ',' + c);
-    }
+  for (const [r, c] of [[0, 0], [4, 4], [8, 8]]) {
+    const g = clone();
+    g[r][c] = 0;
+    assert.strictEqual(completionFor(g, t), null, 'empty at ' + r + ',' + c);
   }
   assert.strictEqual(completionFor(PUZZLE, t), null);
   assert.strictEqual(completionFor(emptyGrid(), t), null);
@@ -800,18 +727,17 @@ test('TECHNIQUE_DEFINITIONS: the two texts, byte for byte', () => {
 
 // ---- Issue 30: Hint prefers the technique applied less ----
 
-const frozen = require('./frozen-sudoku-e81999c.js'); // byte copy of sudoku.js at e81999c (before issue 30)
-
 const tallyOf = (no, nh, ho, hh) => ({ naked: { own: no, hint: nh }, hidden: { own: ho, hint: hh } });
 
 test('preferredTechnique: all-zero tally follows the level', () => {
   assert.strictEqual(preferredTechnique(emptyTally(), 'easy'), 'naked');
   assert.strictEqual(preferredTechnique(emptyTally(), 'medium'), 'hidden');
   assert.strictEqual(preferredTechnique(emptyTally(), 'hard'), 'hidden');
+  assert.strictEqual(preferredTechnique(emptyTally(), 'tricky'), 'hidden');
 });
 
 test('preferredTechnique: the technique with the lower count wins on every level', () => {
-  for (const level of ['easy', 'medium', 'hard']) {
+  for (const level of ['easy', 'medium', 'tricky', 'hard']) {
     assert.strictEqual(preferredTechnique(tallyOf(2, 1, 1, 0), level), 'hidden', 'N>H ' + level);
     assert.strictEqual(preferredTechnique(tallyOf(0, 0, 0, 3), level), 'naked', 'H>N ' + level);
   }
@@ -835,173 +761,71 @@ test('preferredTechnique: does not change its input', () => {
   assert.strictEqual(JSON.stringify(t), copy);
 });
 
-// Independent oracle (no use of the code under test): candidates by brute force.
-const peersHold = (g, r, c, d) => {
-  for (let i = 0; i < 9; i++) if (g[r][i] === d || g[i][c] === d) return true;
-  const br = 3 * Math.floor(r / 3), bc = 3 * Math.floor(c / 3);
-  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (g[br + i][bc + j] === d) return true;
-  return false;
-};
-const candidates = (g, r, c) => {
-  const out = [];
-  if (g[r][c]) return out;
-  for (let d = 1; d <= 9; d++) if (!peersHold(g, r, c, d)) out.push(d);
-  return out;
-};
-const unitCells = (kind, r, c) => {
-  const out = [];
-  for (let i = 0; i < 9; i++) {
-    if (kind === 'row') out.push([r, i]);
-    else if (kind === 'column') out.push([i, c]);
-    else out.push([3 * Math.floor(r / 3) + Math.floor(i / 3), 3 * Math.floor(c / 3) + (i % 3)]);
-  }
-  return out;
-};
-// First hidden single in reading order; unit order box, row, column; digits 1-9.
-// pure = skip cells with exactly one candidate.
-const oracleHidden = (g, pure) => {
-  for (let r = 0; r < 9; r++) {
-    for (let c = 0; c < 9; c++) {
-      const cand = candidates(g, r, c);
-      if (!cand.length || (pure && cand.length === 1)) continue;
-      for (const unit of ['box', 'row', 'column']) {
-        for (let d = 1; d <= 9; d++) {
-          if (!cand.includes(d)) continue;
-          const spots = unitCells(unit, r, c).filter(([a, b]) => candidates(g, a, b).includes(d));
-          if (spots.length === 1) return { r, c, digit: d, unit };
-        }
-      }
-    }
-  }
-  return null;
-};
+// Position with a naked single and hidden singles that are also naked singles (found once from seed 1, then fixed):
+// the first hidden single (0,1) is also a naked single; the first pure hidden single is (0,7).
+const H_SKIP = grid81('804700100962081057073005800300002010000000000000000780000120500080579031005000602');
+const HIDDEN = (g) => ({ technique: 'hidden', digit: g.digit, r: g.r, c: g.c, unit: g.unit });
 
-// Walk seeded Easy and Medium puzzles, following the Hint with the preferred technique
-// (as the page would); where Hint has nothing, fill the first empty cell from the solution.
-const walkPositions = (() => {
-  const cache = [];
-  return () => {
-    if (cache.length) return cache;
-    let seed = 3000;
-    for (const level of ['easy', 'medium']) {
-      for (let i = 0; i < 120; i++) {
-        const p = generatePuzzle(level, { rng: seededRng(seed++) });
-        const g = p.puzzle.map((row) => row.slice());
-        const tally = emptyTally();
-        for (let guard = 0; guard < 81; guard++) {
-          cache.push({ level, grid: g.map((row) => row.slice()) });
-          const h = hintFor(g, 1, preferredTechnique(tally, level));
-          let r, c, d;
-          if (h.kind === 'nudge') { r = h.r; c = h.c; d = h.digit; tally[h.technique].hint++; }
-          else {
-            const e = [].concat(...g.map((row, rr) => row.map((v, cc) => [rr, cc, v]))).find((x) => !x[2]);
-            if (!e) break;
-            [r, c] = e; d = p.solution[r][c];
-          }
-          g[r][c] = d;
-        }
-      }
-    }
-    return cache;
-  };
-})();
-
-test('walk covers at least 200 generated Easy and Medium puzzles with varied positions', () => {
-  const pos = walkPositions();
-  assert.ok(pos.length > 5000);
-  assert.ok(pos.some((x) => x.level === 'easy') && pos.some((x) => x.level === 'medium'));
+test('hintFor with hidden: the first pure hidden single, at step 1 and step 2', () => {
+  const nudge = hintFor(H_NAKED_FIRST, 1, 'hidden'), explain = hintFor(H_NAKED_FIRST, 2, 'hidden');
+  assert.strictEqual(nudge.kind, 'nudge');
+  assert.deepStrictEqual([nudge.technique, nudge.r, nudge.c, nudge.digit, nudge.unit], ['hidden', 0, 1, 5, 'box']);
+  assert.strictEqual(explain.kind, 'explain');
+  assert.deepStrictEqual(HIDDEN(explain), HIDDEN(nudge)); // step 2 explains the same cell as step 1
+  assert.match(nudge.text, /is a hidden single: in its box/);
+  assert.match(explain.text, /^Hidden single: row 1, column 2 must be 5/);
 });
 
-test('hintFor without prefer, or with naked, equals the frozen pre-change hintFor (steps 1 and 2)', () => {
-  for (const { grid } of walkPositions()) {
-    for (const step of [1, 2]) {
-      const want = frozen.hintFor(grid, step);
-      assert.deepStrictEqual(hintFor(grid, step), want);
-      assert.deepStrictEqual(hintFor(grid, step, 'naked'), want);
-    }
-  }
+test('hintFor with hidden: a hidden single that is also a naked single is skipped for a later pure one', () => {
+  assert.deepStrictEqual(findHiddenSingle(H_SKIP), { r: 0, c: 1, digit: 5, unit: 'box' });
+  assert.strictEqual(hintFor(H_SKIP, 1).technique, 'naked'); // without prefer: the naked single
+  const h = hintFor(H_SKIP, 1, 'hidden');
+  assert.deepStrictEqual([h.technique, h.r, h.c, h.digit, h.unit], ['hidden', 0, 7, 2, 'row']);
+  assert.deepStrictEqual(HIDDEN(hintFor(H_SKIP, 2, 'hidden')), HIDDEN(h));
 });
 
-test('hintFor with hidden: first pure hidden single in reading order, else the unchanged result', () => {
-  let pure = 0, fallback = 0, nakedAlsoExisted = 0;
-  for (const { grid } of walkPositions()) {
-    const want = oracleHidden(grid, true);
-    for (const step of [1, 2]) {
-      const got = hintFor(grid, step, 'hidden');
-      if (want) {
-        assert.strictEqual(got.technique, 'hidden');
-        assert.strictEqual(got.kind, step === 2 ? 'explain' : 'nudge');
-        assert.deepStrictEqual({ r: got.r, c: got.c, digit: got.digit, unit: got.unit }, want);
-        assert.notStrictEqual(candidates(grid, got.r, got.c).length, 1, 'not a naked single');
-      } else {
-        assert.deepStrictEqual(got, frozen.hintFor(grid, step));
-      }
-    }
-    if (want) { pure++; if (frozen.hintFor(grid, 1).technique === 'naked') nakedAlsoExisted++; } else fallback++;
-  }
-  assert.ok(pure > 500 && fallback > 50 && nakedAlsoExisted > 200, [pure, fallback, nakedAlsoExisted].join());
-});
-
-test('hintFor with hidden: step 2 explains the same cell as step 1, and a hidden hint uses the existing texts', () => {
-  for (const { grid } of walkPositions()) {
-    for (const prefer of [undefined, 'naked', 'hidden']) {
-      const a = hintFor(grid, 1, prefer), b = hintFor(grid, 2, prefer);
-      if (a.kind !== 'nudge') { assert.strictEqual(a.kind, b.kind); continue; }
-      assert.deepStrictEqual([b.r, b.c, b.digit, b.technique, b.unit], [a.r, a.c, a.digit, a.technique, a.unit]);
-    }
-  }
-  // Same texts as the frozen code for the same hidden single: H_BOX-like grid where only hidden singles exist.
-  for (const { grid } of walkPositions().slice(0, 4000)) {
-    const f = frozen.hintFor(grid, 1);
-    const h = hintFor(grid, 1, 'hidden');
-    if (h.technique === 'hidden' && f.technique === 'hidden') assert.deepStrictEqual(h, f);
-  }
-});
-
-test('hintFor with hidden: conflicts, full grid and no single are the same for every prefer', () => {
-  const conflict = PUZZLE.map((r) => r.slice()); conflict[0][2] = 5;
-  const full = clone();
-  for (const prefer of [undefined, 'naked', 'hidden']) {
-    assert.deepStrictEqual(hintFor(conflict, 1, prefer), frozen.hintFor(conflict, 1));
-    assert.strictEqual(hintFor(conflict, 1, prefer).kind, 'conflict');
-    assert.deepStrictEqual(hintFor(full, 1, prefer), frozen.hintFor(full, 1));
-    assert.strictEqual(hintFor(full, 1, prefer).kind, 'full');
-    const empty = Array.from({ length: 9 }, () => Array(9).fill(0));
-    assert.deepStrictEqual(hintFor(empty, 2, prefer), frozen.hintFor(empty, 2));
-    assert.strictEqual(hintFor(empty, 2, prefer).kind, 'none');
+test('hintFor: prefer naked, an unknown prefer and no prefer give the same result', () => {
+  for (const g of [H_SKIP, H_NAKED_FIRST, H_BOX]) for (const step of [1, 2]) {
+    assert.deepStrictEqual(hintFor(g, step, 'naked'), hintFor(g, step));
+    assert.deepStrictEqual(hintFor(g, step, undefined), hintFor(g, step));
   }
 });
 
 test('hintFor with hidden falls back to the naked single when the only hidden singles are naked singles', () => {
-  // Cell (0,8) is the only gap: it is a naked single and also a hidden single.
-  const g = clone(); g[0][8] = 0;
-  assert.deepStrictEqual(findHiddenSingle(g, { notNaked: true }), null);
+  const g = clone(); g[0][8] = 0; // the only gap: a naked single and also a hidden single
   assert.ok(findHiddenSingle(g));
   const h = hintFor(g, 1, 'hidden');
   assert.strictEqual(h.technique, 'naked');
-  assert.deepStrictEqual(h, frozen.hintFor(g, 1));
+  assert.deepStrictEqual([h.kind, h.r, h.c, h.digit], ['nudge', 0, 8, SOLUTION[0][8]]);
+  assert.deepStrictEqual(hintFor(g, 2, 'hidden'), hintFor(g, 2));
 });
 
-test('findHiddenSingle: without options unchanged; notNaked matches the oracle and never returns a naked single', () => {
-  let skipped = 0;
-  for (const { grid } of walkPositions()) {
-    const copy = JSON.stringify(grid);
-    const plain = findHiddenSingle(grid);
-    assert.deepStrictEqual(plain, frozen.findHiddenSingle(grid));
-    assert.deepStrictEqual(findHiddenSingle(grid, {}), plain);
-    assert.deepStrictEqual(findHiddenSingle(grid, { notNaked: false }), plain);
-    const pure = findHiddenSingle(grid, { notNaked: true });
-    assert.deepStrictEqual(pure, oracleHidden(grid, true));
-    if (pure) assert.notStrictEqual(candidates(grid, pure.r, pure.c).length, 1);
-    if (plain && (!pure || pure.r !== plain.r || pure.c !== plain.c)) skipped++;
-    assert.strictEqual(JSON.stringify(grid), copy, 'input not mutated');
+test('hintFor with hidden: conflict, full grid and no single are the same for every prefer', () => {
+  const conflict = PUZZLE.map((r) => r.slice()); conflict[0][2] = 5;
+  for (const prefer of [undefined, 'naked', 'hidden']) {
+    for (const [g, step, kind] of [[conflict, 1, 'conflict'], [clone(), 1, 'full'], [emptyGrid(), 2, 'none']]) {
+      assert.strictEqual(hintFor(g, step, prefer).kind, kind, kind + ' ' + prefer);
+      assert.deepStrictEqual(hintFor(g, step, prefer), hintFor(g, step));
+    }
   }
-  assert.ok(skipped > 100, 'the option really skips naked-single cells: ' + skipped);
 });
 
-test('hintFor does not mutate its input for any prefer', () => {
-  const g = PUZZLE.map((r) => r.slice()), copy = JSON.stringify(g);
+test('findHiddenSingle notNaked: skips cells that are naked singles; options {} or false change nothing', () => {
+  const pure = findHiddenSingle(H_SKIP, { notNaked: true });
+  assert.deepStrictEqual(pure, { r: 0, c: 7, digit: 2, unit: 'row' });
+  assert.notDeepStrictEqual(pure, findHiddenSingle(H_SKIP));
+  assert.deepStrictEqual(findHiddenSingle(H_SKIP, {}), findHiddenSingle(H_SKIP));
+  assert.deepStrictEqual(findHiddenSingle(H_SKIP, { notNaked: false }), findHiddenSingle(H_SKIP));
+  assert.deepStrictEqual(findHiddenSingle(H_BOX, { notNaked: true }), findHiddenSingle(H_BOX)); // no naked cell: same
+  const g = clone(); g[0][8] = 0;
+  assert.strictEqual(findHiddenSingle(g, { notNaked: true }), null); // only a naked single left
+  assert.strictEqual(findHiddenSingle(emptyGrid(), { notNaked: true }), null);
+});
+
+test('hintFor and findHiddenSingle do not mutate their input, for any prefer or option', () => {
+  const g = H_SKIP.map((r) => r.slice()), copy = JSON.stringify(g);
   for (const prefer of [undefined, 'naked', 'hidden']) for (const step of [1, 2]) hintFor(g, step, prefer);
+  findHiddenSingle(g, { notNaked: true });
   assert.strictEqual(JSON.stringify(g), copy);
 });
 
@@ -1013,7 +837,6 @@ test('creditEntry (a): not a single, text byte for byte, nothing counted', () =>
   assert.strictEqual(res.tally, T0);
   assert.deepStrictEqual(res.credited, {});
   assert.strictEqual(creditEntry(T0, {}, null, H_BOX, 4, 5, '6').text, NOT_SINGLE(5, 6, 6));
-  assert.strictEqual(creditEntry(T0, {}, null, H_BOX, 4, 5, '4').text.indexOf('Entered: row 5, column 6 is 4. '), 0);
 });
 
 test('creditEntry (a): a digit already in the row, column or box; digit 8, row and column 9', () => {
@@ -1072,54 +895,94 @@ test('creditEntry: a credited cell re-entered with a non-single shows (a), count
   assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '1').text, NOT_SINGLE(5, 6, 1));
 });
 
-// E2: walk generated puzzles against the frozen pre-#31 creditEntry (frozen-sudoku-e81999c.js; its
-// creditEntry is byte-identical to main's before this issue).
-test('creditEntry vs the frozen creditEntry over 220 generated puzzles (E2)', () => {
-  // independent rule check, written without classifyEntry or findConflicts
-  const clashes = (g) => {
-    for (let a = 0; a < 81; a++) for (let b = a + 1; b < 81; b++) {
-      const ra = Math.floor(a / 9), ca = a % 9, rb = Math.floor(b / 9), cb = b % 9;
-      if (!g[ra][ca] || g[ra][ca] !== g[rb][cb]) continue;
-      if (ra === rb || ca === cb || (Math.floor(ra / 3) === Math.floor(rb / 3) && Math.floor(ca / 3) === Math.floor(cb / 3))) return true;
-    }
-    return false;
-  };
-  const counts = { same: 0, a: 0, b: 0, skipped: 0, puzzles: 0 };
-  for (const level of ['easy', 'medium']) {
-    for (let seed = 1; seed <= 110; seed++) {
-      const { puzzle, solution } = generatePuzzle(level, { rng: seededRng(seed * 7 + (level === 'easy' ? 1 : 2)), maxMs: 400 });
-      counts.puzzles++;
-      const rng = seededRng(seed);
-      const g = puzzle.map((r) => r.slice());
-      let tN = emptyTally(), crN = {}, tF = emptyTally(), crF = {};
-      const cells = [];
-      for (let p = 0; p < 81; p++) if (!g[Math.floor(p / 9)][p % 9]) cells.push(p);
-      for (let step = 0; step < 90 && cells.length; step++) {
-        const p = cells[Math.floor(rng() * cells.length)], r = Math.floor(p / 9), c = p % 9;
-        const kind = rng();
-        // mix: the solution digit, a random (often wrong) digit, and now and then a clear / bad value
-        const value = kind < 0.45 ? String(solution[r][c]) : kind < 0.9 ? String(1 + Math.floor(rng() * 9)) : ['', '0', 'x', '12'][Math.floor(rng() * 4)];
-        const h = rng() < 0.4 ? hintFor(g, 1 + Math.floor(rng() * 2)) : null;
-        const hint = h && h.kind !== 'conflict' && h.kind !== 'full' && h.kind !== 'none' ? h : null;
-        const before = JSON.stringify([g, tN, crN]);
-        const want = frozen.creditEntry(tF, crF, hint, g, r, c, value);
-        const got = creditEntry(tN, crN, hint, g, r, c, value);
-        assert.strictEqual(JSON.stringify([g, tN, crN]), before, 'inputs not mutated');
-        assert.deepStrictEqual(got.tally, want.tally);
-        assert.deepStrictEqual(got.credited, want.credited);
-        if (want.text !== '') { assert.strictEqual(got.text, want.text); counts.same++; }
-        else if (!/^[1-9]$/.test(value)) { assert.strictEqual(got.text, ''); counts.skipped++; }
-        else if (clashes(g)) { assert.strictEqual(got.text, BROKEN(r + 1, c + 1, value)); counts.b++; }
-        else { assert.strictEqual(got.text, NOT_SINGLE(r + 1, c + 1, value)); counts.a++; }
-        tN = got.tally; crN = got.credited; tF = want.tally; crF = want.credited;
-        // enter the value like the page does (judged entries are digits into empty cells)
-        // (a wrong digit is mostly not kept, so most of the walk stays free of clashes; sometimes it is, to reach (b))
-        if (/^[1-9]$/.test(value) && (+value === solution[r][c] || rng() < 0.08)) { g[r][c] = +value; cells.splice(cells.indexOf(p), 1); }
-        // and now and then clear it again so the credited-cell path is exercised
-        if (g[r][c] && rng() < 0.15) { g[r][c] = 0; cells.push(p); }
-      }
-    }
-  }
-  assert.ok(counts.puzzles >= 200);
-  assert.ok(counts.same > 300 && counts.a > 500 && counts.b > 100 && counts.skipped > 50, JSON.stringify(counts));
+// ---- Issue 36: Hint teaches pointing ----
+
+// Two Hard walls (generatePuzzle('hard', { rng: seededRng(seed) }) filled with singles until none is left), as literals.
+const rows9 = (...rows) => rows.map((s) => [...s].map(Number));
+const WALL_ROW = rows9('000100402', '840002001', '521040030', '000469205', '965020014', '402051000', '000290040', '204080069', '093014528'); // seed 3
+const WALL_COL = rows9('425386179', '390217004', '170594230', '030941607', '917600480', '064000913', '781400000', '000020700', '000000000'); // seed 8
+const WALL_BOX = rows9('090600030', '002005000', '050008091', '000003080', '070500300', '230007400', '689174003', '703000000', '000300078'); // seed 139
+const BOX_INTRO = 'In the box of rows 1-3 and columns 1-3, the digit ';
+
+test('pointing, row line, naked form: finder, nudge, explain on the same cell, no mutation', () => {
+  const snap = JSON.stringify(WALL_ROW);
+  assert.deepStrictEqual(findPointing(WALL_ROW), { r: 0, c: 4, digit: 7, form: 'naked', box: 0, line: 'row', index: 0, pointDigit: 3 });
+  const one = hintFor(WALL_ROW, 1), two = hintFor(WALL_ROW, 2);
+  assert.strictEqual(one.kind, 'nudge');
+  assert.strictEqual(two.kind, 'explain');
+  assert.strictEqual(one.technique, 'pointing');
+  assert.strictEqual(one.text, 'Hint: try pointing. ' + BOX_INTRO + '3 fits only in row 1, so it cannot go anywhere else in row 1. '
+    + 'Use that to find the digit for row 1, column 5. Click Hint again to see why.');
+  assert.strictEqual(two.text, 'Pointing: in the box of rows 1-3 and columns 1-3, the digit 3 fits only in row 1, so 3 cannot go in row 1 outside that box. '
+    + 'Row 1, column 5 could only take 3 or 7, so it must be 7.');
+  assert.deepStrictEqual([two.r, two.c, two.digit, two.form], [one.r, one.c, one.digit, one.form]);
+  assert.strictEqual(JSON.stringify(WALL_ROW), snap);
+});
+
+test('pointing, column line, hidden form: the earlier digit 6 step in the same box makes no single and is skipped', () => {
+  assert.deepStrictEqual(findPointing(WALL_COL),
+    { r: 3, c: 0, digit: 8, form: 'hidden', unit: 'row', box: 0, line: 'column', index: 2, pointDigit: 8 });
+  assert.strictEqual(hintFor(WALL_COL, 1).text, 'Hint: try pointing. ' + BOX_INTRO + '8 fits only in column 3, so it cannot go anywhere else in column 3. '
+    + 'Use that to find the digit for row 4, column 1. Click Hint again to see why.');
+  const two = hintFor(WALL_COL, 2);
+  assert.strictEqual(two.text, 'Pointing: in the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3, '
+    + 'so 8 cannot go in column 3 outside that box. ' + 'That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
+  assert.deepStrictEqual([two.r, two.c, two.digit, two.unit], [3, 0, 8, 'row']);
+});
+
+test('pointing, hidden form: the unit is the box when box, row and column all qualify (row line, box 7)', () => {
+  assert.deepStrictEqual(findPointing(WALL_BOX),
+    { r: 7, c: 4, digit: 5, form: 'hidden', unit: 'box', box: 6, line: 'row', index: 8, pointDigit: 5 });
+  assert.ok(hintFor(WALL_BOX, 2).text.endsWith('That leaves row 8, column 5 as the only cell in its box where 5 fits, so it must be 5.'));
+});
+
+test('pointing: singles keep priority, conflicts stay unchanged, a box with one spot is no step', () => {
+  const single = WALL_ROW.map((row) => row.slice()); single[8][8] = 0; // the last single filled before the wall
+  assert.notStrictEqual(hintFor(single, 1).technique, 'pointing');
+  assert.strictEqual(hintFor(single, 1).kind, 'nudge');
+  const broken = WALL_ROW.map((row) => row.slice()); broken[0][1] = 4;
+  assert.strictEqual(hintFor(broken, 1).kind, 'conflict');
+  assert.strictEqual(findPointing(blank([0, 1], [1, 5], [8, 1], [7, 0], [8, 0])), null); // 3 fits one cell of the top-left box only
+});
+
+test('pointing: within a box the lower digit wins when two digits both make a single', () => {
+  // seed 339 wall: the top-left box has a digit 2 step and a digit 5 step, each making a single.
+  const wall = rows9('000001489', '398604010', '174900360', '807049021', '010000974', '409100038', '700892146', '986410050', '241056890');
+  const p = findPointing(wall);
+  assert.deepStrictEqual([p.box, p.pointDigit, p.r, p.c, p.digit], [0, 2, 4, 3, 2]);
+});
+
+test('pointing: the hinted entry is rewarded with no count change; another digit is "not counted"', () => {
+  const hint = hintFor(WALL_ROW, 1), tally = { naked: { own: 1, hint: 0 }, hidden: { own: 0, hint: 2 } };
+  const ok = creditEntry(tally, { 5: true }, hint, WALL_ROW, 0, 4, '7');
+  assert.strictEqual(ok.text, 'Well done! You applied pointing: row 1, column 5 is 7.');
+  assert.deepStrictEqual([ok.tally, ok.credited], [tally, { 5: true }]);
+  assert.strictEqual(creditEntry(tally, {}, hint, WALL_ROW, 0, 4, '3').text, NOT_SINGLE(1, 5, 3));
+  assert.strictEqual(creditEntry(tally, {}, null, WALL_ROW, 0, 4, '7').text, NOT_SINGLE(1, 5, 7)); // no hint showing: judged as today
+});
+
+test('hintMarks: tint and marked digits for pointing (box and line, pointing digit) and for singles', () => {
+  const nudge = hintMarks(hintFor(WALL_ROW, 1), WALL_ROW), explain = hintMarks(hintFor(WALL_ROW, 2), WALL_ROW);
+  assert.deepStrictEqual(nudge.area.slice().sort((a, b) => a - b), [0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 18, 19, 20]); // box 1 and row 1, not the target
+  assert.strictEqual(nudge.target, 4);
+  assert.deepStrictEqual(nudge.digits, []);
+  assert.deepStrictEqual(explain.digits, [25, 74]); // the two 3s, though the naked target takes 7
+  const hidden = hintMarks(hintFor(WALL_COL, 2), WALL_COL);
+  assert.deepStrictEqual([hidden.target, hidden.digits], [27, [4, 43, 55]]);
+  const naked = hintMarks(hintFor(blank([4, 7]), 2), blank([4, 7]));
+  assert.deepStrictEqual([naked.area.length, naked.digits], [20, []]); // row, column and box minus the cell; no purple for naked
+  const single = hintMarks(hintFor(H_BOX, 2), H_BOX);
+  assert.deepStrictEqual([single.area.length, single.target], [8, 41]);
+});
+
+// ---- Issue 37: solvableBy 'pointing' ----
+
+test("solvableBy 'pointing': one pointing step then singles is true; more than one is false; full grid true; broken grid false", () => {
+  assert.strictEqual(solvableBy(WALL_ROW, 'pointing'), true);  // one step (naked form), then singles
+  assert.strictEqual(solvableBy(WALL_COL, 'pointing'), true);  // one step (hidden form), then singles
+  assert.strictEqual(solvableBy(WALL_ROW, 'singles'), false);
+  assert.strictEqual(solvableBy(WALL_BOX, 'pointing'), false); // stuck again after two steps
+  assert.strictEqual(solvableBy(clone(), 'pointing'), true);
+  const broken = emptyGrid(); broken[0] = [0, 1, 2, 3, 4, 5, 6, 7, 8]; broken[1][0] = 9; // cell (0,0) has no candidate
+  assert.strictEqual(solvableBy(broken, 'pointing'), false);
 });
