@@ -8,7 +8,7 @@ Last updated: 2026-10-20, lead session 544de00f-db0c-4fd3-8425-f2e90d4ada4d
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #51 clash outline | developer round 1 (wt-51, branch issue-51-clash-outline from 7e23b26) | lead check, then review + test in parallel | developer |
+| #51 clash outline | review + test round 1 (wt-51-review, wt-51-test at 3075d5d; dev head 84e7261) | collect both reports, one rework round (L1, L2 + findings) | reviewer, tester |
 
 ## Open issues / PRs
 - #50 done: PR #52 merged (7e23b26), issue closed.

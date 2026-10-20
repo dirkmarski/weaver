@@ -44,3 +44,6 @@
 - PR #52 opened (head b45a64f). PM acceptance launched on b45a64f.
 - #50 ACCEPTED by the PM on b45a64f; the comment and head were verified on GitHub. PR #52 merged with a merge commit: 7e23b26. Issue #50 is closed; main 143/143. The PM's new candidates (slip follow-ups: wording of the extra sentence, pairs including a given, "stays uncounted") are in its product log 6497e51.
 - #51: gate PASS (OPEN, weaver-agents, enhancement). Branch issue-51-clash-outline from 7e23b26 (log 8a8c13f). N3 from #50 carried in. Developer round 1 launched.
+- #51 developer round 1 (Claude Sonnet 5.5, head 84e7261): 147/147, about 0.59 s; pins 7/7 and the #50 pins 7/7 on the page.
+  - Lead check PASS with L1 (displaced `verify` comment) and L2 (probably unreachable `td.clash.hint-confined` rule). The lead inspected the 375 px screenshots.
+  - Review and test round 1 launched in parallel (wt-51-review, wt-51-test at 3075d5d).
