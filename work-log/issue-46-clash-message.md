@@ -37,7 +37,26 @@
 - Review and test round 1 launched in parallel on c4b48f4.
 
 ## Review round 1 (reviewer)
-- (pending)
+- Reviewer: Claude Sonnet 5.5, round 1, head c4b48f4. I did not read governance/LOG.md. Suite 143/143 at the head.
+- Verdict: APPROVE with should-fix items (one SHOULD).
+- Correctness: precedence is (b), then clash, then (a), as specified. Data path: DOM handler (sudoku.js ~716) passes `cell.value` (string) to `creditEntry`, which converts with `parseInt` to a number; `grid` holds numbers and `toFlat` keeps them, so `cells[q] === digit` compares number to number (a string-compare mutant fails 3 tests). The entry cell is empty in the pre-entry grid, so units cannot match the cell itself. `kind` stays 'notCounted', tally and credited are unchanged, the hint path and "Filling the grid" are untouched (hintFor gives a conflict result on a broken grid, so the hint digit cannot be a clash).
+- README: every changed sentence is true (section order b, clash, a; the "does not point out a clash" sentence is gone; "Any change to a value" paragraph; creditEntry API sentence). "Apart from these messages there is no live checking" stays true: the clash text is a message and no cell turns red. The #31 style statements remain true for (a).
+- Findings:
+  - SHOULD S1 (L1 confirmed): no unit test has a digit in the column and the box but not the row. A faithful unit-order mutant [row, box, column] (loop order and name both permuted) survives (0 failures). The issue pins exactly that case (4 at row 2, column 1, seed 1: column named). Fix: add one assertion in `creditEntry (c)`, for example on grid `e` put a digit X in e[4][0] (column 1) and in e[1][1] (box), none in row 1, and expect CLASH(1,1,X,'column'). (The test's 6 is in row 1 and column 1; 7 is box only.)
+  - nit N1: README line 66 says the "not counted" message "does not say whether the digit is right", and the clash text now says the digit breaks the rules. This is about a rule clash, not the solution (per the issue), but a reader may find the wording loose. Optional: "does not say whether the digit matches the solution". Not required.
+  - nit N2: the test lead-in comment on the old line "1-8 are in row 9" is fine; no issue.
+- Test change: proportionate (+7 lines, one test, no sweep). Old test replaced; what went away: "the clash is not revealed" assertions (intended, behaviour changed) and the digit-9 naked-single check at (9,9) (covered by existing naked single tests). The two single-assertion edits (H_BOX (5,6) digit 1, SEED1_WALL (3,3) digit 3) are correct.
+- Mutants (scratch copy rv46, full suite each):
+  - order [column,row,box]: killed (2)
+  - order [box,row,column]: killed (2)
+  - order [row,box,column] with permuted names: SURVIVES (S1)
+  - skip row: killed (3); skip column: killed (1); skip box: killed (1)
+  - column number off by one in the text: killed (7)
+  - transposed cell for unit lookup (c*9+r): killed (3)
+  - (b) check removed: killed (3); (b) moved after the clash check: killed (2)
+  - string compare of digit: killed (3)
+  - names reversed: killed (3)
+  - only the row scanned: killed (1)
 
 <!-- separator: keep the review and test sections apart -->
 
