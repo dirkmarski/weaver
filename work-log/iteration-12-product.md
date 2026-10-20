@@ -141,6 +141,7 @@ In scope for it12: #55 (page test harness) and #56 (relevant rings for hidden si
 5. **Claiming, then pairs**, each with its own level. Ranked last by the personas.
 6. **Mobile and long-term:**
    - the 375 px level buttons;
+   - hint badge at 320 px overlaps neighbouring notes (#56 Q2 limit);
    - long messages on a phone;
    - a middle hint level;
    - progress across puzzles.
@@ -159,3 +160,17 @@ Delivered and removed: #55 (page test harness, accepted at 0e699d5). #56 is remo
 - New text: "Key: dashed purple = the only places for D in the box; struck grey D = D can no longer go there; purple ring = this D rules out other cells." The ring clause is still left out when there are no rings.
 - Issue #56 body updated (section 2, pins P(3) and P(4), new pin P(8), and a Change log section) and a comment added. The change is noted in the issue, not made silently.
 - Assumption: "this D" reads naturally beside a ringed cell. I will confirm at acceptance with the personas if time allows. Not a blocker.
+
+## Q2 on #56: badge size vs note slot at phone widths (2026-10-20)
+- Raised by the lead from the tester's finding D1. At 900 px the badge covers no other note. At 375 px the cell is about 37 px wide and a note slot about 12 px, but the unchanged chip is 13-16 px wide. For D = 5 it touches notes 4 and 6, which are still readable. For D = 3/6/9 its right edge is clipped by the cell edge, so part of the strike and the rounded border is lost. At 320 px it overlaps the neighbouring glyphs. I looked at the screenshots in scratchpad/ts56: zoom_s9_D5_375, zoom_s2_D9_375 and shot_s4_D9_375, against zoom_s9_D5_900.
+- Options: (A) accept as is; (B) shrink the chip at <= ~400 px; (C) keep the size, keep the chip inside the cell, and accept touching.
+- Decision: **C**.
+  - The clipping is the real defect: a half-cut badge looks broken. Touching a neighbour does not hide it.
+  - B was rejected because B and C asked in round 2 for a larger, more legible struck badge (candidate 2). Shrinking it on phones goes the opposite way, and a chip of about 9 px would be hard to read.
+  - A was rejected because it leaves the clipping in place.
+- Criterion, now in #56 AC3. The tester sets notes 1-9 in a confined cell and a removed cell, then checks every D = 1-9 and both badge kinds:
+  - 900 px: 0 px overlap with any other note glyph box, and the badge is unchanged.
+  - 375 px: the badge box is fully inside the cell box (tolerance 0.5 px); the badge centre is inside D's slot; overlap with any other note glyph box is at most 2 px in each direction; the font size and padding equal the 900 px values.
+  - 320 px is out of scope. It is a known limit, added to candidate 6 (mobile) next to "the 375 px level buttons".
+- Issue #56 body updated (a section 3 note, AC3 and the Change log) and a comment added.
+- Assumption: a 2 px overlap keeps the neighbouring digit readable. This is based on the D = 5 shot at 375 px, where the notes touch and are still clearly legible.
