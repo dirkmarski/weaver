@@ -421,14 +421,14 @@
   }
 
   // The cells a showing hint marks, as flat indices: { area: tinted cells (not the target),
-  // target, digits: the ringed cells, only on explain (see below), confined, removed: a pointing
-  // explain's box cells where the digit fits and line cells that lose it (else empty) } for a hintFor
+  // target, digits: the ringed cells, only on explain (see below), hatched: the reason cells (see below), ascending,
+  // on explain only, confined, removed: a pointing explain's box cells where the digit fits and line cells that lose it (else empty) } for a hintFor
   // result of kind nudge/explain. Tint: a naked single's row, column and box; a hidden single's unit;
   // a pointing step's box and line, plus its hidden-form unit. Ringed digits (ascending), for D = the hidden single's
   // digit or the pointing digit: a cell holding D that shares a row, column or box with a reason cell (an empty cell
   // that D's rings help to rule out). Reason cells: a hidden single's: the other empty cells of its unit; pointing's: the
   // empty box cells that are not confined and, in the hidden form, the empty cells of the hidden unit other than the target
-  // and the removed cells. None for a naked single.
+  // and the removed cells, hatched on the page. None for a naked single.
   function hintMarks(hint, grid) {
     var p = hint.r * 9 + hint.c, units, pointing = hint.technique === 'pointing';
     var hidden = hint.unit ? [CELL_UNITS[p][UNIT_NAMES.indexOf(hint.unit)]] : [];
@@ -439,7 +439,7 @@
     var explain = pointing && hint.kind === 'explain';
     var reasons = [];
     function addReasons(cells, skip) {
-      cells.forEach(function (x) { if (x !== p && grid[Math.floor(x / 9)][x % 9] === 0 && skip.indexOf(x) < 0) reasons.push(x); });
+      cells.forEach(function (x) { if (x !== p && grid[Math.floor(x / 9)][x % 9] === 0 && skip.indexOf(x) < 0 && reasons.indexOf(x) < 0) reasons.push(x); });
     }
     if (d && hint.kind === 'explain') {
       if (pointing) {
@@ -452,18 +452,20 @@
         if (reasons.some(function (x) { return CELL_UNITS[x].some(function (u) { return mine.indexOf(u) >= 0; }); })) digits.push(q);
       }
     }
-    return { area: area, target: p, digits: digits, confined: explain ? hint.confined : [], removed: explain ? hint.removed : [] };
+    return { area: area, target: p, digits: digits, hatched: reasons.sort(function (a, b) { return a - b; }), confined: explain ? hint.confined : [], removed: explain ? hint.removed : [] };
   }
 
   // 'an 8' or 'a D'.
   function aDigit(d) { return (d === 8 ? 'an ' : 'a ') + d; }
 
-  // The key line under a pointing explanation. step is the pointing hint (pointDigit, form, unit, r, c); ringCount the rings showing.
-  function pointingKey(step, ringCount) {
-    var d = step.pointDigit, where = 'the other cells of ' + (step.unit === 'box' ? 'both boxes' : 'the box');
-    if (step.form === 'hidden' && step.unit !== 'box') where += ' and of ' + step.unit + ' ' + (step.unit === 'row' ? step.r + 1 : step.c + 1);
-    return 'Key: dashed purple = the only places for ' + d + ' in the box; struck grey ' + d + ' = ' + d + ' can no longer go there'
-      + (ringCount ? '; purple ' + (ringCount > 1 ? 'rings = ' + d + 's already placed that keep ' : 'ring = ' + aDigit(d) + ' already placed that keeps ') + d + ' out of ' + where + '.' : '.');
+  // The key line under a hidden single's or pointing step's explanation; hatchedCount the hatched cells showing.
+  // Pointing names its dashed and struck marks, and the hatching only when a cell is hatched; a hidden single always has some.
+  function hintKey(hint, hatchedCount) {
+    var pointing = hint.technique === 'pointing', d = pointing ? hint.pointDigit : hint.digit;
+    var hatch = 'hatched = a purple ring rules ' + d + ' out there (' + aDigit(d) + ' already in the same row, column or box)';
+    if (!pointing) return 'Key: ' + hatch + '.';
+    return 'Key: dashed purple = the only places for ' + d + ' in the box; struck grey ' + d + ' = this step rules ' + d + ' out there'
+      + (hatchedCount ? '; ' + hatch : '') + '.';
   }
 
   // ---- Rewards: recognising naked and hidden singles the learner enters ----
@@ -788,7 +790,7 @@
       status.className = '';
       // data-d is always set together with hint-confined / hint-removed, so [data-d] finds those cells too.
       table.querySelectorAll('.hint-target, .hint-area, .hint-digit, [data-d]').forEach(function (el) {
-        el.classList.remove('hint-target', 'hint-area', 'hint-digit', 'hint-confined', 'hint-removed');
+        el.classList.remove('hint-target', 'hint-area', 'hint-hatched', 'hint-digit', 'hint-confined', 'hint-removed');
         el.removeAttribute('data-d');
       });
       table.querySelectorAll('.conflict').forEach(function (el) {
@@ -996,11 +998,12 @@
       function cellAt(q) { return table.rows[Math.floor(q / 9)].cells[q % 9]; }
       marks.area.forEach(function (q) { cellAt(q).classList.add('hint-area'); });
       cellAt(marks.target).classList.add('hint-target');
+      marks.hatched.forEach(function (q) { cellAt(q).classList.add('hint-hatched'); });
       marks.digits.forEach(function (q) { cellAt(q).classList.add('hint-digit'); });
       [['confined', marks.confined], ['removed', marks.removed]].forEach(function (m) {
         m[1].forEach(function (q) { cellAt(q).classList.add('hint-' + m[0]); cellAt(q).setAttribute('data-d', res.pointDigit); });
       });
-      if (res.technique === 'pointing' && res.kind === 'explain') keyLine.textContent = pointingKey(res, marks.digits.length);
+      if (res.kind === 'explain' && res.technique !== 'naked') keyLine.textContent = hintKey(res, marks.hatched.length);
       inputs[res.r][res.c].focus();
     });
 
@@ -1032,7 +1035,7 @@
     LEVELS: LEVELS, isValidSolution: isValidSolution,
     findConflicts: findConflicts, clashCells: clashCells, fixedMessage: fixedMessage, namedClash: namedClash, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
-    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, hintMarks: hintMarks, pointingKey: pointingKey, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
+    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, hintMarks: hintMarks, hintKey: hintKey, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
     classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, completionFor: completionFor, tallyLines: tallyLines, statusClass: statusClass,
     TECHNIQUE_DEFINITIONS: TECHNIQUE_DEFINITIONS
   };
