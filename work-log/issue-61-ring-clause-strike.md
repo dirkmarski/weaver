@@ -91,3 +91,30 @@ Iteration 13. Branch `issue-61-ring-clause-strike`. Session `5034fe53-a839-46a5-
 - Screenshots (4x zoom of the struck badge, seed 1): scratchpad `test-61/strike-main-375.png`, `strike-new-375.png`, `strike-main-1280.png`, `strike-new-1280.png`. After: the strike is visibly darker and thicker at both widths; chip geometry unchanged.
 - Cleanup: no Chrome processes or weaver-chrome profiles of mine left; private TMPDIR used.
 - Defects: critical none, major none, minor none. Observation: AC 9 ratio is exactly 1.6000x, no headroom for the next issue.
+
+### Re-test (rework round 2), head c5851d9 (Tester, Claude Sonnet 5.5)
+- Governance/LOG.md not read; only the "## Lead" section of this log read. Own detached worktree and private TMPDIR; scripts in scratchpad test-61/ (`rt2.js`, `rtk.js`).
+- Verdict: PASS. AC 6 now holds for every digit 1-9 at 375 px and 1280 px; no regressions against 24eec95.
+- `node --test` (no path): 167 tests, 167 pass, 0 fail, skipped 0, duration about 3.1 s.
+- Strike thickness, measured two ways on real struck badges (Tricky, Hint twice): (a) formula from the computed `::after` padding box (width+padding, content-box) and the stops actually computed (`to top right`, 43%-57%): 14% x 2WH/hypot(W,H); (b) pixel measurement of a screenshot (scale 24) of the badge: dark-pixel run across the band, perpendicular to it, at six points along the strike away from the digit; the minimum over points agrees with (a) within 0.05 px for the clean points (1280 px) and within 0.2 px at 375 px where the digit or border touches some samples.
+  | D | 375 px box | 375 px calc | 1280 px box | 1280 px calc | real play instance (tricky seed) |
+  |---|---|---|---|---|---|
+  | 1 | 9.25 x 16.8 | 2.27 | 13.25 x 16.8 | 2.91 | seed 32 |
+  | 2 | 11.05 | 2.58 | 15.05 | 3.14 | seed 1 |
+  | 3 | 11.42 | 2.65 | 15.42 | 3.18 | synthetic data-d only |
+  | 4 | 11.69 | 2.69 | 15.69 | 3.21 | seed 14 |
+  | 5 | 11.36 | 2.64 | 15.36 | 3.17 | synthetic only |
+  | 6 | 11.64 | 2.68 | 15.64 | 3.21 | seed 34 |
+  | 7 | 10.48 | 2.49 | 14.48 | 3.07 | seed 16 |
+  | 8 | 11.83 | 2.71 | 15.83 | 3.23 | seed 8 |
+  | 9 | 11.64 | 2.68 | 15.64 | 3.21 | seed 6 |
+  Min/max: 375 px 2.27 (D1) / 2.71 (D8); 1280 px 2.91 (D1) / 3.23 (D8). Real-instance numbers equal the synthetic ones for the same digit. Pixel minima: D1 2.28 px at 375 (seed 32), 2.92 at 1280. Note: PM's Tricky seed 12 gave no struck cell under my seeding hook (my seeding may differ from the PM's), so the real D = 1 instance is seed 32 by my hook.
+- Contrast: #6b6b6b on white 5.33:1; digit #333 on white 12.63:1 (border #595959 7.00:1).
+- Cell width at 375 px: the td border box is 36.44 px (table 328 px, 9 cells), `clientWidth` (padding box) is 34 px. The developer's 34 px is clientWidth, round 1's 36 px the border-box width; same layout, no change (identical in 24eec95). The headless window has a 15 px scrollbar (document client width 360), which does not affect the table.
+- Unchanged vs 24eec95 (numeric, both trees run through the same script, 32 badge measurements incl. all digits 1-9 at 375 and 1280 px): chip rect relative to the td (x, y, outer width, outer height), border width/colour, radius, font, digit set identical, 0 diffs; e.g. 375 px D1 chip [1, 1.93, 11.25 x 18.80] flush left, D9 right edge flush at the cell inner edge, white fill and the max-width 559px padding rule unchanged (only the stops 44/56 -> 43/57 differ).
+- AC 1-5 key lines for seeds 1, 76, 8, 44 are byte-identical to 24eec95 and to the AC text (seed 76 single "purple ring = an 8 ...", seeds 1/8/44 plural clauses with "the other cells of the box", "... and of row 4", "both boxes").
+- README (14%, "at least about 2.2 px at 375 px and 2.9 px at 1280 px, thinnest for D = 1") and the style.css comment match: min 2.27 / 2.91.
+- Ratio: tests 100+27+155+398+1263 = 1943 lines, product 1045+41+129 = 1215 lines; 1943/1215 = 1.5992x (<= 1.6).
+- Screenshots (scratchpad test-61/, 24x zoomed chip crops): `strike-rw2-D1-real-tricky-seed32-375.png`, `strike-rw2-D8-real-tricky-seed8-375.png`, `strike-rw2-D1-synthetic-375.png`, `strike-rw2-D8-synthetic-375.png`; 24eec95 comparison `strike-24eec95-*`.
+- Defects: critical none, major none, minor none. Observation: the struck D = 1 chip is the narrowest (9.25 px content) so the band is thinnest there; headroom 1.6x ratio about 1 line.
+- Cleanup: no Chrome processes or weaver-chrome profiles left; baseline worktree removed.
