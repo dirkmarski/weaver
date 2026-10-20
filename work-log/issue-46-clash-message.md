@@ -83,3 +83,10 @@
 - Developer: Claude Sonnet 5.5. I did not read governance/LOG.md. No product-code change.
 - S1: added to `creditEntry (c)` (grid `e`) a digit 3 at e[2][1] (box) and e[5][0] (column), none in row 1, no conflict; expects CLASH(1,1,3,'column'). Mutant: unit order [row, box, column] with names permuted to match (in `notCounted`). Before the assertion: survived (143/143 pass). After: killed (test fails). Unmutated code with the assertion: 143/143 pass.
 - N1: README "does not say whether the digit is right" became "...matches the solution" in the three places that describe the "not counted" messages (clash text, text (a), "Any change to a value" paragraph). Each sentence is true: none of the texts says anything about the solution. No other sections touched.
+
+## Review round 2 (reviewer, delta)
+- Reviewer: Claude Sonnet 5.5. I did not read governance/LOG.md.
+- (a) S1: the faithful [row, box, column] mutant (check order and names permuted together) is now KILLED: 142 pass, 1 fail. Unmutated: 143/143. The new assertion's grid is sound: digit 3 at e[2][1] (box) and e[5][0] (column 1); row 1 holds only 5; the two 3s share no row, column or box, and no other duplicates exist, so there is no conflict and text (b) is not triggered. Column is the expected first match.
+- (b) N1: the three changed README sentences (clash text, text (a), "Any change to a value" paragraph) now say "matches the solution". All are true: none of the messages says anything about the solution. No other README lines changed.
+- (c) `git diff c4b48f4 HEAD` on sudoku.js, index.html and style.css is empty: product code unchanged.
+- Verdict: APPROVE. No open findings (S1 and N1 closed).
