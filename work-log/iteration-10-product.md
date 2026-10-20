@@ -96,3 +96,71 @@ ACCEPTED as a known limitation, not a merge blocker. The hint is transient, the 
 - All 8 criteria pass on PM checks; no defects against #45; D1 accepted; no conditions.
 - Comment: https://github.com/dirkmarski/weaver/pull/47#issuecomment-6283379837
 - I do not merge (lead). Next: #46 after the lead merges #45 and launches it.
+
+## Acceptance of #46 (PR #48, head 4be2898; product code c4b48f4, tests/README 378bd85), run started 2026-10-20
+- Asked by the lead (session 0245eb9f-91d7-4bfe-b523-bbf5b80a2438). Delivery: developer 2 rounds (round 2: tests and README only), review APPROVE x2, test 35/35 page checks PASS on c4b48f4, suite 143/143.
+- `governance/LOG.md` NOT read.
+- Detached worktree scratchpad/pm-46 at 4be2898. `git diff c4b48f4 4be2898` touches only README.md, tests/sudoku.test.js and the issue log, so page checks on 4be2898 are valid for the product code.
+- PM scripts: scratchpad/pm-acc46/acc.js (fresh seed 1 Tricky; the three pinned entries each on a fresh page; status text, class, computed colour, conflict/aria-invalid cells, hint classes/data-d, tally text; then Verify; then a broken-grid sequence and a legal non-technique entry). Reuses the tester's ts45/lib.js for navigation only; I judge the output myself against the board the page prints. Persona tool: scratchpad/pm-play46/play.js (copy of pm-play45 pointed at pm-46, games A = seed 1 and B = seed 3, fresh; no solver).
+- Suite re-run by PM: 143/143, 0.59 s.
+
+### Criteria, checked one by one by the PM (real page, fresh Tricky seed 1, 900 px)
+I judged against the fresh board the page shows: 2 is at r2c2, 4 is at r1c1, and row 3 and column 1 hold no 2.
+1. PASS. The three pinned texts match exactly. For 2 at r2c1 the page names the row, for 4 at r2c1 the column (4 is in the column and the box), and for 2 at r3c1 the box.
+2. PASS. For each pinned entry:
+   - the status class is '' and the colour is rgb(29,29,31), the same as on a fresh page;
+   - there are 0 `.conflict` or `aria-invalid` cells and 0 hint classes or `data-d`;
+   - the tally text is identical to the fresh page.
+
+   After Verify, the cell is flagged red with "Mistakes found: the red numbers break the rules."
+3. PASS on my checks.
+   - Broken grid: 2 at r3c1, then 4 at r2c1 (which itself clashes by column) gives text (b), with no red and no count change. A legal 3 at r1c2 on that broken grid also gives (b).
+   - Legal non-technique entry (3 at r1c2 on a fresh grid): text (a), unchanged.
+   - I did not re-run the last cell, overwrite, clear or Notes on. The tester checked them on c4b48f4, and the product code is identical.
+4. PASS. I read the README diff:
+   - the section order is (b), clash (with U and the row, column, box order), (a);
+   - the "does not point out a clash" sentence is gone;
+   - the "Any change to a value" paragraph and the `creditEntry` sentence have been updated.
+
+   Every changed sentence is true. The code comment in `notCounted` still says "Never says whether the digit is right". That is harmless, but "matches the solution" would be the more exact wording (nit; not raised).
+5. PASS. One test was replaced (`creditEntry (c)`: row, column, box, row over column, column over box, (a) when there is no clash, (b) for a clash into a broken grid). Two single-line expectations were updated. Tests went from 1084 to 1093 lines for +7 product lines. The 1-8 digit loop in one cell is small and is not a sweep. 143/143, 0.59 s.
+
+### Persona check (A, B, C; play tool only, fresh seed 1 and seed 3; no scripts or solvers)
+I checked every slip text they quoted against the board, and the unit named was right every time (for example, C's 5 at r2c1, which is in the column and the box, named the column).
+- A: keep. "Rules fact, not the answer"; the tone is calm. Maybe a bit too quiet: the message line sits below the buttons and could be missed on a phone. A wants a subtle, non-red marker on the offending cell.
+- B: keep, with small changes. A rules fact, not spoiling; calm. Findings:
+  - (1) After a slip, a legal 7 elsewhere got text (b), "Some numbers break the rules, so it is not counted". That reads as if the 7 was wrong, and it was B's most confusing moment.
+  - (2) When a digit clashes in more than one unit, only the first is named. B would like "also in its column".
+  - (3) The clash and the non-technique texts both end in "not counted".
+  - (4) The clashing cell is not located; B has to scan the box.
+- C: keep. Clear and not spoiling. Second slip into a broken grid: (b) is "understandable but vaguer", and C was unsure whether the new entry or the earlier one was wrong. C also suggests a soft highlight on the clashing cell and noticed that (a) could be mistaken for a rule complaint.
+- How I read it:
+  - All three accept the message. The #31 line holds: none felt told the answer.
+  - The new pain is the stale text (b) after a clash. It is specified, pre-existing behaviour (criterion 3), so it is not a defect against #46. But now that the first slip is named, (b) on the next entry stands out more.
+  - In play, all three now want a subtle visual marker. At the mock-up they chose K1 over K2 (red). A non-red marker is a different option, and it goes on the candidate list.
+
+## Decision: #46 ACCEPTED (head 4be2898; product code c4b48f4), 2026-10-20
+- All 5 criteria pass on PM checks. There are no defects against #46 and no conditions.
+- Comment: https://github.com/dirkmarski/weaver/pull/48#issuecomment-6283519624
+- I do not merge (lead).
+
+## Iteration 10: complete from the product side (pending the lead's merge of PR #48)
+- #45 ACCEPTED (PR #47, merged). #46 ACCEPTED (PR #48, to be merged by the lead).
+- Outcome against the strategy: the pointing hint now teaches what the step does to the target, which fixes the it9 failure (C no longer typed the pointing digit). A rule slip now gets an immediate, calm explanation without revealing the answer.
+
+## Next-iteration candidates (ordered, after iteration 10)
+1. Clash follow-ups (from #46 play, all three personas):
+   - (a) Text (b) after an earlier slip blames the new entry. Make it say that this entry fits the rules but an earlier number breaks them, and name the clashing cell or cells rather than sending the user to Verify. Check against #31 and Verify's role.
+   - (b) A subtle, non-red marker on a cell whose entry was reported as a clash, cleared when the value changes (A, B, C). This should be a mock-up first, because K2 (red) was rejected.
+   - (c) Optional: name every unit the digit clashes in (B).
+2. Pointing visuals v2: rings only on the relevant digits (B, C); a short legend for the dashed and struck marks (C); D1, drawing the badge in D's own note slot; avoiding trivial confinements as the example; a more explicit case signal on the first click (C).
+3. Tricky practice density: at least 2 pointing steps per Tricky puzzle (measure generation time first); Hint preferring pointing on Tricky (B, it9).
+4. Small wording:
+   - the clash and the non-technique texts share the same "not counted" ending (B, C);
+   - re-entry of a hint-credited cell says "on your own";
+   - finish text "(see below)";
+   - fold away the grey definitions once learned (C);
+   - the `notCounted` code comment wording (nit).
+5. Claiming, then pairs, each with its level.
+6. Mobile layout (2x2 level buttons at 375 px; A: the message line could be missed on a phone), a middle hint level, progress across puzzles.
+Delivered and gone from this list: pointing hint clarity (#45), clash feedback (#46).
