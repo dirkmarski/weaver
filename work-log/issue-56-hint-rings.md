@@ -20,6 +20,8 @@
 - Points passed to reviewer/tester: (1) is the key line cleared on New puzzle and on choosing a level (do those paths call `clearResults`?); (2) Hint click with a non-pointing result after a pointing explain (key line cleared first?); (3) reason cells: the hidden-form check relies on `hint.unit` being absent for the naked form; (4) box-case count equality (empties == confined) is equivalent to "all empties confined" only because confined is a subset of the box's empties; (5) badge chip ~18.8 px vs slot ~18.67 px.
 - Lead question Q1 to the PM (wording): the pinned key text "a D" gives "a 8" (and "a 8 that rules out other cells"); "an 8" is grammatical. Asked the PM to decide; review and test proceed in parallel and any wording change rides in the rework round.
 
+- 2026-10-20: PM answer to Q1 (option C, issue body edited with a change log, comment 6286832562): key template "Key: dashed purple = the only places for D in the box; struck grey D = D can no longer go there; purple ring = this D rules out other cells." (ring clause dropped when no rings). Goes into the rework round with the reviewer/tester findings.
+
 ## Developer
 - 2026-10-20: Implemented #56 as specified. No pin disagreed with the rule.
 - Product: `hintMarks` ring rule (reason cells, helper `addReasons`); `pointingKey(digit, ringCount)` (exported); box-case parenthesis in `pointingHint` (now takes the grid; first click and `pointingClause`, so "Well spotted!", unchanged); `<p id="key">` below the status line (not a live region), set on a pointing explain in the Hint handler and cleared in `clearResults`; badge in D's note slot by CSS (`--x`/`--y` per `data-d`, `left/top` + `translate(-50%, -50%)`).
@@ -34,7 +36,48 @@
 - Caveat: the chip (about 18.8 px tall) is nominally 0.1 px taller than the 18.67 px slot; the badge is centred on the slot. Tester to confirm at 375/900 px.
 
 ## Reviewer
-(pending)
+- 2026-10-20 Review of head 8ac1f8b (product commit 31758fc). Verdict: approve; no must-fix. `node --test` x2: 164 tests, 0 fail, 0 skipped, 2.31 s and 2.47 s.
+- Correctness (data followed creation to use): `hintMarks` builds reasons = box empties minus confined (a) plus, only when `hint.unit` is set (pointing hidden form), the unit's empties minus target and removed (b); the target is excluded in a (x !== p) and in b; hidden single: the unit's empties minus the target; ring = a D cell sharing a row/column/box with any reason cell; ascending; D4 keeps all; naked single: d = 0, no rings. `hint.unit` is absent for the naked pointing form (P(1), P(4) pins pass). Box case: `empties.length === s.confined.length` is exact because confined is a subset of the box empties (spotsFor over the box); only on step 2, so the first click, "Well spotted!" (creditEntry uses pointingClause) and "Well done!" are unchanged. `pointingKey` text matches the issue character for character; ring clause only when `marks.digits.length > 0`.
+- Wiring: `#key` is set only in the Hint handler for `technique === 'pointing' && kind === 'explain'`, after `clearResults()`. `clearResults` clears it and is called from the value-change branch of applyEntry (not for a notes-only change), Verify, newPuzzle, choose and the Hint handler (before the new text, so a conflict/none/full/naked/hidden result leaves it empty). A non-pointing Hint result after a pointing explain cannot occur: a showing hint implies the grid is unchanged, so the result is the same pointing explain; that path is therefore unreachable and untested by design. `#key` has no role/aria-live; `#status` keeps role=status.
+- AC5: changed existing assertions match the developer's list exactly (hintMarks test explain.digits [25,74]->[74]; WALL_COL hidden digits [4,43,55]->[43]; WALL_COL pointing text gains the parenthesis; page `noHint` also asserts key ''; test f reads the key and hoists the `pointing` pick). Both digit changes are consistent with the rule (r3c8 and r1c5/r7c2 rule out no reason cell). No other existing assertion changed. First click, order, findPointing, rewards, counts, clash outline, Verify untouched in the diff.
+- CSS: `.notes` is `position:absolute; inset:0` with a 3x3 1fr grid, the badge is positioned from the same td padding box at 1/6, 1/2, 5/6 with translate(-50%,-50%), so its centre equals the slot centre; f3 proves it by computed position for 1, 5, 9. Size, colours, chip, strike untouched. `--x/--y` inherit into ::after. confined and removed are disjoint; hint-target co-occurs only with hint-removed (naked form), which positions the same way. No dead rules; the 16.667/83.333 values are the only new constants. Chip 18.8 px vs slot 18.67 px: 0.07 px overlap per side, invisible (tester to confirm).
+- Leanness: product +30 net sudoku.js, +8 style.css, +1 index.html; tests +120 (ratio ~1.43). Minor duplication: the "cell is empty" expression `grid[Math.floor(q / 9)][q % 9] === 0` is now written in `pointingHint` and `addReasons` (it already appears elsewhere); no existing empties helper takes a unit, so this is acceptable. Tests reuse `emptyGrid`; `put`/`at`/`cells` are small new helpers (`at` could be `9 * r + c` inline but is fine).
+- README: sentence-by-sentence check against behaviour passes (both Second click paragraphs, key line, badge slot, box-case sentence, hint-removal list, `hintMarks` and `pointingKey` in Files). No "corner" or "every cell holding the digit" left in README, sudoku.js, style.css, index.html.
+- Wording (Q1): the "a 8" fix would land in `pointingKey` (sudoku.js, two places: "= a ' + d" and "; purple ring = a ' + d", e.g. a local `var a = d === 8 ? 'an ' : 'a '`), the `pointingKey` unit test (add an 8 case; the 1/9 cases stay), and the quoted text in the README key-line sentence (say "a D"/"an 8"). Page tests use `pointingKey` so they follow automatically.
+
+Findings
+- should-fix S1 (tests/page.test.js, test f around the `s.key` assertion): the wiring of `ringCount` is not covered at zero rings. Mutants `pointingKey(d, 1)` and `pointingKey(d, marks.digits)` (an array is always truthy) survive, so "ring clause only when rings show" is tested for the helper only. Fix: one page assertion on a state with no rings (P(4): seed 4 after playing the singles, as `pointing` does) that `key` equals `pointingKey(9, 0)` and has no "purple ring"; or pick a second state via `pick` where `S.hintMarks(...).digits` is empty.
+- nit N1 (tests/page.test.js f3): checks digits 1, 5, 9 only; a `--x/--y` selector error for 2,3,4,6,7,8 survives (mutant: digit 4 dropped from its --x rule). AC3 asks for 1, 5, 9 at least, so not blocking; looping `[1,2,...,9]` is a one-line change.
+- nit N2 (README.md:47): the "Well done" line lists "tint, purple rings and pointing marks" going away; the key line is not named there (cleared with the hint; the removal sentence at the notes paragraph does name it). Optional.
+- nit N3 (README Files / page-test description at README.md:90): neither mentions `#key`; optional.
+
+Mutants (run on a scratch copy; none committed)
+| # | Mutant | Result |
+|---|---|---|
+| 1 | reason cells a dropped | killed (6) |
+| 2 | target counted as a reason cell (b) | killed (2) |
+| 3 | ring via same box only | killed (10) |
+| 4 | key set on first click | killed (2, page) |
+| 5 | key never cleared | killed (3, page) |
+| 6 | box-case parenthesis on first click | killed (4) |
+| 7 | badge --x dropped for digit 4 | SURVIVED: see N1 |
+| 8 | ringCount passed as 1 always | SURVIVED: see S1 |
+| 9 | removed cells not excluded in b | killed (2) |
+| 10 | hidden-single target counted as reason | killed (2) |
+| 11 | box case "confined > 1" (AC7) | killed (4) |
+| 12 | ring clause always (AC7) | killed (2) |
+| 13 | b dropped (AC7) | killed (6) |
+| 14 | notes change clears key | killed (2, page) |
+| 15 | key clear only in value change/Verify, removed from clearResults | killed (3) |
+| 16 | key text wrong in struck-grey clause | killed (2) |
+| 17 | box-case parenthesis placed before the clause | killed (4) |
+| 18 | badge --y digit 5 wrong | killed (2, page f3) |
+| 19 | ring when only the first reason cell counts | killed (4) |
+| 20 | newPuzzle skips clearResults | killed (2, page) |
+| 21 | Verify skips clearResults | killed (2, page) |
+| 22 | choose skips clearResults | SURVIVED, equivalent: the picker is reachable only after newPuzzle (which clears) or at load (no hint); no test possible or needed |
+| 23 | Hint handler keeps the old key through clearResults | SURVIVED, unreachable: with a hint showing the grid is unchanged, so the Hint result is again the pointing explain; no test possible |
+
 
 ---
 
