@@ -13,6 +13,13 @@
 
 ## Developer
 
+- Added `firstHolder(cells, p, digit)` (first of row, column, box holding the digit in another cell, first holder in reading order) and `namedClash(grid)` -> `{phrase, extra}` (exported) in `sudoku.js`; `notCounted` and `hintFor` both use them. `notCounted` order is now: own clash, broken grid, not a technique.
+- Hint conflict text is plain: `render()` set class `fail` for kind `conflict`; now the class is always `''`. `kind` stays `conflict`.
+- Extra sentence on text 2 and 3 only (lead note L0).
+- Tests extended in place (hint conflict test, `creditEntry (c)`, `(b)`, pointing/classify tests); `fives()` helper builds two- and three-clash grids. 143 tests, about 0.6 s.
+- Pinned examples 7/7 by a Node script and on the real page (headless, seed 1); example 3 also checked for no red class and no highlights.
+- README updated (Hint, not-counted texts, named clash, summary sentence, Files).
+
 ## Review
 
 ---
