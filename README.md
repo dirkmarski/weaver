@@ -92,7 +92,7 @@ The page tests (`tests/page.test.js`) load the real `index.html` in one headless
     CHROME_PATH=/path/to/chrome node --test
     WEAVER_NO_CHROME=1 node --test     # page tests skipped, unit tests only
 
-Later UI work adds its page checks to `tests/page.test.js`. Chrome and its temporary profile are removed when the run ends, also after a failed test or on Ctrl-C / SIGTERM.
+Later UI work adds its page checks to `tests/page.test.js`. Chrome and its temporary profile are removed when the run ends, also after a failed test or on Ctrl-C / SIGTERM (not after `kill -9`).
 
 ## Files
 - `index.html`, `style.css` - page and styling (`td.clash`: the orange clash outline)

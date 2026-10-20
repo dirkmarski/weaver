@@ -25,7 +25,7 @@ before(async () => {
   page = await launch(found.path);
   await page.send('Page.addScriptToEvaluateOnNewDocument', { source: seedScript() });
 });
-after(() => { if (page) page.close(); });
+after(() => page && page.close());
 
 const J = JSON.stringify;
 const game = (level, seed) => S.generatePuzzle(level, { rng: S.seededRng(seed) });

@@ -29,16 +29,37 @@ async function launch(chromePath) {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'weaver-chrome-'));
   const child = spawn(chromePath, ['--headless=new', '--no-sandbox', '--disable-gpu', '--no-first-run',
     '--user-data-dir=' + profile, '--remote-debugging-port=0', 'about:blank'], { detached: true, stdio: 'ignore' });
-  let ws = null, closed = false;
-  const close = () => {
-    if (closed) return;
-    closed = true;
+  let ws = null, done = null, gone = false;
+  const exited = new Promise((resolve) => child.once('exit', () => { gone = true; resolve(); }));
+  const rmProfile = () => fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 50 });
+  // Kills the whole Chrome group, waits (bounded) for Chrome to be gone, then removes the profile: a dying
+  // Chrome can re-create files in it, so the removal comes last. Safe to call repeatedly.
+  const close = () => done || (done = (async () => {
+    clearInterval(watchdog);
     try { if (ws) ws.close(); } catch (e) { /* already gone */ }
     try { process.kill(-child.pid, 'SIGKILL'); } catch (e) { /* already gone */ }
-    fs.rmSync(profile, { recursive: true, force: true });
-  };
-  process.on('exit', close); // also covers a test that throws or a crashed run
-  for (const [sig, code] of [['SIGINT', 130], ['SIGTERM', 143]]) process.once(sig, () => { close(); process.exit(code); });
+    let timer;
+    await Promise.race([exited, new Promise((r) => { timer = setTimeout(r, 2000); })]);
+    clearTimeout(timer);
+    rmProfile();
+  })());
+  process.on('exit', () => { // sync last resort (failed run, crash): no event loop left to wait on
+    if (!done) {
+      try { process.kill(-child.pid, 'SIGKILL'); } catch (e) { /* already gone */ }
+      if (!gone) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
+    }
+    rmProfile();
+  });
+  // SIGINT/SIGTERM: clean up fully, then exit. process.on (not once), so a repeated signal cannot kill us mid-cleanup.
+  const onSignal = (code) => close().then(() => process.exit(code));
+  for (const [sig, code] of [['SIGINT', 130], ['SIGTERM', 143]]) process.on(sig, () => onSignal(code));
+  // `node --test` exits on a signal without waiting for this process (its test child). We are then orphaned:
+  // writing results to the dead pipe raises EPIPE (which would kill us silently, skipping all cleanup), and the
+  // parent pid changes. Treat either like SIGTERM.
+  for (const stream of [process.stdout, process.stderr]) stream.on('error', () => onSignal(143));
+  const parent = process.ppid;
+  const watchdog = setInterval(() => { if (process.ppid !== parent) onSignal(143); }, 200);
+  watchdog.unref();
   try {
     let port = null;
     for (let i = 0; i < 200 && !port; i++) {
@@ -71,7 +92,7 @@ async function launch(chromePath) {
     await send('Page.enable');
     return { send, eval: evaluate, close };
   } catch (e) {
-    close();
+    await close();
     throw e;
   }
 }
