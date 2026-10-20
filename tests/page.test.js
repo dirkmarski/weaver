@@ -327,12 +327,13 @@ describe('page (headless Chrome)', () => {
         // flush against its own edge (left rule for 1, right rule for 9), not merely inside the 1 px tolerance
         assert.ok(Math.abs(x.d === 1 ? x.inL : x.inR) < 0.25, 'badge ' + x.d + ' not flush: ' + x.inL + ' / ' + x.inR);
       });
-      const [bg, w, h] = await page.eval('(function () { var td = document.querySelectorAll("#sudoku td")[1]; td.classList.add("hint-removed"); td.setAttribute("data-d", 5); var a = getComputedStyle(td, "::after");' +
-        'return [a.backgroundImage, parseFloat(a.width) + parseFloat(a.paddingLeft) + parseFloat(a.paddingRight), parseFloat(a.height) + parseFloat(a.paddingTop) + parseFloat(a.paddingBottom)]; })()');
-      const [, rgb, from, to] = bg.match(/rgb\(255, 255, 255\) [\d.]+%, rgb\((\d+, \d+, \d+)\) ([\d.]+)%, rgb\([\d, ]+\) ([\d.]+)%/);
+      const rows = await page.eval('(function () { var td = document.querySelectorAll("#sudoku td")[1], out = []; td.classList.add("hint-removed");' +
+        'for (var d = 1; d <= 9; d++) { td.setAttribute("data-d", d); var a = getComputedStyle(td, "::after"); out.push([a.backgroundImage, parseFloat(a.width) + parseFloat(a.paddingLeft) + parseFloat(a.paddingRight), parseFloat(a.height) + parseFloat(a.paddingTop) + parseFloat(a.paddingBottom)]); } return out; })()');
+      const [, rgb, from, to] = rows[0][0].match(/rgb\(255, 255, 255\) [\d.]+%, rgb\((\d+, \d+, \d+)\) ([\d.]+)%, rgb\([\d, ]+\) ([\d.]+)%/);
       const lin = rgb.split(', ').map((v) => (v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
       assert.ok(1.05 / (0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2] + 0.05) >= 4.5, 'strike contrast: rgb(' + rgb + ')');
-      assert.ok((to - from) / 100 * 2 * w * h / Math.hypot(w, h) >= 2, 'strike thickness (>= 2 px at 375 px, the narrowest chip) at stops ' + from + '-' + to + ' of ' + w + ' x ' + h);
+      const thin = Math.min(...rows.map(([, w, h]) => (to - from) / 100 * 2 * w * h / Math.hypot(w, h)));
+      assert.ok(thin >= 2, 'strike thickness at 375 px, thinnest of the digits 1-9: ' + thin + ' px at stops ' + from + '-' + to);
     } finally {
       await page.send('Emulation.clearDeviceMetricsOverride');
     }
