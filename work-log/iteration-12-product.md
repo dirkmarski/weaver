@@ -151,3 +151,11 @@ Not wanted:
 - retroactive counting after a fix (it11).
 
 Delivered and removed: #55 (page test harness, accepted at 0e699d5). #56 is removed when accepted.
+
+## Q1 on #56: key-line article for D = 8 (2026-10-20)
+- Raised by the lead during development: the pinned text "a D can no longer go there" / "a D that rules out other cells" gives "a 8" for D = 8.
+- Options: (A) keep as pinned; (B) special-case "an 8"; (C) reword to drop the article.
+- Decision: **C**. One wording for all digits, with no special case in the helper and no grammar bug. A was rejected because it is visibly ungrammatical for 8. B was rejected because it adds a branch and a test for one digit.
+- New text: "Key: dashed purple = the only places for D in the box; struck grey D = D can no longer go there; purple ring = this D rules out other cells." The ring clause is still left out when there are no rings.
+- Issue #56 body updated (section 2, pins P(3) and P(4), new pin P(8), and a Change log section) and a comment added. The change is noted in the issue, not made silently.
+- Assumption: "this D" reads naturally beside a ringed cell. I will confirm at acceptance with the personas if time allows. Not a blocker.
