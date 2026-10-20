@@ -52,3 +52,37 @@
   - Test (f2410b3): criteria 1-8 and 10 PASS on the page, no defects; DOM mutants caught.
   - The lead confirmed that M13 (completion precedence) is killed by the tester's page suite.
   - Round 2 (behaviour-neutral) launched; the lead runs the delta re-check.
+- #51 round 2 (4afbc19, behaviour-neutral):
+  - lead delta re-check: 147/147, pins51 7/7, suite51 106/106, #50 pins 7/7;
+  - PR #53 opened at head ab7f260.
+- #51 ACCEPTED by the PM on ab7f260. The comment and head were verified on GitHub. PR #53 was merged with a merge commit pinned to the accepted head (ca536d3); issue #51 is closed; main is 147/147 in about 0.59 s.
+- Persona notes from #51 acceptance: the #50 "extra sentence" misreading is closed by the outline. New wording candidates went to the PM list (3a-3g).
+
+## Outcome
+- Delivered: #50 (the named clash in the not-counted texts and in Hint; Hint during a clash is plain) and #51 (the dashed orange clash outline, givens included, as the only live mark; the fixed message). Both were accepted by the PM with personas (A, B and C would ship both).
+- Gates per issue:
+  - developer;
+  - lead check;
+  - reviewer and tester in parallel;
+  - one rework round each, delta-checked by the lead;
+  - PM acceptance.
+  No defects were found by the tester in either issue. Review findings were Should-fix level at most.
+- Quality signals:
+  - suite 143 -> 147 tests, about 0.6 s;
+  - test/product ratio about 1.18 -> 1.15;
+  - #50: 14 targeted mutants, 13 killed after round 2 (the Hint colour is UI-only and covered by the page check);
+  - #51: 15 mutants, all caught by unit tests or the page suite.
+- Concerns:
+  - UI wiring still has no repo tests: 8 of the 15 #51 mutants were caught only by scratchpad page tools. Recorded as tech debt and as a possible candidate.
+  - GitHub Pages is still unconfirmed, so the evidence is simulated.
+
+## Close
+- Wiki refreshed:
+  - product: clash outline, fixed message, named clash, new not-counted order, slip-wording gaps;
+  - architecture: helpers, the setCell flow, sizes 1149 product / 1322 test lines, 147 tests;
+  - backlog: the PM's end-of-it11 list;
+  - lessons: pins settle prose; caller-side precedence needs a page scenario; reachable visual states only; lead delta re-checks; the work-log rule; tooling;
+  - process: the work-log rule, merging pinned to the accepted head;
+  - index and glossary updated.
+- WIP reset to "no active run".
+- Learning on the memory rule (D1): restarting from WIP and the wiki was enough for the whole iteration. The only work-log read was the PM's own candidate list at the close, needed for the backlog snapshot.

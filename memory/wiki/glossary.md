@@ -12,15 +12,19 @@
 - **Reading order**: row by row from the top, left to right within a row; used to pick the first cell, box (0-8) or step.
 - **Solvable by (technique)**: the puzzle can be completed using only that technique (`solvableBy`).
 - **Wall**: the point where no naked or hidden single remains.
+- **Clash / slip**: a digit that also appears in another cell of its row, column or box (`findConflicts`, givens included). A slip is a player entry that creates a clash.
 
 ## Project terms
 - **Level**: Easy, Medium, Tricky, Hard (see product.md). `LEVELS` holds the band and `technique`/`beyond`.
 - **Seed**: input to `seededRng(seed)` for reproducible generation and tests.
 - **Capped**: generation hit the 1000 ms limit and returned the best unique puzzle so far (`capped: true`).
-- **Tally**: per-puzzle counts of naked and hidden singles, "on your own" vs "with a hint".
+- **Tally**: per-puzzle counts of naked singles, hidden singles and pointing, "on your own" vs "with a hint".
 - **Credited**: a cell already counted in the tally this puzzle; counted once per cell.
 - **Not counted**: neutral "Entered: ... not counted" message for a judged entry that earns no reward.
 - **Nudge / explain**: first and second Hint click.
+- **Named clash**: the one clashing pair (P, Q) and unit U named in the not-counted text and in Hint during a clash (`namedClash`, #50).
+- **Clash outline**: the dashed orange `td.clash` mark on every clashing cell while the clash lasts; the only live mark (#51).
+- **Fixed message**: "No numbers break the rules now. New entries are counted again.", shown when a value change ends the last clash (#51).
 - **Hint mark / ring**: amber target, tinted area, purple ring and digit on cells holding the key digit.
 - **Persona (user-a/b/c)**: simulated user agents used by the PM for scoping and acceptance; not real users.
 - **Play tool**: headless text-grid driver of the game logic (in a session scratchpad), used for persona sessions and acceptance.
