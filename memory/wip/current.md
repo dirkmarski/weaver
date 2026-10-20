@@ -12,10 +12,10 @@ Last updated: 2026-10-20, lead session 48eaa449-33cf-461f-85bc-196e8d61fc39
 |---|---|---|---|
 | Memory setup (wiki + WIP) | wiki seeded (50db9f9) | end of iteration: review session learnings, refresh product/backlog pages | lead |
 | Iteration 9 scope | done: one issue, #42 count pointing | - | PM |
-| #42 count pointing | round 1: review APPROVE (S1 test gap), test PASS; L1 closed | dev round 2 (S1 test + N2 split) -> delta re-review (mutant 8) + re-test (suite + ts42-tools/run.js) -> PR -> PM acceptance | developer |
+| #42 count pointing | rounds 1-2 done; review APPROVE, test PASS; PR #43 open at head b7d8aea | PM acceptance on PR #43; then the lead verifies the hand-off on GitHub and merges (merge commit) | PM |
 
 ## Open issues / PRs in this run
-- #42 (OPEN), branch `issue-42-count-pointing`, worktree `<scratchpad>/wt-42`, log `work-log/issue-42-count-pointing.md`
+- #42 (OPEN), PR #43 (OPEN, head b7d8aea), branch `issue-42-count-pointing`, worktree `<scratchpad>/wt-42`, log `work-log/issue-42-count-pointing.md`
 
 ## Blockers / waiting on
 - none

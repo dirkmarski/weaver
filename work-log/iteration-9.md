@@ -41,3 +41,5 @@
 - #42 started: branch issue-42-count-pointing (1405cd1), developer round 1.
 - #42 developer round 1 done (head 429e2d4; 143/143, ~0.58 s; 7/7 developer mutants caught). Lead check PASS with concern L1. Review and test round 1 launched in parallel on 3a84c1b.
 - #42 round 1: review APPROVE (S1 test gap, N1/N2 nits), test PASS (no defects, real page, 375 px). The lead re-ran L1 (caught, 13 fail) and S1 (survives). Round 2: S1 + N2; N1 kept. Re-check is delta-scaled.
+- #42 round 2 (S1 test plus N2 refactor, code 8e9c2ae): delta re-review APPROVE (mutant 8 now caught), re-test PASS (one stale script expectation, not a defect). Lead check round 2 passed.
+- PR #43 opened (head b7d8aea). `gh pr edit` fails because the token lacks the read:org scope; the body was updated via `gh api -X PATCH .../pulls/43`. Handed to the PM for acceptance.
