@@ -81,11 +81,28 @@ Not in scope, and why:
 - Badge-in-slot is CSS. The harness can check computed position or classes, but the tester should still take a 375 px screenshot.
 - Persona evidence is simulated, and GitHub Pages is still unconfirmed (open concern for Dirk).
 
+## Acceptance #55 (PR #57), 2026-10-20: ACCEPTED at 0e699d5
+- Rules confirmed: governance/LOG.md not read; I read only work-log/issue-55-page-tests.md (the evidence) and my own log; memory/wiki not edited.
+- Checked in my own detached worktree (scratchpad/wt-55-pm) at 0e699d5. Node v24.21.0, Chrome on macOS. No personas: there is no user-facing change.
+- AC1 pass: `node --test` 157/157, 2.04 s (2.09-2.14 s wall, 3 runs); limit 10 s, 0.6 s before.
+- AC2 pass: `WEAVER_NO_CHROME=1`: 147 pass, 10 skipped, exit 0, 0.59 s. Each test shows the reason. `CHROME_PATH=/nonexistent` also skips, with its own reason.
+- AC3 pass: requirements 1-7 checked by reading the code. Only node: built-ins are required; there is no package.json. The real index.html is loaded by file URL, the seed script is injected before the page scripts, input goes through keydown and .click(), and results are read from the DOM. One Chrome per file. Scenarios a-h are present. I forced a failure in the seeding test (private TMPDIR): 9 pass / 1 fail, 0 Chrome processes and 0 profile dirs left.
+- AC4 pass: the tester killed mutants (i)-(iv) (issue log). My own mutant: dropped `removeAttribute('data-d')` in clearResults. Test f failed; reverted, 157/157 again.
+- AC5 pass: seed 5 in the suite; the tester's independent oracle matched seeds 3, 17 and 101.
+- AC6 pass: README Test section read sentence by sentence as a newcomer. It is accurate and matches what I observed. The Files list names both new files.
+- AC7 pass: index.html, style.css and sudoku.js are byte-identical to main. No product hook.
+- L1 (lead reading of 7f as "after both clicks"): confirmed, this is what I meant. The first click shows target and area only (asserted). The second adds the ring (hint-digit), confined, removed and data-d.
+- Ratio 1.15x -> 1.45x: accepted, as foreseen in D1. It is a one-off cost for a lean harness (one helper, 10 scenarios) that reaches wiring no unit test can. Condition for later work: UI issues add only targeted scenarios to tests/page.test.js, and the reviewer keeps checking leanness. A trim or ratio review is a candidate if the ratio passes about 1.6x.
+- L4 nits (chrome.js: watchdog declaration order, the dead `gone` check, optional watchdog): fine as tech debt.
+- Concern (minor, no action): the harness needs local Chrome. Without it the page tests are skipped, so a machine without Chrome gives weaker evidence. Testers and the PM must check that the skipped count is 0 when page evidence is claimed.
+- PR comment: https://github.com/dirkmarski/weaver/pull/57#issuecomment-6286683384. Not merged by me.
+
 ## Proposed wiki changes (for the lead; I did not edit memory/wiki)
 - backlog.md:
   - Replace candidate 1 with the list below.
   - Move "UI wiring has no repo tests" from tech debt to "in it12 scope (#55)".
   - Mark the it10 D1 badge-over-note-3 debt as "fixed by #56" once it is accepted.
+- architecture.md / development practices (after #57 merges): name tests/page.test.js and tests/chrome.js (CDP harness; CHROME_PATH, WEAVER_NO_CHROME). Add: "UI changes add their page checks to tests/page.test.js; page evidence counts only when the skipped count is 0". Mark "UI wiring has no repo tests" as resolved by #55.
 - product.md:
   - Update the Hint section after #56 is accepted: the ring rule, the key line, the badge slot and the box-case parenthesis.
   - Remove the "Pointing visuals v2 open" gap.
@@ -133,4 +150,4 @@ Not wanted:
 - counting entries made during a clash (it11);
 - retroactive counting after a fix (it11).
 
-Delivered and removed: none yet in it12. #55 and #56 are removed from this list when they are accepted.
+Delivered and removed: #55 (page test harness, accepted at 0e699d5). #56 is removed when accepted.
