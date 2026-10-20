@@ -8,14 +8,14 @@ Last updated: 2026-10-20, lead session 0245eb9f-91d7-4bfe-b523-bbf5b80a2438
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #45 pointing hint marks | developer round 2 (S1-S3, N1) | delta re-review + smoke re-test, lead check, PR | developer |
+| #45 pointing hint marks | PR #47 open (head 63c13de), PM acceptance | verify PM hand-off, merge (merge commit) | PM |
 | #46 clash message | waiting (after #45 merges) | branch from main, developer | lead |
 
 ## Where things are
 - #45: branch issue-45-pointing-hint-marks, worktree <session scratchpad>/wt-45, log work-log/issue-45-pointing-hint-marks.md.
 
 ## Open issues / PRs
-- #45, #46 open (issues). No PRs yet.
+- #45, #46 open (issues). PR #47 (#45) open.
 
 ## Blockers / waiting on
 - none

@@ -38,3 +38,4 @@
   - Review: APPROVE with S1-S3 and nits N1, N2.
   - Test: criteria 1-5 PASS on the real page, including clearing with the marks showing; D1 is a low cosmetic defect (the badge covers pencil note 3).
   - Round 2: S1, S2, S3 and N1. D1 is accepted as a known limitation and flagged to the PM. The re-check is delta-scaled. Developer round 2 launched.
+- #45 round 2 (code 579c1db): delta re-review APPROVE, smoke re-test PASS, lead check PASS (the lead re-ran the S1 mutant: killed). PR #47 opened (head 63c13de). Handed to the PM for acceptance, with D1 flagged.
