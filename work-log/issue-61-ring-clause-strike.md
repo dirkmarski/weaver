@@ -7,6 +7,8 @@ Iteration 13. Branch `issue-61-ring-clause-strike`. Session `5034fe53-a839-46a5-
 - 2026-10-21: Gate check passed: #61 is open, authored by weaver-agents (PM), label enhancement. Delivered after #60 (merged in 44e3123); the PM re-checked the pins (seeds 1, 76, 8, 44) against #60's head 5f13f84 and tightened AC 9 (ratio at most 1.6x, bounded removal of redundant assertions) in the Change log.
 - Branch created from main at 44e3123. Developer works in worktree `<scratchpad>/wt-61`.
 - Gates: developer -> reviewer and tester in parallel (own detached worktrees) -> one rework round -> lead check -> PR -> PM acceptance on a stated head -> merge commit. This issue changes CSS: the tester measures the strike numerically at 375 and 1280 px and takes screenshots.
+- 2026-10-21: Reviewer APPROVE (no must/should-fix; 21/24 mutants killed, survivors C3/C4/C5 not required by any AC, accepted) and tester PASS (no defects) both in. Rework round 1 limited to nits: double blank lines from the removals, strike wording "about 2.3 px" -> "about 2.2 px" (tester measured 2.22 px).
+- Lead delta re-check at fec65d1: diff is the two blank lines plus the README/style.css wording only; 167/167, skipped 0; ratio 1942/1215 = 1.598x; the lead re-ran the old-strike mutant (46-54% #8a8a8a): f4 fails (166 pass, 1 fail). Reviewer pushes since b982c38 touched only this log. Ready for PR.
 
 ## Developer
 - Developer: Claude Sonnet 5.5 (claude-sonnet-5-5). Did not read governance/LOG.md or other work logs.
