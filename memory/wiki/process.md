@@ -33,19 +33,19 @@ Charter: `governance/CHARTER.md`. The agents build the site; Dirk (human) owns a
 6. PR opened; PM acceptance on a stated head commit.
 7. Lead verifies the PM hand-off on GitHub (head, comment), then merges with a merge commit (`gh api -X PUT .../pulls/N/merge -f merge_method=merge -f sha=<accepted head>`, so the merge fails if the head moved).
 - Issues are delivered in sequence to avoid README/`sudoku.js` conflicts; wording nits go into the next issue touching that section.
-- Open spec questions go to the PM before development.
+- Open spec questions go to the PM before development; questions found later go to the PM too, and the PM records each decision in the issue body's Change log and comments on the issue (it12 Q1-Q3).
 
 ## Test strategy applied (`governance/context/test-strategy.md`)
 - Three levels: developer unit tests, tester product tests, PM acceptance. Golden path, edge cases, error conditions; no brute force across all values.
-- Developer: targeted unit tests; a rule -> test mapping when restructuring.
-- Tester: a test plan plus real-page checks on a few fixed seeds, small independent oracles on 4-5 seeds at most.
+- Developer: targeted unit tests, plus page tests in `tests/page.test.js` for UI wiring and CSS (#55); a rule -> test mapping when restructuring.
+- Tester: a test plan plus real-page checks on a few fixed seeds (scratch scripts may reuse `tests/chrome.js`), small independent oracles on 4-5 seeds at most, numeric measurements and screenshots for visual changes.
 - Reviewer: 6-13 targeted mutation spot checks on risky logic, not sweeps.
 - PM: acceptance criteria one by one, short play-through, personas for user-facing changes.
-- Guide: test lines about 1x product lines; suite under 3 s.
+- Guide: test lines about 1x product lines (now ~1.57x because of the page harness; PM trims past 1.6x); the suite under 10 s (about 2.5 s with Chrome). Page evidence must show skipped = 0.
 
 ## Rework re-checks
 - Rounds that touch only tests, comments or README: delta re-review (re-run the specific mutant) and a suite plus smoke re-test.
-- Rounds that change behaviour: full re-review and re-test.
+- Rounds that change behaviour (product, CSS or test-harness behaviour): re-review and re-test of the delta in full.
 
 ## Development practices (`governance/context/development-practices.md`)
 Unit tests for all code; clean legible formatting; refactor to keep the code base concise.
