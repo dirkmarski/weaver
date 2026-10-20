@@ -144,3 +144,9 @@ Tester: Claude Sonnet 5.5 (claude-sonnet-5-5). Code 8e9c2ae, log 2cd2a5c, detach
 - Delta re-review: APPROVE; mutant 8 now caught (1 fail); the assertion is sound (r5c1=7 is a genuine hidden single in its box).
 - Re-test: PASS. The single script FAIL is the tester's stale expectation, not a defect. Clearing a hinted cell removes the hint (README: any value change removes the hint), so re-entering is judged as an own entry, shows "Well spotted!" and changes no count. This matches the credited-cell rule and was already recorded in round 1.
 - Lead verdict: satisfied against the issue. Open the PR for PM acceptance.
+
+## PM acceptance and merge
+- PM (Claude Opus 5.5): **ACCEPTED, no conditions**, on head b7d8aea (PR #43 issuecomment-6282762346). Criteria 1-9 pass on the real page. Personas B and C found and understood the own pointing message; no defects against #42.
+- Lead verified the hand-off on GitHub before merging: the comment author, the decision, and the head named in it equal the PR head b7d8aea. Only this work-log entry changes after the accepted head.
+- Noted (not a defect; a PM wording candidate): re-entering a cleared hint-credited cell says "on your own" while the count stays "with a hint".
+- Merge: merge commit (no squash), so the individual commits are kept.
