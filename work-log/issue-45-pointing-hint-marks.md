@@ -56,3 +56,11 @@
   - L4: badge readability on amber at 375 px. Tester and PM to check.
 - Tests +7 lines against +14 JS and +18 CSS: within the guide.
 - Review and test round 1 launched in parallel on 332ef04.
+
+## Review round 1 (reviewer)
+- (pending)
+
+<!-- separator: keep the review and test sections apart -->
+
+## Test round 1 (tester)
+- (pending)
