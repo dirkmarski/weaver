@@ -194,3 +194,15 @@ Delivered and removed: #55 (page test harness, accepted at 0e699d5). #56 is remo
 - Concerns and assumptions:
   - The narrow chip is a tall pill. I assume players still read it as the same badge. To confirm with the personas at acceptance; not a blocker.
   - One measuring run gave a 25 px column 8, a one-off layout artefact that did not reproduce in three later runs (natural widths 34.7-36.8 px). The tester should check that the cell width is about 34-36 px when measuring.
+
+## Acceptance #56 (PR #58), 2026-10-20: in progress at e444eb1
+- Rules confirmed: governance/LOG.md not read; I read only work-log/issue-56-hint-rings.md (evidence) and my own log; memory/wiki not edited.
+- Own detached worktree scratchpad/wt-56-pm at e444eb1 (branch issue-56-hint-rings). Node v24.21.0, Chrome on macOS.
+- `node --test` x2: 166/166 pass, 0 fail, **0 skipped**, 2.50 s.
+- Real page (pm-it12/play.js with WT=wt-56-pm, following Hint to the first pointing step): P(1), P(3), P(4), P(8) rings, explanation texts, key lines, box case and badge cells match the pins exactly; H(1), H(2), H(3) rings match. Key line absent on the first click and on the hidden-single explanation; kept on a notes change; cleared by a value change (any cell), Verify, New puzzle and the "Well done!" entry.
+- Badge measurements (my Q3 m3.js, branch CSS only, no injection; columns 0/4/8, notes 1-9, both kinds, 54 badges per width): 375 px (cells 35 px): worst edge -0.07 px, worst glyph overlap 0.88 px (D = 4), centre in D's slot 54/54, 14px, padding 0 1px. 520 px: worst edge -0.07 px, overlap 0, padding 1px. 900 px: overlap 0, padding 0 3px, centre in slot 54/54.
+- Screenshots: pm-it12/sessions/n3-375.png, n4-375.png (about 500 px, headless minimum window width), a-k1.png (true 375 px via device emulation, which I added to play.js today); tester's ts56b/zoom_s33_D4_375.png (worst case D = 4) and shot_s4_D9_375.png. Neighbouring notes readable, strike visible, nothing clipped.
+- Own mutants (reverted, tree clean): M1 confined cells counted as reason cells: 1 test fails (killed). M2 `--y` for digit 7 dropped: 1 page test fails (killed).
+- AC5: the changed existing assertions in the diff are exactly the listed ones (two `digits` lists, the P(8)-shape text, page `noHint` / test f additions).
+- Ratio: tests 1871 / product 1193 lines = 1.57x.
+- Persona check launched (A, B, C; prompt pm-it12/acc56-prompt.txt): narrow chip at 375 px and the "this D rules out other cells" clause (P(3) and P(8)).
