@@ -109,3 +109,10 @@ Tester: Claude Sonnet 5.5, session `48eaa449-33cf-461f-85bc-196e8d61fc39`. Verdi
 - Independent check on seeds 1 and 3 only: (3,3)=7 on seed 1 is pointing-only (candidates {1,7}, not hidden), (5,5)=1 on seed 3 is the hidden form after the row-9 pointing step.
 - Note: re-entry after clearing a hinted cell shows the own "Well spotted!" text (the hint is gone), count unchanged; consistent with the credited-cell rule.
 - Not retested: hidden-before-pointing precedence mutant (L1), left to the reviewer.
+
+## Lead decision after round 1 (review APPROVE, test PASS)
+- L1 closed: the lead re-ran "pointing tried before naked and hidden" independently, and 13 tests fail. The developer's note was wrong; the precedence is pinned.
+- S1 confirmed by the lead: with `pointing` dropped from the creditEntry tally copy loop, 143/143 still pass. **Round 2 must add** an assertion that a Pointing count survives a later credit.
+- N2 (split the own-text ternary in creditEntry): fold into round 2; it is cheap.
+- N1 (redundant filled-cell guard in singleAfterStep): **keep**. It is harmless and keeps the helper safe without relying on the callers' contract. No change.
+- Re-check scale (per the iteration-8 lesson): round 2 is a test plus a tiny legibility refactor, with no behaviour change. It gets a delta re-review (re-run mutant 8, read the N2 diff) and a re-test (suite plus the tester's existing run.js page smoke), not a full re-run.
