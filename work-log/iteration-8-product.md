@@ -88,3 +88,23 @@ Not chosen, and why:
   - Worktree scratchpad/pm-36 removed.
 - Next PM step: acceptance of #37 once it is delivered (B on Tricky and Hard, a less experienced persona on Tricky; watch the uncounted "Well done!" again; check N5 and the "two techniques" nit).
 - 2026-10-20: #37 acceptance STARTED (PR #40, head 542a5db; only a work-log change since the tested head 7dde9ba). Detached worktree scratchpad/pm-37. Play tool scratchpad/pm37play/play.js (copy of the #36 tool: points at pm-37, uses S.seededRng so seeds match the developer table, shows "Difficulty: X", new `wallreset` setup = pre-play singles to the wall then reset the counts). Own checks so far: 137/137 pass (0.60 s); diff read (LEVELS, solvableBy, index.html button, README); README N5 and "two" fixes present and true; golden path seed 1 (pointing at hint 13, r3c3=7, naked) and seed 3 (hint 20, r5c5=1, hidden) match the developer's table; seed 1 followed to the end: no "none", "Puzzle solved! Singles applied: 0 on your own, 53 with a hint" (53 singles + 1 pointing = 54 empty). Product sample (seeds 1-10, hintFor default order): 8 puzzles need 1 pointing step, 2 need 2; givens 27-30, mostly 27. Personas running: B (Medium seed 2 calibration, Tricky seed 3 from empty, Hard seed 1 glance), C (Tricky seed 1, wallreset start, explained).
+- 2026-10-20: #37 acceptance (PR #40, head 542a5db): **ACCEPTED, no conditions.** Decision comment: PR #40 issuecomment-6280786479. I did not merge.
+  - Criteria 1-4 PASS. README N5 and "two" fixes are present and true. My own 375 px screenshot (iframe): no scroll, Hard alone on row 2.
+  - Personas (play tool only; I grep-checked both transcripts: no scripts, no source reads):
+    - B (Medium calibration, then Tricky seed 3 from an empty grid, then a Hard glance): solved with 1 hint (the pointing step); "the right shape for a first non-single lesson"; the ladder Medium -> Tricky -> Hard "seems right"; explained pointing correctly; 4/5.
+    - C (Tricky seed 1, wallreset start, explained): solved with 6 hints; "Medium with one new idea"; explained pointing correctly and checked it on the grid; 4/5. C's "no pencil marks" is a play-tool artefact (the page has Notes).
+    - Key question: YES.
+  - Lead point 1 (one pointing step per puzzle): enough to meet and understand pointing, not enough to practise it. Candidate for later ("practice density"), after counting pointing.
+  - Lead point 2 (givens overlap 27-29): acceptable. Levels are defined by technique; givens are not shown to players; nobody noticed.
+  - 375 px wrap: acceptable. Added to the mobile layout candidate (a 2x2 level grid).
+  - The uncounted pointing is now 5/5 personas' top issue across #36 and #37. B: finish "Singles applied: 49 on your own, 0 with a hint" after a hint "feels wrong and a little dismissive".
+  - Worktree scratchpad/pm-37 removed. The play tool stays at scratchpad/pm37play/play.js (supports tricky, seededRng, wallreset).
+- **Iteration 8 product status: complete.** #35, #36 and #37 are all ACCEPTED. Merging #40 is the lead's step.
+
+## Next-iteration candidates (ordered, end of iteration 8)
+1. Count pointing: own recognition in classifyEntry; a "Pointing" tally line + grey definition; the finish text recaps all techniques (not "Singles applied" only); text (a) mentions pointing. Fold in the status-class testability carry-forward. (5/5 personas)
+2. Pointing hint visuals: mark the box cells the digit is confined to (and the line); ring only the relevant digits; tint the unit in the hidden form; avoid trivial confinements as the example. (B, C at #36 and #37)
+3. Tricky practice density: at least 2 pointing steps per Tricky puzzle (measure generation time); after 1, so repetition is rewarded.
+4. Uncounted-entry feedback v2 (B, C; B again at #37: a correct pair deduction is "a bit cold").
+5. Claiming, then pairs, each with its level.
+6. Mobile layout (2x2 level buttons at 375 px, status layout); middle hint level; unit wording; progress across puzzles.
