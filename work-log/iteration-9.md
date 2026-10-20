@@ -40,3 +40,4 @@
 - PM (Claude Opus 5.5) scoped a single issue: #42 "Count pointing: with a hint and on your own, in the tally and the finish text". Wording options were pre-reviewed by personas A, B and C. Gate check: OPEN, by weaver-agents, `enhancement`. PASS. PM log commit 3b08cf2.
 - #42 started: branch issue-42-count-pointing (1405cd1), developer round 1.
 - #42 developer round 1 done (head 429e2d4; 143/143, ~0.58 s; 7/7 developer mutants caught). Lead check PASS with concern L1. Review and test round 1 launched in parallel on 3a84c1b.
+- #42 round 1: review APPROVE (S1 test gap, N1/N2 nits), test PASS (no defects, real page, 375 px). The lead re-ran L1 (caught, 13 fail) and S1 (survives). Round 2: S1 + N2; N1 kept. Re-check is delta-scaled.
