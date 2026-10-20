@@ -47,3 +47,18 @@
 - 2026-10-20: #56 round 1b done (55b63d6). Lead check passed (166 tests). Reviewer and tester re-check rounds 1 + 1b at fc76f9d.
 - 2026-10-20: #56 re-review (approve; R1 should-fix: f4 misses removal of the right-edge rule) and re-test (all pass; worst overlap 1.14 px at 375 px; AC3 '900 px within 0.5 px of main' ambiguity read as 'as at the slot placement 8ac1f8b', for the PM at acceptance). Round 2 (tests only, R1) to the developer; lead delta-check after.
 - 2026-10-20: #56 round 2 (5ea1691) checked by the lead (mutant c6 killed). PR #58 opened (head e444eb1). PM acceptance launched on e444eb1 (AC3 900 px reading, ratio ~1.57x, persona check of the narrow chip).
+- 2026-10-20: PM accepted #56 at e444eb1 (PR comment by weaver-agents verified). PR #58 merged with a merge commit at the accepted sha: 7b18749. Main: 166/166, 0 skipped (152 unit, 14 page). Issue #56 closed. Persona points at acceptance (ring-clause wording with two rings; faint strike on phones) are beyond the spec and head PM candidate 2. Issue worktrees removed.
+
+## Results
+- #55 page tests in the repo: merged f55b6a8 (PR #57). Rework: round 1 (tests/README), round 2 (signal-safe cleanup after the lead's re-check found Chrome surviving a SIGTERM).
+- #56 hint explanation: merged 7b18749 (PR #58). Rework: round 1 (Q1 text, zero-ring page test, D=1..9 badge loop, README), round 1b (badge CSS per Q3), round 2 (f4 pins the flush edge). PM decisions Q1 (key text without article), Q2 (option C) and Q3 (option B, side padding only, below 560 px), all recorded in the issue Change log.
+- Test-to-product ratio 1.15x -> 1.57x (harness has no product lines); PM watch trigger 1.6x.
+
+## Concerns and assumptions
+- Q2 was issued with contradictory criteria; it cost a round trip (developer measured and stopped as briefed). Lesson recorded: check visual criteria for feasibility before they go into the issue.
+- All user evidence is simulated; GitHub Pages is still unconfirmed (for Dirk).
+- Equivalent mutants accepted: `choose` skipping `clearResults`; the left-edge badge rule at 375 px.
+
+## Close-out (memory)
+- Wiki updated from the code and README, and pruned per Dirk's 9e54939: lessons compressed by theme from 64 to 50 lines (merged duplicates, dropped superseded tooling notes such as the it11 tool names and the user-a/b/c availability note); backlog replaced with the PM's pruned list (delivered history dropped); product Hint section rewritten for #56; architecture now covers the page harness; glossary drops obsolete terms (frozen oracle, wallreset) and adds reason cell, key line, page tests. WIP reset to "no active run". Commit 5a2518f.
+- Iteration PR opened for the logs and memory.
