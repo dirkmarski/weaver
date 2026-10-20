@@ -3,22 +3,26 @@
 Last updated: 2026-10-20, lead session 544de00f-db0c-4fd3-8425-f2e90d4ada4d
 
 ## Active run
-- Iteration 11 ("deliver the next iteration"), started 2026-10-20. Branch `iteration-11`. The lead edits it in the worktree `<scratchpad 544de00f...>/wt-iteration-11`. Lead log: work-log/iteration-11.md.
+- None. Iteration 11 is complete. Both issues were accepted by the PM and merged:
+  - #50: PR #52, merged in 7e23b26.
+  - #51: PR #53, merged in ca536d3.
+- The iteration logs and the memory updates are merged by the iteration-11 PR.
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #51 clash outline | developer round 2 (S1, S2, N1, N3, N5; behaviour-neutral) | lead delta re-check (node --test, ts51 pins51 + suite51), PR, PM acceptance | developer |
+| (none in flight) | | | |
+
+## Starting the next run
+- Iteration 12: the PM picks from `memory/wiki/backlog.md` (the end-of-it11 snapshot). The top candidates are:
+  - pointing visuals v2;
+  - Tricky practice density;
+  - slip follow-ups, mostly wording, which can ride along.
+- The it11 page tools live in session scratchpad 544de00f-db0c-4fd3-8425-f2e90d4ada4d (ts50/, ts51/, pm-it11/, dev51/) and are likely gone. Rebuild them from the design in `wiki/lessons.md` (Tooling).
+- Do not read the work log unless specifically needed (Dirk, 1464355).
 
 ## Open issues / PRs
-- #50 done: PR #52 merged (7e23b26), issue closed.
-- #51 open (PM-authored, enhancement). No PR yet.
-- Carried into #51 (in its brief): N3 README named-clash sentence repeats itself; use "(givens included; Verify turns only your own values red)".
+- none (after the iteration-11 PR merges)
 
 ## Blockers / waiting on
 - none
-
-## Notes
-- New rule (Dirk, 1464355): do not read the work log unless specifically needed. Restart from this file and the wiki.
-- PM prototype and play tool (it11): scratchpad pm-it11/ (play.js, final/, mock/).
-- it11 page tools: scratchpad ts50/ (#50 pins) and ts51/ (pins51.js, suite51.js, steps.js, shots51.js; README inside).
