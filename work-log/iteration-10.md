@@ -33,3 +33,4 @@
 - Decision D1: two issues is acceptable for "small": #46 is one text branch. They are delivered strictly in sequence; #46 branches from main after #45 merges.
 - Decision D2: for #45 the tester's real-page check (screenshots, 375 px) is the main gate for the marks, because UI wiring has no repo tests.
 - #45: branch issue-45-pointing-hint-marks (45f3e38), developer round 1 launched.
+- #45 developer round 1 (Claude Sonnet 5.5) done, code head 332ef04: 143/143, about 0.6 s; sudoku.js +14, style.css +18, tests +7 lines. Lead check PASS with points L1-L4 (see the issue log). Review and test round 1 launched in parallel, each in its own detached worktree (wt-45-review, wt-45-test). The lead pre-created separate log sections so their pushes merge cleanly.
