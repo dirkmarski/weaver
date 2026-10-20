@@ -57,6 +57,7 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 #status { margin-top: 1rem; font-size: 1.1rem; font-weight: 500; }
 #status.ok { color: #1a7f37; }
 #status.fail { color: #b3261e; }
+#key { margin: 0.25rem auto 0; max-width: 36rem; font-size: 0.85rem; font-weight: 400; color: #444; }
 
 #sudoku caption {
   caption-side: top;
@@ -88,7 +89,7 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 #sudoku td.hint-target { background: #ffc83d; box-shadow: inset 0 0 0 6px #e08a00; }
 #sudoku td.hint-target .notes { color: #444; }
 #sudoku td.hint-target input:focus { background: transparent; }
-/* Hidden-single explanation: every cell holding the digit gets a purple ring and a bold purple digit (apart from amber, blue focus and red conflict). */
+/* Second-click explanation: the cells holding the digit that rule out an empty cell of the unit (hidden single) or of the box or unit (pointing) get a purple ring and a bold purple digit (apart from amber, blue focus and red conflict). */
 #sudoku td.hint-digit { box-shadow: inset 0 0 0 4px #6a1fb5; color: #4a0f8a; font-weight: 800; }
 #sudoku td.hint-digit input { color: #4a0f8a; font-weight: 800; }
 
@@ -97,13 +98,20 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 #tally p { margin: 0.25rem 0; font-size: 0.95rem; }
 #tally .definition { margin: 0 auto 0.75rem; max-width: 28rem; font-size: 0.8rem; color: #595959; }
 
-/* Pointing explanation: the digit D (data-d) is badged in the corner of the box cells where it fits (dashed purple outline) and of the line cells that lose it (grey, struck through by a diagonal). The badge is bold on a white chip, unlike the grey pencil notes. */
+/* Pointing explanation: the digit D (data-d) is badged in its own pencil-note slot (1 top-left ... 9 bottom-right, the centre of that third of the cell) of the box cells where it fits (dashed purple outline) and of the line cells that lose it (grey, struck through by a diagonal). The badge is bold on a white chip, unlike the grey pencil notes. Below 560 px the cell is narrower than the chip plus a note slot: the chip's side padding drops to 1px (same 14px digit) and a badge in a left or right edge slot sits flush against the cell's inner edge, so it is never clipped and still lies in its own slot (middle slots stay centred). */
+#sudoku td[data-d="1"], #sudoku td[data-d="4"], #sudoku td[data-d="7"] { --x: 16.667%; }
+#sudoku td[data-d="2"], #sudoku td[data-d="5"], #sudoku td[data-d="8"] { --x: 50%; }
+#sudoku td[data-d="3"], #sudoku td[data-d="6"], #sudoku td[data-d="9"] { --x: 83.333%; }
+#sudoku td[data-d="1"], #sudoku td[data-d="2"], #sudoku td[data-d="3"] { --y: 16.667%; }
+#sudoku td[data-d="4"], #sudoku td[data-d="5"], #sudoku td[data-d="6"] { --y: 50%; }
+#sudoku td[data-d="7"], #sudoku td[data-d="8"], #sudoku td[data-d="9"] { --y: 83.333%; }
 #sudoku td.hint-confined { outline: 3px dashed #6a1fb5; outline-offset: -3px; }
 #sudoku td.hint-confined::after, #sudoku td.hint-removed::after {
   content: attr(data-d);
   position: absolute;
-  top: 2px;
-  right: 2px;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
   padding: 0 3px;
   border-radius: 3px;
   background: #fff;
@@ -114,3 +122,8 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 }
 #sudoku td.hint-confined::after { color: #6a1fb5; border: 1px solid #6a1fb5; }
 #sudoku td.hint-removed::after { color: #333; border: 1px solid #595959; background: linear-gradient(to top right, #fff 46%, #8a8a8a 46% 54%, #fff 54%); }
+@media (max-width: 559px) {
+  #sudoku td.hint-confined::after, #sudoku td.hint-removed::after { padding: 0 1px; }
+  #sudoku td[data-d="1"]::after, #sudoku td[data-d="4"]::after, #sudoku td[data-d="7"]::after { left: 0; transform: translate(0, -50%); }
+  #sudoku td[data-d="3"]::after, #sudoku td[data-d="6"]::after, #sudoku td[data-d="9"]::after { left: auto; right: 0; transform: translate(0, -50%); }
+}
