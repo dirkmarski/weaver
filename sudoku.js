@@ -287,9 +287,16 @@
         ? 'Row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' could only take ' + d + ' or ' + s.digit + ', so it must be ' + s.digit + '.'
         : 'That leaves row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' as the only cell in its ' + s.unit + ' where ' + d + ' fits, so it must be ' + d + '.';
     } else {
-      text = 'Hint: try pointing. In ' + box + ', so it cannot go anywhere else in ' + line + '. ' + (s.form === 'naked'
-        ? 'That means ' + d + ' cannot go in row ' + (s.r + 1) + ', column ' + (s.c + 1) + ', and only one other digit fits there now.'
-        : 'Then look at ' + (s.unit === 'box' ? boxName(3 * Math.floor(s.r / 3) + Math.floor(s.c / 3)) : s.unit + ' ' + ((s.unit === 'row' ? s.r : s.c) + 1)) + ': ' + d + ' now has only one place left there.') + ' Click Hint again to see why.';
+      var tail;
+      if (s.form === 'naked') {
+        tail = 'That means ' + d + ' cannot go in row ' + (s.r + 1) + ', column ' + (s.c + 1) + ', and only one other digit fits there now.';
+      } else {
+        var unitName = s.unit === 'box'
+          ? boxName(3 * Math.floor(s.r / 3) + Math.floor(s.c / 3))
+          : s.unit + ' ' + ((s.unit === 'row' ? s.r : s.c) + 1);
+        tail = 'Then look at ' + unitName + ': ' + d + ' now has only one place left there.';
+      }
+      text = 'Hint: try pointing. In ' + box + ', so it cannot go anywhere else in ' + line + '. ' + tail + ' Click Hint again to see why.';
     }
     return { kind: step === 2 ? 'explain' : 'nudge', technique: 'pointing', form: s.form, unit: s.unit, box: s.box, line: s.line, index: s.index,
       pointDigit: d, confined: s.confined, removed: s.removed, r: s.r, c: s.c, digit: s.digit, text: text };
@@ -679,6 +686,7 @@
       hint = null;
       status.textContent = '';
       status.className = '';
+      // data-d is always set together with hint-confined / hint-removed, so [data-d] finds those cells too.
       table.querySelectorAll('.hint-target, .hint-area, .hint-digit, [data-d]').forEach(function (el) {
         el.classList.remove('hint-target', 'hint-area', 'hint-digit', 'hint-confined', 'hint-removed');
         el.removeAttribute('data-d');

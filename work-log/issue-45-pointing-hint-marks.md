@@ -118,3 +118,14 @@
   - criterion 4 ("must not look like the user's notes") is met.
   - Flagged to the PM for the acceptance judgement; if the PM wants it changed, it becomes a follow-up candidate.
 - Re-check is delta-scaled (tests, README, comments plus a behaviour-neutral refactor): the reviewer re-runs the S1 mutant and checks the S2 split; the tester runs the suite and a smoke re-run of run1.js.
+
+## Developer round 2
+- Developer: Claude Sonnet 5.5, session `0245eb9f-91d7-4bfe-b523-bbf5b80a2438`, from head 6a111e8. Did not read governance/LOG.md.
+- S1: new constant `WALL_UNIT_COL` (Tricky seed 5, grid after the singles, hidden form, unit column, target r9c3 so row and column differ). One assertion added to the WALL_COL pointing test: first-click text contains `Then look at column 3: 6 now has only one place left there.`
+- S2: the first-click `else` branch of `pointingHint` is split into `tail` (naked or hidden sentence) and `unitName` (box name, or row/column and number). Text identical; all old text tests pass unchanged.
+- S3: README `hintFor` entry now lists `confined` and `removed` (true: `pointingHint` returns both).
+- N1: comment in `clearResults` on the `[data-d]` coupling.
+- D1: not touched (accepted limitation); CSS unchanged.
+- Tests: `node --test` 143/143 pass, about 0.59 s (no new test() block, one assertion).
+- S1 mutant `(s.unit === 'row' ? s.r : s.c) + 1` -> `s.r + 1`: BEFORE (old tests, mutated code) 143 pass, 0 fail (survives); AFTER (new tests) 142 pass, 1 fail (killed). Unmutated code with new tests: 143/143.
+- Line deltas: sudoku.js +11/-3, tests +2/-0, README +1/-1 (one line changed).
