@@ -94,16 +94,18 @@ describe('page (headless Chrome)', () => {
     return null;
   });
 
-  // The singles played on the page, so that the next hint is a pointing step.
-  const pointing = pick('tricky', (p, sol) => {
+  // The singles played on the page, so that the next hint is a pointing step (optionally one whose ring count satisfies `ok`).
+  const pointingState = (ok) => pick('tricky', (p, sol) => {
     const grid = p.map((row) => row.slice()), typed = [];
     for (let s; (s = S.findNakedSingle(grid) || S.findHiddenSingle(grid)); ) {
       grid[s.r][s.c] = sol[s.r][s.c];
       typed.push([s.r * 9 + s.c, String(sol[s.r][s.c])]);
     }
     const step = S.findPointing(grid);
-    return step ? { typed, grid, step } : null;
+    return step && ok(S.hintMarks(S.hintFor(grid, 2), grid).digits.length) ? { typed, grid, step } : null;
   });
+  const pointing = pointingState(() => true);
+  const noRings = pointingState((n) => n === 0);
 
   it('seeding: the page Tricky puzzle for a seed equals generatePuzzle with seededRng', async () => {
     await open('tricky', 5);
@@ -241,20 +243,32 @@ describe('page (headless Chrome)', () => {
     assert.deepStrictEqual([s.key, s.dattr], ['', []]);
   });
 
-  it('f3. the badge sits in the note slot of its digit (1 top-left, 5 centre, 9 bottom-right)', async () => {
+  it('f2b. with no ring the key line has no ring clause (and none is ringed)', async () => {
+    const { seed, extra } = noRings;
+    await open('tricky', seed);
+    await keys(extra.typed);
+    await click('#hint');
+    await click('#hint');
+    const s = await read();
+    assert.deepStrictEqual(s.digit, []);
+    assert.strictEqual(s.key, S.pointingKey(extra.step.pointDigit, 0));
+    assert.ok(s.key.endsWith('go there.') && !s.key.includes('purple ring'));
+  });
+
+  it('f3. the badge sits in the note slot of its digit, for every digit 1-9 (1 top-left, 5 centre, 9 bottom-right)', async () => {
     await open('tricky', 5);
-    // Put a purple badge for D on one cell and compare its centre with the centre of the cell's own note slot D.
+    // Probes the CSS rules themselves (no hook in the product): put a purple badge for D on one cell and compare its centre with the centre of the cell's own note slot D.
     const centres = await page.eval('(function () {' +
       'var td = document.querySelector("#sudoku td"), out = [];' +
       'td.classList.add("hint-confined");' +
-      '[1, 5, 9].forEach(function (d) {' +
+      '[1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function (d) {' +
       '  td.setAttribute("data-d", d);' +
       '  var box = td.getBoundingClientRect(), after = getComputedStyle(td, "::after"), slot = td.querySelectorAll(".notes span")[d - 1].getBoundingClientRect();' +
       '  out.push([parseFloat(after.left) + box.left + td.clientLeft - slot.left - slot.width / 2, parseFloat(after.top) + box.top + td.clientTop - slot.top - slot.height / 2, after.transform]);' +
       '});' +
       'return out; })()');
     centres.forEach(([dx, dy, transform], i) => {
-      assert.ok(Math.abs(dx) < 1.5 && Math.abs(dy) < 1.5, 'slot ' + [1, 5, 9][i] + ': centre off by ' + dx + ', ' + dy);
+      assert.ok(Math.abs(dx) < 1.5 && Math.abs(dy) < 1.5, 'slot ' + (i + 1) + ': centre off by ' + dx + ', ' + dy);
       assert.notStrictEqual(transform, 'none');
     });
   });

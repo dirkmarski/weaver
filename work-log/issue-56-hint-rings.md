@@ -41,6 +41,16 @@
 - `node --test` x3: 164 tests, 0 fail, 0 skipped, ~2.27 s. Code lines: sudoku.js 993 -> 1023, style.css 116 -> 124, index.html 40 -> 41; tests 1574 -> 1694 (ratio ~1.43).
 - Caveat: the chip (about 18.8 px tall) is nominally 0.1 px taller than the 18.67 px slot; the badge is centred on the slot. Tester to confirm at 375/900 px.
 
+### Rework round 1
+- 2026-10-20: Items 1-4 done; item 5 (D1, Q2 CSS) NOT implemented: measured first and the Q2 criteria cannot all hold with an unchanged chip. Reported to the lead (numbers below); style.css is unchanged.
+- Q1: `pointingKey` text without the article (sudoku.js; unit test now covers 1 (ring), 8 (ring) and 9 (no ring); README quote). Page tests use the helper, so they follow.
+- S1: new page test f2b: a P(4)-like state (a pick whose `hintMarks` digits are empty): digits empty, key === `pointingKey(D, 0)`, ends "go there.", no "purple ring". Mutants `pointingKey(d, 1)` and `pointingKey(d, marks.digits)` each fail 1 test (killed).
+- N1: f3 loops D = 1..9. Approach: the test sets `hint-confined` and `data-d` on a real cell in the DOM and reads the computed `::after` position against the cell's own note slot; this probes the CSS rule itself and needs no hook in the product. Mutant "digit 4 dropped from --x" fails 1 test (killed).
+- N2/N3: README "Well done" line names the key line; Files list names `#key` (index.html/style.css entry) and the key line in the page-test description.
+- Changed existing assertions: the `pointingKey` unit test only (text). The `pointing` pick in page.test.js became `pointingState(ok)` (same default behaviour).
+- Measurement (D1, 375 px): see the report to the lead; best case (chip flush with the cell edge for D = 1, 3, 4, 6, 7, 9) still penetrates a neighbour's glyph box by 2.6-5.1 px (D = 8 even unshifted 2.0-2.1 px), above the 2 px limit.
+- `node --test` x3: 165 tests, 0 fail, 0 skipped, 2.36-2.37 s. AC7 mutants re-run, all killed.
+
 ## Reviewer
 - 2026-10-20 Review of head 8ac1f8b (product commit 31758fc). Verdict: approve; no must-fix. `node --test` x2: 164 tests, 0 fail, 0 skipped, 2.31 s and 2.47 s.
 - Correctness (data followed creation to use): `hintMarks` builds reasons = box empties minus confined (a) plus, only when `hint.unit` is set (pointing hidden form), the unit's empties minus target and removed (b); the target is excluded in a (x !== p) and in b; hidden single: the unit's empties minus the target; ring = a D cell sharing a row/column/box with any reason cell; ascending; D4 keeps all; naked single: d = 0, no rings. `hint.unit` is absent for the naked pointing form (P(1), P(4) pins pass). Box case: `empties.length === s.confined.length` is exact because confined is a subset of the box empties (spotsFor over the box); only on step 2, so the first click, "Well spotted!" (creditEntry uses pointingClause) and "Well done!" are unchanged. `pointingKey` text matches the issue character for character; ring clause only when `marks.digits.length > 0`.

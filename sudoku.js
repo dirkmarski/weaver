@@ -440,8 +440,8 @@
 
   // The key line under a pointing explanation, for pointing digit d and the number of rings showing.
   function pointingKey(d, ringCount) {
-    return 'Key: dashed purple = the only places for ' + d + ' in the box; struck grey ' + d + ' = a ' + d + ' can no longer go there'
-      + (ringCount ? '; purple ring = a ' + d + ' that rules out other cells.' : '.');
+    return 'Key: dashed purple = the only places for ' + d + ' in the box; struck grey ' + d + ' = ' + d + ' can no longer go there'
+      + (ringCount ? '; purple ring = this ' + d + ' rules out other cells.' : '.');
   }
 
   // ---- Rewards: recognising naked and hidden singles the learner enters ----

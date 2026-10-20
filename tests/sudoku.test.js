@@ -1136,9 +1136,10 @@ test('hintMarks, pointing: reason cells are the unconfined empty box cells (a) a
   assert.deepStrictEqual(ringsOf(hidden, b), [at(8, 6)]);
 });
 
-test('pointingKey: the exact key line, with the ring clause only when rings show', () => {
-  assert.strictEqual(pointingKey(1, 2), 'Key: dashed purple = the only places for 1 in the box; struck grey 1 = a 1 can no longer go there; purple ring = a 1 that rules out other cells.');
-  assert.strictEqual(pointingKey(9, 0), 'Key: dashed purple = the only places for 9 in the box; struck grey 9 = a 9 can no longer go there.');
+test('pointingKey: the exact key line for every digit, with the ring clause only when rings show', () => {
+  assert.strictEqual(pointingKey(1, 2), 'Key: dashed purple = the only places for 1 in the box; struck grey 1 = 1 can no longer go there; purple ring = this 1 rules out other cells.');
+  assert.strictEqual(pointingKey(8, 1), 'Key: dashed purple = the only places for 8 in the box; struck grey 8 = 8 can no longer go there; purple ring = this 8 rules out other cells.');
+  assert.strictEqual(pointingKey(9, 0), 'Key: dashed purple = the only places for 9 in the box; struck grey 9 = 9 can no longer go there.');
 });
 
 // PM pins (issue 56): P(N) follows Hint on the Tricky puzzle of seed N (entering each digit as a hinted one) to the first pointing step.
