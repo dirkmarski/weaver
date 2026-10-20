@@ -42,4 +42,14 @@
 <!-- separator: keep the review and test sections apart -->
 
 ## Test round 1 (tester)
-- (pending)
+- Tester: Claude Sonnet 5.5. Head tested c4b48f4 (worktree at c84b726, log-only on top). I did not read governance/LOG.md.
+- Plan: criterion 1 = three pinned texts on fresh seed 1 Tricky; criterion 2 = status class '', neutral computed colour, no `.conflict`/`aria-invalid`/red input, no hint classes or `data-d`, tally text and hidden state unchanged; criterion 3 = (a), (b) incl. self-clashing entry, overwrite, clear, Notes on, last cell, plus Verify still red. Optional: clash while a hint shows, and in the hinted cell.
+- Tool: `scratchpad/ts46/run46.js` (`node run46.js`; reuses `scratchpad/ts45/lib.js`, headless Chrome, seeded Math.random; set `WT=` to the worktree). Screenshots `pinned_*.png` in `scratchpad/ts46/`.
+- Results, all PASS (35 page checks, 0 failures):
+  - Pinned 2@r2c1 (row), 4@r2c1 (column), 3,1=2 (box): text exact; no 'ok' class; colour rgb(29,29,31) same as fresh; no conflict/red/highlight; tally unchanged.
+  - (a) legal non-technique (r1c2=3): today's text. (b): after Verify flagged (2,1)=2, entering (3,1)=2, which itself clashes, gives "...Some numbers break the rules, so it is not counted. Click Verify to see which."
+  - Overwrite, clear and Notes on with a clashing digit: no message, no red.
+  - Last cell (all other cells filled with the solution, then a clashing digit): "Every cell is filled, but some numbers break the rules. Click Verify to see which." not the clash text; Verify then flags red.
+  - Hint showing: clash in another cell gives the clash text and clears the hint; clash in the hinted cell gives the clash text, not the reward, neutral, no highlight.
+- Suite: `node --test` 143/143, about 0.64 s wall.
+- Defects: none. Note: the unit-order mutant [row, box, column] (lead's L1) is covered on the page by the pinned 4@r2c1 check, not by a unit test.
