@@ -9,7 +9,7 @@ Last updated: 2026-10-21, lead session 5034fe53-a839-46a5-807a-40a5b44d5158
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #61 ring clause + strike | developer | review + test in parallel | developer |
+| #61 ring clause + strike | review + test at b982c38 | rework round, lead check, PR | reviewer, tester |
 
 ## Open issues / PRs
 - #61 open (no PR yet). #60 closed, PR #62 merged.
