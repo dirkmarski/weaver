@@ -13,6 +13,16 @@
 - Developer round 1 (head 572cd18): lead check PASS. The diff was read in full. 143/143 in about 0.61 s. Pinned examples re-run: 7/7. `findConflicts` includes givens, and the box cells in `UNITS` are in reading order, so P and Q follow the definition.
   - L1 (for review): the README says "the cells Verify flags, givens included", but Verify turns only the player's values red. Wording to be judged by the reviewer.
 - Review and test round 1 launched in parallel, in detached worktrees wt-50-review and wt-50-test.
+- Round 1 outcome:
+  - Review (f29b027): APPROVE with changes; S1, S2, N1, N2.
+  - Test (e1c04c3, merged in 3c1595b): criteria 1-9 PASS on the real page, no defects.
+  - The lead re-ran the S2 mutant (Q = last holder, `.pop()`) on a scratch copy: 143/143 pass, so it survives and the gap is confirmed.
+- Round 2 scope (README and tests only):
+  - S1: the README wording, using the reviewer's replacement.
+  - S2: an added assertion for two holders in the winning unit.
+  - N1 is accepted: the Hint class is UI wiring with no Node test, and the tester's real-page check of pin 3 (class "", computed colour not red) covers it.
+  - N2 is for the lead's wiki refresh at the iteration close.
+- Re-check (delta, since no behaviour changes): the lead re-runs the S2 mutant, the suite and the pins script; the reviewer does a delta re-review of S1 and S2. The tester's page run still stands, because no product file changes.
 
 ## Developer
 
