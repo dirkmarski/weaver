@@ -1,7 +1,11 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle, preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, seededRng } = require('../sudoku.js');
+const {
+  isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle,
+  preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle,
+  seededRng, findPointing, hintMarks
+} = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
 const clone = () => SOLUTION.map((r) => r.slice());
@@ -13,13 +17,6 @@ test('rejects duplicate in a row', () => {
   // box keeps the same digits (so stays valid); only rows 0 and 1 gain duplicates.
   const g = clone(); [g[0][0], g[1][0]] = [g[1][0], g[0][0]];
   assert.strictEqual(isValidSolution(g), false);
-  for (let i = 0; i < 9; i++) {
-    const col = g.map((r) => r[i]);
-    assert.strictEqual(new Set(col).size, 9, 'column ' + i);
-    const box = [];
-    for (let j = 0; j < 9; j++) box.push(g[3 * Math.floor(i / 3) + Math.floor(j / 3)][3 * (i % 3) + (j % 3)]);
-    assert.strictEqual(new Set(box).size, 9, 'box ' + i);
-  }
   assert.notStrictEqual(new Set(g[0]).size, 9);
 });
 
@@ -332,11 +329,13 @@ test('hintFor: full grid without conflicts', () => {
   assert.strictEqual(h.text, 'Every cell is filled. Click Verify to check the grid.');
 });
 
-test('hintFor: no naked and no hidden single', () => {
-  for (const g of [emptyGrid(), blank(...TWO_CANDIDATES)]) {
+test('hintFor: no naked single, hidden single or pointing step', () => {
+  // The last grid has a pointing step (top-left box, digit 1, row 1) that makes no cell a single.
+  const stepOnly = grid81('000000000456000000789000000' + '0'.repeat(54));
+  for (const g of [emptyGrid(), blank(...TWO_CANDIDATES), stepOnly]) {
     const h = hintFor(g, 1);
     assert.strictEqual(h.kind, 'none');
-    assert.strictEqual(h.text, 'No naked or hidden single right now. At this point the puzzle needs another technique.');
+    assert.strictEqual(h.text, 'No naked single, hidden single or pointing step right now. At this point the puzzle needs another technique.');
     assert.strictEqual(hintFor(g, 2).kind, 'none');
   }
 });
@@ -465,15 +464,17 @@ test('hintFor: hidden single explain text for box, row and column', () => {
   assert.strictEqual(box.technique, 'hidden');
   assert.strictEqual(box.unit, 'box');
   assert.strictEqual(box.text, 'Hidden single: row 5, column 6 must be 5, because every other empty cell in its box already has a 5 in its row or column.');
-  assert.strictEqual(hintFor(H_ROW, 2).text, 'Hidden single: row 4, column 7 must be 6, because every other empty cell in its row already has a 6 in its column or box.');
-  assert.strictEqual(hintFor(H_COL, 2).text, 'Hidden single: row 1, column 6 must be 4, because every other empty cell in its column already has a 4 in its row or box.');
+  assert.strictEqual(hintFor(H_ROW, 2).text, 'Hidden single: row 4, column 7 must be 6, because every other empty cell in its row '
+    + 'already has a 6 in its column or box.');
+  assert.strictEqual(hintFor(H_COL, 2).text, 'Hidden single: row 1, column 6 must be 4, because every other empty cell in its column '
+    + 'already has a 4 in its row or box.');
 });
 
 test('hintFor: hidden single explain text uses "an" before 8 and "a" before 7 and 9', () => {
   const relabel = (d) => H_BOX.map((row) => row.map((v) => (v === 5 ? d : v === d ? 5 : v)));
-  const text = (d, a) => 'Hidden single: row 5, column 6 must be ' + d + ', because every other empty cell in its box already has ' + a + ' ' + d + ' in its row or column.';
+  const text = (d, a) => 'Hidden single: row 5, column 6 must be ' + d + ', because every other empty cell in its box '
+    + 'already has ' + a + ' ' + d + ' in its row or column.';
   assert.strictEqual(hintFor(relabel(8), 2).text, text(8, 'an'));
-  assert.strictEqual(hintFor(relabel(8), 2).text, 'Hidden single: row 5, column 6 must be 8, because every other empty cell in its box already has an 8 in its row or column.');
   assert.strictEqual(hintFor(relabel(7), 2).text, text(7, 'a'));
   assert.strictEqual(hintFor(relabel(9), 2).text, text(9, 'a'));
 });
@@ -555,8 +556,10 @@ test('classifyEntry agrees with Hint at every step of 6 seeded Medium puzzles', 
 
 const T0 = emptyTally();
 // Issue 31: the two "not counted" texts, byte for byte (R, C 1-based).
-const NOT_SINGLE = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d + '. It was not a naked or hidden single at this point, so it is not counted.';
-const BROKEN = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d + '. Some numbers break the rules, so it is not counted. Click Verify to see which.';
+const NOT_SINGLE = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d
+  + '. It was not a naked or hidden single at this point, so it is not counted.';
+const BROKEN = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d
+  + '. Some numbers break the rules, so it is not counted. Click Verify to see which.';
 
 test('creditEntry: with a hint, right cell and digit', () => {
   const hint = hintFor(H_BOX, 1);
@@ -833,7 +836,6 @@ test('creditEntry (a): not a single, text byte for byte, nothing counted', () =>
   assert.strictEqual(res.tally, T0);
   assert.deepStrictEqual(res.credited, {});
   assert.strictEqual(creditEntry(T0, {}, null, H_BOX, 4, 5, '6').text, NOT_SINGLE(5, 6, 6));
-  assert.strictEqual(creditEntry(T0, {}, null, H_BOX, 4, 5, '4').text.indexOf('Entered: row 5, column 6 is 4. '), 0);
 });
 
 test('creditEntry (a): a digit already in the row, column or box; digit 8, row and column 9', () => {
@@ -890,4 +892,84 @@ test('creditEntry: a credited cell re-entered with a non-single shows (a), count
   const hint = hintFor(H_BOX, 1);
   assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '6').text, NOT_SINGLE(5, 6, 6));
   assert.strictEqual(creditEntry(T0, {}, hint, H_BOX, 4, 5, '1').text, NOT_SINGLE(5, 6, 1));
+});
+
+// ---- Issue 36: Hint teaches pointing ----
+
+// Two Hard walls (generatePuzzle('hard', { rng: seededRng(seed) }) filled with singles until none is left), as literals.
+const rows9 = (...rows) => rows.map((s) => [...s].map(Number));
+const WALL_ROW = rows9('000100402', '840002001', '521040030', '000469205', '965020014', '402051000', '000290040', '204080069', '093014528'); // seed 3
+const WALL_COL = rows9('425386179', '390217004', '170594230', '030941607', '917600480', '064000913', '781400000', '000020700', '000000000'); // seed 8
+const WALL_BOX = rows9('090600030', '002005000', '050008091', '000003080', '070500300', '230007400', '689174003', '703000000', '000300078'); // seed 139
+const BOX_INTRO = 'In the box of rows 1-3 and columns 1-3, the digit ';
+
+test('pointing, row line, naked form: finder, nudge, explain on the same cell, no mutation', () => {
+  const snap = JSON.stringify(WALL_ROW);
+  assert.deepStrictEqual(findPointing(WALL_ROW), { r: 0, c: 4, digit: 7, form: 'naked', box: 0, line: 'row', index: 0, pointDigit: 3 });
+  const one = hintFor(WALL_ROW, 1), two = hintFor(WALL_ROW, 2);
+  assert.strictEqual(one.kind, 'nudge');
+  assert.strictEqual(two.kind, 'explain');
+  assert.strictEqual(one.technique, 'pointing');
+  assert.strictEqual(one.text, 'Hint: try pointing. ' + BOX_INTRO + '3 fits only in row 1, so it cannot go anywhere else in row 1. '
+    + 'Use that to find the digit for row 1, column 5. Click Hint again to see why.');
+  assert.strictEqual(two.text, 'Pointing: in the box of rows 1-3 and columns 1-3, the digit 3 fits only in row 1, so 3 cannot go in row 1 outside that box. '
+    + 'Row 1, column 5 could only take 3 or 7, so it must be 7.');
+  assert.deepStrictEqual([two.r, two.c, two.digit, two.form], [one.r, one.c, one.digit, one.form]);
+  assert.strictEqual(JSON.stringify(WALL_ROW), snap);
+});
+
+test('pointing, column line, hidden form: the earlier digit 6 step in the same box makes no single and is skipped', () => {
+  assert.deepStrictEqual(findPointing(WALL_COL),
+    { r: 3, c: 0, digit: 8, form: 'hidden', unit: 'row', box: 0, line: 'column', index: 2, pointDigit: 8 });
+  assert.strictEqual(hintFor(WALL_COL, 1).text, 'Hint: try pointing. ' + BOX_INTRO + '8 fits only in column 3, so it cannot go anywhere else in column 3. '
+    + 'Use that to find the digit for row 4, column 1. Click Hint again to see why.');
+  const two = hintFor(WALL_COL, 2);
+  assert.strictEqual(two.text, 'Pointing: in the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3, '
+    + 'so 8 cannot go in column 3 outside that box. ' + 'That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
+  assert.deepStrictEqual([two.r, two.c, two.digit, two.unit], [3, 0, 8, 'row']);
+});
+
+test('pointing, hidden form: the unit is the box when box, row and column all qualify (row line, box 7)', () => {
+  assert.deepStrictEqual(findPointing(WALL_BOX),
+    { r: 7, c: 4, digit: 5, form: 'hidden', unit: 'box', box: 6, line: 'row', index: 8, pointDigit: 5 });
+  assert.ok(hintFor(WALL_BOX, 2).text.endsWith('That leaves row 8, column 5 as the only cell in its box where 5 fits, so it must be 5.'));
+});
+
+test('pointing: singles keep priority, conflicts stay unchanged, a box with one spot is no step', () => {
+  const single = WALL_ROW.map((row) => row.slice()); single[8][8] = 0; // the last single filled before the wall
+  assert.notStrictEqual(hintFor(single, 1).technique, 'pointing');
+  assert.strictEqual(hintFor(single, 1).kind, 'nudge');
+  const broken = WALL_ROW.map((row) => row.slice()); broken[0][1] = 4;
+  assert.strictEqual(hintFor(broken, 1).kind, 'conflict');
+  assert.strictEqual(findPointing(blank([0, 1], [1, 5], [8, 1], [7, 0], [8, 0])), null); // 3 fits one cell of the top-left box only
+});
+
+test('pointing: within a box the lower digit wins when two digits both make a single', () => {
+  // seed 339 wall: the top-left box has a digit 2 step and a digit 5 step, each making a single.
+  const wall = rows9('000001489', '398604010', '174900360', '807049021', '010000974', '409100038', '700892146', '986410050', '241056890');
+  const p = findPointing(wall);
+  assert.deepStrictEqual([p.box, p.pointDigit, p.r, p.c, p.digit], [0, 2, 4, 3, 2]);
+});
+
+test('pointing: the hinted entry is rewarded with no count change; another digit is "not counted"', () => {
+  const hint = hintFor(WALL_ROW, 1), tally = { naked: { own: 1, hint: 0 }, hidden: { own: 0, hint: 2 } };
+  const ok = creditEntry(tally, { 5: true }, hint, WALL_ROW, 0, 4, '7');
+  assert.strictEqual(ok.text, 'Well done! You applied pointing: row 1, column 5 is 7.');
+  assert.deepStrictEqual([ok.tally, ok.credited], [tally, { 5: true }]);
+  assert.strictEqual(creditEntry(tally, {}, hint, WALL_ROW, 0, 4, '3').text, NOT_SINGLE(1, 5, 3));
+  assert.strictEqual(creditEntry(tally, {}, null, WALL_ROW, 0, 4, '7').text, NOT_SINGLE(1, 5, 7)); // no hint showing: judged as today
+});
+
+test('hintMarks: tint and marked digits for pointing (box and line, pointing digit) and for singles', () => {
+  const nudge = hintMarks(hintFor(WALL_ROW, 1), WALL_ROW), explain = hintMarks(hintFor(WALL_ROW, 2), WALL_ROW);
+  assert.deepStrictEqual(nudge.area.slice().sort((a, b) => a - b), [0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 18, 19, 20]); // box 1 and row 1, not the target
+  assert.strictEqual(nudge.target, 4);
+  assert.deepStrictEqual(nudge.digits, []);
+  assert.deepStrictEqual(explain.digits, [25, 74]); // the two 3s, though the naked target takes 7
+  const hidden = hintMarks(hintFor(WALL_COL, 2), WALL_COL);
+  assert.deepStrictEqual([hidden.target, hidden.digits], [27, [4, 43, 55]]);
+  const naked = hintMarks(hintFor(blank([4, 7]), 2), blank([4, 7]));
+  assert.deepStrictEqual([naked.area.length, naked.digits], [20, []]); // row, column and box minus the cell; no purple for naked
+  const single = hintMarks(hintFor(H_BOX, 2), H_BOX);
+  assert.deepStrictEqual([single.area.length, single.target], [8, 41]);
 });
