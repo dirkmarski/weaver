@@ -78,3 +78,8 @@
 - Test (e485cc4, merge 150cce5): 35/35 page checks PASS, no defects. That covers the three pinned texts, neutral style, (a), (b) with a self-clash, overwrite, clear, Notes on, the last cell, Verify still red, and a clash with a hint showing.
 - Round 2 scope: S1 (one assertion) and N1 (README wording). Both are taken: N1 is one phrase and makes the #31 statement exact next to the new clash text.
 - Re-check is delta-scaled, with no product-code change: the reviewer re-runs the S1 mutant and reads the N1 sentence; the lead runs the suite. No tester re-run: product code is identical to c4b48f4, which the tester ran on the page. Decided by the lead per the rework re-check rule.
+
+## Developer round 2
+- Developer: Claude Sonnet 5.5. I did not read governance/LOG.md. No product-code change.
+- S1: added to `creditEntry (c)` (grid `e`) a digit 3 at e[2][1] (box) and e[5][0] (column), none in row 1, no conflict; expects CLASH(1,1,3,'column'). Mutant: unit order [row, box, column] with names permuted to match (in `notCounted`). Before the assertion: survived (143/143 pass). After: killed (test fails). Unmutated code with the assertion: 143/143 pass.
+- N1: README "does not say whether the digit is right" became "...matches the solution" in the three places that describe the "not counted" messages (clash text, text (a), "Any change to a value" paragraph). Each sentence is true: none of the texts says anything about the solution. No other sections touched.

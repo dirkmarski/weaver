@@ -855,6 +855,8 @@ test('creditEntry (c): a digit already in the row, column or box says so; row, t
   assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '5').text, CLASH(1, 1, 5, 'row'));
   assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '6').text, CLASH(1, 1, 6, 'column'));
   assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '7').text, CLASH(1, 1, 7, 'box'));
+  e[2][1] = 3; e[5][0] = 3; // 3 is in the box and the column but not the row, with no conflict: the column is named
+  assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '3').text, CLASH(1, 1, 3, 'column'));
   e[0][4] = 6; // 6 now in the row and the column: the row is named
   assert.strictEqual(creditEntry(T0, {}, null, e, 0, 0, '6').text, CLASH(1, 1, 6, 'row'));
   const res = creditEntry(T0, {}, null, e, 0, 0, '7');
