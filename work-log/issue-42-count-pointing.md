@@ -56,3 +56,9 @@ Headless Chrome, page driven on Tricky seed 1 (Math.random seeded like `seededRn
 
 ### Open questions
 - None blocking. Note a "hinted pointing digit" entered while that cell is already credited shows "Well done!" and changes no count (same rule as the singles).
+
+## Lead check, round 1 (head 429e2d4)
+- Head verified on origin; 3 developer commits (Sonnet 5.5 trailer); `node --test` 143/143, about 0.58 s.
+- Diff read (sudoku.js, index.html): `findPointing` was split into `pointingSteps` + `singleAfterStep` and reused by `classifyEntry`, with no duplication (PM point 2 met). The `findPointing` loop semantics are preserved (the filled-cell skip moved into `singleAfterStep`). Hinted pointing is now counted; the status class comes from `statusClass(kind)`, and the regex is gone. Chained steps are excluded by construction (one step applied to the current grid).
+- Concern L1 (criterion 3): the developer reports no test pins **hidden before pointing** precedence (a mutant that tries pointing before hidden would survive). The reviewer is asked to confirm; if it survives, it is a must-fix.
+- PASS to review and test in parallel.
