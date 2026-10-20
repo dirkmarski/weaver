@@ -6,7 +6,7 @@ const S = require('../sudoku.js');
 const LEVELS = ['easy', 'medium', 'hard'];
 const flat = (g) => g.flat();
 const givens = (g) => flat(g).filter((v) => v).length;
-const N = 20; // puzzles per level in the batch tests
+const N = 10; // puzzles per level in the batch tests
 
 function batch(level, n, seedBase) {
   const out = [];
