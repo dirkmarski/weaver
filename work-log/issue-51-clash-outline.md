@@ -101,3 +101,16 @@ Tools (scratchpad/ts51/, see its README.md): `pins51.js`, `suite51.js` (106 page
 - aria-label has one builder, `relabel(inp)`: position, notes, then ", clashes" when the td has `clash`.
 - CSS: orange dashed outline on td at -4px offset; moves to -7px when the input has focus (blue ring) or the td is a dashed purple confined cell, so none hides another.
 - README updated (N3 carry-in, live-checking and red sentences, two new bullets, Files). Tests: 4 new unit tests (suite 147, ~0.6 s). 7 pins and the #50 pins checked on the real page headless (scripts in scratchpad/dev51).
+
+## Lead (round 1 outcome)
+- Review (1a20a8b): APPROVE with changes. Findings S1 (L2 confirmed: the `.hint-confined` half of the rule is dead), S2 (Files does not name `td.clash`), N1 (= L1), N2 (keep `:focus-within`), N3 (unify the before-grid), N4 (relabel all 81: accept), N5 (optional README Verify clause).
+- Test (f2410b3, merged in 72d53bc): criteria 1-8 and 10 PASS on the page, no defects. DOM mutants (a), (b) and (c) are caught. The amber/purple marks never co-occur with the outline, which agrees with L2.
+- M13 ("completion no longer wins") survived the unit tests and the reviewer's page run. The lead ran it against the tester's ts51/suite51.js on a scratch copy: check "c7a overwrite with right digit on a full grid" FAILS under the mutant, so it is KILLED by the page suite.
+- Round 2 scope:
+  - S1: CSS becomes `#sudoku td.clash:focus-within { outline-offset: -7px; }` and the comment is shortened; the README stops claiming visibility with the purple pointing marks and says instead that a clash and a hint never show together.
+  - S2: name `td.clash` in Files.
+  - N1: move the comment back above `verify`.
+  - N3: compute `before` once and pass it to `creditEntry`.
+  - N5: the README Verify bullet notes that the outline includes givens.
+  - N2 and N4: no change.
+- Re-check (delta; the round is behaviour-neutral): the lead runs `node --test`, ts51/pins51.js and ts51/suite51.js. The tester's page run otherwise stands.
