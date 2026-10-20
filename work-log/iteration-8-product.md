@@ -68,6 +68,9 @@ Not chosen, and why:
 - Product decisions pinned in #37: level name "Tricky" between Medium and Hard; "solvable by singles plus pointing" = following Hint solves it; Hard additionally excludes such puzzles; givens band measured by the developer (cap rule: <= 1/50 capped).
 - Acceptance approach (per test strategy): criteria one by one, short play.js golden path + key edges, README changed sentences, personas for #36/#37 (not #35). No PM oracles or sweeps.
 - Next PM step: acceptance of #35 when relaunched. A play tool will be needed for persona sessions (iteration-7 play.js lived in another session's scratchpad; ask the assistant to rebuild a minimal one if it is not available).
+- 2026-10-20: #35 acceptance (PR #38, head cb0f7a5): ACCEPTED, no conditions. Only a work-log change since the reviewed/tested head 479aad7. I checked it myself in the detached worktree scratchpad/pm-35 (now removed). Product files are identical to main; the frozen file is gone; targeted cases read; loops are at most 10 seeds per level (walk 6); no oracles; 123/123 pass in 0.23-0.31 s (was ~15 s). Size: 1041 test lines vs 912 product lines (1.14x), above the guide but justified in the PR, so I accepted it. I read the mapping and it matches. README is correct. Mutation checks by the reviewer (13) and the developer (12) were all caught. No personas, per the test strategy. Decision comment on PR #38: issuecomment-6280297330. I did not merge.
+- Review nits N1-N3 (optional test trimming and formatting) are folded into #36 by the lead. Agreed, and noted on #36 (issuecomment-6280297593): they are not #36 acceptance criteria and must not grow the suite.
+- Next PM step: acceptance of #36 once it is delivered.
 
 ## Next-iteration candidates (ordered, start of iteration 8)
 1. Count pointing: own recognition in classifyEntry, a "Pointing" tally line + definition, finish text "Techniques applied", text (a) mentions pointing. Fold in the status-class testability carry-forward.
