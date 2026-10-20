@@ -58,7 +58,29 @@
 - Review and test round 1 launched in parallel on 332ef04.
 
 ## Review round 1 (reviewer)
-- (pending)
+- Reviewer: Claude Sonnet 5.5, session `0245eb9f-91d7-4bfe-b523-bbf5b80a2438`, head 332ef04. Did not read governance/LOG.md. Suite 143/143 (0.6 s).
+- Verdict: APPROVE with should-fix items. No MUST-fix.
+- Data flow checked: `pointingSteps` (`confined` = `spots`, `removed` filtered; both ascending) -> `findPointing` -> `pointingHint` -> `hintMarks` (empty unless pointing explain) -> DOM (`cellAt`, class plus `data-d`) -> `clearResults` (`[data-d]` selector). No second search; `boxName` extraction is a good refactor. A hidden-form target can never be confined or removed (checked by reasoning), so the classes never collide with the amber target in that form.
+- Findings:
+  - S1 (SHOULD, L2 confirmed): the column-unit first-click text is not pinned. Mutant `((s.unit === 'row' ? s.r : s.c) + 1)` -> `(s.r + 1)` survives (the row case is correct); an off-by-one on the shared expression is killed only through the row case. One assertion on a column-unit hidden wall would close it, if a cheap wall exists (a tweak of WALL_BOX or WALL_COL); otherwise accept the gap.
+  - S2 (SHOULD, L3): the first-click `else` branch in `pointingHint` (sudoku.js ~line 290) is a nested ternary on one line of about 270 characters. Split it: compute the unit name and the tail sentence in two named variables (for example `var where = s.unit === 'box' ? boxName(...) : s.unit + ' ' + ...;` and `var tail = naked ? ... : ...;`). This is the "legible" rule in the development practices; behaviour unchanged, tests cover it.
+  - S3 (SHOULD): README line 92, `hintFor` result: it still lists only `form, box, line, index and pointDigit` as the extra pointing fields. The result now also carries `confined` and `removed`; add them (the `findPointing` and `hintMarks` entries are right).
+  - N1 (nit): the comment above `hintMarks` is long; fine. The style.css rule for `.hint-removed::after` repeats `border` colours; acceptable.
+  - N2 (nit): `clearResults` removal of `hint-confined`/`hint-removed` depends on `data-d` always being set with the classes; true today, and the coupling is only visible in the selector (consider a comment).
+- README, sentence by sentence (lines 40, 41, 92, 59, 47): first-click texts (both forms) match the code and the pins; "U" values and "(the box of the target cell)" are true; "twice" is still true; the tint sentence is true (box, line, hidden unit; target stays amber); second-click marks match CSS (dashed purple outline, purple D top-right; grey struck D, also on amber target; white chip); the `hintMarks` sentence is true (ascending, empty unless pointing explain). Line 59 and 47 stay true. Nothing else made untrue. Only S3 is missing.
+- Mutants (scratch copy, rv45; kills counted as failing tests):
+  - hidden unit dropped from pointing area: killed (1).
+  - hidden unit added to naked-single area: equivalent (naked hint has no `unit`); a hidden-single area unchanged by design, nothing to mutate.
+  - marks on nudge as well: killed (1).
+  - confined/removed swapped in the step: killed (12); swapped in `hintMarks`: killed (1).
+  - `boxName` rows/columns swapped: killed (2); row end 3 -> 2: killed (4).
+  - column-unit index off by one: killed (1, via the row case); column unit uses `s.r`: SURVIVED (S1).
+  - box unit uses (c, r) box index: killed (1); box unit uses the pointing box: killed (1).
+  - naked/hidden text switch inverted: killed (3).
+  - `removed` reversed: killed (3).
+  - hidden unit dropped for hidden singles (`units = []`): killed (1).
+  - `clearResults` selector without `[data-d]`: SURVIVED (DOM only, no repo test; the tester's page check with pointing marks showing must cover it, lead point L1).
+- Test proportionality: +7 test lines against +14 JS (+18 CSS): within the ~1x guide, no sweeps, no new test() blocks. Good.
 
 <!-- separator: keep the review and test sections apart -->
 
