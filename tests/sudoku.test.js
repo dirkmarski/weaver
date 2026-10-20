@@ -919,7 +919,6 @@ test('pointing, row line, naked form: finder, nudge, explain on the same cell, n
 });
 
 test('pointing, column line, hidden form: the earlier digit 6 step in the same box makes no single and is skipped', () => {
-  // Later steps (box 4 digit 5, box 5 digit 8, in reading order) also make singles, but the first box and digit in order wins.
   assert.deepStrictEqual(findPointing(WALL_COL),
     { r: 3, c: 0, digit: 8, form: 'hidden', unit: 'row', box: 0, line: 'column', index: 2, pointDigit: 8 });
   assert.strictEqual(hintFor(WALL_COL, 1).text, 'Hint: try pointing. ' + BOX_INTRO + '8 fits only in column 3, so it cannot go anywhere else in column 3. '
@@ -943,6 +942,13 @@ test('pointing: singles keep priority, conflicts stay unchanged, a box with one 
   const broken = WALL_ROW.map((row) => row.slice()); broken[0][1] = 4;
   assert.strictEqual(hintFor(broken, 1).kind, 'conflict');
   assert.strictEqual(findPointing(blank([0, 1], [1, 5], [8, 1], [7, 0], [8, 0])), null); // 3 fits one cell of the top-left box only
+});
+
+test('pointing: within a box the lower digit wins when two digits both make a single', () => {
+  // seed 339 wall: the top-left box has a digit 2 step and a digit 5 step, each making a single.
+  const wall = rows9('000001489', '398604010', '174900360', '807049021', '010000974', '409100038', '700892146', '986410050', '241056890');
+  const p = findPointing(wall);
+  assert.deepStrictEqual([p.box, p.pointDigit, p.r, p.c, p.digit], [0, 2, 4, 3, 2]);
 });
 
 test('pointing: the hinted entry is rewarded with no count change; another digit is "not counted"', () => {

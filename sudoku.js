@@ -276,7 +276,7 @@
   }
 
   // What Hint says for a grid. step 1 = nudge, step 2 = explain (only used when
-  // a single is found). A naked single is taught before a hidden single, unless
+  // a single or pointing step is found). A naked single is taught before a hidden single, unless
   // prefer === 'hidden' and a hidden single that is not a naked single exists. With no single, a pointing step
   // (findPointing) is taught; its result adds technique 'pointing', form, box, line, index, pointDigit. Returns
   // { kind, technique, unit, r, c, digit, text } where kind is
