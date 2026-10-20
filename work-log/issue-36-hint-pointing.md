@@ -20,3 +20,4 @@ Clarify one spec gap with the PM, then developer, then reviewer and tester in pa
   - 129/129 tests pass, and attribution is correct.
   - Notes for the reviewer: the hintFor doc comment "(only used when a single is found)" is now stale; a few long lines. Known (and fine for #36): findPointing on its own also returns steps where a single already existed (hidden form). #37 must call it only after the singles are exhausted.
 - Reviewer and tester launched in parallel.
+- Reviewer round 1 (Claude Sonnet 5.5): APPROVE at 8cd4236 (comment 6280434094). 12 mutation spot checks, 11 caught. The survivor was the digit loop reversed to 9..1. S1: no test pins the digits-1-to-9 order within a box. N1: stale hintFor doc comment. N2: two adjacent parentheses in the README 'with a hint' bullet. N3: dense lines in pointingHint/findPointing. N4: the WALL_COL comment names steps that no assertion backs. Rework is held until the tester reports.
