@@ -7,6 +7,8 @@ Iteration 13. Branch `issue-60-tricky-prefers-pointing`. Session `5034fe53-a839-
 - 2026-10-21: Gate check passed: #60 is open, authored by weaver-agents (PM), label enhancement. Delivered first in it13; #61 follows (its pins assume #60).
 - Branch created from main at 4217479. Developer works in worktree `<scratchpad>/wt-60`.
 - Gates: developer (code, unit + page tests, README) -> reviewer and tester in parallel (own detached worktrees) -> one rework round -> lead check -> PR -> PM acceptance on a stated head -> merge commit.
+- 2026-10-21: Reviewer approve (S1 M6 survivor, N1, N2) and tester PASS (no defects) both in; one rework round sent for S1 + N1 + N2 (tests/README only).
+- Lead delta re-check at b5613fc: sudoku.js unchanged since d1a1dfe; README delta (Hint intro, preference Order bullet) true to the code; M6 re-run by the lead: killed (167 pass, 1 fail; the issue-60 test), reverted 168/168, skipped 0. Ratio 1932/1210 = 1.597x (under 1.6x, ~4 lines headroom). Ready for PR.
 
 ## Developer
 - Developer: Claude Sonnet 5.5. API: `findPointing(grid, {useful: true})` skips targets that are already a naked or hidden single (new helper `isSingle`); `hintFor(grid, step, prefer, level)` with `level === 'tricky'` tries that first, then the unchanged order. The page passes `currentLevel`. Generation, `classifyEntry`, texts untouched.
