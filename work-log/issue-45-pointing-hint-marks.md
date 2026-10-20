@@ -149,3 +149,11 @@ Verdict: APPROVE. Delta 6a111e8..579c1db; I did not read governance/LOG.md.
 - N1: comment is accurate (line 879 is the only place setting data-d, together with hint-confined / hint-removed).
 - Product code: only the pointingHint refactor and the comment changed. `node --test`: 143/143 pass.
 - Findings: none.
+
+## Lead check round 2 (code 579c1db, branch tip 5f5844f)
+- I read the round 2 diff: exactly S1 (WALL_UNIT_COL plus one assertion), S2 (`tail`/`unitName` split), S3 (README `hintFor` fields) and N1 (comment). Nothing else changed in product code.
+- I re-ran the S1 mutant myself (column unit uses `s.r`): 142 pass and 1 fail, so it is killed. Unmutated: 143/143, about 0.59 s.
+- Delta re-review (f30b757): APPROVE, 4 mutants killed, no findings. Smoke re-test (10af2ce, merge 5f5844f): PASS (run1 36/36, run2 clearing ok, one text per unit kind on the page).
+  - The tester's unit labels in that report look swapped (the "row unit" example at seed 5 hint 7 reads "Then look at column 3"). The texts themselves are correct and match WALL_UNIT_COL, so this does not matter.
+- The only change after 579c1db is the log (the tester merged both log sections; no conflict markers).
+- Lead check round 2: PASS. PR opened for PM acceptance. D1 (the badge covers pencil note 3 while the hint shows) is flagged to the PM.
