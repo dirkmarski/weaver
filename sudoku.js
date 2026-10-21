@@ -795,7 +795,7 @@
     var button = document.getElementById('verify');
     var picker = document.getElementById('picker');
     var game = document.getElementById('game');
-    var levelLabel = document.getElementById('level');
+    var levelLabel = document.getElementById('level-text');
     var puzzle = null;  // current puzzle (9x9, 0 = empty)
     var inputs = [];    // [r][c] -> input element or null for givens
     var notesMode = false;

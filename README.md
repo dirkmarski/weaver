@@ -8,7 +8,7 @@ Open `index.html` in a browser, or serve the folder:
     python3 -m http.server   # then visit http://localhost:8000
 
 ## How to play
-- On load, pick **Easy**, **Medium**, **Tricky** or **Hard**. The chosen level is shown above the grid. **New puzzle** clears the grid and returns to the difficulty prompt.
+- On load, pick **Easy**, **Medium**, **Tricky** or **Hard**. The chosen level is shown above the grid, with **New puzzle** next to it; **Verify**, **Hint** and **Notes** are below the grid. **New puzzle** clears the grid and returns to the difficulty prompt.
 - Bold dark numbers are givens and cannot be changed.
 - Click an empty cell and type a digit 1-9. Other input (letters other than N, 0, pasted or dropped multi-character text) is rejected and the cell keeps its previous value. With Notes off, Backspace or Delete clears the cell's value; on a cell that holds only notes it does nothing and the notes stay.
 - Keyboard: with a cell focused:
