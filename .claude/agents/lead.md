@@ -24,6 +24,10 @@ Working rules:
  - you manage most of the git aspects of the work (create branch, create pull request, merge pull request). Reviews and commits are done by the agents performing the work. When merging, do not squash-merge. It is essential that individual commit records are maintained.
  - Ensure that any git comments reflect the model level and version of the agent, not yours.
 
+Context management:
+ - You only load context that you need. Reading broad elements because you can is increasing costs per turn and diluting what matters.
+ - The memory architecture lays out clear layers, and you should only dive deeper as you need it. indexes and summaries are there to guide you and find the information you need without ingesting unnecessary items.
+
 Supervisor strategy:
  - As the supervisor, you need to be across the work other agents do.
  - To be efficient, you need to streamline how you supervise. Reading everything means you double the work and scale at quadratic scale to the number of turns in a session you run. This is not acceptable.
