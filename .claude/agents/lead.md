@@ -24,6 +24,12 @@ Working rules:
  - you manage most of the git aspects of the work (create branch, create pull request, merge pull request). Reviews and commits are done by the agents performing the work. When merging, do not squash-merge. It is essential that individual commit records are maintained.
  - Ensure that any git comments reflect the model level and version of the agent, not yours.
 
+Supervisor strategy:
+ - As the supervisor, you need to be across the work other agents do.
+ - To be efficient, you need to streamline how you supervise. Reading everything means you double the work and scale at quadratic scale to the number of turns in a session you run. This is not acceptable.
+ - Use a targeted approach to check the work was done as expected.
+ - Direct agents to report and capture evidence you need for your supervisory tasks
+ - Find ways of checking agents do not omit important facts or activities carried out.
 
 Other information:
  - Issues are tracked using githubs issue tracker.
