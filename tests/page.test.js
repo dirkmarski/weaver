@@ -64,7 +64,7 @@ const read = () => page.eval(`(function () {
   function at(c) { return tds.map(function (t, i) { return t.classList.contains(c) ? i : -1; }).filter(function (i) { return i >= 0; }); }
   var a = document.activeElement;
   return { status: st.textContent, key: document.getElementById('key').textContent, link: document.getElementById('link').textContent, cls: st.className, picker: !document.getElementById('picker').hidden, game: !document.getElementById('game').hidden,
-    tallyShown: !document.getElementById('tally').hidden, level: document.getElementById('level').textContent,
+    tallyShown: !document.getElementById('tally').hidden, level: document.getElementById('level-text').textContent,
     tally: ['tally-naked', 'tally-hidden', 'tally-pointing'].map(function (id) { return document.getElementById(id).textContent; }),
     notes: document.getElementById('notes').textContent, pressed: document.getElementById('notes').getAttribute('aria-pressed'),
     clash: at('clash'), target: at('hint-target'), area: at('hint-area'), hatched: at('hint-hatched'), digit: at('hint-digit'), linked: at('hint-linked'), ruled: at('hint-ruled'), confined: at('hint-confined'), removed: at('hint-removed'),
@@ -354,6 +354,13 @@ describe('page (headless Chrome)', () => {
       const rows = []; // [grid bottom, link top, link bottom, button row top] after: no hint, nudge, invitation, R3, forward link, invitation
       for (const step of steps) rows.push(await step().then(measure));
       rows.forEach(([g, l, e, b], i) => assert.ok(g < l && e < b && b === rows[0][3], '375 px step ' + i + ' [grid bottom, link top, link bottom, buttons top]: ' + rows[i]));
+      await click('#new-puzzle');
+      await click('[data-level=easy]'); // a second level choice: the text and New puzzle must survive it
+      assert.strictEqual((await read()).level, 'Difficulty: Easy');
+      const [text, newp, grid, ver, hint, notes] = await page.eval('["#level-text", "#new-puzzle", "#sudoku", "#verify", "#hint", "#notes"].map(function (s) { var b = document.querySelector(s).getBoundingClientRect(); return [b.left, b.top, b.right, b.bottom]; })'); // [left, top, right, bottom]
+      assert.ok(newp[0] >= text[2] && newp[1] < text[3] && text[1] < newp[3] && newp[3] < grid[1] && newp[3] - newp[1] >= 28, 'New puzzle after the level text, on its line, above the grid: ' + [text, newp, grid]);
+      assert.ok(ver[1] === hint[1] && hint[1] === notes[1] && hint[0] - ver[2] >= 8 && notes[0] - hint[2] >= 8, 'Verify, Hint, Notes share a top, gaps >= 8: ' + [ver, hint, notes]);
+      assert.ok([ver, hint, notes].every((b) => b[3] - b[1] >= 34), 'play buttons >= 34 px tall: ' + [ver, hint, notes]);
     } finally {
       await page.send('Emulation.clearDeviceMetricsOverride');
     }
