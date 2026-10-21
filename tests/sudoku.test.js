@@ -4,7 +4,7 @@ const assert = require('node:assert');
 const {
   isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle,
   preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, solvableBy,
-  seededRng, findPointing, hintMarks, hintKey, ringLink, statusClass, clashCells, fixedMessage
+  seededRng, findPointing, hintMarks, hintKey, ringLink, ringRules, statusClass, clashCells, fixedMessage
 } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
@@ -936,7 +936,7 @@ test('pointing, row line, naked form: finder, nudge, explain on the same cell, n
   assert.strictEqual(one.text, 'Hint: try pointing. ' + BOX_INTRO + '3 fits only in row 1, so it cannot go anywhere else in row 1. '
     + 'That means 3 cannot go in row 1, column 5, and only one other digit fits there now. Click Hint again to see why.');
   assert.strictEqual(two.text, 'Pointing: in the box of rows 1-3 and columns 1-3, the digit 3 fits only in row 1, so 3 cannot go in row 1 outside that box. '
-    + 'Row 1, column 5 could only take 3 or 7, so it must be 7.');
+    + 'Row 1, column 5 has every digit except 3 and 7 in its row, column and box, so it could only take 3 or 7. With 3 now ruled out there, it must be 7.');
   assert.deepStrictEqual([two.r, two.c, two.digit, two.form], [one.r, one.c, one.digit, one.form]);
   assert.strictEqual(JSON.stringify(WALL_ROW), snap);
 });
@@ -1188,10 +1188,24 @@ test('ringLink: partners and sentence for one partner, two partners, and a partn
   const at = (r, c) => (r - 1) * 9 + c - 1; // 1-based row and column to a flat index
   const rings = [at(2, 8), at(3, 6), at(9, 3)]; // L1: D = 5
   assert.deepStrictEqual(ringLink(at(2, 3), rings, 5).partners, [at(2, 8), at(9, 3)]);
-  assert.strictEqual(ringLink(at(2, 3), rings, 5).text, 'Row 2, column 3 cannot be 5: the 5 at row 2, column 8 is in the same row, and the 5 at row 9, column 3 is in the same column.');
-  assert.strictEqual(ringLink(at(3, 1), rings, 5).text, 'Row 3, column 1 cannot be 5: the 5 at row 3, column 6 is in the same row.');
-  assert.strictEqual(ringLink(at(4, 4), [at(4, 6)], 4).text, 'Row 4, column 4 cannot be 4: the 4 at row 4, column 6 is in the same row and box.');
-  assert.strictEqual(ringLink(at(4, 8), [at(5, 8)], 8).text, 'Row 4, column 8 cannot be 8: the 8 at row 5, column 8 is in the same column and box.');
+  assert.strictEqual(ringLink(at(2, 3), rings, 5).text, 'Hatched cell row 2, column 3: no 5 here, because the 5 at row 2, column 8 is in the same row, and the 5 at row 9, column 3 is in the same column.');
+  assert.strictEqual(ringLink(at(3, 1), rings, 5).text, 'Hatched cell row 3, column 1: no 5 here, because the 5 at row 3, column 6 is in the same row.');
+  assert.strictEqual(ringLink(at(4, 4), [at(4, 6)], 4).text, 'Hatched cell row 4, column 4: no 4 here, because the 4 at row 4, column 6 is in the same row and box.');
+  assert.strictEqual(ringLink(at(4, 8), [at(5, 8)], 8).text, 'Hatched cell row 4, column 8: no 8 here, because the 8 at row 5, column 8 is in the same column and box.');
+});
+
+test('ringRules: one hatched cell, two (one sharing row and box), three (pins R1, R2, R3)', () => {
+  const at = (r, c) => (r - 1) * 9 + c - 1;
+  const r1 = ringRules(at(9, 3), [at(2, 3), at(3, 1)], 5);
+  assert.deepStrictEqual(r1.cells, [at(2, 3)]);
+  assert.strictEqual(r1.text, 'The 5 at row 9, column 3 rules 5 out of one hatched cell: row 2, column 3 (same column).');
+  assert.strictEqual(ringRules(at(4, 6), [at(4, 4), at(6, 4), at(1, 1)], 4).text,
+    'The 4 at row 4, column 6 rules 4 out of two hatched cells: row 4, column 4 (same row and box) and row 6, column 4 (same box).');
+  const r3 = ringRules(at(2, 2), [at(2, 7), at(2, 8), at(2, 9), at(3, 7)], 2);
+  assert.deepStrictEqual(r3.cells, [at(2, 7), at(2, 8), at(2, 9)]);
+  assert.strictEqual(r3.text, 'The 2 at row 2, column 2 rules 2 out of three hatched cells: row 2, column 7 (same row), row 2, column 8 (same row) and row 2, column 9 (same row).');
+  assert.strictEqual(ringRules(at(5, 9), [at(5, 1), at(5, 2), at(5, 3), at(5, 4)], 7).text,
+    'The 7 at row 5, column 9 rules 7 out of four hatched cells: row 5, column 1 (same row), row 5, column 2 (same row), row 5, column 3 (same row) and row 5, column 4 (same row).');
 });
 
 // PM pins (issue 56): P(N) follows Hint on the Tricky puzzle of seed N (entering each digit as a hinted one) to the first pointing step.
@@ -1214,7 +1228,7 @@ test('issue 56 pins P(1), P(3), P(4), P(8), P(10): rings, key line and the box-c
   pin(10, cells([6, 6], [7, 7], [8, 1], [9, 4]), false);
   const p4 = pin(4, [], true), p8 = pin(8, cells([5, 8]), true);
   assert.strictEqual(p4.h.text, 'Pointing: in the box of rows 7-9 and columns 4-6, the digit 9 fits only in column 5 (the box has no other empty cells), so 9 cannot go in column 5 outside that box. '
-    + 'Row 4, column 5 could only take 9 or 7, so it must be 7.');
+    + 'Row 4, column 5 has every digit except 9 and 7 in its row, column and box, so it could only take 9 or 7. With 9 now ruled out there, it must be 7.');
   assert.deepStrictEqual(p4.m.confined.concat(p4.m.removed), cells([8, 5], [9, 5], [4, 5], [5, 5], [6, 5]));
   assert.strictEqual(p8.h.text, 'Pointing: in the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3 (the box has no other empty cells), so 8 cannot go in column 3 outside that box. '
     + 'That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
