@@ -2,19 +2,19 @@
 
 Static site, no dependencies, no build. Plain ES5-style JS in an IIFE.
 
-## Files (end of iteration 15)
+## Files (end of iteration 17)
 | File | Lines | Role |
 |---|---|---|
-| `index.html` | 42 | page skeleton: picker (4 `data-level` buttons), `#game` (table, Verify, Hint, Notes, New puzzle), `#status` (role=status), `#key` (key line, plain `<p>`, not a live region), `#link` (link line, plain `<p>`, #68), `#tally` |
-| `style.css` | 137 | styling, box shading, hint/conflict classes, `td.hint-hatched` (stripe layer at 0.25 listed before the amber tint layer, #65/#68), `td.hint-linked` (solid fill shorthand overrides tint and stripes; its own `input` colour rule, #68), `td.hint-ruled` (inset 3 px #4a0f8a box-shadow, background untouched, #72), `#link`, `td.clash` dashed orange outline, pointing badges (`::after` with `attr(data-d)`) placed in D's note slot via `--x`/`--y` per `data-d`; below 560 px the chip's side padding is 1 px and edge badges sit flush inside the cell |
-| `sudoku.js` | 1133 | pure logic exported for Node and as `window.Sudoku`, plus the browser `render()` UI |
-| `tests/sudoku.test.js` | 1278 | unit tests on hand-built grids |
+| `index.html` | 42 | page skeleton: picker (4 `data-level` buttons), `#game` (table, `#link` link line under the grid (plain `<p>`, #68, moved by #76), `#buttons`: Verify, Hint, Notes, New puzzle), `#status` (role=status), `#key` (key line, plain `<p>`, not a live region), `#tally` |
+| `style.css` | 139 | styling, box shading, hint/conflict classes, `td.hint-hatched` (stripe layer at 0.25 listed before the amber tint layer, #65/#68), `td.hint-linked` (solid fill shorthand overrides tint and stripes; its own `input` colour rule, #68), `td.hint-ruled::after` (purple struck D badge sharing the pointing-badge rules, #78; was an inset border, #72), `#status.steps` (pre-line, left, 36rem; pointing explanation only, #77), `#link` (min-height 4lh so the buttons stay still, #76), `td.clash` dashed orange outline, pointing badges (`::after` with `attr(data-d)`) placed in D's note slot via `--x`/`--y` per `data-d`; below 560 px the chip's side padding is 1 px and edge badges sit flush inside the cell |
+| `sudoku.js` | 1138 | pure logic exported for Node and as `window.Sudoku`, plus the browser `render()` UI |
+| `tests/sudoku.test.js` | 1294 | unit tests on hand-built grids |
 | `tests/generator.test.js` | 155 | generator tests |
-| `tests/page.test.js` | 452 | page tests: the real `index.html` in one headless Chrome (#55, it12) |
+| `tests/page.test.js` | 534 | page tests: the real `index.html` in one headless Chrome (#55, it12) |
 | `tests/chrome.js` | 100 | test helper only: finds Chrome, launches it, CDP over the global WebSocket, cleanup |
 | `tests/fixture.js` | 27 | a valid grid and puzzle, fixture only |
 
-Product code 1312 lines; tests 2081 (ratio 1.586x, guide ~1x; tests may be at most floor(1.6 x product) = 2099, 18 lines of headroom). The jump from 1.15x is the page harness (#55, no product lines). Ratio rule (PM, it13): at most 1.6x; the issue that would pass it trims redundant assertions in the files it touches (each listed with the test that still covers it, tester-confirmed) or a separate trim item comes first.
+Product code 1319 lines; tests 2110 (ratio 1.600x, guide ~1x; tests may be at most floor(1.6 x product) = 2110, 0 lines of headroom, it17 close). The jump from 1.15x is the page harness (#55, no product lines). Ratio rule (PM, it13): at most 1.6x; the issue that would pass it trims redundant assertions in the files it touches (each listed with the test that still covers it, tester-confirmed) or a separate trim item comes first.
 
 ## Exports of `sudoku.js` (the `api` object)
 - Generation: `generatePuzzle(level, {rng, maxMs})` -> `{level, puzzle, solution, givens, attempts, capped?}`; `generateSolution(rng)`; `seededRng(seed)` (mulberry32); `countSolutions(grid, limit)`; `solvableBy(grid, 'naked'|'singles'|'pointing')`; `LEVELS`.
@@ -34,7 +34,7 @@ Product code 1312 lines; tests 2081 (ratio 1.586x, guide ~1x; tests may be at mo
 - Value change (`setCell`, the single write path): `before` grid -> `creditEntry`; then `clearResults`, `showClashes(after)`, `fixedMessage`, the credit text, then `completionFor` (wins when the grid is full); `showTally`.
 - `clearResults` (Verify, Hint, value changes, `choose`, `newPuzzle`) clears the status, the key line, `hatchedRings` and the link line (`unlink`), red flags and all hint classes (including `hint-hatched`)/`data-d`; never `td.clash`. Notes changes do not call it, so a hint and its key line survive them.
 - Hint button: `clearResults`, then `hintFor(grid, step, preferredTechnique(tally, currentLevel), currentLevel)`, `hintMarks` adds `hint-target`, `hint-area`, `hint-digit`, and on a pointing explain `hint-confined`/`hint-removed` plus `data-d`, adds `hint-hatched` to `marks.hatched`, and on every explain except a naked single sets `#key` to `hintKey(res, marks.hatched.length)`; when `marks.hatched` is non-empty it stores `hatchedRings = {hatched, rings: marks.digits, d}` (d = pointDigit for pointing, else digit) and shows the invitation. `cellAt(q)` is shared at wiring scope.
-- Link (#68, #72): `unlink()` removes `hint-linked` and `hint-ruled` and sets the line to the invitation (or empty when nothing is hatched); `clearResults` calls it. `focusin` on the table calls `unlink()`, then: an entered ring -> `selectRing(p)` (adds `hint-linked` to the ring, `hint-ruled` to `ringRules(...).cells`, shows its text); a hatched cell -> `hint-linked` on `ringLink(...).partners` and its text. `focusout` -> `unlink`. A document-level `click` handler (runs after the focusout of the cell that lost focus) ignores editable cells (left to focusin, else it would undo a forward link), otherwise unlinks and, on a given ring, calls `selectRing`; it returns early when no hint with hatching shows.
+- Link (#68, #72): `unlink()` removes `hint-linked`, and `hint-ruled` with its `data-d` (#78), and sets the line to the invitation (or empty when nothing is hatched); `clearResults` calls it. `focusin` on the table calls `unlink()`, then: an entered ring -> `selectRing(p)` (adds `hint-linked` to the ring, `hint-ruled` plus `data-d` to `ringRules(...).cells`, shows its text); a hatched cell -> `hint-linked` on `ringLink(...).partners` and its text. `focusout` -> `unlink`. A document-level `click` handler (runs after the focusout of the cell that lost focus) ignores editable cells (left to focusin, else it would undo a forward link), otherwise unlinks and, on a given ring, calls `selectRing`; it returns early when no hint with hatching shows.
 - `relabel(inp)` is the only aria-label builder (position, notes, ", clashes").
 
 ## Tests
