@@ -18,7 +18,7 @@
   - M1 drop `q !== p`: survives, unreachable (p is empty and hatched, a ring holds a digit). Dead code, remove it.
   - M2 shared-unit check removed: killed (ringLink unit test, f1c).
   - M3a/M3b unit join ", " / reversed order: killed (ringLink unit test).
-  - M4a `d = res.digit` always: SURVIVES and is reachable. In the pointing naked form digit != pointDigit (Tricky seed 1, second Hint: target r1c... digit 7, D = 2, hatched r2c7: "Row 2, column 7 cannot be 2: the 2 at row 2, column 2 ..., and the 2 at row 9, column 7 ..."). L3 is the hidden form, where digit == pointDigit, so it cannot kill it. M4b `d = pointDigit` always: killed by f1c.
+  - M4a `d = res.digit` always: SURVIVES and is reachable. In the pointing naked form digit != pointDigit (Tricky seed 1, second Hint: target r1c5, digit 7, D = 2, hatched r2c7: "Row 2, column 7 cannot be 2: the 2 at row 2, column 2 is in the same row, and the 2 at row 9, column 7 is in the same column."). L3 is the hidden form, where digit == pointDigit, so it cannot kill it. M4b `d = pointDigit` always: killed by f1c.
   - M5 focusin hatched guard dropped: killed (f1c target focus).
   - M6 unlink() removed from focusin, and M16 moved after the guard, M17 classes not cleared: killed (f1c).
   - M7a focusout always unlinks (relatedTarget check dropped): survives, equivalent. focusin always follows a focusout into the table and relinks, so the check does nothing observable. Simplify or keep as a documented no-flicker guard.
