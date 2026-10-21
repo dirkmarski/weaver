@@ -232,7 +232,7 @@ describe('page (headless Chrome)', () => {
     let s = await read();
     assert.deepStrictEqual([s.target, s.status.startsWith('Hint: try pointing. In the box of rows 1-3 and columns 7-9, the digit 2 fits only in row 1')], [[4], true]);
     await click('#hint');
-    assert.ok((await read()).status.endsWith('Row 1, column 5 could only take 2 or 7, so it must be 7.'));
+    assert.ok((await read()).status.endsWith('Row 1, column 5 has every digit except 2 and 7 in its row, column and box, so it could only take 2 or 7. With 2 now ruled out there, it must be 7.'));
     await keys([[4, '7']]);
     s = await read();
     assert.strictEqual(s.status, 'Well done! You applied pointing: row 1, column 5 is 7.');
@@ -272,7 +272,7 @@ describe('page (headless Chrome)', () => {
     await focus(2, 3);
     s = await read();
     assert.deepStrictEqual(s.linked, [pos(2, 8), pos(9, 3)]);
-    assert.strictEqual(s.link, 'Row 2, column 3 cannot be 5: the 5 at row 2, column 8 is in the same row, and the 5 at row 9, column 3 is in the same column.');
+    assert.strictEqual(s.link, 'Hatched cell row 2, column 3: no 5 here, because the 5 at row 2, column 8 is in the same row, and the 5 at row 9, column 3 is in the same column.');
     const look = await page.eval('(function () { var td = document.querySelectorAll("#sudoku td")[' + pos(2, 8) + ']; var cs = getComputedStyle(td);' +
       ' var e = document.querySelectorAll("#sudoku td")[' + pos(1, 2) + '], i = e.querySelector("input"); e.classList.add("hint-linked");' +
       ' return [td.classList.contains("given"), cs.backgroundColor, cs.color, getComputedStyle(i).color]; })()');
@@ -296,7 +296,7 @@ describe('page (headless Chrome)', () => {
     await page.eval('document.querySelector("input[data-pos=\\"15\\"]").focus()'); // row 2, column 7
     const s = await read();
     assert.deepStrictEqual(s.linked, [10, 78]); // row 2, column 2 and row 9, column 7
-    assert.strictEqual(s.link, 'Row 2, column 7 cannot be 2: the 2 at row 2, column 2 is in the same row, and the 2 at row 9, column 7 is in the same column.');
+    assert.strictEqual(s.link, 'Hatched cell row 2, column 7: no 2 here, because the 2 at row 2, column 2 is in the same row, and the 2 at row 9, column 7 is in the same column.');
   });
 
   it('f2. the key line is gone after Verify; a hidden single is taught (its key line is pinned in f1b), a naked single none and nothing hatched', async () => {

@@ -341,7 +341,7 @@
     if (step === 2) {
       text = 'Pointing: in ' + box + ', so ' + d + ' cannot go in ' + line + ' outside that box. ';
       text += s.form === 'naked'
-        ? 'Row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' could only take ' + d + ' or ' + s.digit + ', so it must be ' + s.digit + '.'
+        ? 'Row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' has every digit except ' + d + ' and ' + s.digit + ' in its row, column and box, so it could only take ' + d + ' or ' + s.digit + '. With ' + d + ' now ruled out there, it must be ' + s.digit + '.'
         : 'That leaves row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' as the only cell in its ' + s.unit + ' where ' + d + ' fits, so it must be ' + d + '.';
     } else {
       var tail;
@@ -485,8 +485,8 @@
       var shared = UNIT_NAMES.filter(function (n, k) { return CELL_UNITS[q][k] === CELL_UNITS[p][k]; });
       return 'the ' + d + ' at row ' + (Math.floor(q / 9) + 1) + ', column ' + (q % 9 + 1) + ' is in the same ' + shared.join(' and ');
     });
-    var cell = 'Row ' + (Math.floor(p / 9) + 1) + ', column ' + (p % 9 + 1);
-    var text = cell + ' cannot be ' + d + ': ' + parts.join(', and ') + '.';
+    var cell = 'Hatched cell row ' + (Math.floor(p / 9) + 1) + ', column ' + (p % 9 + 1);
+    var text = cell + ': no ' + d + ' here, because ' + parts.join(', and ') + '.';
     return { partners: partners, text: text };
   }
 
