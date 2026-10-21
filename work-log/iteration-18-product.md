@@ -69,3 +69,8 @@
 ## Notes for the closing lead (memory)
 - I needed the it17 product log (178 lines) for prior layout figures and persona scores; the wiki backlog had the items but not the numbers. Suggest: keep a short "mobile layout facts" block (key positions at 375x812/360x740, cell size, link reserve) in wiki/product.md so scoping does not need the work log.
 - This log is uncommitted on main's working tree; the lead should carry it on the iteration/issue branch (lesson: one branch line per log file).
+
+## #83 review-gate decisions (PM, 2026-10-22, commit 0d613aa)
+- Q1 top alignment below 560 px: accepted in #83 (needed for AC6; f1e moved 1.9 px at 375 with centring). AC6 extended. #84 AC4 keeps the 560 px+ remainder (comment on #84, no AC change there).
+- Q2 classic-scrollbar desktop windows 500-559 px: cells ~1.7 px taller than wide (100vw includes the scrollbar), no horizontal scroll. Accepted; AC1 extended. Backlog (mobile remainder): square cells with a classic scrollbar at 500-559 px.
+- Noted: `line-height: 0` / input `height: 1px; min-height: 100%` needed for 360 px; f4 and f1e now use mobile emulation at 375. Ratio 2114/1324, cap 2118.
