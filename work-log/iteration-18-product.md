@@ -74,3 +74,19 @@
 - Q1 top alignment below 560 px: accepted in #83 (needed for AC6; f1e moved 1.9 px at 375 with centring). AC6 extended. #84 AC4 keeps the 560 px+ remainder (comment on #84, no AC change there).
 - Q2 classic-scrollbar desktop windows 500-559 px: cells ~1.7 px taller than wide (100vw includes the scrollbar), no horizontal scroll. Accepted; AC1 extended. Backlog (mobile remainder): square cells with a classic scrollbar at 500-559 px.
 - Noted: `line-height: 0` / input `height: 1px; min-height: 100%` needed for 360 px; f4 and f1e now use mobile emulation at 375. Ratio 2114/1324, cap 2118.
+
+## #83 acceptance (PM, 2026-10-22, code head fcabe1f): ACCEPT
+- Setup: `git archive` of fcabe1f and main 7fdc9a2 into $WEAVER_SCRATCHPAD/pm-83 (private TMPDIR/Chrome); tester scripts copied, pointed at my copies (W83/MAIN83). Headless Chrome, mobile emulation + CDP touch at 360/375/390, mouse at 1280. Tricky seed 1, Hint twice.
+- AC1: cells square at 360/375/390 (36.44/38.11/39.77, max |w-h| 1.0 = thick-border cells, same 1.0 at 1280 on main); grid 16-344 at 360, 16-359 at 375; no h-scroll. Classic scrollbar 500/540/559: typical 1.67 px, worst 2.67 px taller, no h-scroll (main 8.7/4.2/2.1).
+- AC2: 560/600/1280 cells 58 (as main); 1280x900 screenshot byte-identical to main.
+- AC3: value/input 30 px, note 13 px, chip 14 px at 360/375/1280 (as main).
+- AC4: 189 injected combos (9 digits x 3 kinds) at 360/375 inside the cell (min margin 0), 1-3 flush top, 7-9 flush bottom, 4-6 centred, edges flush L/R; 177 real chips seeds 1-40 (23 kind+digit combos, ruled via touch) pass; 560/600/1280 offsets identical to main.
+- AC5: replay vs main 450 steps 360 touch + 450 steps 1280 mouse (my seeds 11/13): 0 diffs.
+- AC6: button row steady across 6 states at 360/375/390 touch, 600/1280 mouse; below 560 main top 0, horizontally centred; >=560 alignment diffs vs main 0.
+- AC7: 375x812 scroll 0: grid 96-481 fully visible; #status top 642.5 vs main 821.6 (179 px higher; 360: 194 px). Screenshots 360/375 (with notes 1/3/7/9 and ruled chips): digits/notes/chips readable, no chip crosses a border.
+- AC8: README diff = the two sentences required, nothing else.
+- AC9: f4/f1e extended (mobile:true, square at 360/375, grid span, -0.5 inside on four edges, flush), override cleared; `node --test` 173/173, skipped 0.
+- Decision D5 (AC1 limit wording): measured 1.67 px typical, 2.67 px thick-border cells vs my "up to 2 px". The extra 1 px is the box-border artefact present at every width (also main). Reworded AC1 ("about 1.7 px; up to 2.7 px for thick-border cells") and logged in the issue Change log. Not a reason to reject.
+- Persona check: chips look right at 360/375; folded into #84's round as planned.
+- Open: backlog item "square cells with a classic scrollbar at 500-559 px" stands. Real-device check (Safari/Android) still not done (A1).
+- Note for memory: the tester's script README lived only in the lead's brief; a README.md in $WEAVER_SCRATCHPAD/test-83 would save rediscovery. governance/LOG.md not read.
