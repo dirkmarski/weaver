@@ -3,20 +3,22 @@
 Last updated: 2026-10-21, lead session c0f6ffb1-d246-448a-942e-3cfd5baa05e4
 
 ## Active run
-- Iteration 14 ("deliver the next iteration"), branch `iteration-14`, lead log `work-log/iteration-14.md`.
+- None once the iteration-14 PR merges. Iteration 14 is complete: #65 (hatch the cells the rings rule out, key line for hidden singles) accepted by the PM at 1f6906a and merged with PR #66 in 84889f5.
+- If the iteration-14 PR is still open on restart: verify it on GitHub and merge it with a merge commit (it only holds work logs and memory).
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #65 hatch ruled-out cells | PR #66 at 1f6906a; reviewer APPROVE, tester PASS, lead check done | PM acceptance on 1f6906a, then merge with sha | product-manager |
+| (none in flight) | | | |
 
-## Notes for a restart
-- Scratchpad (this session): /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/<session id>/scratchpad (moved under /tmp/wvr by Dirk's run-task change 9c5542b).
-- Test ratio 1.599x (about 1 line of headroom to the PM's 1.6x cap).
-- Temp-dir safety rule in every agent prompt; no agent reads governance/LOG.md; do not read the work log unless needed.
+## Starting the next run
+- Iteration 15: the PM picks from `memory/wiki/backlog.md` (end-of-it14 snapshot). Top: a direct ring-to-cell link plus the alpha-0.25 notes-readability quick win, then mobile.
+- The test ratio is 1.5995x with 0 lines of headroom: the PM decides at scoping whether a trim item comes first or the next issue trims in place (listed removals, never an AC-required case, no line packing).
+- Prompts: temp-dir safety rule (scratchpad under /tmp/wvr), no governance/LOG.md, tagged merge-commit messages for reviewer/tester.
+- Do not read the work log unless specifically needed (Dirk, 1464355). Prune memory at each close (Dirk, 9e54939).
 
 ## Open issues / PRs
-- #65 open; PR #66 (head 1f6906a) awaiting PM acceptance.
+- none (after the iteration-14 PR merges)
 
 ## Blockers / waiting on
 - none

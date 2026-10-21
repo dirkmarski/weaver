@@ -22,7 +22,8 @@ Charter: `governance/CHARTER.md`. The agents build the site; Dirk (human) owns a
 - `main` changes only by pull request.
 - Work log: `work-log/iteration-N.md` (lead), `iteration-N-product.md` (PM), `issue-N-<slug>.md` per issue.
 - No agent reads `governance/LOG.md` (Dirk's log); pass this rule to every agent.
-- Agents running Chrome or temp files use explicit private temp dirs under the session scratchpad and never `rm -rf` a possibly unset variable (it13 incident); pass this rule in prompts.
+- Agents running Chrome or temp files use explicit private temp dirs under the session scratchpad (`/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/<session>/scratchpad` since 9c5542b) and never `rm -rf` a possibly unset variable (it13 incident); pass this rule in prompts.
+- Merge commits made by agents carry the `[<agent>][session <id>]` prefix too; give the message in the prompt (it14).
 - Agents read the wiki and WIP, not the work log, unless specifically needed. Reviewers and testers read only the Lead section of the issue log. The PM scopes from `wiki/backlog.md` and leaves an up-to-date ordered list at the end of its product log for the lead's snapshot.
 
 ## Per-issue flow
@@ -42,7 +43,7 @@ Charter: `governance/CHARTER.md`. The agents build the site; Dirk (human) owns a
 - Tester: a test plan plus real-page checks on a few fixed seeds (scratch scripts may reuse `tests/chrome.js`), small independent oracles on 4-5 seeds at most, numeric measurements and screenshots for visual changes.
 - Reviewer: 6-13 targeted mutation spot checks on risky logic, not sweeps.
 - PM: acceptance criteria one by one, short play-through, personas for user-facing changes.
-- Guide: test lines about 1x product lines (now 1.599x because of the page harness). PM rule (it13): at most 1.6x; an issue that would pass it adapts rather than adds tests and may remove only redundant assertions in the files it touches, each listed in the PR with the test that still covers it and confirmed by reviewer and tester; otherwise a trim item comes first. The suite under 10 s (about 3 s with Chrome). Page evidence must show skipped = 0.
+- Guide: test lines about 1x product lines (now 1.5995x because of the page harness). PM rule (it13): at most 1.6x; an issue that would pass it adapts rather than adds tests and may remove only redundant assertions in the files it touches, each listed in the PR with the test that still covers it and confirmed by reviewer and tester, never one an AC explicitly requires, and no line packing (it14); otherwise a trim item comes first. The suite under 10 s (about 3 s with Chrome). Page evidence must show skipped = 0.
 
 ## Rework re-checks
 - Rounds that touch only tests, comments or README: delta re-review (re-run the specific mutant) and a suite plus smoke re-test.
