@@ -15,7 +15,8 @@ Issue: https://github.com/dirkmarski/weaver/issues/84 (PM, it18 issue 2 of 3). B
 - Top alignment: `body { align-items: flex-start }` in the base rule; the #83 media-query copy removed.
 - README: one sentence in How to play (New puzzle next to the level; Verify, Hint, Notes below the grid).
 - Tests: f1e 375 px flow extended (New puzzle then second level, level text, New puzzle after the text/on the line/above the grid/>= 28 px, one top and gaps >= 8 for Verify/Hint/Notes, each >= 34 px). `read()` level now reads #level-text.
-- Removed (redundant, same `length !== 9` branch / setup check): `isValidSolution([])`, the 'rejects an extra 10th row' test, the `new Set(g[0]).size` line in 'rejects duplicate in a row'.
+- Removed (redundant, same `length !== 9` branch / setup check): `isValidSolution([])`, the `new Set(g[0]).size` line in 'rejects duplicate in a row'. The 'rejects an extra 10th row' test is replaced by one line in 'rejects wrong shape' (see Rework 1).
+- Rework 1: removal of the 10th-row test had left the outer `grid.length !== 9` guard untested (mutant survived); restored with one assertion in 'rejects wrong shape', mutant now fails. Tests 2118 lines, cap 2118; suite 172 pass, 0 fail, 0 skipped.
 - Ratio: product 1324 -> 1324 (index 42, style 144, sudoku.js 1138 unchanged counts); tests 2117 -> 2117; cap 2118.
 - Suite: 172 pass, 0 fail, 0 skipped.
 - Tricky seed 1, Hint twice: 375x812 status 618.6-807.6, grid bottom 491.8, button row top 567.8; 360x740 status 603.5-792.5, grid bottom 476.7, row top 552.7 (steps 1 and 2 end at 709). 1280x1200 row top 729.8 in all four states (no hint, nudge, explanation, Verify).

@@ -43,6 +43,7 @@ test('rejects wrong shape', () => {
   assert.strictEqual(isValidSolution(SOLUTION.slice(1)), false);
   const g = clone(); g[3] = g[3].slice(1);
   assert.strictEqual(isValidSolution(g), false);
+  assert.strictEqual(isValidSolution([...clone(), SOLUTION[0].slice()]), false);
   assert.strictEqual(isValidSolution(null), false);
 });
 
