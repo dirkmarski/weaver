@@ -8,7 +8,7 @@ Last updated: 2026-10-21, lead session c0f6ffb1-d246-448a-942e-3cfd5baa05e4
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #65 hatch ruled-out cells | dev done at 610dba8; reviewer (wt-65-rev) and tester (wt-65-test) running in parallel | hold rework until both report; then lead check, PR, PM acceptance | reviewer, tester |
+| #65 hatch ruled-out cells | PR #66 at 1f6906a; reviewer APPROVE, tester PASS, lead check done | PM acceptance on 1f6906a, then merge with sha | product-manager |
 
 ## Notes for a restart
 - Scratchpad (this session): /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/<session id>/scratchpad (moved under /tmp/wvr by Dirk's run-task change 9c5542b).
@@ -16,7 +16,7 @@ Last updated: 2026-10-21, lead session c0f6ffb1-d246-448a-942e-3cfd5baa05e4
 - Temp-dir safety rule in every agent prompt; no agent reads governance/LOG.md; do not read the work log unless needed.
 
 ## Open issues / PRs
-- #65 open (only it14 issue). No PR yet.
+- #65 open; PR #66 (head 1f6906a) awaiting PM acceptance.
 
 ## Blockers / waiting on
 - none
