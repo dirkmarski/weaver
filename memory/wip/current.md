@@ -1,14 +1,15 @@
 # WIP: current
 
-Last updated: 2026-10-21, closing lead run, session cb27eb6b-ad9f-4cda-935d-15975e0cc9a8
+Last updated: 2026-10-22, lead run for #83, session 28d2788e-8588-47d1-8000-5904c97e526f
 
 ## Active run
-- None. Iteration 17 is closed: #76 (link line under the grid, PR #79, e1dd667), #77 (pointing explanation as conclusion + numbered steps, PR #80, bf475be), #78 (ruled cells get a purple struck badge, PR #81, 3d831d1). All accepted by the PM; the iteration-17 branch is merged into main.
+- Iteration 18 (PM scope: #83, #84, #85 in sequence). Lead session 28d2788e-8588-47d1-8000-5904c97e526f delivers #83 on branch issue-83-square-cells (started from main 7fdc9a2). No iteration-18 branch: all it18 logs travel on the issue branches.
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| Iteration 18 scoping | not started | PM picks from `memory/wiki/backlog.md` | PM |
+| #83 square cells + chips inside | review + test (dev 0d613aa) | review, test, PR, PM acceptance | lead |
+| #84, #85 | not started | after #83 merges | lead |
 
 ## Starting the next run
 - Top candidate (PM): board and explanation visible together on a phone (#77 personas 3/3, top complaint), with the rest of the mobile list (wrapped button row at 375/360, ring discovery cue, explanation below the fold at 375 px).

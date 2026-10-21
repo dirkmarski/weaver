@@ -6,3 +6,5 @@
 
 ## #83
 - 2026-10-22: gate check passed (open, authored by weaver-agents/PM, enhancement). Fresh start from main 7fdc9a2 (no branch, PR or log existed). Per-issue log: work-log/issue-83-square-cells.md.
+- Developer 0d613aa: td width/height `calc((100vw - 32px) / 9 - 2px)` below 560 px, chips flush top/bottom via --tx/--ty, `body { align-items: flex-start }` below 560 (AC6: page shifted 1.9 px on Hint otherwise), td line-height 0 + input min-height (360 px floor). f4 extended, f4/f1e moved to mobile:true. Product 1324, tests 2114, cap 2118. Suite 173/173, skipped 0.
+- Lead check: classic-scrollbar windows 500-559 px: no horizontal scroll, cells ~1.7 px taller than wide. Two questions to the PM: Q1 top alignment (overlaps #84) -> accepted in #83 below 560 px; Q2 scrollbar case -> accepted limit, backlog. AC1/AC6 text amended, Change log added (PM 0587923).
