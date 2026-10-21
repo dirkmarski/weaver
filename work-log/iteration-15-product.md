@@ -114,3 +114,82 @@ Screens (`pm-shots`, blind copies in `pm-persona`): case1 = Medium 1 focus r2c3 
 7. Long-term: a middle hint level, progress across puzzles, claiming then pairs.
 
 Watch: the ratio after #68 (cap 1.6x; trim-in-place rule in #68).
+
+## Acceptance of #68 on PR #69 (2026-10-21)
+- Head checked with `gh pr view 69` both before and after the run: 209a9d2083e20bd883dff64e0074d76c85cd83ab. Worktree `scratchpad/wt-68-pm` (detached); main 326c911 in `scratchpad/pm-acc/main-wt` for the comparisons. Scripts and screens are in `scratchpad/pm-acc` (acc.js, arrow.js, shots.js, shots/, persona/).
+- Work-log reads: only the Lead section of work-log/issue-68-ring-link.md. That file is on the PR head (209a9d2), not on iteration-15, so I read it via `git show`. governance/LOG.md was not read.
+- Suite at head: 170/170 pass, skipped 0, with TMPDIR set to pm-acc/tmp. Ratio 2012/1277 = 1.575x. The test diff removes no assertions; the only removed test lines are edits (read(), noHint, the 0.3 -> 0.25 assertion, the import line).
+- acc.js: 4459 checks passed and 6 failed. I triaged all 6 as errors in my own script, none in the product:
+  - The box-shadow regex expected "inset" first (2 checks).
+  - An arrow path started from a cell with givens on both sides (2 checks). Re-checked with arrow.js: from r2c4, ArrowLeft goes to r2c3 and links r2c8 and r9c3, ArrowRight reverts, and ArrowUp from r3c3 links again.
+  - A second Hint while an explanation is showing re-shows the same explanation (linked marks cleared, invite back). That is correct.
+  - Backspace on an empty cell is not a value change, so the link stays, the same as the hatching on main.
+
+### AC results (head 209a9d2)
+1. Pass. In the replay (Easy, Medium and Tricky seeds 1-12, following Hint, every hatched cell clicked), 246 explanations with hatching and 874 hatched cells all had 1 or 2 partners (228 had two). The rings, hatched cells and badges match main.
+2. Pass. The invite text is exact. The line is empty with no hint, on nudges, on 186 naked singles, on explanations without hatched cells, and on L5. The key line is unchanged.
+3. Pass. The link works by click, by touch tap at 375 px and by arrow keys. Focusing the target, a non-hatched cell or anything outside the grid reverts it. Moving from hatched cell to hatched cell switches it. The Hint click focuses the target with nothing linked.
+4. Pass. All 874 sentences equal my independent builder. In pointing explanations D is the pointing digit; there were 9 naked-form cases.
+5. Pass. L1 to L5 and the naked-form pin pass at 375 and 1280 px.
+6. Pass.
+   - Linked given and entered ring (L4 r1c8): rgb(106, 31, 181), white digit, inset 4px rgb(74, 15, 138).
+   - Link line: rgb(74, 15, 138), 13.6px (same as the key line), weight 500, below the key line.
+   - Heights: 48 px at 375 and 32 px at 1280, matching the measurements in the issue.
+7. Pass. The stripe is rgba(106, 31, 181, 0.25); the rest of the gradient is unchanged.
+8. Pass.
+   - A value change, Verify, New puzzle, a level choice and the next Hint result all clear the link.
+   - A typed note keeps it, and the Notes button keeps it too because focus returns to the cell.
+9. Pass. The replay snapshots of head and main are identical in all 36 runs: status, key and every mark class, with the link and linked marks left out.
+10. Pass. Both second-click paragraphs, the change to 25%, the removal list and the ringLink API entry are in place.
+11. Pass. The ringLink unit test covers one partner, two partners and two units. Page tests f1c (L1, target revert, leaving the grid, a value change, computed styles for a given and an entered value) and f1d (naked form) are there, plus the edited 0.25 assertion. Skipped 0.
+12. Pass. The ratio is 1.575x, under the 1.6x cap.
+
+### Play-through
+- The acc.js replay is the play-through. Easy, Medium and Tricky, 12 seeds each, up to 12 rounds of following Hint and typing the digit, with every hatched cell clicked: 0 defects.
+- I also looked at 375 px screens of L1, L3 (box-only r4c9) and the naked form. The solid fill is unmistakable, and the link line sits clearly under the key line.
+
+### Persona check (user-a, user-b, user-c; 375 px screenshots only)
+- Ring naming: 18 of 18 correct, sureness 5 in every case, including two partners, a long column, box-only, an entered ring and the naked form.
+- Link line: 3 of 3 noticed the invite and would tap.
+- Naked-form wording (Tricky 1, r2c7: "Row 2, column 7 cannot be 2..." under "...so it must be 7"): clarity 3/5 for all three.
+  - The sentence is correct, but sitting under the conclusion it can read as being about the target, or as a contradiction.
+  - Suggested fixes: a lead-in ("The cell you tapped: ..."), or making it clear that the line explains the hatching rather than the final step.
+  - PM view: the behaviour meets AC 4 (D is the pointing digit, which the key line also uses). The risk is in reading, not in correctness. I am not rejecting for it; it goes to the backlog.
+- Notes in hatched cells at 0.25 (s8, notes I placed by hand): 3/5 for all three, and every note was read correctly.
+  - The complaint is that notes are small and grey and the stripes compete with them.
+  - This is in line with it15 round 1 (3, 3, 4). It is not a regression, but it is still a mobile wish.
+  - user-b flagged notes that "disagree with the grid". Those were my arbitrary hand-placed notes, not a defect.
+- Verdict: ship with small changes, 3 of 3.
+
+### Decision
+- **ACCEPTED at 209a9d2083e20bd883dff64e0074d76c85cd83ab.** PR comment: https://github.com/dirkmarski/weaver/pull/69#issuecomment-6306211386
+- No spec change. The #68 Change log stays empty.
+
+### Follow-ups (backlog)
+- F1: the link sentence needs a lead-in or a framing, so it does not read as being about the target. Most visible in the naked-form pointing case (3/5). Candidate: "Tapped cell: Row R, column C cannot be D: ...". A small wording change.
+- F2: notes in hatched cells on phones are 3/5 (small and grey under the stripes): a darker note colour in hatched cells, or a lighter stripe. This goes in the mobile item.
+- F3: with two partners, "and" can read as if both are needed (user-b). This is a minor wording point; keep it under watch.
+- Carried over: the reverse link, and the soft keyboard on tap (it cannot be tested headless).
+
+## Candidate list (PM, ordered, after #68 acceptance)
+1. Explanation depth, continued:
+   - the reverse link (tap a ring to highlight its cells);
+   - F1, a link-line lead-in and the naked-form framing ("why 7", the "only D or X" step);
+   - a stronger first-click signal for pointing;
+   - "same D as before";
+   - the box-case wording;
+   - minimal rings.
+2. Mobile:
+   - F2, notes contrast and size in hatched cells;
+   - the soft keyboard on tapping a hatched cell;
+   - long messages plus the key and link lines (conclusion first?);
+   - struck grey vs purple on tinted cells;
+   - cell size at 375 px;
+   - the level buttons at 375 px;
+   - the hint badge at 320 px.
+3. Pointing reach (watch, no action).
+4. Slip follow-ups (it11, wording-led), unchanged.
+5. Small wording items: F3, the two-partner "and", plus the existing ones.
+6. Long-term: a middle hint level, progress across puzzles, claiming then pairs.
+
+Watch: the ratio is 1.575x at the #68 head, about 31 lines of headroom under 1.6x.
