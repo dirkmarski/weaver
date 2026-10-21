@@ -281,8 +281,22 @@ describe('page (headless Chrome)', () => {
     s = await read();
     assert.deepStrictEqual([s.link, s.linked], [INVITE, []]);
     await focus(2, 3);
+    await page.eval('document.activeElement.blur()'); // focus leaves the grid
+    s = await read();
+    assert.deepStrictEqual([s.link, s.linked], [INVITE, []]);
+    await focus(2, 3);
     await keys([[pos(1, 2), '5']]);
     noHint(await read());
+  });
+
+  it('f1d. pointing, naked form (Tricky seed 1): the link names the pointing digit 2, not the hinted digit 7', async () => {
+    await open('tricky', 1);
+    await click('#hint');
+    await click('#hint');
+    await page.eval('document.querySelector("input[data-pos=\\"15\\"]").focus()'); // row 2, column 7
+    const s = await read();
+    assert.deepStrictEqual(s.linked, [10, 78]); // row 2, column 2 and row 9, column 7
+    assert.strictEqual(s.link, 'Row 2, column 7 cannot be 2: the 2 at row 2, column 2 is in the same row, and the 2 at row 9, column 7 is in the same column.');
   });
 
   it('f2. the key line is gone after Verify; a hidden single is taught (its key line is pinned in f1b), a naked single none and nothing hatched', async () => {

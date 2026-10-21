@@ -9,6 +9,10 @@
 - Supervision: each agent ends with a fixed evidence report; the lead spot-checks it (diff stat vs claimed files, removed-assertion list vs test diff, suite run, re-run of named mutants, AC map vs issue).
 
 ## Developer
+- Rework round 1 (suite 170/170, skipped 0; ratio 2012/1277 = 1.575, cap 2043):
+  - R1 new page test f1d (Tricky seed 1, pointing naked form, link names the pointing digit 2): kills M4a.
+  - R2 f1c: blur after linking restores the invitation, nothing linked: kills M7b.
+  - R3 dead `q !== p` removed. R4 ringLink return split (`cell`, `text`), `cellAt` hoisted to the wiring scope and used in focusin. R5 focusout is `unlink` directly (no observable difference found). R6 README lines 41 and 46 say D is the hint's digit (the pointing digit for pointing).
 
 ## Reviewer
 - Reviewed cde6884 vs origin/main. Suite 169/169, skipped 0. Ratio 1998/1271 = 1.572 (cap 2033, headroom 35).

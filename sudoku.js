@@ -479,13 +479,15 @@
   // units (row, column, box, in that order) it shares with p.
   function ringLink(p, ringed, d) {
     var partners = ringed.filter(function (q) {
-      return q !== p && CELL_UNITS[q].some(function (u) { return CELL_UNITS[p].indexOf(u) >= 0; });
+      return CELL_UNITS[q].some(function (u) { return CELL_UNITS[p].indexOf(u) >= 0; });
     });
     var parts = partners.map(function (q) {
       var shared = UNIT_NAMES.filter(function (n, k) { return CELL_UNITS[q][k] === CELL_UNITS[p][k]; });
       return 'the ' + d + ' at row ' + (Math.floor(q / 9) + 1) + ', column ' + (q % 9 + 1) + ' is in the same ' + shared.join(' and ');
     });
-    return { partners: partners, text: 'Row ' + (Math.floor(p / 9) + 1) + ', column ' + (p % 9 + 1) + ' cannot be ' + d + ': ' + parts.join(', and ') + '.' };
+    var cell = 'Row ' + (Math.floor(p / 9) + 1) + ', column ' + (p % 9 + 1);
+    var text = cell + ' cannot be ' + d + ': ' + parts.join(', and ') + '.';
+    return { partners: partners, text: text };
   }
 
   // ---- Rewards: recognising naked and hidden singles the learner enters ----
@@ -1017,16 +1019,18 @@
       }));
     }
 
+    function cellAt(q) { return table.rows[Math.floor(q / 9)].cells[q % 9]; }
+
     // Focus on a hatched cell links its rings; focus anywhere else (or out of the grid) undoes it.
     table.addEventListener('focusin', function (e) {
       var p = e.target.dataset ? +e.target.dataset.pos : -1;
       unlink();
       if (!hatchedRings || hatchedRings.hatched.indexOf(p) < 0) return;
       var link = ringLink(p, hatchedRings.rings, hatchedRings.d);
-      link.partners.forEach(function (q) { table.rows[Math.floor(q / 9)].cells[q % 9].classList.add('hint-linked'); });
+      link.partners.forEach(function (q) { cellAt(q).classList.add('hint-linked'); });
       linkLine.textContent = link.text;
     });
-    table.addEventListener('focusout', function (e) { if (!table.contains(e.relatedTarget)) unlink(); });
+    table.addEventListener('focusout', unlink);
 
     // Hint: step 1 unless a hint is already showing, then step 2.
     document.getElementById('hint').addEventListener('click', function () {
@@ -1037,13 +1041,15 @@
       if (res.kind !== 'nudge' && res.kind !== 'explain') return;
       hint = res;
       var marks = hintMarks(res, currentGrid());
-      function cellAt(q) { return table.rows[Math.floor(q / 9)].cells[q % 9]; }
       marks.area.forEach(function (q) { cellAt(q).classList.add('hint-area'); });
       cellAt(marks.target).classList.add('hint-target');
       marks.hatched.forEach(function (q) { cellAt(q).classList.add('hint-hatched'); });
       marks.digits.forEach(function (q) { cellAt(q).classList.add('hint-digit'); });
       [['confined', marks.confined], ['removed', marks.removed]].forEach(function (m) {
-        m[1].forEach(function (q) { cellAt(q).classList.add('hint-' + m[0]); cellAt(q).setAttribute('data-d', res.pointDigit); });
+        m[1].forEach(function (q) {
+          cellAt(q).classList.add('hint-' + m[0]);
+          cellAt(q).setAttribute('data-d', res.pointDigit);
+        });
       });
       if (res.kind === 'explain' && res.technique !== 'naked') keyLine.textContent = hintKey(res, marks.hatched.length);
       if (marks.hatched.length) {
