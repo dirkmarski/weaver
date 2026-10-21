@@ -347,7 +347,7 @@ describe('page (headless Chrome)', () => {
     await tap(2, 2);
     await click('#verify');
     noHint(await read()); // clearing leaves no data-d behind
-    await page.send('Emulation.setDeviceMetricsOverride', { width: 375, height: 900, deviceScaleFactor: 1, mobile: false });
+    await page.send('Emulation.setDeviceMetricsOverride', { width: 375, height: 900, deviceScaleFactor: 1, mobile: true });
     try {
       const steps = [() => open('tricky', 1), () => click('#hint'), () => click('#hint'), () => tap(2, 2), () => focusAt(pos(3, 7)), () => focusAt(pos(1, 5))];
       const measure = () => page.eval('[["#sudoku","bottom"],["#link","top"],["#link","bottom"],["#hint","top"]].map(function (p) { return document.querySelector(p[0]).getBoundingClientRect()[p[1]]; })');
@@ -433,35 +433,42 @@ describe('page (headless Chrome)', () => {
     });
   });
 
-  it('f4. at 375 px the edge badges (1 left, 9 right) lie inside the cell, the chip padding is 1px and the struck chip is legible; the viewport is restored', async () => {
+  it('f4. at 375 px (phone mode) the cells are square and the corner badges (1, 3, 7, 9) lie inside the cell, flush with their edges; the chip padding is 1px and the struck chip is legible; the viewport is restored', async () => {
     await open('tricky', 5);
-    await page.send('Emulation.setDeviceMetricsOverride', { width: 375, height: 900, deviceScaleFactor: 1, mobile: false });
     try {
       const probe = '(function () {' +
-        'var tds = document.querySelectorAll("#sudoku td"), out = { cw: tds[0].clientWidth, rows: [] };' +
-        '[[tds[0], 1], [tds[8], 9]].forEach(function (p) {' +
+        'var tds = document.querySelectorAll("#sudoku td"), g = document.getElementById("sudoku").getBoundingClientRect(), out = { sq: 0, rows: [], grid: [g.left, g.right] };' +
+        'tds.forEach(function (t) { var q = t.getBoundingClientRect(); out.sq = Math.max(out.sq, Math.abs(q.width - q.height)); });' +
+        '[[tds[0], 1], [tds[2], 3], [tds[6], 7], [tds[8], 9]].forEach(function (p) {' +
         '  var td = p[0], d = p[1];' +
         '  td.classList.add("hint-confined"); td.setAttribute("data-d", d);' +
         '  var box = td.getBoundingClientRect(), a = getComputedStyle(td, "::after"), m = a.transform.match(/matrix\\(([^)]+)\\)/)[1].split(",").map(parseFloat);' +
         '  var pl = box.left + td.clientLeft, pr = box.right - (td.offsetWidth - td.clientLeft - td.clientWidth);' +
         '  var w = ["width", "paddingLeft", "paddingRight", "borderLeftWidth", "borderRightWidth"].reduce(function (n, k) { return n + parseFloat(a[k]); }, 0);' +
         '  var left = pl + parseFloat(a.left) + m[4];' +
-        '  out.rows.push({ d: d, inL: left - pl, inR: pr - (left + w), pad: a.paddingLeft + " " + a.paddingRight });' +
+        '  var pt = box.top + td.clientTop, pb = box.bottom - (td.offsetHeight - td.clientTop - td.clientHeight), top = pt + parseFloat(a.top) + m[5];' +
+        '  var h = ["height", "paddingTop", "paddingBottom", "borderTopWidth", "borderBottomWidth"].reduce(function (n, k) { return n + parseFloat(a[k]); }, 0);' +
+        '  out.rows.push({ d: d, inL: left - pl, inR: pr - (left + w), inT: top - pt, inB: pb - (top + h), pad: a.paddingLeft + " " + a.paddingRight });' +
         '});' +
         'return out; })()';
       let r;
-      for (let i = 0; i < 100; i++) { // wait for the new width to lay out
-        r = await page.eval(probe);
-        if (r.cw >= 34 && r.cw <= 36) break;
-        await page.eval('document.querySelectorAll("#sudoku td").forEach(function (t) { t.classList.remove("hint-confined"); t.removeAttribute("data-d"); })');
-        await new Promise((x) => setTimeout(x, 20));
+      for (const w of [360, 375]) {
+        await page.send('Emulation.setDeviceMetricsOverride', { width: w, height: 900, deviceScaleFactor: 1, mobile: true });
+        for (let i = 0; i < 100; i++) { // wait for the new width to lay out
+          r = await page.eval(probe);
+          if (r.sq <= 1) break;
+          await page.eval('document.querySelectorAll("#sudoku td").forEach(function (t) { t.classList.remove("hint-confined"); t.removeAttribute("data-d"); })');
+          await new Promise((x) => setTimeout(x, 20));
+        }
+        assert.ok(r.sq <= 1, 'cells not square at ' + w + ' px: ' + r.sq);
       }
-      assert.ok(r.cw >= 34 && r.cw <= 36, 'cell width at 375 px: ' + r.cw);
+      assert.ok(Math.abs(r.grid[0] - 16) <= 1 && Math.abs(r.grid[1] - 359) <= 1, 'grid does not span the page padding at 375 px: ' + r.grid);
       r.rows.forEach((x) => {
         assert.strictEqual(x.pad, '1px 1px', 'badge ' + x.d + ' padding');
-        assert.ok(x.inL >= -1 && x.inR >= -1, 'badge ' + x.d + ' outside the cell: ' + x.inL + ' / ' + x.inR);
-        // flush against its own edge (left rule for 1, right rule for 9), not merely inside the 1 px tolerance
-        assert.ok(Math.abs(x.d === 1 ? x.inL : x.inR) < 0.25, 'badge ' + x.d + ' not flush: ' + x.inL + ' / ' + x.inR);
+        assert.ok(Math.min(x.inL, x.inR, x.inT, x.inB) >= -0.5, 'badge ' + x.d + ' outside the cell: ' + [x.inL, x.inR, x.inT, x.inB]);
+        // flush against its own edges (left rule for 1 and 7, right for 3 and 9, top for 1 and 3, bottom for 7 and 9), not merely inside the tolerance
+        assert.ok(Math.abs(x.d % 3 === 1 ? x.inL : x.inR) < 0.25, 'badge ' + x.d + ' not flush sideways: ' + x.inL + ' / ' + x.inR);
+        assert.ok(Math.abs(x.d < 4 ? x.inT : x.inB) < 0.25, 'badge ' + x.d + ' not flush top or bottom: ' + x.inT + ' / ' + x.inB);
       });
       const rows = await page.eval('(function () { var td = document.querySelectorAll("#sudoku td")[1], out = []; td.classList.add("hint-removed");' +
         'for (var d = 1; d <= 9; d++) { td.setAttribute("data-d", d); var a = getComputedStyle(td, "::after"); out.push([a.backgroundImage, parseFloat(a.width) + parseFloat(a.paddingLeft) + parseFloat(a.paddingRight), parseFloat(a.height) + parseFloat(a.paddingTop) + parseFloat(a.paddingBottom)]); } return out; })()');
