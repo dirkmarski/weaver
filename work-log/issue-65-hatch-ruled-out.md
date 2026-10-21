@@ -19,6 +19,39 @@ Iteration 14. Branch `issue-65-hatch-ruled-out`. Session `c0f6ffb1-d246-448a-942
 - Counts: `node --test`: 167 tests, 167 pass, 0 fail, 0 skipped.
 
 ## Reviewer
+- Reviewer: Claude Sonnet 5.5 (claude-sonnet-5-5), head 610dba8. Did not read governance/LOG.md; read only the Lead section of this log.
+- Verdict: REQUEST CHANGES (one must-fix, two should-fix).
+- Suite: `node --test` 167 tests, 167 pass, 0 fail, 0 skipped.
+- Ratio: tests 1952 (chrome 100, fixture 27, generator 155, page 408, sudoku 1262) / product 1220 (index 41, style 131, sudoku.js 1048) = 1.6000x exactly (AC 9 met, zero headroom).
+- Data flow AC 1-6 followed `hintMarks.hatched` -> class `hint-hatched` -> CSS (both layers, after hint-area so it wins) -> `clearResults` (class removed on all five paths, keyLine cleared at the same place). Correct. Reachability: the two reason passes in `addReasons` cannot overlap (the hidden unit is perpendicular to the line or the other box), so the de-dup is equivalent code.
+- README (AC 7): every sentence checked against behaviour (second click pointing, hidden single, removal lists, `#key` line, `hintKey` and `hintMarks` API entries). No discrepancy. `pointingKey` appears nowhere any more.
+
+Mutants (each reverted; `node --test`):
+| # | Mutant | Result |
+|---|---|---|
+| M1 | page key gate `&& res.technique !== 'naked'` removed | SURVIVED |
+| M2 | `addReasons` de-dup removed | SURVIVED (equivalent, see above) |
+| M3 | `hatched` sort removed | SURVIVED |
+| M4 | stripe layer dropped from CSS | killed (f1b) |
+| M5 | tint layer dropped from hatched rule | killed (f1b) |
+| M6 | `hint-hatched` missing from `clearResults` | killed (4) |
+| M7 | `hatchedCount ?` always true | killed (4) |
+| M8 | `hatchedCount ?` always false | killed (4) |
+| M9 | "an 8" -> "a 8" | killed (6) |
+| M10 | page passes 0 as count | killed (3) |
+| M11 | page never adds `hint-hatched` | killed (3) |
+| M12 | `x !== p` dropped in `addReasons` | killed (8) |
+| M13 | hidden-form `removed` skip dropped | killed (6) |
+| M14 | box `confined` skip dropped | killed (6) |
+| M15 | hidden key uses `pointDigit` | killed (4) |
+12 killed, 3 survived (1 equivalent).
+
+Findings
+- MUST-FIX 1 (M1): tests/page.test.js:263-278 (f2). The "no key line for a naked single" guard is not tested: the seed is picked by `findHiddenSingle` on Tricky and Hint teaches the hidden single there, so the naked branch of sudoku.js:1006 is never exercised, and the assertion `[key.startsWith('Key: hatched = '), ...] == [status is Hidden single]` hides that. Fix: add a naked-single page case (adapt f2: Easy prefers naked on a tie, so `pick('easy', (pz) => S.findNakedSingle(pz))`, Hint twice, assert status starts with "Naked single" and `key === ''`, `hatched` empty), and make the hidden-single case assert its status. Re-run M1 to confirm it dies.
+- SHOULD-FIX 2 (M3): no test has a hatched set in which a unit cell has a lower index than a box cell, so the sort of `hatched` (sudoku.js:455) is unpinned although the contract is "ascending". Reachable, for example: pointing box 6, line row 6, target r7c5 (hidden unit column), empty box cell r8c1 (index 63) and empty column cell r1c5 (index 4) give `[4, 63]` sorted and `[63, 4]` without the sort (checked in node). Fix: extend the existing "hintMarks, pointing: reason cells ..." case (b) with such a layout and assert `hatched` deepStrictEqual ascending, no new test.
+- SHOULD-FIX 3 (legibility, development-practices "clean and legible"): the 1.600x was reached by packing lines. tests/sudoku.test.js:1118 joins a new comment and the old `// issue 56:` comment on one 260-character line (the new one reads as a different sentence mid-line); :1173-1174 declare `rule`, `point`, `head` and `point`'s long hintKey call on two lines of ~250 characters; sudoku.js:424-425 reflows the hintMarks header comment mid-sentence and :455 is a 180-character return. Not acceptable as is. Fix: put each declaration and each comment on its own line (about +5 test lines), and pay for them legitimately, not by packing: (a) drop assertions that duplicate others, e.g. in hintKey the hidden-single row `[4, 'a 4']` is covered by hintFor's "an 8 ... 7 and 9" text test plus the P3 pin, and `point(8, 1)` repeats the "an 8" already in the hidden-single `[8, 'an 8']` and the P1 pin; the page f1b first-click assertion `[s.hatched, s.key] == [[], '']` is also covered by `noHint` on nudges in f/f2b (list each with its remaining cover; mutants M7/M8/M9 would confirm); or (b) ask the PM for a one-line ratio exemption note. Do not rely on long lines.
+- NIT 4: tests/page.test.js:~214 (f) still builds the expected key from `S.hintKey(...)` (wiring only). Acceptable because P1/P3 pin literal text in f1b; no change needed.
+- NIT 5: Pins P2, P4, P5 are not on the page (only P1, P3), matching AC 8; no change.
 
 ## Tester
 - Tester: Claude Sonnet 5.5 (claude-sonnet-5-5), session c0f6ffb1, head 610dba8. Did not read governance/LOG.md.
