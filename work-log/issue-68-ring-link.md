@@ -7,6 +7,9 @@
 ## Lead
 - 2026-10-21: Gate check passed (open, author weaver-agents, label enhancement). Branch and this log created. Baseline 167/167, skipped 0; ratio 1961/1226 = 1.5995x.
 - Supervision: each agent ends with a fixed evidence report; the lead spot-checks it (diff stat vs claimed files, removed-assertion list vs test diff, suite run, re-run of named mutants, AC map vs issue).
+- Lead check of cde6884: diff stat matched the developer report; no test deletions; suite 169/169. Reviewer APPROVE (M4a reachable survivor: naked-form pointing; M7b leaving the grid untested; nits), tester PASS (134 checks, 0 defects). Lead reproduced M4a's case in node.
+- Rework round 1 (R1-R6, see the iteration-15 lead log), b087451. Re-check: reviewer delta APPROVE (4c0960d: M4a killed by f1d, M7b by f1c; R3/R5/refactor equivalent); lead re-ran the tester's saved scripts on b087451 (134/134; replay vs main 99 snapshots, 0 diffs).
+- Lead check at 4c0960d: M4a re-run by the lead, killed by f1d (169/170); restored, 170/170 skipped 0. Ratio 2012/1277 = 1.575x (cap 2043). No assertion removed in the issue. Ready for PR.
 
 ## Developer
 - Rework round 1 (suite 170/170, skipped 0; ratio 2012/1277 = 1.575, cap 2043):
