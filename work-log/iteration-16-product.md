@@ -114,3 +114,22 @@ What next, value (a/b/c) and rank:
    - claiming, then pairs, each with its own level.
 
 Watch: ratio 1.575x, 31 lines of headroom at 8b6cbc7. Not wanted (unchanged): instant red on a wrong entry, counting entries made during a clash, retroactive counting.
+
+## Acceptance #71 (PR #73, head 9080646) - in progress
+- Worktree at 9080646 (detached, scratchpad pm-71-acc). Read: issue #71, PR #73 body and diff. No other work-log read.
+- Suite: `node --test tests/*.test.js` 170/170, skipped 0 (Chrome present).
+- Own model diff main vs PR (Easy/Medium/Tricky/Hard seeds 1-30, following Hint, steps 1+2, both preferences): 20020 hint texts, 19888 identical, 132 differ and all are the naked-form step 2 with exactly the AC 2 text; the reason clause checked against the grid 132/132. 11017 link sentences: all equal to main with only the lead-in rewritten, partners identical; marks and key lines identical.
+- Page (headless Chrome, page seeding): P1, P2, P3 exact; invitation unchanged; play-through on Tricky seed 1 (Hint, Hint, focus r2c7, enter 7 in r1c5) gives "Well done! You applied pointing: row 1, column 5 is 7." and the pointing tally 1 with a hint.
+- Persona on-screen check launched (screenshots 1280 and 375 px, Tricky seed 1, r2c7 focused; cell not named in the brief).
+- Persona on-screen results (user-a / user-b / user-c), shown 3 screenshots: P3 after Hint 2 (1280), r2c7 focused (1280), r2c7 focused (375). Brief did not name the cell or quote any text.
+  - Contradiction seen: no / no / no (it15 finding gone; all three named r2c7 and the two purple 2s correctly).
+  - Link line clarity: 4 / 5 / 5 (it15 on-screen: 3 / 3 / 3).
+  - Big pointing message clarity: 3 / 4 / 3. All three could say why r1c5 must be 7 (uses the "every digit except 2 and 7" clause). Text-only N2 scored 5/4/5; on screen the whole paragraph is judged dense, not the new clause.
+  - Phone 375 px: 4 / 4 / 4. Comments: long message pushes text down, tiny 2 badges, "New puzzle" wraps.
+- DECISION: ACCEPTED at 908064610c271587db501218eed73ff652b36bfc. PR comment https://github.com/dirkmarski/weaver/pull/73#issuecomment-6307256594. Merge is the lead's call.
+- Concern (logged, not blocking): the naked-form sentence was accepted although the tested N2 order had the cell named in a different position (Decision note); the on-screen check covers it (all three understood it).
+- Follow-ups for the backlog:
+  - split the pointing explanation into short steps (user-a, user-c), or put the conclusion first; this joins backlog item 3 "long messages ... conclusion first?";
+  - pointing badges too small on a phone (3/3), part of F2 / mobile;
+  - the invitation line goes away after a cell is focused (user-b), so remind users that other hatched cells can be tapped;
+  - (user-c) solid purple rings show before the key mentions them; watch only.
