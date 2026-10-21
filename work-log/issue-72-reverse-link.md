@@ -16,6 +16,7 @@
 - Tests: ringRules unit (R1, R2, R3), page f1e (R3 flow, invitation, re-click, outside click, given non-ring click), f1f (entered ring by focus). Mutants (no focus select, no unlink in click, editable click unlinks) each fail one test.
 
 ## Reviewer
+- Rework round 1: R1 f1e now clicks a focused hatched cell's input (forward link and empty `ruled` stay; kills M2). R2 ringRules pin with four hatched cells (ring r5c9, hatched r5c1-r5c4; kills M10). R3 count above 4 prints the numeral. Deviation: ring r5c9 not r5c5, since r5c4 shares the box with r5c5.
 
 ## Tester
 - 2026-10-21, commit 3891a97 vs main c8e36fc. Scripts: scratchpad/test-72/run.sh (real CDP Input.dispatchMouseEvent / dispatchTouchEvent / dispatchKeyEvent; focus emulation on).

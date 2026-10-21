@@ -319,6 +319,9 @@ describe('page (headless Chrome)', () => {
     await focusAt(pos(3, 7));
     assert.deepStrictEqual(await state(), [[pos(9, 7)], [],
       'Hatched cell row 3, column 7: no 2 here, because the 2 at row 9, column 7 is in the same column.']);
+    await page.eval('document.querySelector(\'input[data-pos="' + pos(3, 7) + '"]\').click()'); // the click that follows the focus
+    assert.deepStrictEqual(await state(), [[pos(9, 7)], [],
+      'Hatched cell row 3, column 7: no 2 here, because the 2 at row 9, column 7 is in the same column.']);
     await focusAt(pos(1, 5)); // the target
     assert.deepStrictEqual(await state(), [[], [], INVITE]);
     await tap(2, 2);

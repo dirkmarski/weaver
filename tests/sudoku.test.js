@@ -1204,6 +1204,8 @@ test('ringRules: one hatched cell, two (one sharing row and box), three (pins R1
   const r3 = ringRules(at(2, 2), [at(2, 7), at(2, 8), at(2, 9), at(3, 7)], 2);
   assert.deepStrictEqual(r3.cells, [at(2, 7), at(2, 8), at(2, 9)]);
   assert.strictEqual(r3.text, 'The 2 at row 2, column 2 rules 2 out of three hatched cells: row 2, column 7 (same row), row 2, column 8 (same row) and row 2, column 9 (same row).');
+  assert.strictEqual(ringRules(at(5, 9), [at(5, 1), at(5, 2), at(5, 3), at(5, 4)], 7).text,
+    'The 7 at row 5, column 9 rules 7 out of four hatched cells: row 5, column 1 (same row), row 5, column 2 (same row), row 5, column 3 (same row) and row 5, column 4 (same row).');
 });
 
 // PM pins (issue 56): P(N) follows Hint on the Tricky puzzle of seed N (entering each digit as a hinted one) to the first pointing step.

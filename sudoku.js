@@ -493,7 +493,7 @@
     var items = cells.map(function (p) { return cellPlace(p) + ' (same ' + sharedUnits(p, q).join(' and ') + ')'; });
     var last = items.length > 1 ? ' and ' + items.pop() : '';
     var count = items.length + (last ? 1 : 0);
-    var text = 'The ' + d + ' at ' + cellPlace(q) + ' rules ' + d + ' out of ' + ['', 'one', 'two', 'three', 'four'][count]
+    var text = 'The ' + d + ' at ' + cellPlace(q) + ' rules ' + d + ' out of ' + (['', 'one', 'two', 'three', 'four'][count] || count)
       + ' hatched cell' + (count > 1 ? 's' : '') + ': ' + items.join(', ') + last + '.';
     return { cells: cells, text: text };
   }
