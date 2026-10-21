@@ -19,4 +19,15 @@
 
 ## Reviewer
 
+- 2026-10-21 (reviewer, session cb27eb6b): Review of 1c7c312 against origin/main. Verdict APPROVE, no blocking findings.
+  - Move: #link is now in #game, so it is hidden with the game and cannot show on the picker (AC4). sudoku.js only uses getElementById('link').textContent (unlink, forward, reverse), no sibling or order assumption; no CSS sibling selector and no test relied on the old place.
+  - AC2: only margin (0.25rem -> 0.5rem) and min-height (4lh) changed; font-size 0.85rem, weight and colour untouched. README: only the phrase "Under the key line" -> "Under the grid, above the buttons," in both paragraphs that carried the sentence (pointing second click, hidden-single second click); no other word changed, no stale mention left. Both are the "hint section", so within AC6.
+  - 4lh: 64 px at 0.85rem (lh is the element's own line height, so it equals four text lines; 4em would be too short, mutant M10 killed). Where lh is unsupported the declaration is dropped: no reserve, the line still sits under the grid (graceful, accepted).
+  - f1e extension: 10 added lines, legible, width override reset in finally. Step 3 (R3 sentence) is the only 4-line state: with 3lh and that step replaced the check passes, with 3lh and the step kept it fails. Step 4 is the forward link, step 5 the target (invitation).
+  - Low: the 375 px loop does not assert the link text per step (the states are asserted earlier in f1e at the default width). Survives mutant M7 (step 3 replaced by a no-op tap) because 4lh still holds; M3+M7 shows step 3 is what pins the 4-line reserve. Not worth more lines.
+  - Low: AC2 font size and colour have no test (mutant M9, font-size 1.1rem, survives); the diff shows them unchanged, accepted for the ratio.
+  - Mutants: M1 margin 0 killed (f1e); M2 min-height removed killed; M3 3lh killed; M4 2lh killed; M5 link after key outside game killed; M6 link after buttons killed; M7 survives; M8 override not reset killed (f3); M9 survives; M10 4em killed.
+  - Suite 173/173, skipped 0. Ratio 2091/1312 = 1.594 (cap 1.6).
+  - Not checked: Safari/Firefox, mobile emulation (mobile: true), 1280 px and 360 px content widths by my own measure (relied on lead measurement), pixel look.
+
 ## Tester
