@@ -18,6 +18,12 @@
 ## Reviewer
 
 ## Tester
+- 2026-10-21, commit 3891a97 vs main c8e36fc. Scripts: scratchpad/test-72/run.sh (real CDP Input.dispatchMouseEvent / dispatchTouchEvent / dispatchKeyEvent; focus emulation on).
+- Verdict PASS, no defects. Pins R1-R4 exact (mouse and tap). R5 (Medium 1, 5th hint pair, r1c8 entered 2, hatched r1c5 r1c6 r2c4 r3c5): ruled r1c5, r1c6; line "The 2 at row 1, column 8 rules 2 out of two hatched cells: row 1, column 5 (same row) and row 1, column 6 (same row)."
+- Oracle: 15 seeds (easy 1-2, medium 1-5, tricky 1-5 and 8, hard 1-2), 129 explanation states with hatching, 369 rings (311 given, 58 entered), 0 mismatches against the reverse of #68 partners; sizes 1:184, 2:132, 3:53, none 4 or 0. Sentences match an independent model in all 369. 5160 random-walk steps (click, tap, Tab, arrows, outside clicks) all matched the expected state.
+- Replay vs main: 870 snapshots (487 with hatching), 605 identical, 265 differ only in the invitation text, 0 other diffs.
+- 375 px: invitation 2 lines, three-cell sentence 3 lines, no overflow, no overlap with controls; ruled look visible with and without notes; note digit ink stays at least 3.13 px from the cell edge (just outside the 3 px band).
+- Suite: 173 tests, 173 pass, 0 fail, skipped 0.
 
 ## Change log (spec changes, from the PM)
 - 2026-10-21 (reviewer, 3891a97 vs c8e36fc): Suite 173/173, skipped 0. APPROVE with one SHOULD-FIX (about 2 test lines).
