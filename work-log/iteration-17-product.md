@@ -160,3 +160,18 @@
     - no orphan tails: non-breaking space in "row N"/"column N" and the box range;
     - a test that single explanations do not get `steps`, when the ratio headroom allows (reviewer mutant m2).
 - Did not read governance/LOG.md.
+
+## Acceptance: #78 ruled badge (PR #81, head c898a06; product code 356a879) - 2026-10-21
+- Decision: ACCEPTED at c898a06. The lead merges; the iteration stays open.
+- Evidence used: the lead's work log `work-log/issue-78-ruled-badge.md` (reviewer APPROVE, nothing blocking; tester AC1-AC9 PASS with real input), the tester's screenshots at 375 and 1280 px (R3 r2c2 selected, notes 2/5/7 in r2c8; R4 Tricky seed 8 r5c8), and my own reading of the bf475be..c898a06 diff.
+- Diff check: style.css adds `hint-ruled::after` to the shared badge rule and the below-560 px padding rule, adds one colour/band rule (#4a0f8a, gradient 43-57% like the grey band) and removes the inset 3 px box-shadow. sudoku.js sets `data-d` in `selectRing` and removes it in `unlink` (4 lines). The test extends f1e (badges after the r2c2 click, after the switch and after the forward link; no hatched cell is confined or removed; `noHint` after Verify); there is no new test. README: the ring-selection sentence in both places names the purple struck badge. The ratio of 1319/2110 is within the cap.
+- AC7 phone check (mine), from the m375 screenshots:
+  - R3: the struck "2" sits in slot 2 (top middle) of r2c7, r2c8 and r2c9, inside the cell and not clipped. In r2c8 it covers the player's 2 while the 5 and 7 notes stay visible. Cells without notes look the same. It reads as the purple sibling of the grey struck badges in r1c5/r1c6 and differs from the dashed confined "2" chips in r1c8/r1c9. The ruled cells no longer carry a purple border, so the F-72c confusion with a ring is gone.
+  - R4: the "8" sits in slot 8 (bottom middle) of r4c8 and r4c9, inside the cell and above the cell's bottom edge.
+  - PASS.
+- AC5: 12.16:1 recorded (12:1 or better asked). PASS.
+- Personas: no new round. The variant was scored 4/5, 5/5, 4/5 in persona round 1 (it17 scoping), and what shipped matches that mock-up. The change has the lowest value rank, and the test strategy asks only for sufficient acceptance.
+- Watch items and backlog (no new issue now):
+  - Middle slots only: the pins exercise D = 2 and 8. Edge digits (1/4/7, 3/6/9) at 375 px rely on the shared edge rules that the pointing badges already proved. Watch this at the next real edge-digit ring selection.
+  - It remains out of scope to strike the player's note instead of covering it (persona alternative).
+  - The key line does not mention the ruled badge (out of scope); it is a candidate if players miss the meaning.
