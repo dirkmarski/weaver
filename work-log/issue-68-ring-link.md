@@ -36,6 +36,15 @@
 - Should-fix: (1) one page assertion on Tricky seed 1 (pointing naked form) kills M4a; (2) one assertion that moving focus out of the grid (for example clicking the Notes button, or `document.activeElement.blur()`) restores the invitation kills M7b. About 6 test lines, within the 35 headroom.
 - Nits: long lines in ringLink's return (147 chars) and the focusin handler; cellAt is duplicated inline in focusin (hoist the Hint handler's cellAt to the wiring scope); README example does not say that D is the hint's digit (the pointing digit for pointing).
 
+### Delta re-review (b087451)
+- Verdict: APPROVE. Delta cde6884 -> b087451 reviewed; suite 170/170, skipped 0.
+- M4a (`d: res.digit` always): killed by f1d. M7b (focusout listener removed): killed by f1c (new blur assertion). Both re-run by me.
+- R3 (`q !== p` removed): equivalent, hatched cells are empty and ringed cells are filled, so p is never in `ringed`.
+- R5 (`focusout -> unlink`): behaviour-neutral. The only focusable elements in the table are the cell inputs; focus moving between cells fires focusout (unlink) then focusin (re-link) synchronously, same end state. Focus leaving the grid unlinks as before.
+- Refactor (cellAt hoist, ringLink split, forEach unpack): equivalent; legibility fine.
+- README R6 sentences true. No assertion removed (diff has no `-` lines under tests). Ratio 2012/1277 = 1.5755, cap 2043.
+- Issues: none.
+
 ## Tester
 Test report at cde6884 (2026-10-21). Scratch scripts (not committed) under scratchpad/test-68: lib.js, checks.js (pins and ACs), replay.js + cmp.js (AC 9 vs `git archive origin/main`), oracle.js.
 
