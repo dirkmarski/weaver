@@ -7,6 +7,9 @@
 ## Lead
 - 2026-10-21: Gate check passed (open, author weaver-agents, label enhancement). Branch and this log created. Baseline 170/170, skipped 0; ratio 2012/1277 = 1.575x (cap 2043).
 - Supervision: fixed evidence reports per agent; lead spot-checks (diff stat vs claimed files, removed-assertion list vs test diff, suite run, re-run of named mutants, AC map vs issue).
+- Developer f4942c8: diff stat matched the report; product diff = exactly the AC 1/2 strings; 170/170 skipped 0; ratio 2012/1277 unchanged; no assertion removed.
+- Reviewer APPROVE (6/6 mutants killed), tester PASS (4150 replay snapshots vs main, 1763 diffs all the two intended texts, 0 unexplained; oracle 11/11; pins P1-P3 exact). Log commits cherry-picked (602771c, a1fd36f).
+- Lead check: re-ran a mutant (drop "now" in the naked sentence): killed by 3 tests (unit naked-form, #56 pins, page); restored. Looked at naked-375.png: sentence wraps 6 lines, readable, no overlap. No leftover headless Chrome. No rework needed. Ready for PR.
 
 ## Developer
 - Changed two text lines in sudoku.js (ringLink lead-in; naked-form pointing sentence) and README (link example, naked-form sentence); edited 9 existing pins in place (3 page, 6 unit). No new tests, no assertions removed. Suite 170/170, skipped 0. Ratio 2012/1277 unchanged.
