@@ -1176,11 +1176,12 @@ test('hintMarks, pointing: reason cells are the unconfined empty box cells (a) a
   assert.deepStrictEqual(marksOf(low, sorted).hatched, [at(0, 4), at(7, 0)]);
 });
 
-test('hintKey: the exact key line for pointing with and without hatched cells', () => {
+test('hintKey: the exact key line for pointing with and without hatched cells, for a hidden single and for "an 8"', () => {
   const point = (d, n) => hintKey({ technique: 'pointing', pointDigit: d, form: 'hidden', unit: 'row' }, n);
   const head = (d) => 'Key: dashed purple = the only places for ' + d + ' in the box; struck grey ' + d + ' = this step rules ' + d + ' out there';
   assert.strictEqual(point(2, 4), head(2) + '; hatched = a purple ring rules 2 out there (a 2 already in the same row, column or box).');
   assert.strictEqual(point(9, 0), head(9) + '.');
+  assert.strictEqual(hintKey({ technique: 'hidden', digit: 8 }, 1), 'Key: hatched = a purple ring rules 8 out there (an 8 already in the same row, column or box).');
 });
 
 // PM pins (issue 56): P(N) follows Hint on the Tricky puzzle of seed N (entering each digit as a hinted one) to the first pointing step.

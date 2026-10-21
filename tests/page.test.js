@@ -258,7 +258,7 @@ describe('page (headless Chrome)', () => {
     noHint(await read());
   });
 
-  it('f2. the key line is gone after Verify; a hidden single has the hatched key line, a naked single none and nothing hatched', async () => {
+  it('f2. the key line is gone after Verify; a hidden single is taught (its key line is pinned in f1b), a naked single none and nothing hatched', async () => {
     const { seed, extra } = pointing;
     await open('tricky', seed);
     await keys(extra.typed);
@@ -272,7 +272,6 @@ describe('page (headless Chrome)', () => {
     await click('#hint');
     let s = await read();
     assert.ok(s.status.startsWith('Hidden single'), s.status);
-    assert.match(s.key, /^Key: hatched = a purple ring rules (\d) out there \(an? \1 already in the same row, column or box\)\.$/);
     const n = pick('easy', (pz) => S.findNakedSingle(pz));
     await open('easy', n.seed);
     await click('#hint');

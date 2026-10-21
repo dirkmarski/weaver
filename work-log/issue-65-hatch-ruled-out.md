@@ -35,6 +35,12 @@ Iteration 14. Branch `issue-65-hatch-ruled-out`. Session `c0f6ffb1-d246-448a-942
 - Counts: `node --test` (no path): 167 tests, 167 pass, 0 fail, 0 skipped.
 - Mutants after rework: M1 killed (1), M3 killed (1); also re-checked page passes 0 count (killed 2), "an 8" -> "a 8" (killed 2), `hatchedCount ?` always true (killed 2).
 
+### Rework round 1b (Claude Sonnet 5.5, claude-sonnet-5-5; read no log other than this one)
+- What: AC 8 "Unit:" bullet requires unit tests of the key text for pointing with and without hatching, a hidden single and "an 8"; removal 4 of round 1 had dropped the hidden-single and "an 8" rows from the unit level. Restored with one literal assertion in the hintKey test: `hintKey({ technique: 'hidden', digit: 8 }, 1)` equals the exact "Key: hatched = a purple ring rules 8 out there (an 8 already in the same row, column or box)." (hidden single and "an 8" together); test title restored accordingly.
+- Extra removal (pays the line): page f2, `assert.match(s.key, /^Key: hatched = ... (an? \1 ...)\.$/)` for the hidden single -> remaining cover: the hintKey unit assertions (exact text), page f1b P3 (literal hidden-single key on the page) and f2's status check "Hidden single" plus the naked case `key === ''`. Mutants still killed: key line shown for pointing only (page, 1 fail), hidden key uses `pointDigit` (unit and page, 1 fail each). f2 title adjusted (no line change).
+- Ratio: tests 1961 (chrome 100, fixture 27, generator 155, page 411, sudoku 1268) / product 1226 = 1.5995x (limit 1.6x).
+- Counts: `node --test` (no path): 167 tests, 167 pass, 0 fail, 0 skipped.
+
 ## Reviewer
 - Reviewer: Claude Sonnet 5.5 (claude-sonnet-5-5), head 610dba8. Did not read governance/LOG.md; read only the Lead section of this log.
 - Verdict: REQUEST CHANGES (one must-fix, two should-fix).
