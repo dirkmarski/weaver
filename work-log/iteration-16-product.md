@@ -140,3 +140,71 @@ Watch: ratio 1.575x, 31 lines of headroom at 8b6cbc7. Not wanted (unchanged): in
 - Page, headless Chrome, page seeding, real CDP input (mouse at 1280 px and touch at 375 px, both runs 0 failures): R1, R2, R3 (select, switch, re-click keeps, real click on r3c7 shows the forward link and clears ruled, target ends), R4 exact; outside click, non-ring given, other empty cell end the selection; Verify, a new Hint and a value change clear; a nudge (one Hint) click on a given does nothing. Play-through Tricky 1: 7 into r1c5 gives "Well done! You applied pointing: row 1, column 5 is 7.", pointing tally 1 with a hint.
 - R5 (follow Hint on Medium 1, 5th hint pair, r1c8 holds the entered 2): click, ArrowLeft from r1c9, Tab from r1c6 and programmatic focus all select it; ruled r1c5, r1c6 (equals the #68 partner oracle); line "The 2 at row 1, column 8 rules 2 out of two hatched cells: row 1, column 5 (same row) and row 1, column 6 (same row)." Checked by hand against the grid.
 - AC 9 at 375 px (touch): grid 96-660, buttons to 746, status 762-909, key 926-990, link 994-1042; no overlap, no horizontal scroll; viewport 812, so the link line is below the fold (as #68). Ruled border visible on a hatched cell with notes 2/5/7 (notes readable, clear of the band) and without. Border contrast computed 5.74:1 minimum (worst: stripe over tint over grey box).
+- Persona on-screen results (user-a / user-b / user-c). Each was shown 4 screenshots: A (explanation, 1280), B (ring r2c2 selected, 1280), C (ring r9c7 selected, 1280), D (B at 375 px, full page). The brief did not name the cells. All three found the invitation, named the clicked ring and the ruled cells correctly, and explained "same row / same column" in their own words.
+  - Discover: 2 / 3 / 3 ("tiny, low in the page and below the key"; "nothing on the grid itself hints that the rings are clickable").
+  - Ruled look: 4 / 4 / 4. All three said the solid ruled border can be confused with an unselected ring (same purple, similar weight). The dashed and orange cells are told apart easily.
+  - Sentence: 4 / 4 / 4 (clear; two found the repeated "(same row)" wordy).
+  - Helps learning: 4 / 4 / 4 ("the '(same row/column)' wording is exactly the lesson").
+  - Phone: 3 / 3 / 3. The purple line is off screen after a tap (known, AC 9 allows it as with #68). The notes 2/5/7 in r2c8 are cramped and the 7 touches the border.
+  - Top wishes: put the invitation and the feedback near the grid, or scroll it into view on a phone (3/3); give the rings a visible clickable cue (2/3); highlight the shared row/column (user-b).
+- DECISION: ACCEPTED at 1b0770698b8ef3bd8affe7f117132e2492aa5acd. Reason: AC 1-11 pass, and the core lesson scores 4/4/4 for ruled look, sentence and learning. The low scores (Discover, Phone) are in areas outside the #72 ACs and are logged as follow-ups. No spec change. PR comment https://github.com/dirkmarski/weaver/pull/74#issuecomment-6307581096. Merging is the lead's call.
+- Concern: discoverability is the weakest point of the link feature (2/3/3). It is the first candidate for iteration 17.
+- Follow-ups for the backlog:
+  - F-72a: the invitation is hard to discover, and the rings and hatched cells have no visible clickable cue;
+  - F-72b: on a phone the link line is below the fold after a tap (scroll it into view or move it up). This joins mobile item "long messages ... conclusion first?" and the #71 follow-up;
+  - F-72c: the solid ruled border looks like an unselected ring, so differentiate the weight or style;
+  - F-72d: pencil notes are cramped against the ruled border at 375 px (joins F2);
+  - F-72e: the repeated "(same row)" per cell is wordy, so group it ("row 2, columns 7, 8 and 9, all in the same row") (watch);
+  - F-72f: highlight the shared row/column/box on selection (user-b; watch).
+
+## Candidate list (PM, ordered, end of iteration 16)
+1. Link discoverability and phone reach (it16 personas, #71 + #72 follow-ups):
+   - F-72a: a clickable cue on rings and hatched cells, and the invitation nearer the grid;
+   - F-72b: the link line visible after a tap on a phone;
+   - F-72c: the ruled border distinct from a ring.
+2. Explanation depth, continued:
+   - split long pointing explanations into short steps, or put the conclusion first (#71 follow-up);
+   - minimal rings (rings exceed a minimal cover in 36% of hidden-single explanations);
+   - a stronger first-click signal for pointing;
+   - "same D as before";
+   - the box-case wording "(the box has no other empty cells)";
+   - a step-by-step "show me why" replay;
+   - keyboard reach for given rings;
+   - F-72e grouped "(same row)" wording (watch);
+   - F-72f highlight the shared unit (watch).
+3. Mobile:
+   - F2 notes contrast/size in hatched cells, plus F-72d notes cramped by the ruled border;
+   - pointing badges too small on a phone;
+   - the soft keyboard on a hatched-cell tap (not testable headless);
+   - struck grey vs purple on tinted cells;
+   - grid cells about 36 x 58 px at 375 px;
+   - 375 px level buttons ("New puzzle" wraps);
+   - the hint badge at 320 px;
+   - a reminder that other hatched cells can be tapped after the invitation goes away.
+4. Pointing reach (watch, no action):
+   - early first pointing via generation;
+   - a cap on the Tricky preference;
+   - "prefer pointing" on Hard.
+5. Slip follow-ups (it11):
+   - an extra-clash sentence;
+   - a partial-fix message;
+   - two-unit clash naming;
+   - "clear your own number";
+   - explain counted/uncounted;
+   - an entry marker during a clash;
+   - Hint/Verify naming one pair at a time.
+6. Small wording items:
+   - F3, the two-partner "and" (watch);
+   - the shared "not counted" ending;
+   - re-entering a hint-credited cell says "on your own";
+   - "(see below)" in the finish text;
+   - fold away definitions once learned;
+   - the heavy naked-single digit list;
+   - solid rings shown before the key mentions them (watch).
+7. Long-term:
+   - a practice puzzle per technique;
+   - a middle hint level;
+   - progress across puzzles;
+   - claiming, then pairs, each with its own level.
+
+Watch: ratio and headroom to be re-measured after the #72 merge. Not wanted (unchanged): instant red on a wrong entry, counting entries made during a clash, retroactive counting.
