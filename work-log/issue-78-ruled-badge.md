@@ -29,3 +29,15 @@
 - Not covered by suite (as the developer said): R4 pin, slot position, AC7 phone check; left to tester.
 
 ## Tester
+
+- 2026-10-21 (tester, 356a879, real Chrome via CDP mouse/key/touch input, branch vs main bf475be): ALL ACs PASS, no defects.
+  - AC1: ruled ::after content "2", 14px/800, padding 0 3px (0 1px at 375), radius 3px, absolute, left/top/transform identical to hint-removed and hint-confined; digit and 1px border rgb(74,15,138); gradient 43%/57% purple band; td box-shadow none (main: inset 3px); stripes and amber background-image present.
+  - AC2: hatched [r2c7,r2c8,r2c9,r3c7] vs confined [r1c8,r1c9] / removed [r1c5,r1c6]: disjoint. r2c8 notes 2/5/7: badge covers slot 2 (screenshot), 5 and 7 visible, notes innerHTML identical before, during, after selection.
+  - AC3: after switch, forward-link focus, outside click, Tab out of grid, Tab to next cell, Backspace/other digit in selected entered ring (r4c8), Verify, New puzzle, level change, new Hint: 0 ruled cells and 0 stray data-d. Confined/removed data-d and all non-ruled cells identical to main.
+  - AC4: class lists, key line, link texts, per-cell computed styles outside ruled cells identical to main in all states.
+  - AC5: #4a0f8a on #fff = 12.163:1.
+  - AC6: R3 seed 1 r2c2 -> 2 on r2c7,r2c8,r2c9 (top middle); r9c7 -> r2c7,r3c7; focus r3c7 -> none. R4 seed 8 r5c8 -> 8 on r4c8,r4c9 (bottom middle).
+  - AC7: 375 and 1280 screenshots in scratchpad test78/shots; badge horizontally inside cell (11.6 px left / 12.6 right margin at 375), vertically within 0.1 px of the cell top edge for top slots (identical to existing grey/confined badges; not visibly clipped); no horizontal scroll.
+  - AC8: README both ring-selection sentences describe the purple struck D badge; no "solid 3 px" text left.
+  - AC9: node --test tests/*.test.js: 173 pass, 0 fail, 0 skipped.
+  - Scripts/dumps: scratchpad/test78 (a_paths.js, out/, shots/). No test files changed.
