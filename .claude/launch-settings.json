@@ -10,7 +10,8 @@
     "GIT_CONFIG_KEY_2": "credential.https://github.com.helper",
     "GIT_CONFIG_VALUE_2": "",
     "GIT_CONFIG_KEY_3": "credential.https://github.com.helper",
-    "GIT_CONFIG_VALUE_3": "!gh auth git-credential"
+    "GIT_CONFIG_VALUE_3": "!gh auth git-credential",
+    "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1"
   },
   "autoMode": {
     "allow": [
