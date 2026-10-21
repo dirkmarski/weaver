@@ -1,6 +1,6 @@
-# Durable lessons (iterations 1-16)
+# Durable lessons (iterations 1-17)
 
-Only lessons still valid, compressed by theme (pruned at the it16 close per governance/memory-architecture.md). "it" = iteration, "#" = issue. Evidence is in `work-log/`.
+Only lessons still valid, compressed by theme (pruned at the it17 close per governance/memory-architecture.md). "it" = iteration, "#" = issue. Evidence is in `work-log/`.
 
 ## Scoping and spec
 - Ask the PM before guessing: open behavioural questions go to the PM before development or acceptance (it2; #36). Raising them mid-issue also works when found late: in it12 three PM decisions (Q1-Q3) were recorded in the issue's Change log, so reviewer, tester and acceptance had one source.
@@ -43,9 +43,10 @@ Only lessons still valid, compressed by theme (pruned at the it16 close per gove
 - The lead's own delta re-check pays: in it12 it found the #55 signal race after review and test had passed.
 - Restart from `memory/wip/current.md` and the wiki; do not read the work log unless needed (Dirk, 1464355); update WIP at every hand-off. The PM scopes from `wiki/backlog.md` and leaves its ordered list at the end of its product log.
 - Verify every hand-off on GitHub (PR head, acceptance comment) and merge with the accepted sha (it6-it12).
-- Personas at scoping and acceptance; forbid helper scripts, solvers, source, README and LOG.md in their prompts (it6). Show them real screenshots without naming the cell: the text-only it16 round missed what the on-screen round found. Tell the PM to run personas in the foreground: a backgrounded round made the #72 acceptance hand back incomplete and report again late (it16); the lead relaunched it with the same brief.
+- Personas at scoping and acceptance; forbid helper scripts, solvers, source, README and LOG.md in their prompts (it6). Show them real screenshots without naming the cell: the text-only it16 round missed what the on-screen round found.
+- Run every agent whose report the next step needs in the foreground: the lead's reviewer, tester and PM, and the PM's personas. Backgrounded agents let the caller hand back before reports arrived: the #72 acceptance came back incomplete (it16), and two #78 lead runs ended with no review or test result, so a third run re-ran both in the foreground, one at a time (it17). Parallel background runs save little next to a lost run.
+- Keep each log file on one branch line: in it17 the PM committed its product log via the issue branches (reaching main) while `iteration-17` held an older copy, an add/add conflict at close (resolved to main's superset). Merge main into `iteration-N` after each issue merge, or keep the PM log only on the issue branches.
 - Use the full session id in commits, PRs and comments, merge commits included: give reviewer/tester a tagged merge-commit message in their prompts (it14: two merges used git's default message); pass "do not read governance/LOG.md" to every agent and have each confirm (it4, it5).
-- Do not run Chrome-heavy agents' mutant batches as the only evidence of a flake: in it14 one unreproduced f2/f2b failure appeared in a reviewer batch while the tester ran Chrome in parallel; 16 clean runs did not repeat it, nor did it15's parallel reviewer/tester Chrome runs (watch).
 
 ## Tooling
 - `gh pr edit` fails (token lacks read:org): use `gh api -X PATCH repos/dirkmarski/weaver/pulls/N -F body=@file` (issues: `.../issues/N`); merge with `gh api -X PUT .../pulls/N/merge -f merge_method=merge -f sha=<accepted head>`. Retry if GitHub is still computing mergeability (it2, it9).
