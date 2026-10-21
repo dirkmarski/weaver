@@ -58,7 +58,8 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 #status.ok { color: #1a7f37; }
 #status.fail { color: #b3261e; }
 #key { margin: 0.25rem auto 0; max-width: 36rem; font-size: 0.85rem; font-weight: 400; color: #444; }
-#link { margin: 0.25rem auto 0; max-width: 36rem; font-size: 0.85rem; font-weight: 500; color: #4a0f8a; }
+#link { margin: 0.25rem auto 0; min-height: 4lh; max-width: 36rem; font-size: 0.85rem; font-weight: 500; color: #4a0f8a; }
+#buttons { margin-top: 0.5rem; }
 
 #sudoku caption {
   caption-side: top;

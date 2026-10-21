@@ -330,6 +330,16 @@ describe('page (headless Chrome)', () => {
     await tap(2, 2);
     await tap(1, 1); // a given that is no ring
     assert.deepStrictEqual(await state(), [[], [], INVITE]);
+    await page.send('Emulation.setDeviceMetricsOverride', { width: 375, height: 900, deviceScaleFactor: 1, mobile: false });
+    try {
+      const steps = [() => open('tricky', 1), () => click('#hint'), () => click('#hint'), () => tap(2, 2), () => focusAt(pos(3, 7)), () => focusAt(pos(1, 5))];
+      const measure = () => page.eval('[["#sudoku","bottom"],["#link","top"],["#link","bottom"],["#hint","top"]].map(function (p) { return document.querySelector(p[0]).getBoundingClientRect()[p[1]]; })');
+      const rows = []; // [grid bottom, link top, link bottom, button row top] after: no hint, nudge, invitation, R3, forward link, invitation
+      for (const step of steps) rows.push(await step().then(measure));
+      rows.forEach(([g, l, e, b], i) => assert.ok(g < l && e < b && b === rows[0][3], '375 px step ' + i + ' [grid bottom, link top, link bottom, buttons top]: ' + rows[i]));
+    } finally {
+      await page.send('Emulation.clearDeviceMetricsOverride');
+    }
   });
 
   it('f1f. an entered ring is selected by focus (Medium seed 1 played on with singles until a ring is a digit the player entered)', async () => {
