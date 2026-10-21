@@ -8,13 +8,14 @@ Last updated: 2026-10-21, lead session 5094a0cd-ce46-4292-89b5-76375233fea2
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| Scoping it16 | PM launched | PM writes issue(s) + product log | PM |
+| #71 link wording | dev done f4942c8; reviewer + tester running (wt-71-rev, wt-71-test) | lead check, rework if any, PR, PM acceptance | lead |
+| #72 reverse link | gated, not started (after #71 merges) | branch from main after #71 | lead |
 
 ## Open issues / PRs
-- none yet
+- #71, #72 open (weaver-agents, enhancement). Branch issue-71-link-wording pushed.
 
 ## Blockers / waiting on
-- PM scoping
+- reviewer/tester reports for #71
 
 ## Standing notes
 - Ratio 1.575x at start, 31 lines of headroom (cap floor(1.6 x product)).
