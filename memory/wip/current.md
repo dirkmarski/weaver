@@ -8,7 +8,7 @@ Last updated: 2026-10-22, lead run for #83, session 28d2788e-8588-47d1-8000-5904
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #83 square cells + chips inside | review + test (dev 0d613aa) | review, test, PR, PM acceptance | lead |
+| #83 square cells + chips inside | PR + PM acceptance (rework 1 329a97c) | review, test, PR, PM acceptance | lead |
 | #84, #85 | not started | after #83 merges | lead |
 
 ## Starting the next run
