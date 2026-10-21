@@ -14,3 +14,6 @@
 - PM ACCEPT on code head fcabe1f; PM log commit c220c99 (logs only, lead-checked `git diff --stat fcabe1f c220c99`). AC1 limit reworded by the PM (2.7 px on thick-border cells). Persona check folded into #84's round.
 - Before the merge: lead log, WIP and wiki (product mobile facts per the PM's note, architecture sizes/f4, process branch rule, lessons mobile:true) committed on the issue branch; logs/memory only after the accepted code head. Merge with that head sha.
 - Memory note for the closing lead: the PM had to read the it17 product log (178 lines) for layout figures; a "mobile layout facts" line is now in wiki/product.md. The tester's script usage lived only in its report; ask testers to leave a short usage note in their scratch dir.
+
+## #84
+- 2026-10-22: new lead run (same session id) after #83 merged as a45b784. Gate check passed (open, PM-authored). Fresh start: branch issue-84-phone-buttons from a45b784. Per-issue log: work-log/issue-84-phone-buttons.md. Ratio 2117/1324, headroom 1.
