@@ -8,14 +8,14 @@ Last updated: 2026-10-21, lead session 5094a0cd-ce46-4292-89b5-76375233fea2
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #71 link wording | dev done f4942c8; reviewer + tester running (wt-71-rev, wt-71-test) | lead check, rework if any, PR, PM acceptance | lead |
-| #72 reverse link | gated, not started (after #71 merges) | branch from main after #71 | lead |
+| #71 link wording | DONE: merged PR #73 (c8e36fc) | - | - |
+| #72 reverse link | branch issue-72-reverse-link from c8e36fc; developer launched | dev report, then reviewer + tester | lead |
 
 ## Open issues / PRs
 - #71, #72 open (weaver-agents, enhancement). Branch issue-71-link-wording pushed.
 
 ## Blockers / waiting on
-- reviewer/tester reports for #71
+- #72 developer
 
 ## Standing notes
 - Ratio 1.575x at start, 31 lines of headroom (cap floor(1.6 x product)).
