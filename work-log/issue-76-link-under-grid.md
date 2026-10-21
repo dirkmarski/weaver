@@ -10,6 +10,7 @@
 - Constraint from the director: #77 and #78 also touch page test f1e, so the f1e extension must stay clean and legible (no packing).
 
 ## Developer
+- 2026-10-21 (session cb27eb6b): moved `<p id="link">` into `#game`, between the table and the button row (hidden with the game, so no picker gap). Means: `#link { margin: 0.5rem auto 0; min-height: 4lh }`; font size and colour untouched. Reserved four lines, not three, because the R3 sentence (Tricky seed 1, r2c2) measures four lines at 375 px (box 668-732, buttons 748); the invitation is three lines. At 375 px grid bottom 660, link 668-732, buttons top 748 in every state; at 1280 px grid 643, link 651-715, buttons 731. f1e extended (375 px, reset in finally). Mutants (link below key, no min-height, 2lh, 3lh, link above grid) all killed by f1e. Suite 173/173.
 
 ## Reviewer
 
