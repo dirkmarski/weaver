@@ -435,10 +435,9 @@ describe('page (headless Chrome)', () => {
 
   it('f4. at 375 px (phone mode) the cells are square and the corner badges (1, 3, 7, 9) lie inside the cell, flush with their edges; the chip padding is 1px and the struck chip is legible; the viewport is restored', async () => {
     await open('tricky', 5);
-    await page.send('Emulation.setDeviceMetricsOverride', { width: 375, height: 900, deviceScaleFactor: 1, mobile: true });
     try {
       const probe = '(function () {' +
-        'var tds = document.querySelectorAll("#sudoku td"), out = { sq: 0, rows: [] };' +
+        'var tds = document.querySelectorAll("#sudoku td"), g = document.getElementById("sudoku").getBoundingClientRect(), out = { sq: 0, rows: [], grid: [g.left, g.right] };' +
         'tds.forEach(function (t) { var q = t.getBoundingClientRect(); out.sq = Math.max(out.sq, Math.abs(q.width - q.height)); });' +
         '[[tds[0], 1], [tds[2], 3], [tds[6], 7], [tds[8], 9]].forEach(function (p) {' +
         '  var td = p[0], d = p[1];' +
@@ -453,13 +452,17 @@ describe('page (headless Chrome)', () => {
         '});' +
         'return out; })()';
       let r;
-      for (let i = 0; i < 100; i++) { // wait for the new width to lay out
-        r = await page.eval(probe);
-        if (r.sq <= 1) break;
-        await page.eval('document.querySelectorAll("#sudoku td").forEach(function (t) { t.classList.remove("hint-confined"); t.removeAttribute("data-d"); })');
-        await new Promise((x) => setTimeout(x, 20));
+      for (const w of [360, 375]) {
+        await page.send('Emulation.setDeviceMetricsOverride', { width: w, height: 900, deviceScaleFactor: 1, mobile: true });
+        for (let i = 0; i < 100; i++) { // wait for the new width to lay out
+          r = await page.eval(probe);
+          if (r.sq <= 1) break;
+          await page.eval('document.querySelectorAll("#sudoku td").forEach(function (t) { t.classList.remove("hint-confined"); t.removeAttribute("data-d"); })');
+          await new Promise((x) => setTimeout(x, 20));
+        }
+        assert.ok(r.sq <= 1, 'cells not square at ' + w + ' px: ' + r.sq);
       }
-      assert.ok(r.sq <= 1, 'cells not square at 375 px: ' + r.sq);
+      assert.ok(Math.abs(r.grid[0] - 16) <= 1 && Math.abs(r.grid[1] - 359) <= 1, 'grid does not span the page padding at 375 px: ' + r.grid);
       r.rows.forEach((x) => {
         assert.strictEqual(x.pad, '1px 1px', 'badge ' + x.d + ' padding');
         assert.ok(Math.min(x.inL, x.inR, x.inT, x.inB) >= -0.5, 'badge ' + x.d + ' outside the cell: ' + [x.inL, x.inR, x.inT, x.inB]);

@@ -16,6 +16,7 @@ Issue: https://github.com/dirkmarski/weaver/issues/83 (PM, it18 issue 1 of 3). B
 - Measurements (Tricky seed 1, Hint twice): 360 cell 36.44 x 36.44, 375 38.11 x 38.11, 390 39.77 x 39.77, max |w-h| over cells 1.0 (thick borders); #status top 375x812: 642.5 vs main 821.6. 1280x900 screenshot byte-identical to main. Chips D 1-9 x 3 kinds x 6 cells at 360/375/390/559: inside, flush, centred, font 14 px.
 - Ratio: product 1324, tests 2114, cap 2118.
 - Known limit: narrow desktop window with a classic scrollbar below 560 px: 100vw includes the scrollbar, cells about 1.7 px taller than wide.
+- Rework 1 (tests only): f4 loops the square check over 360 and 375 px mobile (pins the `line-height: 0` and input rules at 360), and asserts the #sudoku rect spans 16..359 (+-1) at 375 (pins the `- 32px`). Mutants `-60px`, drop td `line-height: 0`, drop input height rules each fail f4. Suite 173 pass, 0 skipped. Ratio: product 1324, tests 2117, cap 2118.
 
 ## Reviewer
 - Reviewer: Claude Sonnet 5.5 (claude-sonnet-5-5), session `28d2788e-8588-47d1-8000-5904c97e526f`, detached worktree at 3c9a871. Did not read governance/LOG.md.
