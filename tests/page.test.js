@@ -67,7 +67,7 @@ const read = () => page.eval(`(function () {
     tallyShown: !document.getElementById('tally').hidden, level: document.getElementById('level').textContent,
     tally: ['tally-naked', 'tally-hidden', 'tally-pointing'].map(function (id) { return document.getElementById(id).textContent; }),
     notes: document.getElementById('notes').textContent, pressed: document.getElementById('notes').getAttribute('aria-pressed'),
-    clash: at('clash'), target: at('hint-target'), area: at('hint-area'), hatched: at('hint-hatched'), digit: at('hint-digit'), linked: at('hint-linked'), confined: at('hint-confined'), removed: at('hint-removed'),
+    clash: at('clash'), target: at('hint-target'), area: at('hint-area'), hatched: at('hint-hatched'), digit: at('hint-digit'), linked: at('hint-linked'), ruled: at('hint-ruled'), confined: at('hint-confined'), removed: at('hint-removed'),
     dattr: tds.map(function (t, i) { return t.hasAttribute('data-d') ? i : -1; }).filter(function (i) { return i >= 0; }),
     dvals: tds.filter(function (t) { return t.hasAttribute('data-d'); }).map(function (t) { return t.getAttribute('data-d'); }),
     conflict: tds.map(function (t, i) { return t.querySelector('input.conflict') ? i : -1; }).filter(function (i) { return i >= 0; }),
@@ -75,7 +75,9 @@ const read = () => page.eval(`(function () {
     given: tds.map(function (t) { return t.classList.contains('given') ? +t.textContent : 0; }),
     active: a && a.dataset ? a.dataset.pos : null };
 })()`);
-const noHint = (s) => { assert.deepStrictEqual([s.key, s.link], ['', '']); ['linked', 'target', 'area', 'hatched', 'digit', 'confined', 'removed', 'dattr'].forEach((k) => assert.deepStrictEqual(s[k], [], k)); };
+const focusAt = (p) => page.eval('document.querySelector(\'input[data-pos="' + p + '"]\').focus()');
+const noHint = (s) => { assert.deepStrictEqual([s.key, s.link], ['', '']); ['linked', 'ruled', 'target', 'area', 'hatched', 'digit', 'confined', 'removed', 'dattr'].forEach((k) => assert.deepStrictEqual(s[k], [], k)); };
+const INVITE = 'Click or tap a hatched cell to see what rules it out (solid purple), or a ring to see which cells it rules out.';
 const TALLY0 = ['Naked single: 0 on your own, 0 with a hint', 'Hidden single: 0 on your own, 0 with a hint', 'Pointing: 0 on your own, 0 with a hint'];
 
 describe('page (headless Chrome)', () => {
@@ -260,7 +262,6 @@ describe('page (headless Chrome)', () => {
   });
 
   it('f1c. L1 (Medium seed 1): focusing a hatched cell links its rings and names them; the target and a value change undo it; a linked given and entered value are white on purple', async () => {
-    const INVITE = 'Click or tap a hatched cell to see what rules it out (solid purple).';
     const pos = (r, c) => (r - 1) * 9 + c - 1;
     const focus = (r, c) => page.eval('document.querySelector("input[data-pos=\\"' + pos(r, c) + '\\"]").focus()');
     await open('medium', 1);
@@ -297,6 +298,60 @@ describe('page (headless Chrome)', () => {
     const s = await read();
     assert.deepStrictEqual(s.linked, [10, 78]); // row 2, column 2 and row 9, column 7
     assert.strictEqual(s.link, 'Hatched cell row 2, column 7: no 2 here, because the 2 at row 2, column 2 is in the same row, and the 2 at row 9, column 7 is in the same column.');
+  });
+
+  it('f1e. reverse link (Tricky seed 1, R3): click a ring, switch, hatched focus shows the forward link, target ends; outside click ends; re-click keeps', async () => {
+    const pos = (r, c) => (r - 1) * 9 + c - 1;
+    const tap = (r, c) => page.eval('document.querySelectorAll("#sudoku td")[' + pos(r, c) + '].click()');
+    const state = async () => { const s = await read(); return [s.linked, s.ruled, s.link]; };
+    await open('tricky', 1);
+    await click('#hint');
+    await click('#hint');
+    assert.deepStrictEqual(await state(), [[], [], INVITE]); // the Hint click leaves nothing selected
+    await tap(2, 2);
+    assert.deepStrictEqual(await state(), [[pos(2, 2)], [pos(2, 7), pos(2, 8), pos(2, 9)],
+      'The 2 at row 2, column 2 rules 2 out of three hatched cells: row 2, column 7 (same row), row 2, column 8 (same row) and row 2, column 9 (same row).']);
+    await tap(9, 7);
+    assert.deepStrictEqual(await state(), [[pos(9, 7)], [pos(2, 7), pos(3, 7)],
+      'The 2 at row 9, column 7 rules 2 out of two hatched cells: row 2, column 7 (same column) and row 3, column 7 (same column).']);
+    await tap(9, 7); // the selected ring again
+    assert.deepStrictEqual((await state())[0], [pos(9, 7)]);
+    await focusAt(pos(3, 7));
+    assert.deepStrictEqual(await state(), [[pos(9, 7)], [],
+      'Hatched cell row 3, column 7: no 2 here, because the 2 at row 9, column 7 is in the same column.']);
+    await page.eval('document.querySelector(\'input[data-pos="' + pos(3, 7) + '"]\').click()'); // the click that follows the focus
+    assert.deepStrictEqual(await state(), [[pos(9, 7)], [],
+      'Hatched cell row 3, column 7: no 2 here, because the 2 at row 9, column 7 is in the same column.']);
+    await focusAt(pos(1, 5)); // the target
+    assert.deepStrictEqual(await state(), [[], [], INVITE]);
+    await tap(2, 2);
+    await page.eval('document.body.click()'); // outside the grid
+    assert.deepStrictEqual(await state(), [[], [], INVITE]);
+    await tap(2, 2);
+    await tap(1, 1); // a given that is no ring
+    assert.deepStrictEqual(await state(), [[], [], INVITE]);
+  });
+
+  it('f1f. an entered ring is selected by focus (Medium seed 1 played on with singles until a ring is a digit the player entered)', async () => {
+    await open('medium', 1);
+    const grid = game('medium', 1).puzzle.map((row) => row.slice()), sol = game('medium', 1).solution;
+    let s;
+    for (let i = 0; i < 40; i++) {
+      await click('#hint');
+      await click('#hint');
+      s = await read();
+      if (s.hatched.length && s.digit.some((p) => !s.given[p])) break;
+      const step = S.findNakedSingle(grid) || S.findHiddenSingle(grid);
+      grid[step.r][step.c] = sol[step.r][step.c];
+      await keys([[step.r * 9 + step.c, String(sol[step.r][step.c])]]);
+    }
+    const ring = s.digit.find((p) => !s.given[p]);
+    assert.ok(ring !== undefined, 'no entered ring found');
+    await focusAt(ring);
+    s = await read();
+    const d = +(await page.eval('document.querySelector(\'input[data-pos="' + ring + '"]\').value'));
+    assert.deepStrictEqual([s.linked, s.ruled, s.link], [[ring], S.ringRules(ring, s.hatched, d).cells, S.ringRules(ring, s.hatched, d).text]);
+    assert.ok(s.ruled.length >= 1);
   });
 
   it('f2. the key line is gone after Verify; a hidden single is taught (its key line is pinned in f1b), a naked single none and nothing hatched', async () => {

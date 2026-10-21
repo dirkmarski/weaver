@@ -4,7 +4,7 @@ const assert = require('node:assert');
 const {
   isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle,
   preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, solvableBy,
-  seededRng, findPointing, hintMarks, hintKey, ringLink, statusClass, clashCells, fixedMessage
+  seededRng, findPointing, hintMarks, hintKey, ringLink, ringRules, statusClass, clashCells, fixedMessage
 } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
@@ -1192,6 +1192,20 @@ test('ringLink: partners and sentence for one partner, two partners, and a partn
   assert.strictEqual(ringLink(at(3, 1), rings, 5).text, 'Hatched cell row 3, column 1: no 5 here, because the 5 at row 3, column 6 is in the same row.');
   assert.strictEqual(ringLink(at(4, 4), [at(4, 6)], 4).text, 'Hatched cell row 4, column 4: no 4 here, because the 4 at row 4, column 6 is in the same row and box.');
   assert.strictEqual(ringLink(at(4, 8), [at(5, 8)], 8).text, 'Hatched cell row 4, column 8: no 8 here, because the 8 at row 5, column 8 is in the same column and box.');
+});
+
+test('ringRules: one hatched cell, two (one sharing row and box), three (pins R1, R2, R3)', () => {
+  const at = (r, c) => (r - 1) * 9 + c - 1;
+  const r1 = ringRules(at(9, 3), [at(2, 3), at(3, 1)], 5);
+  assert.deepStrictEqual(r1.cells, [at(2, 3)]);
+  assert.strictEqual(r1.text, 'The 5 at row 9, column 3 rules 5 out of one hatched cell: row 2, column 3 (same column).');
+  assert.strictEqual(ringRules(at(4, 6), [at(4, 4), at(6, 4), at(1, 1)], 4).text,
+    'The 4 at row 4, column 6 rules 4 out of two hatched cells: row 4, column 4 (same row and box) and row 6, column 4 (same box).');
+  const r3 = ringRules(at(2, 2), [at(2, 7), at(2, 8), at(2, 9), at(3, 7)], 2);
+  assert.deepStrictEqual(r3.cells, [at(2, 7), at(2, 8), at(2, 9)]);
+  assert.strictEqual(r3.text, 'The 2 at row 2, column 2 rules 2 out of three hatched cells: row 2, column 7 (same row), row 2, column 8 (same row) and row 2, column 9 (same row).');
+  assert.strictEqual(ringRules(at(5, 9), [at(5, 1), at(5, 2), at(5, 3), at(5, 4)], 7).text,
+    'The 7 at row 5, column 9 rules 7 out of four hatched cells: row 5, column 1 (same row), row 5, column 2 (same row), row 5, column 3 (same row) and row 5, column 4 (same row).');
 });
 
 // PM pins (issue 56): P(N) follows Hint on the Tricky puzzle of seed N (entering each digit as a hinted one) to the first pointing step.
