@@ -478,17 +478,29 @@
   // indices, hintMarks' digits) that share a row, column or box with p; text names, for the hint's digit d, each partner and the
   // units (row, column, box, in that order) it shares with p.
   function ringLink(p, ringed, d) {
-    var partners = ringed.filter(function (q) {
-      return CELL_UNITS[q].some(function (u) { return CELL_UNITS[p].indexOf(u) >= 0; });
-    });
+    var partners = ringed.filter(function (q) { return sharedUnits(p, q).length > 0; });
     var parts = partners.map(function (q) {
-      var shared = UNIT_NAMES.filter(function (n, k) { return CELL_UNITS[q][k] === CELL_UNITS[p][k]; });
-      return 'the ' + d + ' at row ' + (Math.floor(q / 9) + 1) + ', column ' + (q % 9 + 1) + ' is in the same ' + shared.join(' and ');
+      return 'the ' + d + ' at ' + cellPlace(q) + ' is in the same ' + sharedUnits(p, q).join(' and ');
     });
-    var cell = 'Hatched cell row ' + (Math.floor(p / 9) + 1) + ', column ' + (p % 9 + 1);
-    var text = cell + ': no ' + d + ' here, because ' + parts.join(', and ') + '.';
+    var text = 'Hatched cell ' + cellPlace(p) + ': no ' + d + ' here, because ' + parts.join(', and ') + '.';
     return { partners: partners, text: text };
   }
+
+  // The reverse of ringLink, for the ring q holding d: { cells, text }. Cells are the hatched cells (`hatched`, ascending flat
+  // indices) that share a row, column or box with q, and text names each with the units it shares (row, column, box).
+  function ringRules(q, hatched, d) {
+    var cells = hatched.filter(function (p) { return sharedUnits(p, q).length > 0; });
+    var items = cells.map(function (p) { return cellPlace(p) + ' (same ' + sharedUnits(p, q).join(' and ') + ')'; });
+    var last = items.length > 1 ? ' and ' + items.pop() : '';
+    var count = items.length + (last ? 1 : 0);
+    var text = 'The ' + d + ' at ' + cellPlace(q) + ' rules ' + d + ' out of ' + ['', 'one', 'two', 'three', 'four'][count]
+      + ' hatched cell' + (count > 1 ? 's' : '') + ': ' + items.join(', ') + last + '.';
+    return { cells: cells, text: text };
+  }
+
+  // "row R, column C" for a flat index; the units (UNIT_NAMES order) that cells p and q share.
+  function cellPlace(p) { return 'row ' + (Math.floor(p / 9) + 1) + ', column ' + (p % 9 + 1); }
+  function sharedUnits(p, q) { return UNIT_NAMES.filter(function (n, k) { return CELL_UNITS[q][k] === CELL_UNITS[p][k]; }); }
 
   // ---- Rewards: recognising naked and hidden singles the learner enters ----
 
@@ -806,10 +818,10 @@
       document.getElementById('definition-pointing').textContent = TECHNIQUE_DEFINITIONS.pointing;
     }
 
-    // Un-links the rings and shows the invitation (or nothing, when no hatched cell is showing).
-    var INVITE = 'Click or tap a hatched cell to see what rules it out (solid purple).';
+    // Un-links the rings and the ruled cells and shows the invitation (or nothing, when no hatched cell is showing).
+    var INVITE = 'Click or tap a hatched cell to see what rules it out (solid purple), or a ring to see which cells it rules out.';
     function unlink() {
-      table.querySelectorAll('.hint-linked').forEach(function (el) { el.classList.remove('hint-linked'); });
+      table.querySelectorAll('.hint-linked, .hint-ruled').forEach(function (el) { el.classList.remove('hint-linked', 'hint-ruled'); });
       linkLine.textContent = hatchedRings ? INVITE : '';
     }
 
@@ -1021,16 +1033,37 @@
 
     function cellAt(q) { return table.rows[Math.floor(q / 9)].cells[q % 9]; }
 
-    // Focus on a hatched cell links its rings; focus anywhere else (or out of the grid) undoes it.
+    // Focus on a hatched cell links its rings; focus on an entered ring selects it (its hatched cells are "ruled");
+    // focus anywhere else (or out of the grid) undoes either.
     table.addEventListener('focusin', function (e) {
       var p = e.target.dataset ? +e.target.dataset.pos : -1;
       unlink();
-      if (!hatchedRings || hatchedRings.hatched.indexOf(p) < 0) return;
+      if (!hatchedRings) return;
+      if (hatchedRings.rings.indexOf(p) >= 0) return selectRing(p);
+      if (hatchedRings.hatched.indexOf(p) < 0) return;
       var link = ringLink(p, hatchedRings.rings, hatchedRings.d);
       link.partners.forEach(function (q) { cellAt(q).classList.add('hint-linked'); });
       linkLine.textContent = link.text;
     });
     table.addEventListener('focusout', unlink);
+
+    function selectRing(q) {
+      var rule = ringRules(q, hatchedRings.hatched, hatchedRings.d);
+      cellAt(q).classList.add('hint-linked');
+      rule.cells.forEach(function (p) { cellAt(p).classList.add('hint-ruled'); });
+      linkLine.textContent = rule.text;
+    }
+
+    // A click selects the ring under it (givens take no focus). It comes after the focusout of the cell that lost focus, so
+    // it is the last word. A click outside the grid, or on a given that is no ring, ends the selection; a click on an
+    // editable cell is left to focusin (unlinking here would undo a hatched cell's link).
+    document.addEventListener('click', function (e) {
+      var td = e.target.closest ? e.target.closest('#sudoku td') : null;
+      var q = td ? td.parentNode.rowIndex * 9 + td.cellIndex : -1;
+      if (!hatchedRings || (td && !td.classList.contains('given'))) return;
+      unlink();
+      if (hatchedRings.rings.indexOf(q) >= 0) selectRing(q);
+    });
 
     // Hint: step 1 unless a hint is already showing, then step 2.
     document.getElementById('hint').addEventListener('click', function () {
@@ -1087,7 +1120,7 @@
     LEVELS: LEVELS, isValidSolution: isValidSolution,
     findConflicts: findConflicts, clashCells: clashCells, fixedMessage: fixedMessage, namedClash: namedClash, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
-    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, hintMarks: hintMarks, hintKey: hintKey, ringLink: ringLink, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
+    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, hintMarks: hintMarks, hintKey: hintKey, ringLink: ringLink, ringRules: ringRules, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
     classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, completionFor: completionFor, tallyLines: tallyLines, statusClass: statusClass,
     TECHNIQUE_DEFINITIONS: TECHNIQUE_DEFINITIONS
   };

@@ -10,6 +10,10 @@
 - Risks flagged by the PM (not prescribed): a click on a given ring may blur the focused cell first (focusout unlink runs before the click); ending the selection on an outside click likely needs a document-level handler; invitation may wrap to 3 lines at 375 px.
 
 ## Developer
+- 2026-10-21: Implemented. `ringRules(q, hatched, d)` pure export (sudoku.js, beside `ringLink`; both share new helpers `cellPlace`, `sharedUnits`). Page: `selectRing`, focusin extension (entered ring), one document click handler (given rings, outside click, non-ring given), `unlink` also clears `hint-ruled`. CSS `td.hint-ruled` inset 3px #4a0f8a. README updated.
+- Ordering: click comes after the focusout/unlink of the previously focused cell, so the click handler is the last word; an editable cell is left to focusin (unlinking in click would undo a hatched cell's link). Hint button click: target focus unlinks, document handler then only unlinks.
+- Contrast of #4a0f8a: blue box 9.61 / 8.45 amber / 5.60 amber+stripe; cream 10.76 / 9.25 / 6.05; plain #f5f5f7 11.17 / 9.49 / 6.19.
+- Tests: ringRules unit (R1, R2, R3), page f1e (R3 flow, invitation, re-click, outside click, given non-ring click), f1f (entered ring by focus). Mutants (no focus select, no unlink in click, editable click unlinks) each fail one test.
 
 ## Reviewer
 
