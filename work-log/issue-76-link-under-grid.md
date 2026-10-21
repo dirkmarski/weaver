@@ -21,6 +21,7 @@
 ## Developer
 - 2026-10-21 (session cb27eb6b): moved `<p id="link">` into `#game`, between the table and the button row (hidden with the game, so no picker gap). Means: `#link { margin: 0.5rem auto 0; min-height: 4lh }`; font size and colour untouched. Reserved four lines, not three, because the R3 sentence (Tricky seed 1, r2c2) measures four lines at 375 px (box 668-732, buttons 748); the invitation is three lines. At 375 px grid bottom 660, link 668-732, buttons top 748 in every state; at 1280 px grid 643, link 651-715, buttons 731. f1e extended (375 px, reset in finally). Mutants (link below key, no min-height, 2lh, 3lh, link above grid) all killed by f1e. Suite 173/173.
 - 2026-10-21 (session cb27eb6b): rework round 1, tests only: f1e 375 px block cut from 18 to 10 added lines (steps list starting with open, one measure eval, one assertion with the numbers); CSS and markup unchanged. Mutants (link below key, no min-height, 3lh, link above grid) still killed by f1e. Suite 173/173.
+- 2026-10-21 (session cb27eb6b): rework round 2 (CSS, PM option B2): `#link` margin-top 0.25rem; new id `buttons` on the button paragraph with `#buttons { margin-top: 0.5rem; }`; min-height 4lh kept. At 375x812 and 360x800 (mobile) the wrapped row now ends at 806 (New puzzle bottom); grid 660, link 664-728, Hint 736, identical in every state. Mutants min-height removed, 3lh, link outside #game, link margin 0 killed by f1e; removing the `#buttons` rule survives (expected). Suite 173/173, ratio 2091/1313.
 
 ## Reviewer
 
