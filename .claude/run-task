@@ -48,6 +48,10 @@ cd "$repo"
 command -v claude >/dev/null || die "claude is not on PATH"
 command -v jq >/dev/null || die "jq is not on PATH"
 [ -f "$settings" ] || die "missing $settings"
+# The session's top agent. The director launches the product manager and one lead per
+# issue (from iteration 17, 21 Oct 2026); until then the lead ran the whole iteration.
+top_agent="director"
+[ -f ".claude/agents/$top_agent.md" ] || die "missing .claude/agents/$top_agent.md"
 [ "$team" != "$repo" ] || die "the team clone cannot be Dirk's clone"
 
 # 1. Definitions must be committed and pushed.
@@ -126,11 +130,11 @@ export MAC_CHROMIUM_TMPDIR="$TMPDIR"
 
 echo "run-task: $label, definitions at $defs, session $WEAVER_SESSION_ID, team clone $team, $(claude --version)"
 
-# 9. Print mode (-p): the session exits by itself once the lead has finished, after
+# 9. Print mode (-p): the session exits by itself once the top agent has finished, after
 #    waiting for its background agents, and the exit writes Claude Code's cost record
-#    (tested 21 Oct 2026, 2.1.304). Nothing shows on screen until the end - the lead's
+#    (tested 21 Oct 2026, 2.1.304). Nothing shows on screen until the end - the top agent's
 #    final summary - so follow the run in the transcript.
-cmd=(claude -p --agent lead --settings "$team/$settings" --permission-mode auto --session-id "$WEAVER_SESSION_ID" "$prompt")
+cmd=(claude -p --agent "$top_agent" --settings "$team/$settings" --permission-mode auto --session-id "$WEAVER_SESSION_ID" "$prompt")
 transcript="$HOME/.claude/projects/$(printf '%s' "$team" | tr '/.' '--')/$WEAVER_SESSION_ID.jsonl"
 if [ "$check_only" = 1 ]; then
   echo "run-task: checks passed - would run in $team: ${cmd[*]}"
