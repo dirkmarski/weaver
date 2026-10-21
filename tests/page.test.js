@@ -23,6 +23,7 @@ let page;
 before(async () => {
   if (found.skip) return;
   page = await launch(found.path);
+  await page.send('Emulation.setFocusEmulationEnabled', { enabled: true }); // headless Chrome fires no focus events otherwise
   await page.send('Page.addScriptToEvaluateOnNewDocument', { source: seedScript() });
 });
 after(() => page && page.close());
@@ -62,11 +63,11 @@ const read = () => page.eval(`(function () {
   var tds = [].slice.call(document.querySelectorAll('#sudoku td')), st = document.getElementById('status');
   function at(c) { return tds.map(function (t, i) { return t.classList.contains(c) ? i : -1; }).filter(function (i) { return i >= 0; }); }
   var a = document.activeElement;
-  return { status: st.textContent, key: document.getElementById('key').textContent, cls: st.className, picker: !document.getElementById('picker').hidden, game: !document.getElementById('game').hidden,
+  return { status: st.textContent, key: document.getElementById('key').textContent, link: document.getElementById('link').textContent, cls: st.className, picker: !document.getElementById('picker').hidden, game: !document.getElementById('game').hidden,
     tallyShown: !document.getElementById('tally').hidden, level: document.getElementById('level').textContent,
     tally: ['tally-naked', 'tally-hidden', 'tally-pointing'].map(function (id) { return document.getElementById(id).textContent; }),
     notes: document.getElementById('notes').textContent, pressed: document.getElementById('notes').getAttribute('aria-pressed'),
-    clash: at('clash'), target: at('hint-target'), area: at('hint-area'), hatched: at('hint-hatched'), digit: at('hint-digit'), confined: at('hint-confined'), removed: at('hint-removed'),
+    clash: at('clash'), target: at('hint-target'), area: at('hint-area'), hatched: at('hint-hatched'), digit: at('hint-digit'), linked: at('hint-linked'), confined: at('hint-confined'), removed: at('hint-removed'),
     dattr: tds.map(function (t, i) { return t.hasAttribute('data-d') ? i : -1; }).filter(function (i) { return i >= 0; }),
     dvals: tds.filter(function (t) { return t.hasAttribute('data-d'); }).map(function (t) { return t.getAttribute('data-d'); }),
     conflict: tds.map(function (t, i) { return t.querySelector('input.conflict') ? i : -1; }).filter(function (i) { return i >= 0; }),
@@ -74,7 +75,7 @@ const read = () => page.eval(`(function () {
     given: tds.map(function (t) { return t.classList.contains('given') ? +t.textContent : 0; }),
     active: a && a.dataset ? a.dataset.pos : null };
 })()`);
-const noHint = (s) => { assert.strictEqual(s.key, ''); ['target', 'area', 'hatched', 'digit', 'confined', 'removed', 'dattr'].forEach((k) => assert.deepStrictEqual(s[k], [], k)); };
+const noHint = (s) => { assert.deepStrictEqual([s.key, s.link], ['', '']); ['linked', 'target', 'area', 'hatched', 'digit', 'confined', 'removed', 'dattr'].forEach((k) => assert.deepStrictEqual(s[k], [], k)); };
 const TALLY0 = ['Naked single: 0 on your own, 0 with a hint', 'Hidden single: 0 on your own, 0 with a hint', 'Pointing: 0 on your own, 0 with a hint'];
 
 describe('page (headless Chrome)', () => {
@@ -247,7 +248,7 @@ describe('page (headless Chrome)', () => {
     assert.deepStrictEqual(s.hatched, all([1, 3], [2, 2], [4, 8], [4, 9]));
     assert.strictEqual(s.key, 'Key: dashed purple = the only places for 8 in the box; struck grey 8 = this step rules 8 out there; hatched = a purple ring rules 8 out there (an 8 already in the same row, column or box).');
     const bg = await page.eval('getComputedStyle(document.querySelectorAll("#sudoku td")[2]).backgroundImage'); // r1c3, hatched
-    assert.ok(bg.includes('repeating-linear-gradient(135deg, rgba(106, 31, 181, 0.3)') && bg.includes('linear-gradient(rgba(255, 179, 0, 0.3), rgba(255, 179, 0, 0.3))'), bg);
+    assert.ok(bg.includes('repeating-linear-gradient(135deg, rgba(106, 31, 181, 0.25)') && bg.includes('linear-gradient(rgba(255, 179, 0, 0.3), rgba(255, 179, 0, 0.3))'), bg);
     await open('medium', 4);
     await click('#hint');
     await click('#hint');
@@ -256,6 +257,46 @@ describe('page (headless Chrome)', () => {
     assert.strictEqual(s.key, 'Key: hatched = a purple ring rules 4 out there (a 4 already in the same row, column or box).');
     await keys([[all([2, 8])[0], '1']]); // a value: removes the hatching and the key line
     noHint(await read());
+  });
+
+  it('f1c. L1 (Medium seed 1): focusing a hatched cell links its rings and names them; the target and a value change undo it; a linked given and entered value are white on purple', async () => {
+    const INVITE = 'Click or tap a hatched cell to see what rules it out (solid purple).';
+    const pos = (r, c) => (r - 1) * 9 + c - 1;
+    const focus = (r, c) => page.eval('document.querySelector("input[data-pos=\\"' + pos(r, c) + '\\"]").focus()');
+    await open('medium', 1);
+    await click('#hint');
+    assert.strictEqual((await read()).link, ''); // the nudge
+    await click('#hint');
+    let s = await read();
+    assert.deepStrictEqual([s.link, s.linked], [INVITE, []]);
+    await focus(2, 3);
+    s = await read();
+    assert.deepStrictEqual(s.linked, [pos(2, 8), pos(9, 3)]);
+    assert.strictEqual(s.link, 'Row 2, column 3 cannot be 5: the 5 at row 2, column 8 is in the same row, and the 5 at row 9, column 3 is in the same column.');
+    const look = await page.eval('(function () { var td = document.querySelectorAll("#sudoku td")[' + pos(2, 8) + ']; var cs = getComputedStyle(td);' +
+      ' var e = document.querySelectorAll("#sudoku td")[' + pos(1, 2) + '], i = e.querySelector("input"); e.classList.add("hint-linked");' +
+      ' return [td.classList.contains("given"), cs.backgroundColor, cs.color, getComputedStyle(i).color]; })()');
+    assert.deepStrictEqual(look, [true, 'rgb(106, 31, 181)', 'rgb(255, 255, 255)', 'rgb(255, 255, 255)']);
+    await focus(1, 2); // the target
+    s = await read();
+    assert.deepStrictEqual([s.link, s.linked], [INVITE, []]);
+    await focus(2, 3);
+    await page.eval('document.activeElement.blur()'); // focus leaves the grid
+    s = await read();
+    assert.deepStrictEqual([s.link, s.linked], [INVITE, []]);
+    await focus(2, 3);
+    await keys([[pos(1, 2), '5']]);
+    noHint(await read());
+  });
+
+  it('f1d. pointing, naked form (Tricky seed 1): the link names the pointing digit 2, not the hinted digit 7', async () => {
+    await open('tricky', 1);
+    await click('#hint');
+    await click('#hint');
+    await page.eval('document.querySelector("input[data-pos=\\"15\\"]").focus()'); // row 2, column 7
+    const s = await read();
+    assert.deepStrictEqual(s.linked, [10, 78]); // row 2, column 2 and row 9, column 7
+    assert.strictEqual(s.link, 'Row 2, column 7 cannot be 2: the 2 at row 2, column 2 is in the same row, and the 2 at row 9, column 7 is in the same column.');
   });
 
   it('f2. the key line is gone after Verify; a hidden single is taught (its key line is pinned in f1b), a naked single none and nothing hatched', async () => {

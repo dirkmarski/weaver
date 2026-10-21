@@ -58,6 +58,7 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 #status.ok { color: #1a7f37; }
 #status.fail { color: #b3261e; }
 #key { margin: 0.25rem auto 0; max-width: 36rem; font-size: 0.85rem; font-weight: 400; color: #444; }
+#link { margin: 0.25rem auto 0; max-width: 36rem; font-size: 0.85rem; font-weight: 500; color: #4a0f8a; }
 
 #sudoku caption {
   caption-side: top;
@@ -86,14 +87,17 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 
 /* Hint: tint over a naked single's row, column and box (a hidden single: its unit only; a pointing hidden form adds the unit of the single); the target is amber with a ring that stays visible under the focus outline. */
 #sudoku td.hint-area { background-image: linear-gradient(rgba(255, 179, 0, 0.3), rgba(255, 179, 0, 0.3)); }
-/* Second click: the empty cells the purple rings rule the digit out of get purple stripes (135deg, #6a1fb5 at 0.3, 1.5px every 8px) on top of the amber tint, so both layers are listed; notes and the input paint above the td background. */
-#sudoku td.hint-hatched { background-image: repeating-linear-gradient(135deg, rgba(106, 31, 181, 0.3) 0 1.5px, transparent 1.5px 8px), linear-gradient(rgba(255, 179, 0, 0.3), rgba(255, 179, 0, 0.3)); }
+/* Second click: the empty cells the purple rings rule the digit out of get purple stripes (135deg, #6a1fb5 at 0.25, 1.5px every 8px) on top of the amber tint, so both layers are listed; notes and the input paint above the td background. */
+#sudoku td.hint-hatched { background-image: repeating-linear-gradient(135deg, rgba(106, 31, 181, 0.25) 0 1.5px, transparent 1.5px 8px), linear-gradient(rgba(255, 179, 0, 0.3), rgba(255, 179, 0, 0.3)); }
 #sudoku td.hint-target { background: #ffc83d; box-shadow: inset 0 0 0 6px #e08a00; }
 #sudoku td.hint-target .notes { color: #444; }
 #sudoku td.hint-target input:focus { background: transparent; }
 /* Second-click explanation: the cells holding the digit that rule out an empty cell of the unit (hidden single) or of the box or unit (pointing) get a purple ring and a bold purple digit (apart from amber, blue focus and red conflict). */
 #sudoku td.hint-digit { box-shadow: inset 0 0 0 4px #6a1fb5; color: #4a0f8a; font-weight: 800; }
 #sudoku td.hint-digit input { color: #4a0f8a; font-weight: 800; }
+/* Linked: while a hatched cell has focus its ring(s) turn solid purple with a white digit (8.48:1) and a darker inner ring. */
+#sudoku td.hint-linked { background: #6a1fb5; box-shadow: inset 0 0 0 4px #4a0f8a; color: #fff; }
+#sudoku td.hint-linked input { color: #fff; }
 
 /* Techniques tally below the status line. */
 #tally h2 { margin: 1rem 0 0.5rem; font-size: 1.1rem; }
