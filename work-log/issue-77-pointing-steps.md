@@ -11,6 +11,9 @@
 
 ## Developer
 
+- 2026-10-21: `pointingHint` step 2 rebuilt (conclusion + 3 steps joined with "\n"; BOXNOTE at end of step 1); `#status.steps` (pre-line, left, 36rem) set only for pointing explain; README sentence rewritten. Product 1313 -> 1315 lines, tests 2091 -> 2101 (cap 2104); 173/173 pass, 0 skipped.
+- 2026-10-21: Mutants all caught: (a) class never set (1 fail), (b) class for pointing nudge too (1 fail), (c) BOXNOTE after step 2 (2 fails), (d) "\n" -> " " (5 fails). Naked target lies in L outside the box by construction (findPointing: naked needs target in `removed`).
+
 ## Reviewer
 
 ## Tester
