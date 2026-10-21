@@ -7,3 +7,16 @@ Issue: https://github.com/dirkmarski/weaver/issues/84 (PM, it18 issue 2 of 3). B
 - Gate: issue open, authored by weaver-agents (PM). PM comment: top alignment below 560 px done in #83 (Q1); #84 does 560 px and wider (AC4 1280x1200 C1 case), AC4 still checked in full.
 - Baseline: product 1324, tests 2117, cap floor(1.6 x 1324) = 2118, headroom 1. #84 pays for its own test lines (1.6 per product line); removals listed and confirmed by reviewer and tester, no line packing.
 - Plan: developer (markup move, CSS, README, extend the existing 375 px page flow f1e) -> reviewer and tester (own detached worktrees, foreground, one at a time) -> lead spot checks -> PR -> PM acceptance incl. persona round (also on #83 chips) -> merge commit with the accepted sha.
+
+## Developer
+- Developer: Claude Sonnet 5.5 (claude-sonnet-5-5), session `28d2788e-8588-47d1-8000-5904c97e526f`.
+- New puzzle: moved into `<p id="level">` after a child `<span id="level-text">`; `choose` sets only the span (`levelLabel` now points at it), so the button survives every level choice. #level is a flex line (centred, gap 0.75rem, no wrap); button font 0.9rem, min-height 1.8rem.
+- Play buttons: `#buttons` flex, centred, gap 0.75rem (12 px); padding 0.4rem 1rem, min-height 2.15rem (>= 34 px).
+- Top alignment: `body { align-items: flex-start }` in the base rule; the #83 media-query copy removed.
+- README: one sentence in How to play (New puzzle next to the level; Verify, Hint, Notes below the grid).
+- Tests: f1e 375 px flow extended (New puzzle then second level, level text, New puzzle after the text/on the line/above the grid/>= 28 px, one top and gaps >= 8 for Verify/Hint/Notes, each >= 34 px). `read()` level now reads #level-text.
+- Removed (redundant, same `length !== 9` branch / setup check): `isValidSolution([])`, the 'rejects an extra 10th row' test, the `new Set(g[0]).size` line in 'rejects duplicate in a row'.
+- Ratio: product 1324 -> 1324 (index 42, style 144, sudoku.js 1138 unchanged counts); tests 2117 -> 2117; cap 2118.
+- Suite: 172 pass, 0 fail, 0 skipped.
+- Tricky seed 1, Hint twice: 375x812 status 618.6-807.6, grid bottom 491.8, button row top 567.8; 360x740 status 603.5-792.5, grid bottom 476.7, row top 552.7 (steps 1 and 2 end at 709). 1280x1200 row top 729.8 in all four states (no hint, nudge, explanation, Verify).
+- Known limits: seed 8 not measured; AC7 at 360x740 shows conclusion and steps 1-2 only (step 3 below the fold, as allowed).
