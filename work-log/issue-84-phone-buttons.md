@@ -21,3 +21,8 @@ Issue: https://github.com/dirkmarski/weaver/issues/84 (PM, it18 issue 2 of 3). B
 - Suite: 172 pass, 0 fail, 0 skipped.
 - Tricky seed 1, Hint twice: 375x812 status 618.6-807.6, grid bottom 491.8, button row top 567.8; 360x740 status 603.5-792.5, grid bottom 476.7, row top 552.7 (steps 1 and 2 end at 709). 1280x1200 row top 729.8 in all four states (no hint, nudge, explanation, Verify).
 - Known limits: seed 8 not measured; AC7 at 360x740 shows conclusion and steps 1-2 only (step 3 below the fold, as allowed).
+
+## Lead review of the developer round
+- Developer f6dfaed (product + README), e429342 (f1e extended), 7cce946 (3 unit-test removals), 6e0b790 (log). Product line counts unchanged (1324): markup move, CSS rule edits, `levelLabel` -> `#level-text`.
+- Lead R1: removal 2 ('rejects an extra 10th row') was not redundant: `g[3].slice(1)` and `[]` both fail at the row check; mutant dropping the outer `grid.length !== 9` passed 152/152 unit tests. Rework 1 (2197782): one guard line in 'rejects wrong shape'; mutant now fails. Tests 2118 = cap (headroom 0). Developer's log ratio line still says 2117: the correct figure is 2118.
+- Remaining removals for reviewer/tester confirmation: `isValidSolution([])` (covered by the row check path, same result) and `new Set(g[0]).size` (fixture sanity check). New f1e line is 297 chars; page.test.js on main already has lines to 320 (8 over 200): reviewer to judge packing.
