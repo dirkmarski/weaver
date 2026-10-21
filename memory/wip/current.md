@@ -9,13 +9,13 @@ Last updated: 2026-10-21, lead session 5094a0cd-ce46-4292-89b5-76375233fea2
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
 | #71 link wording | DONE: merged PR #73 (c8e36fc) | - | - |
-| #72 reverse link | dev done 3891a97; reviewer + tester running (wt-72-rev, wt-72-test) | lead check, rework if any, PR, PM acceptance | lead |
+| #72 reverse link | PR #74 open at 1b07706 (gates passed, rework 1 done) | PM acceptance, then merge at accepted sha | PM / lead | lead |
 
 ## Open issues / PRs
 - #71, #72 open (weaver-agents, enhancement). Branch issue-71-link-wording pushed.
 
 ## Blockers / waiting on
-- #72 reviewer/tester reports
+- PM acceptance of #72 (PR #74)
 
 ## Standing notes
 - Ratio 1.575x at start, 31 lines of headroom (cap floor(1.6 x product)).
