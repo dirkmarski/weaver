@@ -20,3 +20,6 @@
 - 2026-10-21: 9 mutants: killed class never set, class on hidden explain only, "\n" -> " ", step 2 "not in" clause dropped, pre-line removed, text-align removed. Survived: class on all explain texts (page test checks only the nudge as non-pointing, as AC8 allows), max-width/margins removed (not pinned), clear-path className reset removed (no visible effect, each write sets className). Approved with notes.
 
 ## Tester
+
+- 2026-10-21: Tester run on ce2a2f3 (real CDP mouse/touch/key input, scripts in scratchpad/test: replay.js, follow.js, layout.js, diff.js, diff2.js). E1/E2 read from the page equal the AC text; 12 Tricky follow-the-hint states (7 naked, 5 hidden, 1 hidden with BOXNOTE) equal an independent regex oracle built from main's text. Replay main e1dd667 vs branch on 48 puzzles x 16 steps (768 statuses): 0 differences except the 11 pointing explanations (class steps, pre-line, left); marks, rings, key, link, tally identical; 3rd/4th Hint same text.
+- 2026-10-21: Layout at 375 mobile, 375 desktop, 1280: four lines each start a new line, left-aligned, no horizontal scroll, no overlap with key or link; class removed on digit entry, Verify, New puzzle, level switch. Suite 173/173, skipped 0. Not reached on the page: naked form with BOXNOTE (unit pin only), "Well spotted!" text.
