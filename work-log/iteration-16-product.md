@@ -133,3 +133,10 @@ Watch: ratio 1.575x, 31 lines of headroom at 8b6cbc7. Not wanted (unchanged): in
   - pointing badges too small on a phone (3/3), part of F2 / mobile;
   - the invitation line goes away after a cell is focused (user-b), so remind users that other hatched cells can be tapped;
   - (user-c) solid purple rings show before the key mentions them; watch only.
+
+## Acceptance #72 (PR #74, head 1b07706) - in progress
+- Worktree at 1b07706 (detached, scratchpad pm-72-acc). Read: issue #72, PR #74 body and diff (vs origin/main). No work-log read beyond this log. Product strategy unchanged.
+- Suite: `node --test tests/*.test.js` 173/173, skipped 0.
+- Page, headless Chrome, page seeding, real CDP input (mouse at 1280 px and touch at 375 px, both runs 0 failures): R1, R2, R3 (select, switch, re-click keeps, real click on r3c7 shows the forward link and clears ruled, target ends), R4 exact; outside click, non-ring given, other empty cell end the selection; Verify, a new Hint and a value change clear; a nudge (one Hint) click on a given does nothing. Play-through Tricky 1: 7 into r1c5 gives "Well done! You applied pointing: row 1, column 5 is 7.", pointing tally 1 with a hint.
+- R5 (follow Hint on Medium 1, 5th hint pair, r1c8 holds the entered 2): click, ArrowLeft from r1c9, Tab from r1c6 and programmatic focus all select it; ruled r1c5, r1c6 (equals the #68 partner oracle); line "The 2 at row 1, column 8 rules 2 out of two hatched cells: row 1, column 5 (same row) and row 1, column 6 (same row)." Checked by hand against the grid.
+- AC 9 at 375 px (touch): grid 96-660, buttons to 746, status 762-909, key 926-990, link 994-1042; no overlap, no horizontal scroll; viewport 812, so the link line is below the fold (as #68). Ruled border visible on a hatched cell with notes 2/5/7 (notes readable, clear of the band) and without. Border contrast computed 5.74:1 minimum (worst: stripe over tint over grey box).
