@@ -9,6 +9,7 @@
 - Supervision: fixed evidence reports per agent; lead spot-checks (diff stat vs claimed files, removed-assertion list vs test diff, suite run, re-run of named mutants, AC map vs issue).
 
 ## Developer
+- Changed two text lines in sudoku.js (ringLink lead-in; naked-form pointing sentence) and README (link example, naked-form sentence); edited 9 existing pins in place (3 page, 6 unit). No new tests, no assertions removed. Suite 170/170, skipped 0. Ratio 2012/1277 unchanged.
 
 ## Reviewer
 
