@@ -474,6 +474,20 @@
       + (hatchedCount ? '; ' + hatch : '') + '.';
   }
 
+  // The link for a hatched cell p (flat index): { partners, text }. Partners are the ringed cells (`ringed`, ascending flat
+  // indices, hintMarks' digits) that share a row, column or box with p; text names, for the hint's digit d, each partner and the
+  // units (row, column, box, in that order) it shares with p.
+  function ringLink(p, ringed, d) {
+    var partners = ringed.filter(function (q) {
+      return q !== p && CELL_UNITS[q].some(function (u) { return CELL_UNITS[p].indexOf(u) >= 0; });
+    });
+    var parts = partners.map(function (q) {
+      var shared = UNIT_NAMES.filter(function (n, k) { return CELL_UNITS[q][k] === CELL_UNITS[p][k]; });
+      return 'the ' + d + ' at row ' + (Math.floor(q / 9) + 1) + ', column ' + (q % 9 + 1) + ' is in the same ' + shared.join(' and ');
+    });
+    return { partners: partners, text: 'Row ' + (Math.floor(p / 9) + 1) + ', column ' + (p % 9 + 1) + ' cannot be ' + d + ': ' + parts.join(', and ') + '.' };
+  }
+
   // ---- Rewards: recognising naked and hidden singles the learner enters ----
 
   // Which technique makes `digit` in the empty cell (r, c) of `grid` (the grid
@@ -762,6 +776,7 @@
     var table = document.getElementById('sudoku');
     var status = document.getElementById('status');
     var keyLine = document.getElementById('key');
+    var linkLine = document.getElementById('link');
     var button = document.getElementById('verify');
     var picker = document.getElementById('picker');
     var game = document.getElementById('game');
@@ -772,6 +787,7 @@
     var lastCell = null; // cell input that last had focus
     var notesButton = document.getElementById('notes');
     var hint = null;     // hint showing now (result of hintFor), or null
+    var hatchedRings = null; // { hatched, rings, d } of the explanation showing when it has hatched cells, else null
     var tally = emptyTally(); // techniques applied in this puzzle
     var currentLevel = null; // level chosen for the current puzzle
     var credited = {};   // cells already credited in this puzzle
@@ -788,9 +804,18 @@
       document.getElementById('definition-pointing').textContent = TECHNIQUE_DEFINITIONS.pointing;
     }
 
+    // Un-links the rings and shows the invitation (or nothing, when no hatched cell is showing).
+    var INVITE = 'Click or tap a hatched cell to see what rules it out (solid purple).';
+    function unlink() {
+      table.querySelectorAll('.hint-linked').forEach(function (el) { el.classList.remove('hint-linked'); });
+      linkLine.textContent = hatchedRings ? INVITE : '';
+    }
+
     // Clears the status line, the Verify flags and any showing hint.
     function clearResults() {
       hint = null;
+      hatchedRings = null;
+      unlink();
       keyLine.textContent = '';
       status.textContent = '';
       status.className = '';
@@ -992,6 +1017,17 @@
       }));
     }
 
+    // Focus on a hatched cell links its rings; focus anywhere else (or out of the grid) undoes it.
+    table.addEventListener('focusin', function (e) {
+      var p = e.target.dataset ? +e.target.dataset.pos : -1;
+      unlink();
+      if (!hatchedRings || hatchedRings.hatched.indexOf(p) < 0) return;
+      var link = ringLink(p, hatchedRings.rings, hatchedRings.d);
+      link.partners.forEach(function (q) { table.rows[Math.floor(q / 9)].cells[q % 9].classList.add('hint-linked'); });
+      linkLine.textContent = link.text;
+    });
+    table.addEventListener('focusout', function (e) { if (!table.contains(e.relatedTarget)) unlink(); });
+
     // Hint: step 1 unless a hint is already showing, then step 2.
     document.getElementById('hint').addEventListener('click', function () {
       var res = hintFor(currentGrid(), hint ? 2 : 1, preferredTechnique(tally, currentLevel), currentLevel);
@@ -1010,6 +1046,10 @@
         m[1].forEach(function (q) { cellAt(q).classList.add('hint-' + m[0]); cellAt(q).setAttribute('data-d', res.pointDigit); });
       });
       if (res.kind === 'explain' && res.technique !== 'naked') keyLine.textContent = hintKey(res, marks.hatched.length);
+      if (marks.hatched.length) {
+        hatchedRings = { hatched: marks.hatched, rings: marks.digits, d: res.technique === 'pointing' ? res.pointDigit : res.digit };
+        unlink();
+      }
       inputs[res.r][res.c].focus();
     });
 
@@ -1041,7 +1081,7 @@
     LEVELS: LEVELS, isValidSolution: isValidSolution,
     findConflicts: findConflicts, clashCells: clashCells, fixedMessage: fixedMessage, namedClash: namedClash, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
-    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, hintMarks: hintMarks, hintKey: hintKey, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
+    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, hintMarks: hintMarks, hintKey: hintKey, ringLink: ringLink, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
     classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, completionFor: completionFor, tallyLines: tallyLines, statusClass: statusClass,
     TECHNIQUE_DEFINITIONS: TECHNIQUE_DEFINITIONS
   };

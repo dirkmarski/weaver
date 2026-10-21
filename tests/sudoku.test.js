@@ -4,7 +4,7 @@ const assert = require('node:assert');
 const {
   isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle,
   preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, solvableBy,
-  seededRng, findPointing, hintMarks, hintKey, statusClass, clashCells, fixedMessage
+  seededRng, findPointing, hintMarks, hintKey, ringLink, statusClass, clashCells, fixedMessage
 } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
@@ -1182,6 +1182,16 @@ test('hintKey: the exact key line for pointing with and without hatched cells, f
   assert.strictEqual(point(2, 4), head(2) + '; hatched = a purple ring rules 2 out there (a 2 already in the same row, column or box).');
   assert.strictEqual(point(9, 0), head(9) + '.');
   assert.strictEqual(hintKey({ technique: 'hidden', digit: 8 }, 1), 'Key: hatched = a purple ring rules 8 out there (an 8 already in the same row, column or box).');
+});
+
+test('ringLink: partners and sentence for one partner, two partners, and a partner sharing two units (pins L1, L2, L3)', () => {
+  const at = (r, c) => (r - 1) * 9 + c - 1; // 1-based row and column to a flat index
+  const rings = [at(2, 8), at(3, 6), at(9, 3)]; // L1: D = 5
+  assert.deepStrictEqual(ringLink(at(2, 3), rings, 5).partners, [at(2, 8), at(9, 3)]);
+  assert.strictEqual(ringLink(at(2, 3), rings, 5).text, 'Row 2, column 3 cannot be 5: the 5 at row 2, column 8 is in the same row, and the 5 at row 9, column 3 is in the same column.');
+  assert.strictEqual(ringLink(at(3, 1), rings, 5).text, 'Row 3, column 1 cannot be 5: the 5 at row 3, column 6 is in the same row.');
+  assert.strictEqual(ringLink(at(4, 4), [at(4, 6)], 4).text, 'Row 4, column 4 cannot be 4: the 4 at row 4, column 6 is in the same row and box.');
+  assert.strictEqual(ringLink(at(4, 8), [at(5, 8)], 8).text, 'Row 4, column 8 cannot be 8: the 8 at row 5, column 8 is in the same column and box.');
 });
 
 // PM pins (issue 56): P(N) follows Hint on the Tricky puzzle of seed N (entering each digit as a hinted one) to the first pointing step.
