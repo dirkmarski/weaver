@@ -138,6 +138,19 @@ if [ "$check_only" = 1 ]; then
   exit 0
 fi
 echo "run-task: running in print mode, exits when done; transcript $transcript"
+
+# 10. Remove the session's temp folder when the run ends, however it ends. Chrome
+#     leaves its profile and socket folders behind (about 155 items, 14 MB in
+#     iteration 14). The pattern check keeps the delete inside /tmp/wvr/tmp-*.
+cleanup() {
+  case "$TMPDIR" in
+    /tmp/wvr/tmp-?*) rm -rf "$TMPDIR" ;;
+    *) echo "run-task: not removing unexpected temp folder '$TMPDIR'" >&2 ;;
+  esac
+}
 mkdir -p "$TMPDIR"
+trap cleanup EXIT
 cd "$team"
-exec "${cmd[@]}" < /dev/null
+status=0
+"${cmd[@]}" < /dev/null || status=$?
+exit "$status"
