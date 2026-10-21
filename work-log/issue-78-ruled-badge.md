@@ -10,6 +10,7 @@
 - Supervision: fixed evidence report per agent; lead spot checks (diff stat vs claim, '-' test lines vs claimed removals, suite, named mutants re-run, screenshot look at 375 and 1280).
 
 ## Developer
+- 2026-10-21: Implemented. style.css: ruled joins the shared badge rules plus one purple colour/band rule, inset box-shadow removed; sudoku.js: selectRing sets data-d, unlink removes it from ruled cells only; README ring-selection sentence (it appears twice, in the pointing and hidden-single bullets; both updated); f1e extended in place. Product 1319, tests 2110, cap 2110. Suite 173 pass, 0 skipped. Mutants (data-d kept, data-d removed from all, selector dropped, wrong colour, no setAttribute) all killed.
 
 ## Reviewer
 

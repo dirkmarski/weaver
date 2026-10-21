@@ -822,6 +822,7 @@
     // Un-links the rings and the ruled cells and shows the invitation (or nothing, when no hatched cell is showing).
     var INVITE = 'Click or tap a hatched cell to see what rules it out (solid purple), or a ring to see which cells it rules out.';
     function unlink() {
+      table.querySelectorAll('.hint-ruled').forEach(function (el) { el.removeAttribute('data-d'); });
       table.querySelectorAll('.hint-linked, .hint-ruled').forEach(function (el) { el.classList.remove('hint-linked', 'hint-ruled'); });
       linkLine.textContent = hatchedRings ? INVITE : '';
     }
@@ -1051,7 +1052,10 @@
     function selectRing(q) {
       var rule = ringRules(q, hatchedRings.hatched, hatchedRings.d);
       cellAt(q).classList.add('hint-linked');
-      rule.cells.forEach(function (p) { cellAt(p).classList.add('hint-ruled'); });
+      rule.cells.forEach(function (p) {
+        cellAt(p).classList.add('hint-ruled');
+        cellAt(p).setAttribute('data-d', hatchedRings.d);
+      });
       linkLine.textContent = rule.text;
     }
 
