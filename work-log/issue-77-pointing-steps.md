@@ -14,6 +14,8 @@
 - Rework round 1 (README only, tester finding): "under the grid" -> "below the buttons" (#status follows the button row), d96745b. Lead delta check instead of a reviewer delta re-review (deviation: a two-word README change; word diff shows only those two words, suite 173/173 skipped 0).
 - Lead spot checks: viewed E1_m375_full.png (conclusion and three steps each on a new line, left-aligned, key line below, no overlap); re-ran mutant "class never set": killed by f1, restored.
 - Tester observations for the PM: a step can wrap leaving a short tail ("3." alone at 1280/desktop 375 in E2 step 1); the block is 7-9 lines tall on a phone. Naked form with BOXNOTE is not reachable on the tested Tricky seeds (unit pin p4 only).
+- PM ACCEPT at 74d9695 (https://github.com/dirkmarski/weaver/pull/80#issuecomment-6312100381; verified on GitHub). Personas: follow naked 4/4/4, hidden 4/4/4; phone readability naked 3/3/3, hidden 4/4/4; steps checkable 4/4/4; main complaint (3/3) board and explanation not visible together on a phone (backlog, proposed top for it18).
+- The PM log commit 8106c8e added work-log/iteration-17-product.md (eed4848 version plus the #77 section) to this branch. Moving it to the iteration-17 branch was declined (that branch is left to the closing lead). Merged with it instead; the commits after 74d9695 touch only work-log files. For the closing lead: merging iteration-17 into main gives an add/add conflict on iteration-17-product.md; take main's version (superset of eed4848) plus any later iteration-17 edits.
 
 ## Developer
 
