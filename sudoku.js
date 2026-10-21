@@ -339,10 +339,11 @@
     if (step === 2 && empties.length === s.confined.length) box += ' (the box has no other empty cells)';
     var text;
     if (step === 2) {
-      text = 'Pointing: in ' + box + ', so ' + d + ' cannot go in ' + line + ' outside that box. ';
+      var rc = 'row ' + (s.r + 1) + ', column ' + (s.c + 1);
+      text = 'Pointing: ' + rc + ' must be ' + s.digit + '.\n1. In ' + box + '.\n';
       text += s.form === 'naked'
-        ? 'Row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' has every digit except ' + d + ' and ' + s.digit + ' in its row, column and box, so it could only take ' + d + ' or ' + s.digit + '. With ' + d + ' now ruled out there, it must be ' + s.digit + '.'
-        : 'That leaves row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' as the only cell in its ' + s.unit + ' where ' + d + ' fits, so it must be ' + d + '.';
+        ? '2. So ' + d + ' cannot go in ' + line + ' outside that box: not in ' + rc + '.\n3. Row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' has every digit except ' + d + ' and ' + s.digit + ' in its row, column and box, so it could only take ' + d + ' or ' + s.digit + '. With ' + d + ' ruled out, it must be ' + s.digit + '.'
+        : '2. So ' + d + ' cannot go in ' + line + ' outside that box.\n3. That leaves ' + rc + ' as the only cell in its ' + s.unit + ' where ' + d + ' fits, so it must be ' + d + '.';
     } else {
       var tail;
       if (s.form === 'naked') {
@@ -1070,7 +1071,7 @@
       var res = hintFor(currentGrid(), hint ? 2 : 1, preferredTechnique(tally, currentLevel), currentLevel);
       clearResults();
       status.textContent = res.text;
-      status.className = '';
+      status.className = res.technique === 'pointing' && res.kind === 'explain' ? 'steps' : '';
       if (res.kind !== 'nudge' && res.kind !== 'explain') return;
       hint = res;
       var marks = hintMarks(res, currentGrid());
