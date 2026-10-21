@@ -127,6 +127,13 @@ export WEAVER_SESSION_ID
 export CLAUDE_CODE_TMPDIR="/tmp/wvr"
 export TMPDIR="$CLAUDE_CODE_TMPDIR/tmp-${WEAVER_SESSION_ID:0:8}"
 export MAC_CHROMIUM_TMPDIR="$TMPDIR"
+#    The shared scratchpad, named for the definitions. They say "the scratchpad" but no
+#    place; in iteration 17 the product manager made scratchpad/ in the team clone,
+#    which blocked the next launch. This is Claude Code's own session scratchpad, the
+#    path every agent's environment already gives, main and subagents alike (tested 22
+#    Oct 2026, 2.1.305) - so one folder under one name. It sits outside TMPDIR, so a
+#    temp clean-up cannot empty it, and outlives the run until a restart clears /tmp.
+export WEAVER_SCRATCHPAD="$CLAUDE_CODE_TMPDIR/claude-$(id -u)/$(printf '%s' "$team" | tr '/.' '--')/$WEAVER_SESSION_ID/scratchpad"
 
 echo "run-task: $label, definitions at $defs, session $WEAVER_SESSION_ID, team clone $team, $(claude --version)"
 
@@ -138,10 +145,10 @@ cmd=(claude -p --agent "$top_agent" --settings "$team/$settings" --permission-mo
 transcript="$HOME/.claude/projects/$(printf '%s' "$team" | tr '/.' '--')/$WEAVER_SESSION_ID.jsonl"
 if [ "$check_only" = 1 ]; then
   echo "run-task: checks passed - would run in $team: ${cmd[*]}"
-  echo "run-task: transcript would be $transcript, temp $TMPDIR"
+  echo "run-task: transcript would be $transcript, temp $TMPDIR, scratchpad $WEAVER_SCRATCHPAD"
   exit 0
 fi
-echo "run-task: running in print mode, exits when done; transcript $transcript"
+echo "run-task: running in print mode, exits when done; transcript $transcript, scratchpad $WEAVER_SCRATCHPAD"
 
 # 10. Remove the session's temp folder when the run ends, however it ends. Chrome
 #     leaves its profile and socket folders behind (about 155 items, 14 MB in
@@ -152,7 +159,7 @@ cleanup() {
     *) echo "run-task: not removing unexpected temp folder '$TMPDIR'" >&2 ;;
   esac
 }
-mkdir -p "$TMPDIR"
+mkdir -p "$TMPDIR" "$WEAVER_SCRATCHPAD"
 trap cleanup EXIT
 cd "$team"
 status=0

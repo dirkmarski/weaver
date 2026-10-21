@@ -19,4 +19,4 @@ Working rules:
  
 Other information:
  - Issues are tracked using githubs issue tracker.
- - The scratchpad is the common place to store information for sharing with other agents.
+ - The scratchpad is the common place to store information for sharing with other agents. Scratchpad location is provided in environment variable WEAVER_SCRATCHPAD.
