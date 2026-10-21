@@ -18,6 +18,14 @@ Issue: https://github.com/dirkmarski/weaver/issues/83 (PM, it18 issue 1 of 3). B
 - Known limit: narrow desktop window with a classic scrollbar below 560 px: 100vw includes the scrollbar, cells about 1.7 px taller than wide.
 
 ## Reviewer
+- Reviewer: Claude Sonnet 5.5 (claude-sonnet-5-5), session `28d2788e-8588-47d1-8000-5904c97e526f`, detached worktree at 3c9a871. Did not read governance/LOG.md.
+- Verdict: REQUEST CHANGES (one small item, R1).
+- Suite: `node --test` 173 pass, 0 fail, skipped 0. Ratio: product 1324 (index.html 42 + style.css 144 + sudoku.js 1138), tests 2114, cap floor(1.6 x 1324) = 2118, headroom 4. No line packing seen.
+- CSS: wide screens neutral. Probe (headless Chrome, main 7fdc9a2 vs HEAD) at 1280: cell rects, input/notes/chip font sizes (30/13/14 px) and the ::after transform matrix, left and top of chips for D = 1-9 are identical. At 560 the media rule does not apply (differences there are run-to-run noise on main itself). Below 560 (360, 375, 390, 540): cells square within 1.00 px, grid 16 to width-16 (343 px at 375), no horizontal scroll, fonts unchanged, input fills the td content box (36.11 x 36.11 in a 38.11 td at 375). Without `line-height: 0` or without the input rule, 360 px cells are 1.56 px off square.
+- README: two additions only (grid sentence; top/bottom flush sentence), both match the CSS; no other change.
+- R1 (must fix, small): the old `cw >= 34 && cw <= 36` also pinned the grid width. It is now only squareness, so AC1 "grid fills the width" is unguarded: mutant `-32px` -> `-60px` (grid 16 px narrower each side) survives. Restore a width pin (e.g. grid rect width within 1 px of 343 at 375 px, or cell width), 1 to 2 lines, headroom is 4.
+- Survivors, non-blocking (lead decides): `line-height: 0` and the input `height: 1px; min-height: 100%` rule (only matter at 360; tests measure 375 only, AC9 asks 375); default `--tx`/`--ty` -> 0 (f3 only asserts transform != none, so this was already unguarded on main; my wide probe shows it neutral); digits 2 and 8 flush rule (f4 checks corners 1, 3, 7, 9 only, AC9 allows worst cases); 4-6 centring; the 559 -> 500 breakpoint (no test between 500 and 559).
+- Mutants (page tests): drop top rule, drop bottom rule, drop `--ty: 0` top, drop `--ty: 0` bottom, drop `top: 0`, drop size rule, -32 -> -40, -32 -> -10, drop `--tx: 0` left, drop `--tx: 0` right: all killed by f4. Drop body align-items: killed by f1e. All mutants restored; worktree clean.
 
 ## Tester
 
