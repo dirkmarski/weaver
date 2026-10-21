@@ -20,5 +20,6 @@
 - Not checked: on-screen rendering, persona wording quality, the page f1d explanation's first sentence (unchanged, not asserted in full by the page test beyond the prefix).
 
 ## Tester
+- 2026-10-21, tested f4942c8 vs main 8b6cbc7, headless Chrome, scripts in scratchpad test-71 (run.sh). AC1 and AC2: 4 pin strings plus 1 one-partner and 1 two-partner link exact (8 checks). P1-P3 exact match (y,y,y). AC3 replay: 4150 snapshots (1167 hint/focus/verify walk + 2983 play-through with rewards, clash, verify, solved), 1763 diffs, all classified: 1636 link lead-in only, 31 naked-form sentence only, 96 both; 0 unexplained (all other text, classes, marks, badges, tally identical). Oracle: Tricky seeds 1-5, 11 naked-form cases, 0 mismatches. 375 px: no horizontal overflow; naked sentence wraps to 6 lines, link line 3 lines (screenshots naked-375.png, link-375.png). README has new wording, no old wording left. Suite 170 pass, 0 fail, 0 skipped. No defects.
 
 ## Change log (spec changes, from the PM)
