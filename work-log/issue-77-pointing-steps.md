@@ -16,4 +16,7 @@
 
 ## Reviewer
 
+- 2026-10-21: Reviewed e1dd667..ce2a2f3. AC1/AC2 texts match the issue character for character (both forms, BOXNOTE at end of step 1, "With D ruled out"); naked target is in `removed` (sudoku.js singleAfterStep), so step 2 naming it holds. Every status write resets className (clearResults, fixed message, reward/not-counted, finish, Verify); `steps` only for pointing explain. Suite 173/173, skipped 0; ratio 2101/1315, cap 2104. README: only the pointing "message is" sentence changed.
+- 2026-10-21: 9 mutants: killed class never set, class on hidden explain only, "\n" -> " ", step 2 "not in" clause dropped, pre-line removed, text-align removed. Survived: class on all explain texts (page test checks only the nudge as non-pointing, as AC8 allows), max-width/margins removed (not pinned), clear-path className reset removed (no visible effect, each write sets className). Approved with notes.
+
 ## Tester
