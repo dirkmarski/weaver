@@ -16,7 +16,7 @@ Charter: `governance/CHARTER.md`. The agents build the site; Dirk (human) owns a
 
 ## Conventions
 - Issues and PRs on GitHub. Issues carry the label `enhancement`.
-- Branches: `issue-N-<slug>` per issue; `iteration-N` holds the iteration work logs and is merged by PR at close.
+- Branches: `issue-N-<slug>` per issue; since it18 the lead, PM and issue logs travel on the issue branches and reach main with each issue PR (no `iteration-N` branch; one branch line per log file).
 - Merge with a merge commit, never squash (individual commits are kept).
 - Commit/PR title: `[<agent>][session <full session id>] <message> (#N)`. Each agent adds a co-author trailer naming its own model.
 - `main` changes only by pull request.

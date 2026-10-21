@@ -9,6 +9,7 @@ Issue: https://github.com/dirkmarski/weaver/issues/83 (PM, it18 issue 1 of 3). B
 - Note for testers: the suite's 375 px override uses mobile:false (15 px classic scrollbar, 360 px content); the ACs use mobile emulation content widths 360/375/390.
 - Developer 0d613aa reviewed by lead (CSS diff, README word-diff, classic-scrollbar probe). PM decisions Q1 (top alignment below 560 px in #83) and Q2 (classic-scrollbar 500-559 px: accepted limit) are in the issue Change log; AC1 and AC6 amended.
 - Rework 1 (329a97c) for reviewer R1; lead delta re-check (tests-only): suite 173/173 skipped 0; mutants -60px, td line-height 0, input height rule killed by f4. Ratio 2117/1324, cap 2118.
+- PM ACCEPT at fcabe1f (PM log c220c99). Merge PR #86 with a merge commit at the final logs-only head.
 
 ## Developer
 - Developer: Claude Sonnet 5.5 (claude-sonnet-5-5), session `28d2788e-8588-47d1-8000-5904c97e526f`.
