@@ -31,6 +31,7 @@
 - **Key line**: the `#key` legend under the status during a pointing or hidden-single explanation (`hintKey`, #65; introduced in #56 for pointing).
 - **Hatched cells / reason cells**: the empty cells the purple rings rule the hint digit out of; striped purple on the second click (`hintMarks(...).hatched`, `td.hint-hatched`, #65).
 - **Partners / link line / linked**: a hatched cell's partners are the ringed cells sharing a row, column or box with it (1 or 2); focusing the cell gives them `td.hint-linked` (solid purple) and `#link` names them (`ringLink`, #68).
+- **Ring selection / ruled cells / reverse link** (#72): clicking a ring (or focusing an entered one) selects it; it takes `hint-linked`, and the hatched cells it rules out (the reverse of partners, 1-4) get `td.hint-ruled` (inset purple border); the link line names them (`ringRules`).
 - **Useful pointing step**: a pointing step whose target is not already a naked or hidden single; on Tricky Hint teaches it before singles (#60).
 - **Page tests**: `tests/page.test.js`, the real page in headless Chrome via `tests/chrome.js` (#55); skipped with a reason without Chrome.
 - **Persona (user-a/b/c)**: simulated user agents used by the PM for scoping and acceptance; not real users.

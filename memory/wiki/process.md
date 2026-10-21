@@ -43,12 +43,13 @@ Charter: `governance/CHARTER.md`. The agents build the site; Dirk (human) owns a
 - Developer: targeted unit tests, plus page tests in `tests/page.test.js` for UI wiring and CSS (#55); a rule -> test mapping when restructuring.
 - Tester: a test plan plus real-page checks on a few fixed seeds (scratch scripts may reuse `tests/chrome.js`), small independent oracles on 4-5 seeds at most, numeric measurements and screenshots for visual changes.
 - Reviewer: 6-13 targeted mutation spot checks on risky logic, not sweeps.
-- PM: acceptance criteria one by one, short play-through, personas for user-facing changes.
+- PM: acceptance criteria one by one, short play-through, personas for user-facing changes (on-screen screenshots, run in the foreground before deciding). Click/tap behaviour is checked with real CDP input by the tester and the PM.
 - Guide: test lines about 1x product lines (now 1.575x because of the page harness). PM rule (it13): at most 1.6x; an issue that would pass it adapts rather than adds tests and may remove only redundant assertions in the files it touches, each listed in the PR with the test that still covers it and confirmed by reviewer and tester, never one an AC explicitly requires, and no line packing (it14); otherwise a trim item comes first. The suite under 10 s (about 3 s with Chrome). Page evidence must show skipped = 0.
 
 ## Rework re-checks
 - Rounds that touch only tests, comments or README: delta re-review (re-run the specific mutant) and a suite plus smoke re-test.
 - Rounds that change behaviour (product, CSS or test-harness behaviour): re-review and re-test of the delta in full.
+- Exception (it16 #72): a one-expression product change on a path not reached in practice may be re-checked by the lead (whole delta read, mutants and the tester's saved scripts re-run), logged as a deviation.
 
 ## Development practices (`governance/context/development-practices.md`)
 Unit tests for all code; clean legible formatting; refactor to keep the code base concise.
