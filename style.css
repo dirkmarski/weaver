@@ -100,15 +100,14 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 /* Linked: while a hatched cell has focus its ring(s) turn solid purple with a white digit (8.48:1) and a darker inner ring. */
 #sudoku td.hint-linked { background: #6a1fb5; box-shadow: inset 0 0 0 4px #4a0f8a; color: #fff; }
 #sudoku td.hint-linked input { color: #fff; }
-/* Ruled: while a ring is selected, the hatched cells it rules out get a solid inset 3px #4a0f8a border; the stripes and tint stay (background untouched), 3:1 or better against every hatched-cell background. */
-#sudoku td.hint-ruled { box-shadow: inset 0 0 0 3px #4a0f8a; }
+/* Ruled: while a ring is selected, each hatched cell it rules out shows a purple struck badge of the digit (see the badge rules below); the cell has no box-shadow of its own and the stripes and tint stay. */
 
 /* Techniques tally below the status line. */
 #tally h2 { margin: 1rem 0 0.5rem; font-size: 1.1rem; }
 #tally p { margin: 0.25rem 0; font-size: 0.95rem; }
 #tally .definition { margin: 0 auto 0.75rem; max-width: 28rem; font-size: 0.8rem; color: #595959; }
 
-/* Pointing explanation: the digit D (data-d) is badged in its own pencil-note slot (1 top-left ... 9 bottom-right, the centre of that third of the cell) of the box cells where it fits (dashed purple outline) and of the line cells that lose it (grey, struck through by a diagonal #6b6b6b band: 14% of the gradient line, at least about 2.2 px thick for every digit at 375 px and 1280 px (D = 1, the narrowest chip, is the thinnest), 5.3:1 against the chip's white; the digit is text, so it stays above the band). The badge is bold on a white chip, unlike the grey pencil notes. Below 560 px the cell is narrower than the chip plus a note slot: the chip's side padding drops to 1px (same 14px digit) and a badge in a left or right edge slot sits flush against the cell's inner edge, so it is never clipped and still lies in its own slot (middle slots stay centred). */
+/* Pointing explanation: the digit D (data-d) is badged in its own pencil-note slot (1 top-left ... 9 bottom-right, the centre of that third of the cell) of the box cells where it fits (dashed purple outline) and of the line cells that lose it (grey, struck through by a diagonal #6b6b6b band: 14% of the gradient line, at least about 2.2 px thick for every digit at 375 px and 1280 px (D = 1, the narrowest chip, is the thinnest), 5.3:1 against the chip's white; the digit is text, so it stays above the band). The badge is bold on a white chip, unlike the grey pencil notes. The ruled cells of a selected ring (hint-ruled, data-d = the ring's digit) share this geometry and show the digit in #4a0f8a with a #4a0f8a band of the same position and thickness (12:1 on the white chip). Below 560 px the cell is narrower than the chip plus a note slot: the chip's side padding drops to 1px (same 14px digit) and a badge in a left or right edge slot sits flush against the cell's inner edge, so it is never clipped and still lies in its own slot (middle slots stay centred). */
 #sudoku td[data-d="1"], #sudoku td[data-d="4"], #sudoku td[data-d="7"] { --x: 16.667%; }
 #sudoku td[data-d="2"], #sudoku td[data-d="5"], #sudoku td[data-d="8"] { --x: 50%; }
 #sudoku td[data-d="3"], #sudoku td[data-d="6"], #sudoku td[data-d="9"] { --x: 83.333%; }
@@ -116,7 +115,7 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 #sudoku td[data-d="4"], #sudoku td[data-d="5"], #sudoku td[data-d="6"] { --y: 50%; }
 #sudoku td[data-d="7"], #sudoku td[data-d="8"], #sudoku td[data-d="9"] { --y: 83.333%; }
 #sudoku td.hint-confined { outline: 3px dashed #6a1fb5; outline-offset: -3px; }
-#sudoku td.hint-confined::after, #sudoku td.hint-removed::after {
+#sudoku td.hint-confined::after, #sudoku td.hint-removed::after, #sudoku td.hint-ruled::after {
   content: attr(data-d);
   position: absolute;
   left: var(--x);
@@ -132,8 +131,9 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 }
 #sudoku td.hint-confined::after { color: #6a1fb5; border: 1px solid #6a1fb5; }
 #sudoku td.hint-removed::after { color: #333; border: 1px solid #595959; background: linear-gradient(to top right, #fff 43%, #6b6b6b 43% 57%, #fff 57%); }
+#sudoku td.hint-ruled::after { color: #4a0f8a; border: 1px solid #4a0f8a; background: linear-gradient(to top right, #fff 43%, #4a0f8a 43% 57%, #fff 57%); }
 @media (max-width: 559px) {
-  #sudoku td.hint-confined::after, #sudoku td.hint-removed::after { padding: 0 1px; }
+  #sudoku td.hint-confined::after, #sudoku td.hint-removed::after, #sudoku td.hint-ruled::after { padding: 0 1px; }
   #sudoku td[data-d="1"]::after, #sudoku td[data-d="4"]::after, #sudoku td[data-d="7"]::after { left: 0; transform: translate(0, -50%); }
   #sudoku td[data-d="3"]::after, #sudoku td[data-d="6"]::after, #sudoku td[data-d="9"]::after { left: auto; right: 0; transform: translate(0, -50%); }
 }

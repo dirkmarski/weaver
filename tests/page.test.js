@@ -312,6 +312,7 @@ describe('page (headless Chrome)', () => {
     const pos = (r, c) => (r - 1) * 9 + c - 1;
     const tap = (r, c) => page.eval('document.querySelectorAll("#sudoku td")[' + pos(r, c) + '].click()');
     const state = async () => { const s = await read(); return [s.linked, s.ruled, s.link]; };
+    const badges = () => page.eval('[].slice.call(document.querySelectorAll("#sudoku td")).map(function (t, i) { var s = getComputedStyle(t, "::after"); return s.color === "rgb(74, 15, 138)" && s.content === \'"2"\' ? i : -1; }).filter((i) => i >= 0)'); // the purple "2" badges
     await open('tricky', 1);
     await click('#hint');
     await click('#hint');
@@ -319,14 +320,19 @@ describe('page (headless Chrome)', () => {
     await tap(2, 2);
     assert.deepStrictEqual(await state(), [[pos(2, 2)], [pos(2, 7), pos(2, 8), pos(2, 9)],
       'The 2 at row 2, column 2 rules 2 out of three hatched cells: row 2, column 7 (same row), row 2, column 8 (same row) and row 2, column 9 (same row).']);
+    assert.deepStrictEqual(await badges(), [pos(2, 7), pos(2, 8), pos(2, 9)]);
     await tap(9, 7);
     assert.deepStrictEqual(await state(), [[pos(9, 7)], [pos(2, 7), pos(3, 7)],
       'The 2 at row 9, column 7 rules 2 out of two hatched cells: row 2, column 7 (same column) and row 3, column 7 (same column).']);
+    assert.deepStrictEqual(await badges(), [pos(2, 7), pos(3, 7)]);
     await tap(9, 7); // the selected ring again
     assert.deepStrictEqual((await state())[0], [pos(9, 7)]);
     await focusAt(pos(3, 7));
     assert.deepStrictEqual(await state(), [[pos(9, 7)], [],
       'Hatched cell row 3, column 7: no 2 here, because the 2 at row 9, column 7 is in the same column.']);
+    assert.deepStrictEqual(await badges(), []);
+    const s = await read(); // a hatched cell is never confined or removed, so no ruled badge meets a pointing badge; only their data-d is left
+    assert.deepStrictEqual([s.hatched.filter((p) => s.confined.concat(s.removed).includes(p)), s.dattr], [[], s.confined.concat(s.removed).sort((x, y) => x - y)]);
     await page.eval('document.querySelector(\'input[data-pos="' + pos(3, 7) + '"]\').click()'); // the click that follows the focus
     assert.deepStrictEqual(await state(), [[pos(9, 7)], [],
       'Hatched cell row 3, column 7: no 2 here, because the 2 at row 9, column 7 is in the same column.']);
@@ -338,6 +344,9 @@ describe('page (headless Chrome)', () => {
     await tap(2, 2);
     await tap(1, 1); // a given that is no ring
     assert.deepStrictEqual(await state(), [[], [], INVITE]);
+    await tap(2, 2);
+    await click('#verify');
+    noHint(await read()); // clearing leaves no data-d behind
     await page.send('Emulation.setDeviceMetricsOverride', { width: 375, height: 900, deviceScaleFactor: 1, mobile: false });
     try {
       const steps = [() => open('tricky', 1), () => click('#hint'), () => click('#hint'), () => tap(2, 2), () => focusAt(pos(3, 7)), () => focusAt(pos(1, 5))];
