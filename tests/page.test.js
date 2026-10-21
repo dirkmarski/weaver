@@ -242,10 +242,8 @@ describe('page (headless Chrome)', () => {
     const all = (...rc) => rc.map(([r, c]) => (r - 1) * 9 + c - 1);
     await open('tricky', 8);
     await click('#hint');
-    let s = await read();
-    assert.deepStrictEqual([s.hatched, s.key], [[], '']); // the first click hatches nothing
     await click('#hint');
-    s = await read();
+    let s = await read();
     assert.deepStrictEqual(s.hatched, all([1, 3], [2, 2], [4, 8], [4, 9]));
     assert.strictEqual(s.key, 'Key: dashed purple = the only places for 8 in the box; struck grey 8 = this step rules 8 out there; hatched = a purple ring rules 8 out there (an 8 already in the same row, column or box).');
     const bg = await page.eval('getComputedStyle(document.querySelectorAll("#sudoku td")[2]).backgroundImage'); // r1c3, hatched
@@ -260,7 +258,7 @@ describe('page (headless Chrome)', () => {
     noHint(await read());
   });
 
-  it('f2. the key line is gone after Verify; a hidden single has the hatched key line, a naked single none', async () => {
+  it('f2. the key line is gone after Verify; a hidden single has the hatched key line, a naked single none and nothing hatched', async () => {
     const { seed, extra } = pointing;
     await open('tricky', seed);
     await keys(extra.typed);
@@ -272,12 +270,19 @@ describe('page (headless Chrome)', () => {
     await open('tricky', p.seed);
     await click('#hint');
     await click('#hint');
-    const s = await read();
-    assert.ok(s.status.startsWith('Hidden single') || s.status.startsWith('Naked single'));
-    assert.deepStrictEqual([s.key.startsWith('Key: hatched = '), s.dattr], [s.status.startsWith('Hidden single'), []]);
+    let s = await read();
+    assert.ok(s.status.startsWith('Hidden single'), s.status);
+    assert.match(s.key, /^Key: hatched = a purple ring rules (\d) out there \(an? \1 already in the same row, column or box\)\.$/);
+    const n = pick('easy', (pz) => S.findNakedSingle(pz));
+    await open('easy', n.seed);
+    await click('#hint');
+    await click('#hint');
+    s = await read();
+    assert.ok(s.status.startsWith('Naked single'), s.status);
+    assert.deepStrictEqual([s.key, s.hatched], ['', []]);
   });
 
-  it('f2b. with no ring and no reason cell the key line has no hatched clause (and none is hatched)', async () => {
+  it('f2b. with no ring and no reason cell the key line has no hatched clause', async () => {
     const { seed, extra } = noRings;
     await open('tricky', seed);
     await keys(extra.typed);
@@ -285,7 +290,6 @@ describe('page (headless Chrome)', () => {
     await click('#hint');
     const s = await read();
     assert.deepStrictEqual(s.digit, []);
-    assert.deepStrictEqual(s.hatched, []);
     assert.ok(s.key.endsWith('out there.') && !s.key.includes('hatched'));
   });
 

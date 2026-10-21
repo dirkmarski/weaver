@@ -18,6 +18,23 @@ Iteration 14. Branch `issue-65-hatch-ruled-out`. Session `c0f6ffb1-d246-448a-942
 - Ratio: tests 1952 / product 1220 (index 41, style 131, sudoku.js 1048) = 1.600x.
 - Counts: `node --test`: 167 tests, 167 pass, 0 fail, 0 skipped.
 
+### Rework round 1 (Claude Sonnet 5.5, claude-sonnet-5-5; read no log other than this one)
+- R1: page f2 adapted (no new test): the hidden-single case now asserts the status starts with "Hidden single" and the key line against the exact hatched-key shape (regex, same digit twice); a new naked-single case (`pick('easy', findNakedSingle)`, Hint twice) asserts status "Naked single", key '' and hatched []. M1 (`res.technique !== 'naked'` dropped from the key gate) now FAILS (1 test).
+- R2: case (b) of "hintMarks, pointing: reason cells ..." extended with the reviewer's layout (box 6, row 6, target r7c5, hidden unit column 5, empty box cell r8c1 = 63, empty column cell r1c5 = 4) asserting `hatched` == [4, 63]. M3 (sort of `hatched` removed) now FAILS (1 test).
+- R3: unpacked: the two comments at the explain assertion in the tint test (one per line), `rule`/`point`/`head` (declarations on their own lines; `rule` then inlined, see removals), the `hintMarks` header comment rewritten as a clean field list plus tint/reason/ring paragraphs, the `hintMarks` return split (sort on its own line, object literal over three lines).
+- R4: `&& reasons.indexOf(x) < 0` removed from `addReasons` (dead: the hidden unit of a pointing hint always holds a removed cell, so it never meets the pointing box); behaviour unchanged, suite green.
+- Removals (exact assertion -> remaining coverage -> mutant still killed):
+  1. page f1b, first-click `assert.deepStrictEqual([s.hatched, s.key], [[], ''])` (and its separate read) -> hintMarks nudge `[nudge.digits, nudge.hatched] == [[], []]` (sudoku tint test), page f first click `[confined, removed, dattr, key] == [[],[],[],'']`, noHint on nudges elsewhere -> mutant "hatched filled on a nudge" (`kind === 'explain'` dropped from the reasons gate) fails 1 test (checked).
+  2. page f2b, `assert.deepStrictEqual(s.hatched, [])` -> hintMarks `none` case (pointing, no reason cell: hatched []) plus the f2b key-has-no-"hatched" assertion -> mutant `hatchedCount ?` always true (M7) still fails f2b (checked: 2 fail).
+  3. page f2, `assert.deepStrictEqual(s.dattr, [])` for the hidden single -> hintMarks tint test `hintMarks(hintFor(H_BOX, 2), H_BOX).confined == []` and the pointing-only data-d loop -> data-d is only set from marks.confined/removed, so no further page path exists; mutant: none applicable beyond the hintMarks line itself (honest note: this one is covered by reasoning, not by a killed mutant).
+  4. sudoku hintKey test `point(8, 1)` ("an 8" in a pointing key) and the hidden-single rows `[4, 'a 4']`, `[8, 'an 8']` (the whole forEach) -> P1 page pin (pointing key with "an 8"), P3 page pin (hidden key "a 4"), f2 regex (hidden key shape) -> mutant "an 8" -> "a 8" fails 2 tests (P1 and one more), mutant `hatchedCount ?` always true fails 2.
+  5. sudoku "hintMarks, hidden single" test, the `m.hatched == [1, 2]` assertion (back to the single `.digits` assertion) -> tint test `single.hatched == [31, 40, 48, 49, 50]` (hidden single, H_BOX) and the P3 page pin -> mutants "x !== p dropped in addReasons" (fails 4) and "hidden-single reasons skip the first unit cell" (fails 1) both still killed (checked).
+  6. sudoku tint test comment "the unconfined empty box cells ... are hatched" removed (a comment, no assertion); `const rule` helper inlined as a literal string in the one remaining use.
+  Not removed (judged not redundant): `point(9, 0)` (exact no-clause text), P3's value-change clear. Kept the f key wiring line `S.hintKey(...)` (it proves the key survives a notes change).
+- Ratio: tests 1961 (chrome 100, fixture 27, generator 155, page 412, sudoku 1267) / product 1226 (index 41, style 131, sudoku.js 1054) = 1.5995x (limit 1.6x).
+- Counts: `node --test` (no path): 167 tests, 167 pass, 0 fail, 0 skipped.
+- Mutants after rework: M1 killed (1), M3 killed (1); also re-checked page passes 0 count (killed 2), "an 8" -> "a 8" (killed 2), `hatchedCount ?` always true (killed 2).
+
 ## Reviewer
 - Reviewer: Claude Sonnet 5.5 (claude-sonnet-5-5), head 610dba8. Did not read governance/LOG.md; read only the Lead section of this log.
 - Verdict: REQUEST CHANGES (one must-fix, two should-fix).

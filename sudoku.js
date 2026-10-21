@@ -420,15 +420,17 @@
     return 'Well done! You applied a ' + hint.technique + ' single: row ' + (hint.r + 1) + ', column ' + (hint.c + 1) + ' is ' + value + '.';
   }
 
-  // The cells a showing hint marks, as flat indices: { area: tinted cells (not the target),
-  // target, digits: the ringed cells, only on explain (see below), hatched: the reason cells (see below), ascending,
-  // on explain only, confined, removed: a pointing explain's box cells where the digit fits and line cells that lose it (else empty) } for a hintFor
-  // result of kind nudge/explain. Tint: a naked single's row, column and box; a hidden single's unit;
-  // a pointing step's box and line, plus its hidden-form unit. Ringed digits (ascending), for D = the hidden single's
-  // digit or the pointing digit: a cell holding D that shares a row, column or box with a reason cell (an empty cell
-  // that D's rings help to rule out). Reason cells: a hidden single's: the other empty cells of its unit; pointing's: the
+  // The cells a showing hint marks, as flat indices, for a hintFor result of kind nudge/explain:
+  // { area: the tinted cells (not the target), target,
+  //   digits: the ringed cells (ascending), on explain only,
+  //   hatched: the reason cells (ascending), on explain only,
+  //   confined, removed: a pointing explain's box cells where the digit fits and line cells that lose it (else empty) }.
+  // Tint: a naked single's row, column and box; a hidden single's unit; a pointing step's box and line, plus its hidden-form unit.
+  // Reason cells (none for a naked single): a hidden single's are the other empty cells of its unit; a pointing step's are the
   // empty box cells that are not confined and, in the hidden form, the empty cells of the hidden unit other than the target
-  // and the removed cells, hatched on the page. None for a naked single.
+  // and the removed cells. They are hatched on the page.
+  // Ringed digits, for D = the hidden single's digit or the pointing digit: a cell holding D that shares a row, column or box
+  // with a reason cell (an empty cell that D helps to rule out).
   function hintMarks(hint, grid) {
     var p = hint.r * 9 + hint.c, units, pointing = hint.technique === 'pointing';
     var hidden = hint.unit ? [CELL_UNITS[p][UNIT_NAMES.indexOf(hint.unit)]] : [];
@@ -439,7 +441,7 @@
     var explain = pointing && hint.kind === 'explain';
     var reasons = [];
     function addReasons(cells, skip) {
-      cells.forEach(function (x) { if (x !== p && grid[Math.floor(x / 9)][x % 9] === 0 && skip.indexOf(x) < 0 && reasons.indexOf(x) < 0) reasons.push(x); });
+      cells.forEach(function (x) { if (x !== p && grid[Math.floor(x / 9)][x % 9] === 0 && skip.indexOf(x) < 0) reasons.push(x); });
     }
     if (d && hint.kind === 'explain') {
       if (pointing) {
@@ -452,7 +454,11 @@
         if (reasons.some(function (x) { return CELL_UNITS[x].some(function (u) { return mine.indexOf(u) >= 0; }); })) digits.push(q);
       }
     }
-    return { area: area, target: p, digits: digits, hatched: reasons.sort(function (a, b) { return a - b; }), confined: explain ? hint.confined : [], removed: explain ? hint.removed : [] };
+    reasons.sort(function (a, b) { return a - b; });
+    return {
+      area: area, target: p, digits: digits, hatched: reasons,
+      confined: explain ? hint.confined : [], removed: explain ? hint.removed : []
+    };
   }
 
   // 'an 8' or 'a D'.
