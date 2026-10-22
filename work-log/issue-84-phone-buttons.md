@@ -35,3 +35,19 @@ Issue: https://github.com/dirkmarski/weaver/issues/84 (PM, it18 issue 2 of 3). B
 - Removals: (a) `isValidSolution([])` confirmed (same outer-length branch as slice(1); no mutant distinguishes it). (b) 10th-row test replaced by one line confirmed (mutants: outer guard dropped and `< 9` both fail 1 test). (c) `new Set(g[0]).size` confirmed (fixture sanity, implied by the preceding false assert).
 - Mutants killed: drop #buttons gap, gap 4px, drop #buttons flex, body align center, drop play-button min-height, drop New puzzle min-height, levelLabel back to #level (18 fail), New puzzle moved out of #level (12 fail), both unit guard mutants. Survived: drop #level flex (inline text+button still one line, AC1 holds: equivalent), play-button padding 2.5rem (still one row at 375).
 - Notes: New puzzle now precedes the grid in Tab order (was last); AC2 only asks reachable. Geometry asserted at 375 only (360/390/1280 by lead/tester checks). Developer log ratio line should read 2118.
+
+## Tester
+- Tester: Claude Sonnet 5.5 (claude-sonnet-5-5), session `28d2788e-8588-47d1-8000-5904c97e526f`. Tested code head 2197782 (test head 5ab1268) vs main a45b784, headless Chrome, real CDP touch (375 mobile) and mouse (1280). Verdict: PASS, no defects.
+- AC1: New puzzle in #level after the text, above the grid, one line (text 120 px + button 108 x 28.8) at 360/375/390/1280; 4 levels x 2 rounds, text right, button survives, no h-scroll.
+- AC2: after New puzzle (DOM click and real tap/click, 375 and 1280) full state equals main (picker back, grid 0, tally/status/key/link empty; notes mode persists as on main, reset on next choice); Tab and Enter reach/activate it; label New puzzle; border/background as Verify; 28.8 px tall.
+- AC3: Verify/Hint/Notes equal tops, gaps 12.0, heights 34.8 at 360/375/390/1280, also with Notes: On.
+- AC4: h1 top 16 at heights 600/900/1200, widths 360/375/559/560/600/768/1280, picker and game; horizontal offset 0. 1280x1200: row top 729.8 across 9 states (hint, nudge, invitation, reverse, forward, verify, notes, key line).
+- AC5: row top steady at 360 (552.7), 375 (567.8), 1280x900 and 1280x1200 (729.8).
+- AC6: replay vs main, 4 runs x 6 puzzles x 200 steps (375 touch, 1280 mouse, incl. New puzzle and second level choice): 0 diffs (one run showed a lone focus diff; main-vs-main shows the same harness flake, rerun clean).
+- AC7: 375x812 seed 1 status 618.6-807.6, seed 8 618.6-765.6, grid bottom 491.8, row 567.8, no h-scroll. 360x740 seeds 1 and 8: conclusion and steps 1-2 end at 709 (step 3 below the fold, allowed). Screenshots in scratchpad test-84/shots; persona rating not done by tester.
+- AC8: README word diff is one sentence (additions only: next to it; Verify, Hint, Notes below the grid).
+- AC9: node --test 172 pass, 0 fail, 0 skipped. Negative controls: main style.css -> f1e fails; main index.html -> all 20 page tests fail; gap 4px and New puzzle min-height 1rem -> 1 fail each; dropping play-button min-height survives (natural height 34.8 >= 34, equivalent here).
+- Removals confirmed: (a) isValidSolution([]) (no mutant tells it from slice(1)); (b) 10th-row test as one line (drop/relax outer length check fails 1 test); (c) Set(g[0]).size (dropping the row check still fails the test). Nothing an AC or product rule needs is lost.
+- Ratio: product 1324, tests 2118, cap 2118: OK (headroom 0).
+- Notes: 1280x1200 with the full explanation the document is 1204 px tall (4 px scroll; main 1200); row does not move. Tab from a fresh puzzle starts in the grid, New puzzle is reached via Shift+Tab or later Tab.
+- Not tested: real devices, Safari/Firefox, persona ratings, landscape phones, widths below 360.
