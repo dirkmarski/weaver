@@ -62,3 +62,7 @@ Issue: https://github.com/dirkmarski/weaver/issues/84 (PM, it18 issue 2 of 3). B
 - Own check in a `git archive` copy (pm-84): suite 172/172 skipped 0; measure.js PASS (AC1-AC5), ac7.js AC7 geometry as the tester; Enter on New puzzle works (tab.js). No AC differs from the tester.
 - Personas (user-a/b/c): thumb safety 5/5/5, findability 4/4/4, chips 3/3/3 (inside the cells; small, struck digits hard to read: backlog).
 - Items: (1) 4 px scroll at 1280x1200 accepted; (2) New puzzle first in Tab order accepted. Details and backlog in work-log/iteration-18-product.md.
+
+## Lead: merge
+- PM ACCEPT at 2197782 (c72758c, logs only; lead-checked: no non-log diff 2197782..c72758c). Personas thumb safety 5/5/5, findability 4/4/4, chips (#83 fold-in) 3/3/3 -> backlog. PM accepted the 4 px scroll at 1280x1200 (D6) and New puzzle first in Tab order (D7).
+- Before the merge: lead log, WIP, wiki product (mobile facts after #84) and backlog (mobile remainder) committed on the branch. Merge PR #87 with a merge commit (no squash).
