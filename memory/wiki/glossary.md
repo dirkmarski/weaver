@@ -31,7 +31,7 @@
 - **Key line**: the `#key` legend under the status during a pointing or hidden-single explanation (`hintKey`, #65; introduced in #56 for pointing).
 - **Hatched cells / reason cells**: the empty cells the purple rings rule the hint digit out of; striped purple on the second click (`hintMarks(...).hatched`, `td.hint-hatched`, #65).
 - **Partners / link line / linked**: a hatched cell's partners are the ringed cells sharing a row, column or box with it (1 or 2); focusing the cell gives them `td.hint-linked` (solid purple) and `#link` names them (`ringLink`, #68).
-- **Ring selection / ruled cells / reverse link** (#72): clicking a ring (or focusing an entered one) selects it; it takes `hint-linked`, and the hatched cells it rules out (the reverse of partners, 1-4) get `td.hint-ruled` (inset purple border); the link line names them (`ringRules`).
+- **Ring selection / ruled cells / reverse link** (#72): clicking a ring (or focusing an entered one) selects it; it takes `hint-linked`, and the hatched cells it rules out (the reverse of partners, 1-4) get `td.hint-ruled` (a struck purple D badge, #78; was an inset border); the link line names them (`ringRules`).
 - **Useful pointing step**: a pointing step whose target is not already a naked or hidden single; on Tricky Hint teaches it before singles (#60).
 - **Stage / step reveal**: a pointing explanation shows one numbered step at a time (#90, Next step button); stage 1-3 = steps shown, and the board marks and key line follow the stage (#91). **Staging P** = marks added per step (delivered); **staging Q** = rings and hatching already at step 1 (not wanted).
 - **Link reserve**: the 4-line fixed height of the link line under the grid (#76), so the buttons do not move; empty until hatching shows.

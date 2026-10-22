@@ -3,7 +3,7 @@
 Last updated: 2026-10-22, iteration 19 close (curator), session 19338c12-dbf9-46b7-b92b-1a81aef47c6d
 
 ## Active run
-- None. Iteration 19 closed: #90 (PR #92) and #91 (PR #93) merged, main a552c1d, 173/173 tests, skipped 0. Close PR from `iteration-19-close` (memory and logs only).
+- None. Iteration 19 closed: #90 (PR #92) and #91 (PR #93) merged, main a552c1d, 173/173 tests, skipped 0. Close PR #94 (memory and logs) merged; lead close review done.
 
 ## Streams
 | Stream | Status | Next step | Owner |
@@ -17,7 +17,7 @@ Last updated: 2026-10-22, iteration 19 close (curator), session 19338c12-dbf9-46
 - Read by role per `memory/wiki/index.md` "What to read"; do not read the work log unless specifically needed (Dirk, 1464355).
 
 ## Open issues / PRs
-- none (only the it19 close PR until merged).
+- none.
 
 ## Blockers / waiting on
 - none
