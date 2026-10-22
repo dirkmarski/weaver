@@ -39,3 +39,10 @@ Mutants (14 real): slice off by one, hide early, label off by one, no early retu
 8. AC8: nudge, naked, hidden, conflict, full, none messages: no button, whole DOM identical to main; marks, key, link and ring/hatched link clicks identical at every stage.
 9. AC9: value change, Verify, New puzzle, level choice clear the button and steps, fresh Hint = nudge; Notes keeps state; hinted digit gives main's "Well done!". 10. AC10: README paragraph matches (one line changed). 11. AC11: `node --test` 173 pass, 0 fail, skipped 0.
 - Not tested: AC12 (PM), the 4 persona scores, real devices, Safari/Firefox. Observed (not a defect): the button stays blue-tinted after a tap (default focus/hover look).
+
+## Lead: rework rounds
+- Reviewer APPROVE (9e2ac6b; 2 minor test gaps: M5 Hint-branch focus, M11-M14 button look/place unpinned). Tester PASS (903da16; 619 real-input checks; "612" in the Tester section is a typo per the tester). Tester's merge commit ed54240 used git's default message (no session tag): deviation, not rewritten.
+- Rework 1 (4b248f9, tests only, +3): killed M5, M11-M14, but the look assertion was a 542-character line (main's longest 320) packing five declarations and three measurements to fit the cap: rejected as line packing.
+- Rework 2 (fb20d95, tests only, 1 line for 1): 214-character `new Set([...]).size === 1` compare of font + padding of #next-step and #verify. Kills M11/M12; M13 (#next centred) and M14 (#next margin) stay unguarded in the suite, covered by the tester's real-input measurement (left edge 0.00 px, gap 9.6 px) and PM acceptance. Accepted trade-off at the cap.
+- Lead delta re-check (tests-only rounds): suite 173/173, skipped 0; mutants M12 (font-size 0.85rem) and M5 (Hint-branch focus) and M14 (margin -0.25rem, round 1) killed; no line > 320; product unchanged since the tested head 57192db (`git diff --stat` empty); tester scripts re-run on fb20d95: 7/7 PASS (619 checks). Ratio product 1359, tests 2174, cap 2174, headroom 0.
+- Observation for the PM: after a tap the button keeps a blue-tinted focus look (tester, 375x812 stage-2 shot).
