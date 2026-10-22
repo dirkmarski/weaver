@@ -24,3 +24,4 @@
 
 ## #85
 - 2026-10-22: new lead run (same session id) after #84 merged as 638c0fa. Gate check passed (open, PM-authored). Fresh start: branch issue-85-compact-top from 638c0fa. Per-issue log: work-log/issue-85-compact-top.md. Ratio 2118/1324, headroom 0.
+- Developer 63fe51e/03ed19b: 4 CSS lines below 560 px (h1 1.4rem, caption 0.8rem + padding 0.25rem, #level and #status margins), f1e grid top <= 88. Grid top 106.8 -> 79.8; 360x740 seed 8 status bottom 736.5. AC3 clarified by the PM (D8: board digits excluded). Reviewer APPROVE (b7f9fbb), tester PASS (58ca5c0). Product 1328, tests 2119, cap 2124.

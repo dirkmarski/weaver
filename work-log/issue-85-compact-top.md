@@ -42,3 +42,9 @@ Issue: https://github.com/dirkmarski/weaver/issues/85 (PM, it18 issue 3 of 3). B
 7. AC7: README mentions no header, title or caption sizes (only cell sizes).
 8. AC8: node --test 172 pass, 0 fail, 0 skipped; main style.css in a copy fails the f1e assertion (grid top 106.8 > 88), 171 pass 1 fail; product 1328, tests 2119, cap 2124; test diff vs main is +1 line, 0 removals.
 - Not tested: real devices, browsers other than headless Chrome, widths other than the listed ones, persona rating (PM). measure.js printed "Enter on focused button -> picker shown: false" (inherited #84 probe, not an AC here; replay shows 0 diffs vs main).
+
+## Lead: gates before the PR
+- Reviewer APPROVE at 03ed19b (b7f9fbb); tester PASS AC1-AC8 at 03ed19b (58ca5c0). No test removals (both confirmed +1 line only). Commits after 03ed19b are logs only (lead-checked diff --stat).
+- Survivors (reviewer): #status margin-top, caption and #level rules not guarded by the suite; AC8 asks one assertion (combined grid top), so AC2's seed 8 fit rests on tester/PM measurement (736.5 of 740, 3.5 px slack). Noted for the PM; not a blocker.
+- Tester's inherited probe "Enter on focused button -> picker shown: false": lead re-ran measure.js on main 638c0fa and the branch: false on both (harness artifact; #84 tab.js showed Enter works). Not a regression.
+- Lead re-run: suite 172/172, skipped 0; product 1328, tests 2119, cap 2124.
