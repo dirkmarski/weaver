@@ -23,3 +23,12 @@ Issue: https://github.com/dirkmarski/weaver/issues/90 (PM, it19 issue 1 of 2). B
 ## Reviewer
 
 ## Tester
+- Tester: Claude Sonnet 5.5 (claude-sonnet-5-5), session `19338c12-dbf9-46b7-b92b-1a81aef47c6d`. Head tested 57192db (5d708cf adds logs only). Verdict: PASS, 0 defects. Real CDP touch (360x740, 375x812, mobile) / mouse (1280x900) / key input; main 84c7c9d compared programmatically; scripts and README in the session scratchpad `test-90` (612 checks, 0 failed; a mutant `shown >= 4` gives 13 + 18 fails).
+1. AC1: 2 lines + "Next step (2 of 3)" on seeds 1 and 8 at all 3 viewports; box-case clause kept (Tricky seed 4 path). 2. AC2: stage 2 = first 3 main lines, label "3 of 3", final text == main's 4 lines (both seeds, all viewports).
+3. AC3: Hint advances with the same text/label as the button; Hint after completion leaves text and cells unchanged.
+4. AC4: button 16px, padding 6.4 16 (same as Verify/Hint/Notes) at 360/375/1280; left delta 0.00 px; gap to the last step 9.6 px; touch, click, Tab+Enter, Tab+Space all work.
+5. AC5: focus on the target after the 2nd Hint, on the button after Enter/Space and after a touch/mouse tap (from the target cell, no focusout interference), on the target after the last step; scrollWidth <= clientWidth everywhere.
+6. AC6: grid, link and Verify/Hint/Notes rects identical at all 4 stages and equal to main's. 7. AC7: button bottom 675.9 / 717.9 at 360x740 (both seeds), 690.9 / 732.9 at 375x812; seed 8 final status bottom 736.5 (<= 740); seed 1 757.5 as on main.
+8. AC8: nudge, naked, hidden, conflict, full, none messages: no button, whole DOM identical to main; marks, key, link and ring/hatched link clicks identical at every stage.
+9. AC9: value change, Verify, New puzzle, level choice clear the button and steps, fresh Hint = nudge; Notes keeps state; hinted digit gives main's "Well done!". 10. AC10: README paragraph matches (one line changed). 11. AC11: `node --test` 173 pass, 0 fail, skipped 0.
+- Not tested: AC12 (PM), the 4 persona scores, real devices, Safari/Firefox. Observed (not a defect): the button stays blue-tinted after a tap (default focus/hover look).
