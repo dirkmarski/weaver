@@ -16,7 +16,7 @@ Charter: `governance/CHARTER.md`. The agents build the site; Dirk (human) owns a
 
 ## Conventions
 - Issues and PRs on GitHub. Issues carry the label `enhancement`.
-- Branches: `issue-N-<slug>` per issue; since it18 the lead, PM and issue logs travel on the issue branches and reach main with each issue PR (no `iteration-N` branch; one branch line per log file).
+- Branches: `issue-N-<slug>` per issue; since it18 the lead, PM and issue logs travel on the issue branches and reach main with each issue PR (no `iteration-N` branch; one branch line per log file). The closing lead uses a short `iteration-N-close` branch for wiki/WIP/close-log changes only.
 - Merge with a merge commit, never squash (individual commits are kept).
 - Commit/PR title: `[<agent>][session <full session id>] <message> (#N)`. Each agent adds a co-author trailer naming its own model.
 - `main` changes only by pull request.
@@ -25,7 +25,7 @@ Charter: `governance/CHARTER.md`. The agents build the site; Dirk (human) owns a
 - Agents running Chrome or temp files use explicit private temp dirs under the session scratchpad (`/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/<session>/scratchpad` since 9c5542b) and never `rm -rf` a possibly unset variable (it13 incident); pass this rule in prompts.
 - Merge commits made by agents carry the `[<agent>][session <id>]` prefix too; give the message in the prompt (it14).
 - Every agent prompt ends with a fixed-format evidence report (commits, files changed, tests incl. skipped, ratio, AC -> evidence map, removed assertions, what was NOT tested, deviations, LOG.md confirmation); the lead spot-checks it rather than reading transcripts or logs (lead.md supervisor strategy, it15).
-- Agents read the wiki and WIP, not the work log, unless specifically needed. Reviewers and testers read only the Lead section of the issue log. The PM scopes from `wiki/backlog.md` and leaves an up-to-date ordered list at the end of its product log for the lead's snapshot.
+- Agents read the wiki and WIP, not the work log, unless specifically needed. Reviewers and testers read only the Lead section of the issue log. The PM scopes from `memory/wiki/backlog.md` and leaves an up-to-date ordered list at the end of its product log for the lead's snapshot.
 
 ## Per-issue flow
 1. Gate check: issue is open and authored by Dirk Marski or weaver-agents (the PM); otherwise abandon. Iteration issues carry `enhancement`.
@@ -41,10 +41,10 @@ Charter: `governance/CHARTER.md`. The agents build the site; Dirk (human) owns a
 ## Test strategy applied (`governance/context/test-strategy.md`)
 - Three levels: developer unit tests, tester product tests, PM acceptance. Golden path, edge cases, error conditions; no brute force across all values.
 - Developer: targeted unit tests, plus page tests in `tests/page.test.js` for UI wiring and CSS (#55); a rule -> test mapping when restructuring.
-- Tester: a test plan plus real-page checks on a few fixed seeds (scratch scripts may reuse `tests/chrome.js`), small independent oracles on 4-5 seeds at most, numeric measurements and screenshots for visual changes.
+- Tester: a test plan plus real-page checks on a few fixed seeds (scratch scripts may reuse `tests/chrome.js`; leave a `README.md` in the scratch folder: setup, env vars, one line per script and its pass line, so the lead, PM and the next tester can re-run it; it18 #84/#85), small independent oracles on 4-5 seeds at most, numeric measurements and screenshots for visual changes.
 - Reviewer: 6-13 targeted mutation spot checks on risky logic, not sweeps.
 - PM: acceptance criteria one by one, short play-through, personas for user-facing changes (on-screen screenshots, run in the foreground before deciding). Click/tap behaviour is checked with real CDP input by the tester and the PM.
-- Guide: test lines about 1x product lines (1.600x at the it17 close, at the cap, because of the page harness). PM rule (it13): at most 1.6x; an issue that would pass it adapts rather than adds tests and may remove only redundant assertions in the files it touches, each listed in the PR with the test that still covers it and confirmed by reviewer and tester, never one an AC explicitly requires, and no line packing (it14); otherwise a trim item comes first. The suite under 10 s (about 3 s with Chrome). Page evidence must show skipped = 0.
+- Guide: test lines about 1x product lines (1.596x at the it18 close, 2119/1328, cap 2124, because of the page harness). PM rule (it13): at most 1.6x; an issue that would pass it adapts rather than adds tests and may remove only redundant assertions in the files it touches, each listed in the PR with the test that still covers it and confirmed by reviewer and tester, never one an AC explicitly requires, and no line packing (it14); otherwise a trim item comes first. The suite under 10 s (about 3 s with Chrome). Page evidence must show skipped = 0.
 
 ## Rework re-checks
 - Rounds that touch only tests, comments or README: delta re-review (re-run the specific mutant) and a suite plus smoke re-test.
