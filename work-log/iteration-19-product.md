@@ -84,3 +84,22 @@
 1. This iteration: #91 next (unchanged; personas again asked for marks per step, 2/3).
 2. Explanation follow-ups: as above, plus: key line fully visible on phones (3/3 this round); Next step prominence (filled colour, b); "Done" cue after the last step (c); pin #next alignment/gap.
 3-6. Unchanged.
+
+## #91 acceptance (2026-10-22, session 19338c12-dbf9-46b7-b92b-1a81aef47c6d)
+- Head: 30edfbb (code 930be19; `git diff --stat 930be19 30edfbb` = issue log only). PR #93. Own export of 30edfbb in scratchpad/pm-91/wt, baseline main 8d4717b exported fresh to pm-91/main (not committed).
+- Read: brief pm-91/brief.md, issue #91, issue log (all sections), test-91/README.md, lib.js API, shots.js, product diff 8d4717b..30edfbb (sudoku.js, README, unit test), Hint handler lines.
+- Suite: `node --test` 173/173, skipped 0. Tester scripts re-run on my tree: ac_stages 1146, ac4_links 957, ac6_unchanged 82, shots 18 PASS; ac7_layout 17/1 (only D1). ac8_readme needs a git tree (crashed on my archive); replaced by `git diff 8d4717b 30edfbb`: README one paragraph, only the "Second click" text, changed files README, sudoku.js, 2 test files, issue log.
+- Own real-input check (pm-91/pm_check.js; touch 360x740/375x812, mouse 1280x900; Tricky seeds 1, 8; Hint x2, Next step x2): per stage confined 2/2/2, removed 0/2/2, hatched 0/0/4, rings 0/0/2 (seed 1) and 0/0/3 (seed 8); literal keys per stage; link empty at 1-2, invitation at 3; grid/link/button tops identical at all stages, 6 runs. Taps on 2 later-hatched cells + 1 ring at stages 1 and 2: 0 reactions in 12 runs. Advancing by Hint after the probes ends with the same marks as Next step (6/6).
+- AC verdicts: AC1-AC9 PASS, AC10 PASS (below).
+- AC10 persona round (brief pm-91/persona-brief.md; 6 real shots 375x812, seeds 1 and 8, stages 1-3, literal paths). "Marks match the step": a 4, b 4, c 4 = 4.0, min 4 (target >= 4, none < 3): met. All 18 per-shot "matches" answers yes/mostly yes.
+  - Checked against shots: struck 2s at r1c5+r1c6 (seed 1 stage 2), text names only c5: true (3/3 raised). Seed 8 rings r1c5/r5c8/r7c2, hatching r1c3/r2c2/r4c8-9: true (3/3 correct). Seed 1 rings: b right (r2c2, r9c7); a (r9c4, said unsure) and c (r8c7) misread; hatching b right (r2c7-9, r3c7), a/c overstated. Misreads are locating errors, not stage mismatches: not counted against. Key cut off at 375 seed 1 stage 3: true (known item). b's "two bars" on the target: true, it is the text caret of the focused input (stages 1, 3); pre-existing.
+  - Q staging (rings/hatching at step 1): a mild yes ("can't see why the other rows are ruled out"), b no ("step 3 feels like the payoff"), c no ("would clutter"). P confirmed; Q stays in backlog, lowered.
+  - Quotes: b "Each step adds exactly the marks it talks about."; c "the dashed boxes and struck digits are enough to follow along".
+- D1 (1280 seed 1 stage 1, left edges 0.0156 px, empty #link/#buttons boxes narrower): confirmed not a defect. Sub-pixel, invisible (pm-91/shots/m1280-seed1-stage1.png), tops/heights identical, same mechanism as main's message-dependent widths. AC7 means visible movement.
+- Decision: ACCEPT on 30edfbb.
+- Backlog additions: naked step 2 names only the target while every removed cell is struck (3/3); struck badges hard to read on phones (a, c); focused target's text caret reads as a "pause"/"11" glyph (b); 1280 key-line width sub-pixel shift (D1, info only).
+
+## Backlog (PM, ordered, after #91 acceptance, iteration 19 close)
+1. Explanation follow-ups: key line fully visible on phones (cut off at 375 stage 3; 3/3 again); naked step 2 names all struck cells or says "e.g." (3/3); blank link-line reserve while empty; struck badge legibility on phones; Next step prominence (b); "Done" cue after the last step (c); target caret glyph (b); "Tap" vs "Click" on touch; jargon ("ring", "hatched"); shorter naked step 3; conclusion set apart; Back/previous step; ring tap cue; invitation wording; non-breaking "row N"/"7-9"; pin #next alignment/gap; staging Q (1/3 mild, lowered).
+2. Mobile remainder: as in memory/wiki/backlog.md item 2; 1280x900 seed 8 stage-2 button 9 px below the fold.
+3-6. Pointing reach (watch), slip follow-ups, small wording items, long-term: unchanged from memory/wiki/backlog.md.
