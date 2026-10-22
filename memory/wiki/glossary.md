@@ -38,6 +38,6 @@
 - **Play tool**: the PM's headless replay driver of the real page (session scratchpad), used for persona sessions and acceptance; it can switch prototype and wording variants.
 - **Mutation spot check**: a deliberate small break of the code to see whether a test fails; used by the reviewer and developer.
 - **Gate**: a check before work moves on (issue gate, lead check, PM acceptance).
-- **Iteration branch**: `iteration-N`, holds the work logs, merged by PR at the end.
+- **Iteration branch**: `iteration-N`, held the work logs up to it17; since it18 logs travel on the issue branches and the close uses `iteration-N-close`.
 - **Scratchpad**: session-specific shared folder for temporary files; not in the repo.
 - **Wiki / WIP / work log / session**: the memory tiers (`governance/memory-architecture.md`).
