@@ -55,3 +55,7 @@ Issue: https://github.com/dirkmarski/weaver/issues/85 (PM, it18 issue 3 of 3). B
 - AC6 personas a/b/c, 360x740: seed 1 3/3/3, seed 8 4/5/4 (avg 3.67; seed 8 4.33). Main: 2/2/2, 2/3/2. 375x812 branch 5/4/5, 5/5/5. Header legibility 4/4/4; prefer branch 3/3.
 - D9: AC6 read against AC2's targets (seed 8 full fit 4.33; seed 1 partial by design). Deviation logged in work-log/iteration-18-product.md and on the issue.
 - Unpinned #status margin-top accepted (AC8 one assertion); backlog: 360x740 seed 8 status assertion in the next phone-layout issue. Enter probe: not a regression.
+
+## Lead: merge
+- PM ACCEPT at 03ed19b (6fe78f8, logs only; lead-checked: no non-log diff 03ed19b..6fe78f8). Personas at 360x740: seed 1 3/3/3, seed 8 4/5/4 (avg of all 3.67 < AC6's 4; PM deviation D9: AC6 judged against AC2's promise, seed 8 4.33); 375x812 5/4/5, 5/5/5; header readability 4/4/4.
+- Before the merge: lead log, WIP, wiki product (mobile facts after #85) and backlog (mobile remainder) committed on the branch. Merge PR #88 with a merge commit (no squash).

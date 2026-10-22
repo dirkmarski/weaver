@@ -25,3 +25,5 @@
 ## #85
 - 2026-10-22: new lead run (same session id) after #84 merged as 638c0fa. Gate check passed (open, PM-authored). Fresh start: branch issue-85-compact-top from 638c0fa. Per-issue log: work-log/issue-85-compact-top.md. Ratio 2118/1324, headroom 0.
 - Developer 63fe51e/03ed19b: 4 CSS lines below 560 px (h1 1.4rem, caption 0.8rem + padding 0.25rem, #level and #status margins), f1e grid top <= 88. Grid top 106.8 -> 79.8; 360x740 seed 8 status bottom 736.5. AC3 clarified by the PM (D8: board digits excluded). Reviewer APPROVE (b7f9fbb), tester PASS (58ca5c0). Product 1328, tests 2119, cap 2124.
+- PM ACCEPT at 03ed19b (6fe78f8). AC6 deviation D9 (360x740 personas avg 3.67 over both seeds; seed 8 4.33). PR #88 merged with a merge commit.
+- Memory note for the closing lead: the wiki is under memory/wiki (I looked for wiki/product.md first); the tester's test-85 README worked for the lead re-check. The inherited measure.js 'Enter on focused button' probe prints false on main too: fix or drop it in the scripts.
