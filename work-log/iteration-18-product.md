@@ -90,3 +90,12 @@
 - Persona check: chips look right at 360/375; folded into #84's round as planned.
 - Open: backlog item "square cells with a classic scrollbar at 500-559 px" stands. Real-device check (Safari/Android) still not done (A1).
 - Note for memory: the tester's script README lived only in the lead's brief; a README.md in $WEAVER_SCRATCHPAD/test-83 would save rediscovery. governance/LOG.md not read.
+
+## #84 acceptance (PM, 2026-10-22, code head 2197782): ACCEPT
+- Setup: `git archive` of 2197782 and main a45b784 into $WEAVER_SCRATCHPAD/pm-84 (private TMPDIR/Chrome); tester scripts copied, W84/MAIN84 pointed at my copies. `node --test` 172/172, skipped 0.
+- AC1-AC5 (measure.js, MEASURE PASS): New puzzle on the #level line after the text, above the grid (grid top 107) at 360/375/390/1280, 28.8 px; AC2 state after New puzzle equals main (DOM click and real tap/click, 375/1280); Enter activates it (tab.js); Verify/Hint/Notes gaps 12.0, heights 34.8, equal tops; h1 top 16 at 7 widths x 3 heights, picker and game; row top steady over 9 states at 360/375/1280x900/1280x1200.
+- AC7: 375x812 seeds 1/8 status fully visible (ends 807.6/765.6), no h-scroll; 360x740 conclusion + steps 1-2 end at 709. Agree with the tester on all ACs; AC6 replay not rerun (tester 4 runs, 0 diffs; no product JS change apart from the level-text target).
+- Persona round (user-a/b/c, real tester shots; brief pm-84/persona/brief.md): thumb safety 5/5/5, New puzzle findability 4/4/4 (AC7 met). Chips (#83 fold-in): inside the cells 3/3 named, score 3/3/3 (tiny, struck digit hard to read, chip crowds notes 1/3 in the zoom); same readability level as scoping (B 3/3/3), not an #83 AC failure.
+- D6 item (1) 1280x1200 full explanation 4 px scroll (1204 vs 1200): accepted; top alignment trades centring for a steady page, row does not move.
+- D7 item (2) New puzzle first in Tab order before the grid: accepted (DOM order follows the visual order; AC2 asks reachable). Fresh puzzle focus starts in the grid, so no extra Tab cost in play.
+- Backlog (mobile remainder): chip legibility at phone width (struck chip, crowding notes 1/3; 3/3/3); play buttons 35 px < 44 px tap guideline (b); blank gap between invitation and buttons (3/3, link reserve D3); New puzzle confirmation (a); picker "Hard" wraps alone at 375 (c, pre-existing); caret line in target cell (c, again).

@@ -56,3 +56,9 @@ Issue: https://github.com/dirkmarski/weaver/issues/84 (PM, it18 issue 2 of 3). B
 - Reviewer APPROVE at 1bf7c5f (a842c22 -> 5ab1268); tester PASS at code head 2197782 (1916941 -> be9d038). Both confirmed removals (a), (b as one-line guard), (c). Reviewer's reason for (a) ("same outer length check as slice(1)") is imprecise: both fail at the row check; conclusion stands (no mutant separates them).
 - Lead re-run at be9d038: `node --test` 172/172, skipped 0; product 1324, tests 2118, cap 2118 (headroom 0). Viewed tester shot ac7-375x812-seed1.png: New puzzle beside "Difficulty: Tricky", three play buttons on one row, whole explanation visible.
 - For the PM: (1) at 1280x1200 with the full explanation the page is 1204 px tall (4 px scroll; main 1200, centred); the button row does not move. (2) New puzzle is now first in Tab order before the grid (was last). Persona round should include the chips (#83 fold-in): tester shots in $WEAVER_SCRATCHPAD/test-84/shots, scripts and README in $WEAVER_SCRATCHPAD/test-84.
+
+## PM acceptance
+- PM: Claude Opus 5.5 (claude-opus-5-5), session `28d2788e-8588-47d1-8000-5904c97e526f`. Decision: ACCEPT at code head 2197782.
+- Own check in a `git archive` copy (pm-84): suite 172/172 skipped 0; measure.js PASS (AC1-AC5), ac7.js AC7 geometry as the tester; Enter on New puzzle works (tab.js). No AC differs from the tester.
+- Personas (user-a/b/c): thumb safety 5/5/5, findability 4/4/4, chips 3/3/3 (inside the cells; small, struck digits hard to read: backlog).
+- Items: (1) 4 px scroll at 1280x1200 accepted; (2) New puzzle first in Tab order accepted. Details and backlog in work-log/iteration-18-product.md.
