@@ -56,6 +56,7 @@ async function open(level, seed) {
   if (level) await click('[data-level=' + level + ']');
 }
 const click = (sel) => page.eval('document.querySelector(' + J(sel) + ').click()');
+const hints = async (n) => { for (let i = 0; i < n; i++) await click('#hint'); };
 // Keydown on the cell input (the page's own key handler): list of [pos, key].
 const keys = (list) => page.eval('(' + J(list) + ').forEach(function (k) { document.querySelector("input[data-pos=\\"" + k[0] + "\\"]")' +
   '.dispatchEvent(new KeyboardEvent("keydown", { key: k[1], bubbles: true, cancelable: true })); })');
@@ -200,7 +201,7 @@ describe('page (headless Chrome)', () => {
     assert.deepStrictEqual(s.clash, []);
   });
 
-  it('f. a pointing hint shows its marks on both clicks; notes keep them, a value change removes them', async () => {
+  it('f. a pointing hint shows all its marks after the third step; notes keep them, a value change removes them', async () => {
     const { seed, g, extra } = pointing;
     const { typed, grid, step } = extra;
     const target = step.r * 9 + step.c;
@@ -211,7 +212,7 @@ describe('page (headless Chrome)', () => {
     assert.deepStrictEqual(s.target, [target]);
     assert.ok(s.area.length > 0 && !s.area.includes(target));
     assert.deepStrictEqual([s.confined, s.removed, s.dattr, s.key], [[], [], [], '']);
-    await click('#hint');
+    await hints(3);
     s = await read();
     const marks = S.hintMarks(S.hintFor(grid, 2), grid);
     assert.deepStrictEqual([s.target, s.confined, s.removed], [[target], step.confined, step.removed]);
@@ -241,14 +242,27 @@ describe('page (headless Chrome)', () => {
     s = await read();
     assert.strictEqual(s.status, 'Pointing: row 1, column 5 must be 7.\n1. In the box of rows 1-3 and columns 7-9, the digit 2 fits only in row 1.');
     assert.strictEqual(await nextStep(), 'Next step (2 of 3)|BUTTON');
+    const staged = (s) => [s.confined, s.removed, s.hatched, s.digit, s.dattr, s.link];
+    assert.deepStrictEqual(staged(s), [[7, 8], [], [], [], [7, 8], '']); // step 1: dashed confined cells only
+    assert.strictEqual(s.key, 'Key: dashed purple = the only places for 2 in the box.');
+    await focusAt(15); // a cell that is hatched later: no link yet
+    s = await read();
+    assert.deepStrictEqual([s.linked, s.link], [[], '']);
     await page.eval('document.getElementById("next-step").focus()');
     await click('#next-step');
     s = await read();
+    assert.deepStrictEqual(staged(s), [[7, 8], [4, 5], [], [], [4, 5, 7, 8], '']); // step 2: + struck badges, the target too
+    assert.strictEqual(s.key, 'Key: dashed purple = the only places for 2 in the box; struck grey 2 = this step rules 2 out there.');
+    await page.eval('document.querySelectorAll("#sudoku td")[10].click()'); // a cell that is ringed later: no selection yet
+    s = await read();
+    assert.deepStrictEqual([s.linked, s.ruled, s.link], [[], [], '']);
     assert.strictEqual(s.status, 'Pointing: row 1, column 5 must be 7.\n1. In the box of rows 1-3 and columns 7-9, the digit 2 fits only in row 1.\n'
       + '2. So 2 cannot go in row 1 outside that box: not in row 1, column 5.');
     assert.deepStrictEqual([await nextStep(), await page.eval('document.activeElement.id')], ['Next step (3 of 3)|BUTTON', 'next-step']); // focus stays on the button
     await click('#next-step');
     s = await read();
+    assert.deepStrictEqual(staged(s), [[7, 8], [4, 5], [15, 16, 17, 24], [10, 78], [4, 5, 7, 8], INVITE]); // step 3: + hatching and rings
+    assert.strictEqual(s.key, 'Key: dashed purple = the only places for 2 in the box; struck grey 2 = this step rules 2 out there; hatched = a purple ring rules 2 out there (a 2 already in the same row, column or box).');
     assert.strictEqual(await nextStep(), null);
     assert.strictEqual(s.active, '4'); // the last step hands focus back to the target cell
     assert.strictEqual(s.status, 'Pointing: row 1, column 5 must be 7.\n1. In the box of rows 1-3 and columns 7-9, the digit 2 fits only in row 1.\n'
@@ -284,6 +298,7 @@ describe('page (headless Chrome)', () => {
       const s = await read();
       assert.strictEqual(s.status.split('\n')[3], '3. That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
       assert.strictEqual(await nextStep(), null);
+      assert.deepStrictEqual(await tops(), still); // and not at the last step either
       assert.ok(await fits('status') <= 740, '#status bottom below the fold');
       await click('#hint'); // once complete, a further click leaves the explanation as it is
       assert.deepStrictEqual([(await read()).status, await nextStep()], [s.status, null]);
@@ -302,10 +317,7 @@ describe('page (headless Chrome)', () => {
   it('f1b. pins on the page: P1 pointing (hatched cells, key line, stripe and tint layers) and P3 hidden single (hatched, key line, a value change clears both)', async () => {
     const all = (...rc) => rc.map(([r, c]) => (r - 1) * 9 + c - 1);
     await open('tricky', 8);
-    await click('#hint');
-    await click('#hint');
-    await click('#hint');
-    await click('#hint');
+    await hints(4);
     let s = await read();
     assert.strictEqual(s.status, 'Pointing: row 4, column 1 must be 8.\n1. In the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3.\n'
       + '2. So 8 cannot go in column 3 outside that box.\n3. That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
@@ -354,8 +366,7 @@ describe('page (headless Chrome)', () => {
 
   it('f1d. pointing, naked form (Tricky seed 1): the link names the pointing digit 2, not the hinted digit 7', async () => {
     await open('tricky', 1);
-    await click('#hint');
-    await click('#hint');
+    await hints(4);
     await page.eval('document.querySelector("input[data-pos=\\"15\\"]").focus()'); // row 2, column 7
     const s = await read();
     assert.deepStrictEqual(s.linked, [10, 78]); // row 2, column 2 and row 9, column 7
@@ -368,8 +379,7 @@ describe('page (headless Chrome)', () => {
     const state = async () => { const s = await read(); return [s.linked, s.ruled, s.link]; };
     const badges = () => page.eval('[].slice.call(document.querySelectorAll("#sudoku td")).map(function (t, i) { var s = getComputedStyle(t, "::after"); return s.color === "rgb(74, 15, 138)" && s.content === \'"2"\' ? i : -1; }).filter((i) => i >= 0)'); // the purple "2" badges
     await open('tricky', 1);
-    await click('#hint');
-    await click('#hint');
+    await hints(4);
     assert.deepStrictEqual(await state(), [[], [], INVITE]); // the Hint click leaves nothing selected
     await tap(2, 2);
     assert.deepStrictEqual(await state(), [[pos(2, 2)], [pos(2, 7), pos(2, 8), pos(2, 9)],
@@ -471,8 +481,7 @@ describe('page (headless Chrome)', () => {
     const { seed, extra } = noRings;
     await open('tricky', seed);
     await keys(extra.typed);
-    await click('#hint');
-    await click('#hint');
+    await hints(4);
     const s = await read();
     assert.deepStrictEqual(s.digit, []);
     assert.ok(s.key.endsWith('out there.') && !s.key.includes('hatched'));

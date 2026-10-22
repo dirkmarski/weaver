@@ -467,12 +467,15 @@
 
   // The key line under a hidden single's or pointing step's explanation; hatchedCount the hatched cells showing.
   // Pointing names its dashed and struck marks, and the hatching only when a cell is hatched; a hidden single always has some.
-  function hintKey(hint, hatchedCount) {
+  // For a pointing step, `stage` (1-3, default 3) is the number of revealed steps: 1 names only the dashed marks, 2 adds the struck.
+  function hintKey(hint, hatchedCount, stage) {
     var pointing = hint.technique === 'pointing', d = pointing ? hint.pointDigit : hint.digit;
+    stage = stage || 3;
     var hatch = 'hatched = a purple ring rules ' + d + ' out there (' + aDigit(d) + ' already in the same row, column or box)';
     if (!pointing) return 'Key: ' + hatch + '.';
-    return 'Key: dashed purple = the only places for ' + d + ' in the box; struck grey ' + d + ' = this step rules ' + d + ' out there'
-      + (hatchedCount ? '; ' + hatch : '') + '.';
+    return 'Key: dashed purple = the only places for ' + d + ' in the box'
+      + (stage > 1 ? '; struck grey ' + d + ' = this step rules ' + d + ' out there' : '')
+      + (stage > 2 && hatchedCount ? '; ' + hatch : '') + '.';
   }
 
   // The link for a hatched cell p (flat index): { partners, text }. Partners are the ringed cells (`ringed`, ascending flat
@@ -802,7 +805,7 @@
     var lastCell = null; // cell input that last had focus
     var notesButton = document.getElementById('notes');
     var hint = null;     // hint showing now (result of hintFor), or null
-    var steps = null;    // { lines, shown } of a pointing explanation revealed step by step (#90), else null
+    var steps = null;    // { lines, shown, marks } of a pointing explanation revealed step by step (#90), else null
     var nextRow = document.getElementById('next');
     var nextStep = document.getElementById('next-step');
     var hatchedRings = null; // { hatched, rings, d } of the explanation showing when it has hatched cells, else null
@@ -1082,10 +1085,32 @@
       if (hatchedRings.rings.indexOf(q) >= 0) selectRing(q);
     });
 
+    // Shows the marks and key line of the hint for revealed step `stage` (1-3; 3 = all, as for every other hint): 1 = target,
+    // area, confined; 2 = + removed; 3 = + hatching, rings and the link invitation. Adds only, so a later stage repeats the earlier.
+    function showMarks(marks, stage) {
+      marks.area.forEach(function (q) { cellAt(q).classList.add('hint-area'); });
+      cellAt(marks.target).classList.add('hint-target');
+      var staged = [['confined', marks.confined], ['removed', stage > 1 ? marks.removed : []]];
+      staged.forEach(function (m) {
+        m[1].forEach(function (q) {
+          cellAt(q).classList.add('hint-' + m[0]);
+          cellAt(q).setAttribute('data-d', hint.pointDigit);
+        });
+      });
+      if (hint.kind === 'explain' && hint.technique !== 'naked') keyLine.textContent = hintKey(hint, marks.hatched.length, stage);
+      if (stage < 3) return;
+      marks.hatched.forEach(function (q) { cellAt(q).classList.add('hint-hatched'); });
+      marks.digits.forEach(function (q) { cellAt(q).classList.add('hint-digit'); });
+      if (!marks.hatched.length) return;
+      hatchedRings = { hatched: marks.hatched, rings: marks.digits, d: hint.technique === 'pointing' ? hint.pointDigit : hint.digit };
+      unlink();
+    }
+
     // Reveals the next step of a pointing explanation; the target cell takes focus when the last one shows.
     function revealStep() {
       steps.shown++;
       showSteps();
+      showMarks(steps.marks, steps.shown);
       if (steps.shown >= 3) inputs[hint.r][hint.c].focus();
     }
     nextStep.addEventListener('click', revealStep);
@@ -1102,25 +1127,12 @@
       var pointingExplain = res.technique === 'pointing' && res.kind === 'explain';
       status.textContent = res.text;
       status.className = pointingExplain ? 'steps' : '';
-      if (pointingExplain) { steps = { lines: res.text.split('\n'), shown: 1 }; showSteps(); }
+      if (pointingExplain) { steps = { lines: res.text.split('\n'), shown: 1, marks: null }; showSteps(); }
       if (res.kind !== 'nudge' && res.kind !== 'explain') return;
       hint = res;
       var marks = hintMarks(res, currentGrid());
-      marks.area.forEach(function (q) { cellAt(q).classList.add('hint-area'); });
-      cellAt(marks.target).classList.add('hint-target');
-      marks.hatched.forEach(function (q) { cellAt(q).classList.add('hint-hatched'); });
-      marks.digits.forEach(function (q) { cellAt(q).classList.add('hint-digit'); });
-      [['confined', marks.confined], ['removed', marks.removed]].forEach(function (m) {
-        m[1].forEach(function (q) {
-          cellAt(q).classList.add('hint-' + m[0]);
-          cellAt(q).setAttribute('data-d', res.pointDigit);
-        });
-      });
-      if (res.kind === 'explain' && res.technique !== 'naked') keyLine.textContent = hintKey(res, marks.hatched.length);
-      if (marks.hatched.length) {
-        hatchedRings = { hatched: marks.hatched, rings: marks.digits, d: res.technique === 'pointing' ? res.pointDigit : res.digit };
-        unlink();
-      }
+      if (steps) steps.marks = marks;
+      showMarks(marks, steps ? 1 : 3);
       inputs[res.r][res.c].focus();
     });
 

@@ -10,3 +10,8 @@
 - Developer 75710b5/cf6fa4d/57192db: `#next` button row after `#status`, reveal state in `render()`, Hint advances. Reviewer APPROVE (9e2ac6b), tester PASS 619 real-input checks (903da16). Rework 1 rejected by the lead (542-char packed assertion); rework 2 fb20d95 one legible line, M13/M14 left to measurement. Ratio 2174/1359 = cap, headroom 0 (for #91: every test line now needs product lines or listed removals).
 - PM ACCEPT at fb20d95 (b928f06): AC1-AC12 PASS, personas 4.0/4.0. Wiki/WIP updated on the branch; PR #92 merged with a merge commit. Agent worktrees removed.
 - Memory notes for the closing lead: rework 1 line packing caught by the lead's line-length check (lessons updated); tester merge commit without session tag (WIP prompt note); the tester's test-90 scripts need `tmp/` and `shots/` created (PM).
+
+## #91
+- 2026-10-22: new lead run (same session id `19338c12-dbf9-46b7-b92b-1a81aef47c6d`, fresh start: no branch, PR or log existed). Gate passed (open, authored by weaver-agents/PM). Per-issue log: work-log/issue-91-staged-marks.md. Baseline ratio 2174/1359, headroom 0.
+- Developer b24f8a8/e4d6ac9/930be19: `showMarks(marks, stage)`, `hintKey` stage arg, README, tests (+13, product +12, cap 2193). Reviewer APPROVE (abced2d, 15 mutants), tester PASS (4af088c, about 2200 real-input checks, D1 sub-pixel 1280 shift judged not a defect). No rework round needed. Reviewer/tester logs fast-forwarded (no agent merge commits).
+- PR #93; PM ACCEPT on 30edfbb (56a7a7c), personas 4/4/4. Wiki/WIP updated on the branch; merged with a merge commit.

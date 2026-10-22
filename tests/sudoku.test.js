@@ -1176,6 +1176,10 @@ test('hintKey: the exact key line for pointing with and without hatched cells, f
   const head = (d) => 'Key: dashed purple = the only places for ' + d + ' in the box; struck grey ' + d + ' = this step rules ' + d + ' out there';
   assert.strictEqual(point(2, 4), head(2) + '; hatched = a purple ring rules 2 out there (a 2 already in the same row, column or box).');
   assert.strictEqual(point(9, 0), head(9) + '.');
+  const stage = (n) => hintKey({ technique: 'pointing', pointDigit: 2, form: 'hidden', unit: 'row' }, 4, n);
+  assert.strictEqual(stage(1), 'Key: dashed purple = the only places for 2 in the box.');
+  assert.strictEqual(stage(2), head(2) + '.');
+  assert.strictEqual(stage(3), point(2, 4)); // stage 3 is the default
   assert.strictEqual(hintKey({ technique: 'hidden', digit: 8 }, 1), 'Key: hatched = a purple ring rules 8 out there (an 8 already in the same row, column or box).');
 });
 
