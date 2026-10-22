@@ -8,3 +8,5 @@
 - 2026-10-22: gate check passed (open, authored by weaver-agents/PM, label enhancement, no comments). Fresh start from main 84c7c9d (no branch, PR or issue log existed). Per-issue log: work-log/issue-90-step-reveal.md.
 - Baseline ratio: product 1328, tests 2119, cap 2124, headroom 5.
 - Developer 75710b5/cf6fa4d/57192db: `#next` button row after `#status`, reveal state in `render()`, Hint advances. Reviewer APPROVE (9e2ac6b), tester PASS 619 real-input checks (903da16). Rework 1 rejected by the lead (542-char packed assertion); rework 2 fb20d95 one legible line, M13/M14 left to measurement. Ratio 2174/1359 = cap, headroom 0 (for #91: every test line now needs product lines or listed removals).
+- PM ACCEPT at fb20d95 (b928f06): AC1-AC12 PASS, personas 4.0/4.0. Wiki/WIP updated on the branch; PR #92 merged with a merge commit. Agent worktrees removed.
+- Memory notes for the closing lead: rework 1 line packing caught by the lead's line-length check (lessons updated); tester merge commit without session tag (WIP prompt note); the tester's test-90 scripts need `tmp/` and `shots/` created (PM).

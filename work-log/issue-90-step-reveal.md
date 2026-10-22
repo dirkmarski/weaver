@@ -46,3 +46,7 @@ Mutants (14 real): slice off by one, hide early, label off by one, no early retu
 - Rework 2 (fb20d95, tests only, 1 line for 1): 214-character `new Set([...]).size === 1` compare of font + padding of #next-step and #verify. Kills M11/M12; M13 (#next centred) and M14 (#next margin) stay unguarded in the suite, covered by the tester's real-input measurement (left edge 0.00 px, gap 9.6 px) and PM acceptance. Accepted trade-off at the cap.
 - Lead delta re-check (tests-only rounds): suite 173/173, skipped 0; mutants M12 (font-size 0.85rem) and M5 (Hint-branch focus) and M14 (margin -0.25rem, round 1) killed; no line > 320; product unchanged since the tested head 57192db (`git diff --stat` empty); tester scripts re-run on fb20d95: 7/7 PASS (619 checks). Ratio product 1359, tests 2174, cap 2174, headroom 0.
 - Observation for the PM: after a tap the button keeps a blue-tinted focus look (tester, 375x812 stage-2 shot).
+
+## Lead: acceptance and merge
+- PM ACCEPT on code head fb20d95 (issue comment 6331973600, PR comment 6331973882; PM log b928f06, logs only, lead-checked with `git diff --stat fb20d95 b928f06`). AC1-AC12 PASS; personas learning 4/4/4, button ease 4/4/4 (targets >= 4). PM backlog: key line cut off on phones (3/3), more prominent button, "done" cue, 1280x900 seed 8 stage-2 button 9 px below the fold, pin #next alignment/gap when there is room.
+- Before the merge: wiki (product, architecture, lessons) and WIP updated on the branch after the accepted head; merge commit with the branch head sha.
