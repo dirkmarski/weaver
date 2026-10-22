@@ -57,6 +57,7 @@ Only lessons still valid, compressed by theme (pruned at the it17 and it18 close
 - On Node 24 run `node --test` without a path. macOS has no `timeout`; BSD `sed -i ''` cannot match `\n` (use `perl -0pi` or Python for multi-line edits). README lines are very long: spot-check README diffs with `--stat` or `--word-diff`.
 - Headless Chrome: `--headless=new --no-sandbox`, temp `--user-data-dir`, `--remote-debugging-port=0` and read `DevToolsActivePort`; kill the process group. Its window has a ~500 px minimum: use `Emulation.setDeviceMetricsOverride` for phone widths and wait for layout (a 25 px cell was once read mid-layout). Focus events (`focusin`/`focusout`) fire only after `Emulation.setFocusEmulationEnabled({enabled: true})` (it15). `Input.dispatchKeyEvent` Enter activates a focused button only with `text: '\r'` on the keyDown (it18 close).
 - Scratch scripts can reuse `launch` from `tests/chrome.js`; compare against main with `git archive origin/main` into a scratch dir. Check leftover processes/profiles with a private `TMPDIR` when agents run in parallel.
+- Reviewer and tester one after the other in detached worktrees, each committing only its log entry there; the lead fast-forwards the branch to each sha (`git merge --ff-only`): no agent merge commits, no untagged merges (it19 #91). Agent briefs as scratchpad files with literal paths, prompt = one line pointing at the brief (it19 #91).
 
 ## Open concerns (not lessons)
 - GitHub Pages never confirmed enabled; all user evidence is simulated.
