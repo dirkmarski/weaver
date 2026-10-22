@@ -10,6 +10,13 @@ Issue: https://github.com/dirkmarski/weaver/issues/91 (PM, it19 issue 2 of 2). B
 
 ## Developer
 
+- Model Claude Sonnet 5.5, session 19338c12-dbf9-46b7-b92b-1a81aef47c6d.
+- Design: new wiring-scope `showMarks(marks, stage)` (adds only; stage 1 target/area/confined, 2 + removed, 3 + hatched/rings/`hatchedRings`) called by Hint (stage 1 for a pointing explain, else 3) and `revealStep` (stage = `steps.shown`; `steps` now also holds `marks`). Key via `hintKey(hint, hatchedCount, stage)`, stage default 3 = today's text. Link handlers unchanged: they are inert while `hatchedRings` is null, which now holds until stage 3.
+- Tests: f1 pins the three stages (naked, seed 1, literal keys, no link on a later-hatched/ringed cell at 1 and 2); f, f1d, f1e, f2b, f1b use the new `hints(n)` helper and reach stage 3; f1b (hidden) is the stage 3 equality for the other form; f1a also compares tops after the last step; unit test pins hintKey stage 1/2/3.
+- Measurements: product 1371 (sudoku.js 1177, index.html 43, style.css 151), tests 2187, cap 2193, headroom 6. `node --test`: 173 pass, 0 fail, 0 skipped.
+- Mutants killed: removed-badge gate, stage-3 gate (off by one each way), key hatch clause at 2, key struck clause at 1, always stage 3, reveal jumps to 3, hatchedRings set before stage 3 (link handler reacting early).
+- Known limits: AC7 steady page checked by f1a at 360 only (tops before/after stages); 375/1280 mouse not re-measured; no real-input check.
+
 ## Reviewer
 
 ## Tester
