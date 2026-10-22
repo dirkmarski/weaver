@@ -141,4 +141,8 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
   #sudoku td[data-d="7"]::after, #sudoku td[data-d="8"]::after, #sudoku td[data-d="9"]::after { top: auto; bottom: 0; --ty: 0; }
   #sudoku td { width: calc((100vw - 32px) / 9 - 2px); height: calc((100vw - 32px) / 9 - 2px); line-height: 0; }
   #sudoku input { height: 1px; min-height: 100%; line-height: normal; }
+  h1 { font-size: 1.4rem; margin: 0 0 0.25rem; }
+  #sudoku caption { font-size: 0.8rem; padding-bottom: 0.25rem; }
+  #level { margin: 0 0 0.25rem; }
+  #status { margin-top: 0.5rem; }
 }
