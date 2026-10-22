@@ -2,15 +2,15 @@
 
 Static site, no dependencies, no build. Plain ES5-style JS in an IIFE.
 
-## Files (end of iteration 18)
+## Files (end of iteration 19, main a552c1d)
 | File | Lines | Role |
 |---|---|---|
 | `index.html` | 43 | page skeleton: picker (4 `data-level` buttons), `#game` (table, `#link` link line under the grid (plain `<p>`, #68, moved by #76), `#level` line: `#level-text` then the New puzzle button (#84), `#buttons`: Verify, Hint, Notes), `#status` (role=status), `#next` (Next step button row, hidden unless a pointing explanation is partly shown, #90; outside the live region so `#status` text stays checkable), `#key` (key line, plain `<p>`, not a live region), `#tally` |
 | `style.css` | 151 | styling, box shading, hint/conflict classes, `td.hint-hatched` (stripe layer at 0.25 listed before the amber tint layer, #65/#68), `td.hint-linked` (solid fill shorthand overrides tint and stripes; its own `input` colour rule, #68), `td.hint-ruled::after` (purple struck D badge sharing the pointing-badge rules, #78; was an inset border, #72), `#status.steps` (pre-line, left, 36rem; pointing explanation only, #77), `#next`/`#next-step` (same column, play-button font/padding, #90), `#link` (min-height 4lh so the buttons stay still, #76), `td.clash` dashed orange outline, pointing badges (`::after` with `attr(data-d)`) placed in D's note slot via `--x`/`--y` per `data-d`; page top-aligned at all widths and play buttons one flex row, 12 px gaps (#84); below 560 px (#83, #85): compact h1/caption/`#level`/`#status` margins (#85), td width/height `calc((100vw - 32px) / 9 - 2px)` (square; td line-height 0 + input min-height remove the 37 px floor), chip side padding 1 px, edge badges flush left/right and 1-3/7-9 flush top/bottom via `--tx`/`--ty` |
 | `sudoku.js` | 1177 | pure logic exported for Node and as `window.Sudoku`, plus the browser `render()` UI |
-| `tests/sudoku.test.js` | 1288 | unit tests on hand-built grids |
+| `tests/sudoku.test.js` | 1292 | unit tests on hand-built grids |
 | `tests/generator.test.js` | 155 | generator tests |
-| `tests/page.test.js` | 601 | page tests: the real `index.html` in one headless Chrome (#55, it12) |
+| `tests/page.test.js` | 613 | page tests: the real `index.html` in one headless Chrome (#55, it12) |
 | `tests/chrome.js` | 100 | test helper only: finds Chrome, launches it, CDP over the global WebSocket, cleanup |
 | `tests/fixture.js` | 27 | a valid grid and puzzle, fixture only |
 
@@ -34,12 +34,12 @@ Product code 1371 lines (sudoku.js 1177); tests 2187 (ratio 1.595x, guide ~1x; t
 - Value change (`setCell`, the single write path): `before` grid -> `creditEntry`; then `clearResults`, `showClashes(after)`, `fixedMessage`, the credit text, then `completionFor` (wins when the grid is full); `showTally`.
 - `clearResults` (Verify, Hint, value changes, `choose`, `newPuzzle`) clears the status, the step-reveal state `steps` and the Next step row (#90), the key line, `hatchedRings` and the link line (`unlink`), red flags and all hint classes (including `hint-hatched`)/`data-d`; never `td.clash`. Notes changes do not call it, so a hint and its key line survive them.
 - `showMarks(marks, stage)` (wiring scope, add-only, #91): stage 1 target/area/confined + `data-d`, 2 + removed, 3 + hatched, rings and `hatchedRings` (so links are inert before 3); sets the key via `hintKey(..., stage)`. Hint calls it with `steps ? 1 : 3` (`steps.marks` keeps the marks), `revealStep` with `steps.shown`.
-- Hint button: `clearResults`, then `hintFor(grid, step, preferredTechnique(tally, currentLevel), currentLevel)`, `hintMarks` adds `hint-target`, `hint-area`, `hint-digit`, and on a pointing explain `hint-confined`/`hint-removed` plus `data-d`, adds `hint-hatched` to `marks.hatched`, and on every explain except a naked single sets `#key` to `hintKey(res, marks.hatched.length)`; when `marks.hatched` is non-empty it stores `hatchedRings = {hatched, rings: marks.digits, d}` (d = pointDigit for pointing, else digit) and shows the invitation. `cellAt(q)` is shared at wiring scope.
+- Hint button: `hintFor(grid, step, preferredTechnique(tally, currentLevel), currentLevel)`, `clearResults`, `hintMarks`; marks go through `showMarks` (above). The key (`hintKey`) shows on every explain except a naked single; when hatched cells show (stage 3), `hatchedRings = {hatched, rings: marks.digits, d}` (d = pointDigit for pointing, else digit) and the invitation shows. While `steps` is set, Hint only calls `revealStep` (until step 3) and focuses the target, no redraw (#90); `revealStep` (also the Next step button) focuses the target at step 3. `cellAt(q)` is shared at wiring scope.
 - Link (#68, #72): `unlink()` removes `hint-linked`, and `hint-ruled` with its `data-d` (#78), and sets the line to the invitation (or empty when nothing is hatched); `clearResults` calls it. `focusin` on the table calls `unlink()`, then: an entered ring -> `selectRing(p)` (adds `hint-linked` to the ring, `hint-ruled` plus `data-d` to `ringRules(...).cells`, shows its text); a hatched cell -> `hint-linked` on `ringLink(...).partners` and its text. `focusout` -> `unlink`. A document-level `click` handler (runs after the focusout of the cell that lost focus) ignores editable cells (left to focusin, else it would undo a forward link), otherwise unlinks and, on a given ring, calls `selectRing`; it returns early when no hint with hatching shows.
 - `relabel(inp)` is the only aria-label builder (position, notes, ", clashes").
 
 ## Tests
-- Run `node --test` from the repo root (on Node 24 `node --test tests/` fails). 172 tests (152 unit, 20 page), about 3 s with Chrome, 0.6 s without.
+- Run `node --test` from the repo root (on Node 24 `node --test tests/` fails). 173 tests (152 unit, 21 page), about 3 s with Chrome, 0.6 s without.
 - Page tests (#55): one headless Chrome per file; `Math.random` seeded by injecting `seededRng`'s source (regex-extracted from `sudoku.js`, guarded by a seeding assertion); keydown on cell inputs and real button clicks; DOM-only reads; no test hooks in product code. Chrome via `CHROME_PATH` or default macOS/Linux paths; `WEAVER_NO_CHROME=1` or a missing Chrome gives a visible skip with a reason (page evidence must show skipped = 0). Cleanup on normal end, failure, Ctrl-C/SIGTERM and the orphaned test child (EPIPE listeners, ppid watchdog); not after `kill -9`.
 - Narrow-width page checks use `Emulation.setDeviceMetricsOverride` (headless Chrome's window has a ~500 px minimum), wait for layout to settle (check the cell width), and clear the override in `finally`.
 - Seeds are chosen on purpose: a seeded test guards a rule only if one of its seeds fails under the mutant.
