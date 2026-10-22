@@ -51,3 +51,8 @@ Issue: https://github.com/dirkmarski/weaver/issues/84 (PM, it18 issue 2 of 3). B
 - Ratio: product 1324, tests 2118, cap 2118: OK (headroom 0).
 - Notes: 1280x1200 with the full explanation the document is 1204 px tall (4 px scroll; main 1200); row does not move. Tab from a fresh puzzle starts in the grid, New puzzle is reached via Shift+Tab or later Tab.
 - Not tested: real devices, Safari/Firefox, persona ratings, landscape phones, widths below 360.
+
+## Lead: gates before the PR
+- Reviewer APPROVE at 1bf7c5f (a842c22 -> 5ab1268); tester PASS at code head 2197782 (1916941 -> be9d038). Both confirmed removals (a), (b as one-line guard), (c). Reviewer's reason for (a) ("same outer length check as slice(1)") is imprecise: both fail at the row check; conclusion stands (no mutant separates them).
+- Lead re-run at be9d038: `node --test` 172/172, skipped 0; product 1324, tests 2118, cap 2118 (headroom 0). Viewed tester shot ac7-375x812-seed1.png: New puzzle beside "Difficulty: Tricky", three play buttons on one row, whole explanation visible.
+- For the PM: (1) at 1280x1200 with the full explanation the page is 1204 px tall (4 px scroll; main 1200, centred); the button row does not move. (2) New puzzle is now first in Tab order before the grid (was last). Persona round should include the chips (#83 fold-in): tester shots in $WEAVER_SCRATCHPAD/test-84/shots, scripts and README in $WEAVER_SCRATCHPAD/test-84.
