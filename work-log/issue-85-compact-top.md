@@ -15,3 +15,8 @@ Issue: https://github.com/dirkmarski/weaver/issues/85 (PM, it18 issue 3 of 3). B
 - Test: one assertion in f1e (375 px): grid top <= 88. Mutant (main style.css) fails it with 106.8. Suite: 172 pass, 0 fail, 0 skipped.
 - Ratio: product 1324 -> 1328 (index 42, style 148, sudoku.js 1138); tests 2118 -> 2119 (page.test.js 549); cap floor(1.6 x 1328) = 2124, headroom 5; ratio 1.596 (before 1.600). No removals, no line packing.
 - Known limits: the 30 px digits typed in the grid cells are larger than the 22.4 px title (on main the title was 32 px, so it was the largest); a title of 30 px would cost about 9 px of the gain and break AC2 seed 8. README and style.css header comment do not describe the phone header; unchanged.
+
+## Lead review of the developer round
+- Developer 63fe51e (CSS, 4 lines in the max-width 559px rule), 03ed19b (f1e: grid top <= 88 at 375 px), 1edd71e (log). Lead re-run: `node --test` 172/172, skipped 0; product 1328, tests 2119, cap 2124 (headroom 5). No removals, no packing.
+- Diff check: all four rules inside the media query, so >= 560 px cannot change; pin 88 sits under AC1's limit (106.8 - 18 = 88.8) with 8 px slack over the measured 79.8.
+- AC3 concern (cell digits 30 px > title 22.4 px): asked the PM. D8 (fc9a789, issue comment 6329612420): "largest text" = prose/heading text, board digits excluded; 22.4 px passes.
