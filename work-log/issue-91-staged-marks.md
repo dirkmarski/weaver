@@ -19,4 +19,14 @@ Issue: https://github.com/dirkmarski/weaver/issues/91 (PM, it19 issue 2 of 2). B
 
 ## Reviewer
 
+- Model Claude Sonnet 5.5 (claude-sonnet-5-5), session 19338c12-dbf9-46b7-b92b-1a81aef47c6d, head reviewed 930be19.
+- Verdict: APPROVE.
+- Findings:
+  1. Info: the click counts of f, f1d, f1e, f2b are not the same as before (f 1 -> 3, f1d/f1e/f2b 2 -> 4 `hints(n)` clicks); this is required, since the first explain click now shows step 1 only. f1b is 4 -> `hints(4)`, identical. No assertion removed in any of them (diff shows click lines only, plus added assertions).
+  2. Info (gap, not blocking): the hidden form is page-tested at stage 3 only (f1b), as AC9 asks; an entered ring's input focus before stage 3 is not asserted directly (code path is inert via `hatchedRings === null`; the early-set mutant m13 is killed through the hatched-cell focus in f1).
+  3. Info: AC7 evidence is f1a at 360 only (developer's stated limit); AC10 is the PM's.
+- Code reading: showMarks stages gate correctly; Hint (steps ? 1 : 3) and revealStep (steps.shown) go through the same function; nudges and singles take stage 3 (steps null); clearResults nulls steps and hatchedRings; hatchedRings and unlink only at stage 3; README changes only the pointing Second click paragraph and is accurate per stage.
+- Suite: 173 pass, 0 fail, 0 skipped. Product 1371, tests 2187, cap 2193. No new line above the previous longest (329 / 320 / 255).
+- Mutants (all killed): removed gate dropped / at stage>2; stage-3 gate at <2 / <4; key struck at stage>0; key hatch at stage>1; always stage 3; always stage 1; reveal with 3; reveal without showMarks; hintKey default 1; hatchedRings set before stage 3; rings not drawn; hatching not drawn; confined hidden at stage 1.
+
 ## Tester
