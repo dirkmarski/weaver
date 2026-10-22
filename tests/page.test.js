@@ -359,6 +359,7 @@ describe('page (headless Chrome)', () => {
       assert.strictEqual((await read()).level, 'Difficulty: Easy');
       const [text, newp, grid, ver, hint, notes] = await page.eval('["#level-text", "#new-puzzle", "#sudoku", "#verify", "#hint", "#notes"].map(function (s) { var b = document.querySelector(s).getBoundingClientRect(); return [b.left, b.top, b.right, b.bottom]; })'); // [left, top, right, bottom]
       assert.ok(newp[0] >= text[2] && newp[1] < text[3] && text[1] < newp[3] && newp[3] < grid[1] && newp[3] - newp[1] >= 28, 'New puzzle after the level text, on its line, above the grid: ' + [text, newp, grid]);
+      assert.ok(grid[1] <= 88, 'compact top at 375 px: grid top <= 88 (main 106.8): ' + grid[1]);
       assert.ok(ver[1] === hint[1] && hint[1] === notes[1] && hint[0] - ver[2] >= 8 && notes[0] - hint[2] >= 8, 'Verify, Hint, Notes share a top, gaps >= 8: ' + [ver, hint, notes]);
       assert.ok([ver, hint, notes].every((b) => b[3] - b[1] >= 34), 'play buttons >= 34 px tall: ' + [ver, hint, notes]);
     } finally {
