@@ -14,3 +14,12 @@ Issue: https://github.com/dirkmarski/weaver/issues/90 (PM, it19 issue 1 of 2). B
 - Measured (headless Chrome, mobile, scroll 0, Tricky; button bottom after 2nd Hint / after 1st Next step; final status bottom): 360x740 seeds 1 and 8: 675.9 / 717.9 (<= 740); seed 8 final 736.5 (unchanged, 3.5 px slack); seed 1 final 757.5 (as today, over). 375x812: 690.9 / 732.9 (<= 812). Grid, link and button-row tops constant; scrollWidth = viewport.
 - Ratio: product 1359 (+31), tests 2171 (+52, all in tests/page.test.js), cap 2174, headroom 3. No assertions removed.
 - Known limits: Tab/Enter/Space activation is native `<button>` behaviour, not driven in a test; the 1280 px mouse case and touch input are not measured here (PM, AC12).
+
+## Lead review of the developer round
+- Developer 75710b5 (product), cf6fa4d (page tests), 57192db (README), 38d8ff8/17b5a0f (log). Lead re-run: `node --test` 173/173, skipped 0. Product 1359, tests 2171, cap 2174, headroom 3. No removals.
+- Diff read in full (index.html +1, style.css +3, sudoku.js +29/-2): button in its own `<p id="next">` after `#status` (status text stays the shown lines only); reveal state reset in `clearResults()`; Hint early-returns while `steps` is set. Mutant `steps.shown > 3` for the final focus: killed (1 fail).
+- Open for review/test: Tab/Enter/Space and real touch/mouse not driven; Verify/New puzzle/level clearing only by code reading; key line now sits below the button while it shows (not in AC6's steady list).
+
+## Reviewer
+
+## Tester
