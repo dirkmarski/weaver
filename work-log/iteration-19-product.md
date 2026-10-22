@@ -54,3 +54,33 @@
 
 ## Notes for the lead
 - This log is uncommitted on main's working tree; carry it on the #90 branch (one branch line per log file).
+
+## #90 acceptance (2026-10-22, session 19338c12-dbf9-46b7-b92b-1a81aef47c6d)
+- Head: code fb20d95 (branch head 83cabe2 = logs only; `git diff --stat fb20d95 origin/issue-90-step-reveal` lists only 2 work-log files). PR #92. Private worktree scratchpad/wt-pm; temp scratchpad/pm-90 (not committed).
+- Read: issue #90 (ACs 1-12), PR #92 body, issue log `## Lead` + `## Lead: rework rounds`, test-90/README.md, test-90/lib.js + shots.js (API for my script), product diff 84c7c9d..fb20d95 (sudoku.js, style.css, index.html, README, new page tests). governance/LOG.md not read.
+- Suite: `node --test tests/*.test.js` 173/173, skipped 0. Tester scripts re-run on my tree (T90_WT=wt-pm): ac_reveal 261, ac4_button 174, ac8_unchanged 83, ac9_clearing 74, ac1_boxcase 3, ac10_readme 16, shots 8: all PASS, 0 failed.
+- Own real-input check (pm-90/pm_check.js; CDP touch 360x740 and 375x812, mouse 1280x900; Tricky seeds 1, 8; Hint x2, Next step x2, Hint):
+  - Grid/link/button-row tops identical at all 3 stages, all 6 runs. scrollWidth = clientWidth; scrollY 0.
+  - Lines 2/3/4; labels "Next step (2 of 3)" / "(3 of 3)" / gone; a 4th Hint leaves the text unchanged.
+  - Focus: target cell after Hint 2, the button after a tap on it, target cell after the last step.
+  - Button: left 16.0 = #status left (1280: 344.5 = 344.5), height 34.8 = Verify. Bottoms 675.9/717.9 (360), 690.9/732.9 (375), both seeds: AC7 met. 360x740 seed 8 final #status bottom 736.5 <= 740; seed 1 757.5 (as today, not required).
+  - 1280x900 seed 8 stage 2: button bottom 909.0 (9 px below the fold; desktop scrolls; outside AC7, spike 2 predicted 7.4).
+- AC verdicts: AC1-AC11 PASS (AC11: naked literal sequence f1; hidden final text literal in f1b, Hint advancing + clearing + 360x740 pins in f1a; hidden-single no-button case present).
+- AC12 persona round (brief pm-90/persona/brief.md; 7 real shots: 375x812 seed 1 stages 1-3, 360x740 seed 8 stages 1-3, 1280x900 stage 1; literal paths, no scripts/source/README/LOG).
+  - Learning value a 4, b 4, c 4 = 4.0 (target >= 4). Button easy to see/tap a 4, b 4, c 4 = 4.0 (target >= 4). Both met.
+  - Step by step preferred 3/3 ("all four at once feels like homework", a; "four lines at once feels like a spoiler", b; "a wall of text and I'd skim it", c).
+  - Blue tint after tap: bothers 0/3 (read as pressed/focus). Key line below the button: problem 0/3, but "cut off at the bottom" on 360 (3/3).
+  - Asks: marks tied to each step (a, c: #91 already scopes this); button plain grey / filled colour (b, a mild); key line visible / scroll into view after the last step (b, c); a "Done" prompt (c).
+- Known items judged:
+  - (a) M13/M14 unpinned at the cap: accepted. Measured by the tester and me (left edge equal, 9.6 px gap). Pin when headroom allows (#91 or later).
+  - (b) Blue tint after a tap: Chrome's default sticky hover/focus on touch (no custom style; computed bg after tap is the default grey, :focus-visible false). Hint shows the same tint on main. 0/3 bothered. Not a defect.
+  - (c) Key line below the button: AC6 lists grid, link line and button row only; the key line was never pinned as steady. 0/3 see a problem. #91 re-stages the key line anyway.
+  - (d) Ratio 2174/1359, headroom 0: #91 must pay 1.6 test lines per product line. Flagged in the #91 hand-off.
+- Decision: ACCEPT on fb20d95.
+- Deviations: tester merge ed54240 lacks a session tag (lead logged it; not rewritten).
+- Backlog additions: key line cut off at 360x740 (now 3/3; existing item); a filled or more prominent Next step (b); 1280x900 seed 8 stage-2 button 9 px below the fold; pin #next alignment/gap when headroom allows.
+
+## Candidate list (PM, ordered, after #90 acceptance)
+1. This iteration: #91 next (unchanged; personas again asked for marks per step, 2/3).
+2. Explanation follow-ups: as above, plus: key line fully visible on phones (3/3 this round); Next step prominence (filled colour, b); "Done" cue after the last step (c); pin #next alignment/gap.
+3-6. Unchanged.
