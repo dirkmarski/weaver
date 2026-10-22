@@ -75,6 +75,8 @@ const read = () => page.eval(`(function () {
     given: tds.map(function (t) { return t.classList.contains('given') ? +t.textContent : 0; }),
     active: a && a.dataset ? a.dataset.pos : null };
 })()`);
+// The Next step button: label, or null while it is hidden (the button sits in #next, under #status).
+const nextStep = () => page.eval('(function () { var p = document.getElementById("next"), b = document.getElementById("next-step"); return p.hidden ? null : b.textContent + "|" + b.tagName; })()');
 const focusAt = (p) => page.eval('document.querySelector(\'input[data-pos="' + p + '"]\').focus()');
 const noHint = (s) => { assert.deepStrictEqual([s.key, s.link], ['', '']); ['linked', 'ruled', 'target', 'area', 'hatched', 'digit', 'confined', 'removed', 'dattr'].forEach((k) => assert.deepStrictEqual(s[k], [], k)); };
 const INVITE = 'Click or tap a hatched cell to see what rules it out (solid purple), or a ring to see which cells it rules out.';
@@ -237,6 +239,18 @@ describe('page (headless Chrome)', () => {
     assert.deepStrictEqual([s.target, s.status.startsWith('Hint: try pointing. In the box of rows 1-3 and columns 7-9, the digit 2 fits only in row 1')], [[4], true]);
     await click('#hint');
     s = await read();
+    assert.strictEqual(s.status, 'Pointing: row 1, column 5 must be 7.\n1. In the box of rows 1-3 and columns 7-9, the digit 2 fits only in row 1.');
+    assert.strictEqual(await nextStep(), 'Next step (2 of 3)|BUTTON');
+    await page.eval('document.getElementById("next-step").focus()');
+    await click('#next-step');
+    s = await read();
+    assert.strictEqual(s.status, 'Pointing: row 1, column 5 must be 7.\n1. In the box of rows 1-3 and columns 7-9, the digit 2 fits only in row 1.\n'
+      + '2. So 2 cannot go in row 1 outside that box: not in row 1, column 5.');
+    assert.deepStrictEqual([await nextStep(), await page.eval('document.activeElement.id')], ['Next step (3 of 3)|BUTTON', 'next-step']); // focus stays on the button
+    await click('#next-step');
+    s = await read();
+    assert.strictEqual(await nextStep(), null);
+    assert.strictEqual(s.active, '4'); // the last step hands focus back to the target cell
     assert.strictEqual(s.status, 'Pointing: row 1, column 5 must be 7.\n1. In the box of rows 1-3 and columns 7-9, the digit 2 fits only in row 1.\n'
       + '2. So 2 cannot go in row 1 outside that box: not in row 1, column 5.\n'
       + '3. Row 1, column 5 has every digit except 2 and 7 in its row, column and box, so it could only take 2 or 7. With 2 ruled out, it must be 7.');
@@ -247,9 +261,49 @@ describe('page (headless Chrome)', () => {
     assert.strictEqual(s.tally[2], 'Pointing: 0 on your own, 1 with a hint');
   });
 
+  it('f1a. Hint advances the steps like Next step (hidden form, seed 8); a value change clears the button; at 360x740 the whole text fits', async () => {
+    await open('tricky', 8);
+    try {
+      await page.send('Emulation.setDeviceMetricsOverride', { width: 360, height: 740, deviceScaleFactor: 1, mobile: true });
+      await click('#hint');
+      await click('#hint');
+      const fits = (id) => page.eval('document.getElementById("' + id + '").getBoundingClientRect().bottom');
+      const tops = () => page.eval('["sudoku", "link", "buttons"].map(function (id) { return document.getElementById(id).getBoundingClientRect().top; })');
+      const still = await tops();
+      assert.strictEqual((await read()).status.split('\n').length, 2);
+      assert.strictEqual(await nextStep(), 'Next step (2 of 3)|BUTTON');
+      assert.ok(await fits('next-step') <= 740, 'Next step button below the fold');
+      assert.strictEqual(await page.eval('new Set(["next-step", "verify"].map(function (id) { var c = getComputedStyle(document.getElementById(id)); return c.font + c.padding; })).size'), 1); // same look as Verify
+      await page.eval('document.getElementById("verify").focus()');
+      await click('#hint');
+      assert.ok(await page.eval('document.activeElement === document.querySelectorAll("#sudoku td")[27].querySelector("input")'), 'Hint focuses the target cell'); // r4c1
+      assert.deepStrictEqual(await tops(), still); // grid, link line and button row do not move
+      assert.strictEqual((await read()).status.split('\n').length, 3);
+      assert.strictEqual(await nextStep(), 'Next step (3 of 3)|BUTTON');
+      await click('#hint');
+      const s = await read();
+      assert.strictEqual(s.status.split('\n')[3], '3. That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
+      assert.strictEqual(await nextStep(), null);
+      assert.ok(await fits('status') <= 740, '#status bottom below the fold');
+      await click('#hint'); // once complete, a further click leaves the explanation as it is
+      assert.deepStrictEqual([(await read()).status, await nextStep()], [s.status, null]);
+    } finally {
+      await page.send('Emulation.clearDeviceMetricsOverride');
+    }
+    await open('tricky', 8);
+    await click('#hint');
+    await click('#hint');
+    await keys([[empties(game('tricky', 8).puzzle).find((q) => q !== 27), '5']]); // a value change removes the hint, its hidden steps and the button
+    assert.deepStrictEqual([(await read()).status.startsWith('Entered: '), await nextStep()], [true, null]);
+    await click('#hint');
+    assert.ok((await read()).status.startsWith('Hint: try pointing'));
+  });
+
   it('f1b. pins on the page: P1 pointing (hatched cells, key line, stripe and tint layers) and P3 hidden single (hatched, key line, a value change clears both)', async () => {
     const all = (...rc) => rc.map(([r, c]) => (r - 1) * 9 + c - 1);
     await open('tricky', 8);
+    await click('#hint');
+    await click('#hint');
     await click('#hint');
     await click('#hint');
     let s = await read();
@@ -403,6 +457,7 @@ describe('page (headless Chrome)', () => {
     await click('#hint');
     let s = await read();
     assert.ok(s.status.startsWith('Hidden single'), s.status);
+    assert.strictEqual(await nextStep(), null);
     const n = pick('easy', (pz) => S.findNakedSingle(pz));
     await open('easy', n.seed);
     await click('#hint');
