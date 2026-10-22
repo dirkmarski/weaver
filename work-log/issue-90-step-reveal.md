@@ -21,6 +21,12 @@ Issue: https://github.com/dirkmarski/weaver/issues/90 (PM, it19 issue 1 of 2). B
 - Open for review/test: Tab/Enter/Space and real touch/mouse not driven; Verify/New puzzle/level clearing only by code reading; key line now sits below the button while it shows (not in AC6's steady list).
 
 ## Reviewer
+- Reviewer: Claude Sonnet 5.5 (claude-sonnet-5-5), session `19338c12-dbf9-46b7-b92b-1a81aef47c6d`. Code head 57192db (5d708cf adds logs only). Suite 173/173, skipped 0; product 1359, tests 2171 (cap 2174); no removed test lines (`git diff -- tests | grep '^-'` shows only the file header).
+- Verdict: APPROVE (state machine, all clearing paths, AC1/AC2 text, AC8 and README read as correct); two minor test gaps, not blocking.
+1. Minor (AC4/AC6): `#next-step` font/padding and `#next` left alignment and gap are unpinned in tests; CSS mutants M11-M14 survive. Fix: one page case comparing computed fontSize/padding of #next-step with #verify and left edge of #next-step with #status.
+2. Minor (AC3): Hint advancing before the last step does not need its target-cell focus line to pass; M5 survives. Fix: in f1a assert `document.activeElement` is the target after the third Hint click.
+3. Info: Tab/Enter/Space and real touch/mouse not driven (native button; PM/tester).
+Mutants (14 real): slice off by one, hide early, label off by one, no early return, steps not cleared, button not cleared, focus early, click listener removed: all killed. Survived: Hint with `shown < 4` (equivalent, no visible change), M5 above, padding, font, text-align center, margin: see findings 1-2.
 
 ## Tester
 - Tester: Claude Sonnet 5.5 (claude-sonnet-5-5), session `19338c12-dbf9-46b7-b92b-1a81aef47c6d`. Head tested 57192db (5d708cf adds logs only). Verdict: PASS, 0 defects. Real CDP touch (360x740, 375x812, mobile) / mouse (1280x900) / key input; main 84c7c9d compared programmatically; scripts and README in the session scratchpad `test-90` (612 checks, 0 failed; a mutant `shown >= 4` gives 13 + 18 fails).
