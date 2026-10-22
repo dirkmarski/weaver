@@ -23,6 +23,7 @@ Working rules:
  - Report back results, decisions, assumptions, concerns and ambiguities to the lead.
  - git commits and pull follow a convention dictated by the lead. Follow it and ask if it is missing.
  - Update the git issue with a summary of the work you did for audit purposes.
+ - As part of your work summary, include documents you read, the amount you read and why you needed it. A central curator will work on optimisation.
 
 Other information:
  - Issues are tracked using githubs issue tracker.

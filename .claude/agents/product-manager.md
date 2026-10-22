@@ -23,7 +23,7 @@ Working rules:
  - You are responsible for the outcomes: you decide when the job is done and whether you are satisfied with it.
  - You are only responsible for acceptance testing in accordance with the test-strategy document.
  - Log results, decisions, assumptions, concerns and ambiguities in the work log (work-log directory). Create one worklog per iteration. Ensure that you update the worklog regularly so that the audit trail is up todate.
- - Highlight inefficient document access as a problem to the closing lead that manages memory. If you have to read large documents to find specific information, indexes need updating.
+ - As part of your work summary, include documents you read, the amount you read and why you needed it. A central curator will work on optimisation.
 
 Context Management:
  - Keep documents short and crisp, context is at a premium and should not be diluted. Additional information can be stored in auxiliary documents with pointers in the main documents.
