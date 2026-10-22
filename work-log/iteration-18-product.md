@@ -99,3 +99,6 @@
 - D6 item (1) 1280x1200 full explanation 4 px scroll (1204 vs 1200): accepted; top alignment trades centring for a steady page, row does not move.
 - D7 item (2) New puzzle first in Tab order before the grid: accepted (DOM order follows the visual order; AC2 asks reachable). Fresh puzzle focus starts in the grid, so no extra Tab cost in play.
 - Backlog (mobile remainder): chip legibility at phone width (struck chip, crowding notes 1/3; 3/3/3); play buttons 35 px < 44 px tap guideline (b); blank gap between invitation and buttons (3/3, link reserve D3); New puzzle confirmation (a); picker "Hard" wraps alone at 375 (c, pre-existing); caret line in target cell (c, again).
+
+## #85 clarification (PM, 2026-10-22, code head 03ed19b)
+- D8 AC3 "largest text": page prose/heading text only; grid cell digits (30 px) are board content and excluded. h1 22.4 px below 560 px passes; 30 px title would break AC2. https://github.com/dirkmarski/weaver/issues/85#issuecomment-6329612420
