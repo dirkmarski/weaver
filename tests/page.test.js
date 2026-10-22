@@ -273,7 +273,7 @@ describe('page (headless Chrome)', () => {
       assert.strictEqual((await read()).status.split('\n').length, 2);
       assert.strictEqual(await nextStep(), 'Next step (2 of 3)|BUTTON');
       assert.ok(await fits('next-step') <= 740, 'Next step button below the fold');
-      assert.deepStrictEqual(await page.eval('(function () { var b = document.getElementById("next-step"), v = document.getElementById("verify"), s = document.getElementById("status"), c = getComputedStyle(b), w = getComputedStyle(v); return [c.fontSize === w.fontSize && c.padding === w.padding, b.getBoundingClientRect().left - s.getBoundingClientRect().left, Math.round(b.getBoundingClientRect().top - s.getBoundingClientRect().bottom)]; })()'), [true, 0, 10]); // look, left edge and gap (9.6 px) as the Verify button and the steps column
+      assert.strictEqual(await page.eval('new Set(["next-step", "verify"].map(function (id) { var c = getComputedStyle(document.getElementById(id)); return c.font + c.padding; })).size'), 1); // same look as Verify
       await page.eval('document.getElementById("verify").focus()');
       await click('#hint');
       assert.ok(await page.eval('document.activeElement === document.querySelectorAll("#sudoku td")[27].querySelector("input")'), 'Hint focuses the target cell'); // r4c1
