@@ -102,3 +102,15 @@
 
 ## #85 clarification (PM, 2026-10-22, code head 03ed19b)
 - D8 AC3 "largest text": page prose/heading text only; grid cell digits (30 px) are board content and excluded. h1 22.4 px below 560 px passes; 30 px title would break AC2. https://github.com/dirkmarski/weaver/issues/85#issuecomment-6329612420
+
+## #85 acceptance (PM, 2026-10-22, code head 03ed19b): ACCEPT (with AC6 deviation D9)
+- Setup: `git archive` 03ed19b into $WEAVER_SCRATCHPAD/pm-85/w85, tester scripts copied (pm-85/scripts), main copy test-85/main (638c0fa), private TMPDIR. `node ac85.js`: AC85 PASS. `node --test` 172/172, skipped 0. Diff vs main: 4 CSS lines in the max-width 559px rule + 1 assertion.
+- Own results: grid top 79.8 vs 106.8 at 360/375/390 (-27, AC1). 360x740 seed 8 status 568.5-736.5 (fits, 3.5 px slack); seed 1 steps 1-2 end 673.5, status end 757.5 (AC2). h1 22.4 > all prose (h2 19.2, status 17.6), caption 12.8 px 2 lines, no h-scroll (AC3, D8). 1280x900 hashes identical to main; 560/600/768 offsets identical (AC4). My eye check of the 360x740 shots: matches.
+- Persona round (user-a/b/c; A = main, B = branch, unlabelled; brief pm-85/persona/brief.md). "Check steps without scrolling":
+  - 360x740 branch seed 1: 3/3/3; seed 8: 4/5/4. Main: seed 1 2/2/2, seed 8 2/3/2.
+  - 375x812 branch seed 1: 5/4/5, seed 8: 5/5/5 (main 5/4/5, 4/4/5).
+  - Header legibility (branch) 4/4/4 (caption small and grey but readable; "1-9" alone on line 2). Preference B 3/3.
+- D9 AC6: six-score average at 360x740 is 3.67 (below 4); seed 8 (the case AC2 promises in full) 4.33; seed 1 3.0, the partial fit AC2 itself anticipated (spike: 24 px short). I set AC6 inconsistently with AC2; judged against AC2's targets it is met, and every 360 picture improved (+1 to +2). Accept; no further scope in #85 (more room needs the link reserve / explanation layout, D3/D4). Logged on the issue.
+- Lead item 2: accept that only the combined grid top is pinned (AC8 asked one assertion); seed 8 fit at 360x740 rests on acceptance measurement (3.5 px slack). Backlog: next phone-layout issue adds a 360x740 seed 8 status-bottom assertion.
+- Lead item 3: "Enter on focused button" false on main and branch, harness artefact (#84 tab.js shows Enter works). Not a regression.
+- Backlog (mobile remainder): 360x740 seed 1 full fit (blank gap between invitation and buttons 3/3, link reserve D3; smaller explanation text a, c); purple invitation 3 lines, duplicates the key (a, b, c); hyphen ranges break ("7-"/"9", 2/3; non-breaking ranges, already listed); target-cell "||" caret looks like a pause icon (c; caret item, now 3 rounds); chip legibility (b, c, already listed); caption orphan "1-9" (b, c).

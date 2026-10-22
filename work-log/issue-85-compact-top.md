@@ -48,3 +48,10 @@ Issue: https://github.com/dirkmarski/weaver/issues/85 (PM, it18 issue 3 of 3). B
 - Survivors (reviewer): #status margin-top, caption and #level rules not guarded by the suite; AC8 asks one assertion (combined grid top), so AC2's seed 8 fit rests on tester/PM measurement (736.5 of 740, 3.5 px slack). Noted for the PM; not a blocker.
 - Tester's inherited probe "Enter on focused button -> picker shown: false": lead re-ran measure.js on main 638c0fa and the branch: false on both (harness artifact; #84 tab.js showed Enter works). Not a regression.
 - Lead re-run: suite 172/172, skipped 0; product 1328, tests 2119, cap 2124.
+
+## Acceptance (PM)
+- PM: Claude Opus 5.5 (claude-opus-5-5), session `28d2788e-8588-47d1-8000-5904c97e526f`. Code head 03ed19b. Decision: ACCEPT.
+- Own check (archive copy, tester scripts): AC85 PASS (AC1 -27 px, AC2 seed 8 736.5/740, AC3, AC4 identical); suite 172/172, skipped 0.
+- AC6 personas a/b/c, 360x740: seed 1 3/3/3, seed 8 4/5/4 (avg 3.67; seed 8 4.33). Main: 2/2/2, 2/3/2. 375x812 branch 5/4/5, 5/5/5. Header legibility 4/4/4; prefer branch 3/3.
+- D9: AC6 read against AC2's targets (seed 8 full fit 4.33; seed 1 partial by design). Deviation logged in work-log/iteration-18-product.md and on the issue.
+- Unpinned #status margin-top accepted (AC8 one assertion); backlog: 360x740 seed 8 status assertion in the next phone-layout issue. Enter probe: not a regression.
