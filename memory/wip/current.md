@@ -1,23 +1,23 @@
 # WIP: current
 
-Last updated: 2026-10-22, iteration 19, #91 merge, session 19338c12-dbf9-46b7-b92b-1a81aef47c6d
+Last updated: 2026-10-22, iteration 19 close (curator), session 19338c12-dbf9-46b7-b92b-1a81aef47c6d
 
 ## Active run
-- Iteration 19 (PM scope: #90 then #91). Both accepted and merged (#90 via PR #92; #91 via PR #93 from `issue-91-staged-marks`, PM ACCEPT on 30edfbb). Next: iteration close.
+- None. Iteration 19 closed: #90 (PR #92) and #91 (PR #93) merged, main a552c1d, 173/173 tests, skipped 0. Close PR from `iteration-19-close` (memory and logs only).
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| it19 close | not started | wiki pruning, backlog snapshot from the end of `work-log/iteration-19-product.md`, close log, `iteration-19-close` branch | lead |
+| it20 scoping | not started | PM scopes from `memory/wiki/backlog.md` item 1 (top: key line on phones, naked step 2 naming, blank link reserve) | PM |
 
 ## Starting the next run
-- Ratio at main after #93: 2187 tests / 1371 product, cap 2193, headroom 6.
-- Tester real-input scripts: session scratchpad `test-91/` (README, `./run_all.sh`, `T91_WT=<tree>`; ac8_readme needs a git tree). Scratchpads are per session: copy or rebuild.
-- Prompts: brief file in the scratchpad with literal paths; fixed-format evidence report; temp dirs under the session scratchpad; no governance/LOG.md; reviewer/tester commit logs in detached worktrees, lead fast-forwards; run reviewer, tester, PM and personas in the foreground; remove agent worktrees after each merge.
-- Do not read the work log unless specifically needed (Dirk, 1464355). Prune memory at each close (Dirk, 9e54939).
+- Ratio at main a552c1d: 2187 tests / 1371 product, cap 2193, headroom 6. A UI issue with page tests likely needs listed removals.
+- Tester scripts from it19 (`test-90/`, `test-91/` with README, `./run_all.sh`) lived in session 19338c12's scratchpad: gone in a new session; rebuild from the README pattern (process.md tester line).
+- Prompts: brief file in the scratchpad with literal absolute paths, one-line prompt; fixed-format evidence report; temp dirs under the session scratchpad; no governance/LOG.md; reviewer then tester in detached worktrees, lead `merge --ff-only`; all agents whose report is needed run in the foreground; remove agent worktrees after each merge.
+- Read by role per `memory/wiki/index.md` "What to read"; do not read the work log unless specifically needed (Dirk, 1464355).
 
 ## Open issues / PRs
-- none for it19 after #93 merges.
+- none (only the it19 close PR until merged).
 
 ## Blockers / waiting on
 - none
