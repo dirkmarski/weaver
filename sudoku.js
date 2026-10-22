@@ -802,6 +802,9 @@
     var lastCell = null; // cell input that last had focus
     var notesButton = document.getElementById('notes');
     var hint = null;     // hint showing now (result of hintFor), or null
+    var steps = null;    // { lines, shown } of a pointing explanation revealed step by step (#90), else null
+    var nextRow = document.getElementById('next');
+    var nextStep = document.getElementById('next-step');
     var hatchedRings = null; // { hatched, rings, d } of the explanation showing when it has hatched cells, else null
     var tally = emptyTally(); // techniques applied in this puzzle
     var currentLevel = null; // level chosen for the current puzzle
@@ -827,9 +830,18 @@
       linkLine.textContent = hatchedRings ? INVITE : '';
     }
 
+    // Shows the conclusion line and the first `shown` steps; the Next step button stays until all three show.
+    function showSteps() {
+      status.textContent = steps.lines.slice(0, steps.shown + 1).join('\n');
+      nextRow.hidden = steps.shown >= 3;
+      nextStep.textContent = 'Next step (' + (steps.shown + 1) + ' of 3)';
+    }
+
     // Clears the status line, the Verify flags and any showing hint.
     function clearResults() {
       hint = null;
+      steps = null;
+      nextRow.hidden = true;
       hatchedRings = null;
       unlink();
       keyLine.textContent = '';
@@ -1070,12 +1082,27 @@
       if (hatchedRings.rings.indexOf(q) >= 0) selectRing(q);
     });
 
-    // Hint: step 1 unless a hint is already showing, then step 2.
+    // Reveals the next step of a pointing explanation; the target cell takes focus when the last one shows.
+    function revealStep() {
+      steps.shown++;
+      showSteps();
+      if (steps.shown >= 3) inputs[hint.r][hint.c].focus();
+    }
+    nextStep.addEventListener('click', revealStep);
+
+    // Hint: step 1 unless a hint is already showing, then step 2 (a pointing explanation: one step at a time).
     document.getElementById('hint').addEventListener('click', function () {
+      if (steps) { // a pointing explanation is showing: reveal the next step, or leave it as it is once complete
+        if (steps.shown < 3) revealStep();
+        inputs[hint.r][hint.c].focus();
+        return;
+      }
       var res = hintFor(currentGrid(), hint ? 2 : 1, preferredTechnique(tally, currentLevel), currentLevel);
       clearResults();
+      var pointingExplain = res.technique === 'pointing' && res.kind === 'explain';
       status.textContent = res.text;
-      status.className = res.technique === 'pointing' && res.kind === 'explain' ? 'steps' : '';
+      status.className = pointingExplain ? 'steps' : '';
+      if (pointingExplain) { steps = { lines: res.text.split('\n'), shown: 1 }; showSteps(); }
       if (res.kind !== 'nudge' && res.kind !== 'explain') return;
       hint = res;
       var marks = hintMarks(res, currentGrid());
