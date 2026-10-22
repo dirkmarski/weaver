@@ -29,3 +29,16 @@ Issue: https://github.com/dirkmarski/weaver/issues/85 (PM, it18 issue 3 of 3). B
 3. Test: one assertion in f1e, grid top <= 88 at 375 (actual 79.8, 8 px slack); width override is reset in the existing finally. No line packing. Guards the combined top, not each rule (see 5).
 4. Ratio: product 1328, tests 2119, cap floor(1.6 x 1328) = 2124. numstat on index.html, sudoku.js, tests: 1 added, 0 removed. No removals.
 5. Suite: 172 pass, 0 fail, 0 skipped. Mutants (copy, not committed): killed: h1 rule dropped, h1 2rem. Survived: caption rule dropped, #level rule dropped, #status margin-top dropped, caption padding-bottom 0, h1 margin 0.5rem. Survivors matter for AC2 (status margin-top is what closes seed 8; the 88 px bound is deliberately loose) but AC8 asks for one assertion on the compact top only; the rest of AC2 is verified by tester measurement/PM acceptance. Optional, not blocking.
+
+## Tester
+- Tester: Claude Sonnet 5.5 (claude-sonnet-5-5), session `28d2788e-8588-47d1-8000-5904c97e526f`. Code head tested: 03ed19b (later commits log-only, verified by diff --stat). Baseline main 638c0fa. Headless Chrome, real CDP touch (375) and mouse (1280).
+- Verdict: PASS.
+1. AC1: grid top 79.8 vs main 106.8 at 360, 375, 390 (-27.0, needs >= 18).
+2. AC2: 360x740 scroll 0, Hint twice: seed 8 status 568.5-736.5 (vh 740, fully visible); seed 1 conclusion ends 589.5, steps 1-2 end 673.5 (visible; step 3 and status end 757.5 are below the fold, not required).
+3. AC3 (D8): h1 22.4 px, every other prose text smaller (h2 19.2, status 17.6, buttons 16); caption 12.8 px, 2 lines, inside its box and the viewport; no overlap or h-scroll at 360/375/390, picker and game (Notes On, explanation shown).
+4. AC4: 1280x900 picker and Tricky seed 1 Hint x2 screenshots byte-identical to main; 560, 600, 768 px layout offsets and font sizes identical to main (picker and game).
+5. AC5: replay vs main 375 touch 408 steps and 1280 mouse 408 steps, 0 diffs; #76 hint row top steady across 9 states at 360 (517.7), 375 (532.8), 1280 (729.8).
+6. AC6: screenshots in scratchpad test-85/shots (persona-360x740-seed{1,8}.png, persona-375x812-seed{1,8}.png; main-* for comparison).
+7. AC7: README mentions no header, title or caption sizes (only cell sizes).
+8. AC8: node --test 172 pass, 0 fail, 0 skipped; main style.css in a copy fails the f1e assertion (grid top 106.8 > 88), 171 pass 1 fail; product 1328, tests 2119, cap 2124; test diff vs main is +1 line, 0 removals.
+- Not tested: real devices, browsers other than headless Chrome, widths other than the listed ones, persona rating (PM). measure.js printed "Enter on focused button -> picker shown: false" (inherited #84 probe, not an AC here; replay shows 0 diffs vs main).
