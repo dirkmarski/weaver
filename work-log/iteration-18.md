@@ -14,3 +14,10 @@
 - PM ACCEPT on code head fcabe1f; PM log commit c220c99 (logs only, lead-checked `git diff --stat fcabe1f c220c99`). AC1 limit reworded by the PM (2.7 px on thick-border cells). Persona check folded into #84's round.
 - Before the merge: lead log, WIP and wiki (product mobile facts per the PM's note, architecture sizes/f4, process branch rule, lessons mobile:true) committed on the issue branch; logs/memory only after the accepted code head. Merge with that head sha.
 - Memory note for the closing lead: the PM had to read the it17 product log (178 lines) for layout figures; a "mobile layout facts" line is now in wiki/product.md. The tester's script usage lived only in its report; ask testers to leave a short usage note in their scratch dir.
+
+## #84
+- 2026-10-22: new lead run (same session id) after #83 merged as a45b784. Gate check passed (open, PM-authored). Fresh start: branch issue-84-phone-buttons from a45b784. Per-issue log: work-log/issue-84-phone-buttons.md. Ratio 2117/1324, headroom 1.
+- Developer f6dfaed/e429342/7cce946: New puzzle in `#level` after `#level-text`, play buttons flex row 12 px gaps, top alignment in the base rule; f1e extended; 3 unit-test lines removed. Lead R1: the 10th-row removal unguarded the outer `grid.length !== 9` (mutant survived); rework 2197782 restores it in one line. Tests 2118 = cap.
+- Reviewer APPROVE (a842c22), tester PASS AC1-AC9 (1916941), removals confirmed by both. Lead re-run 172/172 skipped 0. PR #87.
+- PM ACCEPT at 2197782 (c72758c). Personas: thumb 5/5/5, findability 4/4/4, chips 3/3/3 (backlog). Merged with a merge commit.
+- Memory note for the closing lead: the tester left a usage README in $WEAVER_SCRATCHPAD/test-84 (reused by the PM: worked). Developer's ratio line in the issue log said 2117 (stale after rework); the lead section has the correct 2118.
