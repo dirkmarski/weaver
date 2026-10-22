@@ -21,3 +21,6 @@
 - Reviewer APPROVE (a842c22), tester PASS AC1-AC9 (1916941), removals confirmed by both. Lead re-run 172/172 skipped 0. PR #87.
 - PM ACCEPT at 2197782 (c72758c). Personas: thumb 5/5/5, findability 4/4/4, chips 3/3/3 (backlog). Merged with a merge commit.
 - Memory note for the closing lead: the tester left a usage README in $WEAVER_SCRATCHPAD/test-84 (reused by the PM: worked). Developer's ratio line in the issue log said 2117 (stale after rework); the lead section has the correct 2118.
+
+## #85
+- 2026-10-22: new lead run (same session id) after #84 merged as 638c0fa. Gate check passed (open, PM-authored). Fresh start: branch issue-85-compact-top from 638c0fa. Per-issue log: work-log/issue-85-compact-top.md. Ratio 2118/1324, headroom 0.
