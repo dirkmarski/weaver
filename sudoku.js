@@ -247,11 +247,17 @@
   // 0-based, or null. Grid-based, notes ignored. options.useful: true skips targets that are already a naked
   // or hidden single before the step (a step with no other target is passed over).
   function findPointing(grid, options) {
-    var cells = toFlat(grid), hit = null, useful = !!(options && options.useful);
-    pointingSteps(cells, function (step) {
+    return firstTarget(toFlat(grid), pointingSteps, !!(options && options.useful), 0);
+  }
+
+  // The first step of `steps` (pointingSteps or claimingSteps) that makes a cell a single, with the first such cell in reading
+  // order (see findPointing); skip = the number of unit kinds singleAfterStep leaves out (claiming never has a box-form target).
+  function firstTarget(cells, steps, useful, skip) {
+    var hit = null;
+    steps(cells, function (step) {
       for (var p = 0; p < 81 && !hit; p++) {
         if (useful && isSingle(cells, p)) continue;
-        var res = singleAfterStep(cells, p, step.removed, step.pointDigit);
+        var res = singleAfterStep(cells, p, step.removed, step.pointDigit, skip);
         if (res) {
           hit = res; hit.r = Math.floor(p / 9); hit.c = p % 9;
           hit.box = step.box; hit.line = step.line; hit.index = step.index; hit.pointDigit = step.pointDigit;
@@ -261,6 +267,31 @@
       return hit;
     });
     return hit;
+  }
+
+  // Claiming (box-line reduction, the mirror of pointing): in a row or column (rows 1-9, then columns 1-9), digit D fits in
+  // two or more cells, all inside one box B. D then cannot go in the rest of B (the "removed" cells, at least one). Digits 1-9
+  // within a line; the first step that makes a cell a single wins, the target being the first such cell in reading order. Naked
+  // form as pointing; hidden form: a row or column (row first) without D where D now fits in one cell (never a box).
+  // Same result as findPointing: box = B, line / index = the row or column, confined = the line cells where D fits, removed = the
+  // box cells outside the line that lose D. Grid-based, notes ignored. options.useful as in findPointing.
+  function findClaiming(grid, options) {
+    return firstTarget(toFlat(grid), claimingSteps, !!(options && options.useful), 1);
+  }
+
+  // Calls fn({ box, line, index, pointDigit, confined, removed }) for each claiming step (see findClaiming) until fn returns something truthy.
+  function claimingSteps(cells, fn) {
+    for (var k = 0; k < 18; k++) {
+      var row = k < 9, index = k % 9;
+      for (var d = 1; d <= 9; d++) {
+        var spots = spotsFor(cells, UNITS[index * 3 + (row ? 0 : 1)], d);
+        if (spots.length < 2) continue;
+        var box = Math.floor(spots[0] / 27) * 3 + Math.floor(spots[0] % 9 / 3);
+        if (!spots.every(function (q) { return Math.floor(q / 27) * 3 + Math.floor(q % 9 / 3) === box; })) continue;
+        var removed = spotsFor(cells, UNITS[box * 3 + 2], d).filter(function (q) { return spots.indexOf(q) < 0; });
+        if (removed.length && fn({ box: box, line: row ? 'row' : 'column', index: index, pointDigit: d, confined: spots, removed: removed })) return;
+      }
+    }
   }
 
   // Calls fn({ box, line, index, pointDigit, confined, removed }) for each pointing step (see findPointing:
@@ -293,15 +324,15 @@
   }
 
   // Is the empty cell p a single once digit d is removed from the cells `removed` (see
-  // findPointing)? { digit, form: 'naked' | 'hidden', unit (hidden only) } or null.
-  function singleAfterStep(cells, p, removed, d) {
+  // findPointing; skip: see firstTarget)? { digit, form: 'naked' | 'hidden', unit (hidden only) } or null.
+  function singleAfterStep(cells, p, removed, d, skip) {
     if (cells[p]) return null;
     var used = usedMask(cells, p);
     if (removed.indexOf(p) >= 0) {
       if (bitCount(used & ~1) !== 7) return null;
       for (var x = 1; x <= 9; x++) if (x !== d && !(used & (1 << x))) return { digit: x, form: 'naked' };
     } else if (!(used & (1 << d))) {
-      for (var k = 0; k < 3; k++) { // kinds: box, row, column
+      for (var k = skip || 0; k < 3; k++) { // kinds: box, row, column (skip = kinds left out from the start)
         var kind = [2, 0, 1][k];
         var left = spotsFor(cells, UNITS[CELL_UNITS[p][kind]], d).filter(function (q) { return removed.indexOf(q) < 0; });
         if (left.length === 1 && left[0] === p) return { digit: d, form: 'hidden', unit: UNIT_NAMES[kind] };
@@ -330,11 +361,20 @@
     return boxName(s.box) + ', the digit ' + s.pointDigit + ' fits only in ' + s.line + ' ' + (s.index + 1);
   }
 
-  // "row R, column C" for one struck cell, else "row N, columns A, B and C" ("column N, rows ...") for a line.
-  function struckCells(s) {
-    var col = s.line === 'column', n = s.removed.map(function (q) { return (col ? Math.floor(q / 9) : q % 9) + 1; });
-    if (n.length === 1) return 'row ' + (col ? n[0] : s.index + 1) + ', column ' + (col ? s.index + 1 : n[0]);
-    return s.line + ' ' + (s.index + 1) + ', ' + (col ? 'rows ' : 'columns ') + n.slice(0, -1).join(', ') + ' and ' + n[n.length - 1];
+  // "1, 2 and 3" for a list of numbers.
+  function andList(n) { return n.length > 1 ? n.slice(0, -1).join(', ') + ' and ' + n[n.length - 1] : String(n[0]); }
+
+  // The struck cells (flat indices, ascending) by name: "row R, column C"; in one row "row N, columns A, B and C"; in one
+  // column "column N, rows A and B"; else grouped per row, joined by "; ".
+  function struckCells(removed) {
+    var rows = [], cols = [];
+    removed.forEach(function (q) { if (rows.indexOf(Math.floor(q / 9)) < 0) rows.push(Math.floor(q / 9)); if (cols.indexOf(q % 9) < 0) cols.push(q % 9); });
+    function nums(a) { return a.map(function (x) { return x + 1; }); }
+    if (cols.length === 1 && rows.length > 1) return 'column ' + (cols[0] + 1) + ', rows ' + andList(nums(rows));
+    return rows.map(function (r) {
+      var c = nums(removed.filter(function (q) { return Math.floor(q / 9) === r; }).map(function (q) { return q % 9; }));
+      return 'row ' + (r + 1) + ', column' + (c.length > 1 ? 's ' : ' ') + andList(c);
+    }).join('; ');
   }
 
   // The hintFor result for a pointing step (see findPointing).
@@ -348,7 +388,7 @@
     if (step === 2) {
       var rc = 'row ' + (s.r + 1) + ', column ' + (s.c + 1);
       text = 'Pointing: ' + rc + ' must be ' + s.digit + '.\n1. In ' + box + '.\n';
-      text += '2. So ' + d + ' cannot go in ' + line + ' outside that box: not in ' + struckCells(s) + ' (struck).\n';
+      text += '2. So ' + d + ' cannot go in ' + line + ' outside that box: not in ' + struckCells(s.removed) + ' (struck).\n';
       text += s.form === 'naked'
         ? '3. Row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' has every digit except ' + d + ' and ' + s.digit + ' in its row, column and box, so it could only take ' + d + ' or ' + s.digit + '. With ' + d + ' ruled out, it must be ' + s.digit + '.'
         : '3. That leaves ' + rc + ' as the only cell in its ' + s.unit + ' where ' + d + ' fits, so it must be ' + d + '.';
@@ -368,14 +408,38 @@
       pointDigit: d, confined: s.confined, removed: s.removed, r: s.r, c: s.c, digit: s.digit, text: text };
   }
 
+  // The hintFor result for a claiming step (see findClaiming); same shape as pointingHint's.
+  function claimingHint(s, step, grid) {
+    var line = s.line + ' ' + (s.index + 1), d = s.pointDigit, rc = 'row ' + (s.r + 1) + ', column ' + (s.c + 1);
+    var box = boxName(s.box), text;
+    if (step === 2) {
+      // Every empty cell of the line is confined: line 1 says so.
+      var empties = UNITS[s.index * 3 + (s.line === 'row' ? 0 : 1)].filter(function (q) { return grid[Math.floor(q / 9)][q % 9] === 0; });
+      text = 'Claiming: ' + rc + ' must be ' + s.digit + '.\n1. In ' + line + ', the digit ' + d + ' fits only in ' + box
+        + (empties.length === s.confined.length ? ' (the ' + s.line + ' has no other empty cells)' : '') + '.\n'
+        + '2. So ' + d + ' cannot go anywhere else in that box: not in ' + struckCells(s.removed) + ' (struck).\n';
+      text += s.form === 'naked'
+        ? '3. ' + rc.charAt(0).toUpperCase() + rc.slice(1) + ' has every digit except ' + d + ' and ' + s.digit + ' in its row, column and box, so it could only take ' + d + ' or ' + s.digit + '. With ' + d + ' ruled out, it must be ' + s.digit + '.'
+        : '3. That leaves ' + rc + ' as the only cell in ' + s.unit + ' ' + ((s.unit === 'row' ? s.r : s.c) + 1) + ' where ' + d + ' fits, so it must be ' + d + '.';
+    } else {
+      text = 'Hint: try claiming. In ' + line + ', the digit ' + d + ' fits only in ' + box + ', so it cannot go anywhere else in that box. ';
+      text += s.form === 'naked'
+        ? 'That means ' + d + ' cannot go in ' + rc + ', and only one other digit fits there now.'
+        : 'Then look at ' + s.unit + ' ' + ((s.unit === 'row' ? s.r : s.c) + 1) + ': ' + d + ' now has only one place left there.';
+      text += ' Click Hint again to see why.';
+    }
+    return { kind: step === 2 ? 'explain' : 'nudge', technique: 'claiming', form: s.form, unit: s.unit, box: s.box, line: s.line, index: s.index,
+      pointDigit: d, confined: s.confined, removed: s.removed, r: s.r, c: s.c, digit: s.digit, text: text };
+  }
+
   // What Hint says for a grid. step 1 = nudge, step 2 = explain (only used when
   // a single or pointing step is found). A naked single is taught before a hidden single, unless
   // prefer === 'hidden' and a hidden single that is not a naked single exists. With no single, a pointing step
-  // (findPointing) is taught; on level 'tricky' a useful pointing step (findPointing with useful: true) comes
+  // (findPointing), else a claiming step (findClaiming, same result shape, technique 'claiming'), is taught; on level 'tricky' a useful pointing step (findPointing with useful: true) comes
   // before any single; its result adds technique 'pointing', form, box, line, index, pointDigit. Returns
   // { kind, technique, unit, r, c, digit, text } where kind is
   // 'conflict' | 'full' | 'none' | 'nudge' | 'explain'. For the last two, r/c are
-  // 0-based, technique is 'naked' | 'hidden' | 'pointing' and unit ('box' | 'row' | 'column') is set for hidden.
+  // 0-based, technique is 'naked' | 'hidden' | 'pointing' | 'claiming' and unit ('box' | 'row' | 'column') is set for hidden.
   function hintFor(grid, step, prefer, level) {
     if (findConflicts(grid).length) {
       var clash = namedClash(grid);
@@ -398,7 +462,9 @@
     if (!s) {
       s = findPointing(grid);
       if (s) return pointingHint(s, step, grid);
-      return { kind: 'none', text: 'No naked single, hidden single or pointing step right now. At this point the puzzle needs another technique.' };
+      s = findClaiming(grid);
+      if (s) return claimingHint(s, step, grid);
+      return { kind: 'none', text: 'No naked single, hidden single, pointing or claiming step right now. At this point the puzzle needs another technique.' };
     }
     var where = 'row ' + (s.r + 1) + ', column ' + (s.c + 1);
     var text;
@@ -425,7 +491,7 @@
   // applies the showing hint (a hintFor result of kind nudge/explain); '' otherwise.
   function hintApplied(hint, value) {
     if (!hint || String(hint.digit) !== value) return '';
-    if (hint.technique === 'pointing') return 'Well done! You applied pointing: row ' + (hint.r + 1) + ', column ' + (hint.c + 1) + ' is ' + value + '.';
+    if (hint.technique === 'pointing' || hint.technique === 'claiming') return 'Well done! You applied ' + hint.technique + ': row ' + (hint.r + 1) + ', column ' + (hint.c + 1) + ' is ' + value + '.';
     return 'Well done! You applied a ' + hint.technique + ' single: row ' + (hint.r + 1) + ', column ' + (hint.c + 1) + ' is ' + value + '.';
   }
 
@@ -434,16 +500,19 @@
   //   digits: the ringed cells (ascending), on explain only,
   //   hatched: the reason cells (ascending), on explain only,
   //   confined, removed: a pointing explain's box cells where the digit fits and line cells that lose it (else empty) }.
-  // Tint: a naked single's row, column and box; a hidden single's unit; a pointing step's box and line, plus its hidden-form unit.
+  // Tint: a naked single's row, column and box; a hidden single's unit; a pointing or claiming step's box and line, plus its hidden-form unit.
+  // Claiming: confined = the line cells where D fits, removed = the box cells that lose it, and the first reason set is the
+  // empty cells of the line that are not confined (pointing: of the box).
   // Reason cells (none for a naked single): a hidden single's are the other empty cells of its unit; a pointing step's are the
   // empty box cells that are not confined and, in the hidden form, the empty cells of the hidden unit other than the target
   // and the removed cells. They are hatched on the page.
   // Ringed digits, for D = the hidden single's digit or the pointing digit: a cell holding D that shares a row, column or box
   // with a reason cell (an empty cell that D helps to rule out).
   function hintMarks(hint, grid) {
-    var p = hint.r * 9 + hint.c, units, pointing = hint.technique === 'pointing';
+    var p = hint.r * 9 + hint.c, units, claiming = hint.technique === 'claiming', pointing = claiming || hint.technique === 'pointing';
     var hidden = hint.unit ? [CELL_UNITS[p][UNIT_NAMES.indexOf(hint.unit)]] : [];
-    if (pointing) units = [hint.box * 3 + 2, hint.index * 3 + (hint.line === 'row' ? 0 : 1)].concat(hidden);
+    var lineUnit = hint.index * 3 + (hint.line === 'row' ? 0 : 1);
+    if (pointing) units = [hint.box * 3 + 2, lineUnit].concat(hidden);
     else units = hint.technique === 'hidden' ? hidden : CELL_UNITS[p];
     var area = [], digits = [], d = pointing ? hint.pointDigit : hint.technique === 'hidden' ? hint.digit : 0;
     units.forEach(function (u) { UNITS[u].forEach(function (q) { if (q !== p && area.indexOf(q) < 0) area.push(q); }); });
@@ -454,7 +523,7 @@
     }
     if (d && hint.kind === 'explain') {
       if (pointing) {
-        addReasons(UNITS[hint.box * 3 + 2], hint.confined);
+        addReasons(UNITS[claiming ? lineUnit : hint.box * 3 + 2], hint.confined);
         addReasons(hidden.length ? UNITS[hidden[0]] : [], hint.removed);
       } else addReasons(UNITS[hidden[0]], []);
       for (var q = 0; q < 81; q++) {
@@ -477,11 +546,11 @@
   // Pointing names its dashed and struck marks, and the hatching only when a cell is hatched; a hidden single always has some.
   // For a pointing step, `stage` (1-3, default 3) is the number of revealed steps: 1 names only the dashed marks, 2 adds the struck.
   function hintKey(hint, hatchedCount, stage) {
-    var pointing = hint.technique === 'pointing', d = pointing ? hint.pointDigit : hint.digit;
+    var pointing = hint.technique === 'pointing' || hint.technique === 'claiming', d = pointing ? hint.pointDigit : hint.digit;
     stage = stage || 3;
     var hatch = 'hatched = a purple ring rules ' + d + ' out there (' + aDigit(d) + ' already in the same row, column or box)';
     if (!pointing) return 'Key: ' + hatch + '.';
-    return 'Key: dashed purple = the only places for ' + d + ' in the box'
+    return 'Key: dashed purple = the only places for ' + d + ' in the ' + (hint.technique === 'claiming' ? hint.line : 'box')
       + (stage > 1 ? '; struck grey ' + d + ' = this step rules ' + d + ' out there' : '')
       + (stage > 2 && hatchedCount ? '; ' + hatch : '') + '.';
   }
@@ -545,7 +614,7 @@
   }
 
   function emptyTally() {
-    return { naked: { own: 0, hint: 0 }, hidden: { own: 0, hint: 0 }, pointing: { own: 0, hint: 0 } };
+    return { naked: { own: 0, hint: 0 }, hidden: { own: 0, hint: 0 }, pointing: { own: 0, hint: 0 }, claiming: { own: 0, hint: 0 } };
   }
 
   // The line for a judged entry that is not credited, in this order: (1) the digit is already in the cell's
@@ -597,7 +666,7 @@
     var p = r * 9 + c;
     if (credited[p]) return { tally: tally, credited: credited, text: text, kind: 'reward' };
     var t = emptyTally(), cr = {};
-    ['naked', 'hidden', 'pointing'].forEach(function (k) { t[k].own = tally[k].own; t[k].hint = tally[k].hint; });
+    ['naked', 'hidden', 'pointing', 'claiming'].forEach(function (k) { t[k].own = tally[k].own; t[k].hint = tally[k].hint; });
     Object.keys(credited).forEach(function (k) { cr[k] = true; });
     t[technique][how]++;
     cr[p] = true;
@@ -619,7 +688,7 @@
       return { kind: 'conflict', text: 'Every cell is filled, but some numbers break the rules. Click Verify to see which.' };
     }
     var own = 0, hint = 0;
-    ['naked', 'hidden', 'pointing'].forEach(function (k) { own += tally[k].own; hint += tally[k].hint; });
+    ['naked', 'hidden', 'pointing', 'claiming'].forEach(function (k) { own += tally[k].own; hint += tally[k].hint; });
     return { kind: 'solved', text: 'Puzzle solved! Techniques applied: ' + own + ' on your own, ' + hint + ' with a hint.' };
   }
 
@@ -627,14 +696,16 @@
   var TECHNIQUE_DEFINITIONS = {
     naked: 'Only one digit fits this cell: its row, column and box already hold the other eight.',
     hidden: 'This digit fits in only one cell of a row, column or box, even if that cell could take other digits.',
-    pointing: 'In a box, a digit fits only in one row (or column), so it cannot go anywhere else in that row (column); that can leave a single.'
+    pointing: 'In a box, a digit fits only in one row (or column), so it cannot go anywhere else in that row (column); that can leave a single.',
+    claiming: 'In a row (or column), a digit fits only inside one box, so it cannot go anywhere else in that box (pointing in reverse); that can leave a single.'
   };
 
-  // The heading and the three lines shown for a tally.
+  // The heading and the four lines shown for a tally.
   function tallyLines(tally) {
     function line(name, t) { return name + ' single: ' + t.own + ' on your own, ' + t.hint + ' with a hint'; }
     return ['Techniques applied in this puzzle', line('Naked', tally.naked), line('Hidden', tally.hidden),
-      'Pointing: ' + tally.pointing.own + ' on your own, ' + tally.pointing.hint + ' with a hint'];
+      'Pointing: ' + tally.pointing.own + ' on your own, ' + tally.pointing.hint + ' with a hint',
+      'Claiming: ' + tally.claiming.own + ' on your own, ' + tally.claiming.hint + ' with a hint'];
   }
 
   // ---- Generator -------------------------------------------------------
@@ -832,6 +903,8 @@
       document.getElementById('definition-hidden').textContent = TECHNIQUE_DEFINITIONS.hidden;
       document.getElementById('tally-pointing').textContent = lines[3];
       document.getElementById('definition-pointing').textContent = TECHNIQUE_DEFINITIONS.pointing;
+      document.getElementById('tally-claiming').textContent = lines[4];
+      document.getElementById('definition-claiming').textContent = TECHNIQUE_DEFINITIONS.claiming;
     }
 
     // Un-links the rings and the ruled cells; shows the key under the board and the invitation (or nothing, when no hatched cell is showing).
@@ -1127,7 +1200,7 @@
       marks.hatched.forEach(function (q) { cellAt(q).classList.add('hint-hatched'); });
       marks.digits.forEach(function (q) { cellAt(q).classList.add('hint-digit'); });
       if (!marks.hatched.length) return;
-      hatchedRings = { hatched: marks.hatched, rings: marks.digits, d: hint.technique === 'pointing' ? hint.pointDigit : hint.digit };
+      hatchedRings = { hatched: marks.hatched, rings: marks.digits, d: hint.pointDigit || hint.digit };
       unlink();
     }
 
@@ -1150,7 +1223,7 @@
       }
       var res = hintFor(currentGrid(), hint ? 2 : 1, preferredTechnique(tally, currentLevel), currentLevel);
       clearResults();
-      var pointingExplain = res.technique === 'pointing' && res.kind === 'explain';
+      var pointingExplain = (res.technique === 'pointing' || res.technique === 'claiming') && res.kind === 'explain';
       status.textContent = res.text;
       status.className = pointingExplain ? 'steps' : '';
       if (pointingExplain) { steps = { lines: res.text.split('\n'), shown: 1, marks: null }; showSteps(); }
@@ -1191,7 +1264,8 @@
     LEVELS: LEVELS, isValidSolution: isValidSolution,
     findConflicts: findConflicts, clashCells: clashCells, fixedMessage: fixedMessage, namedClash: namedClash, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
-    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, hintMarks: hintMarks, hintKey: hintKey, ringLink: ringLink, ringRules: ringRules, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
+    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, findClaiming: findClaiming, hintMarks: hintMarks, hintKey: hintKey,
+    ringLink: ringLink, ringRules: ringRules, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
     classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, completionFor: completionFor, tallyLines: tallyLines, statusClass: statusClass,
     TECHNIQUE_DEFINITIONS: TECHNIQUE_DEFINITIONS
   };

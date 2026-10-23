@@ -67,7 +67,7 @@ const read = () => page.eval(`(function () {
   var lk = document.getElementById('link'), sel = lk.classList.contains('selected');
   return { status: st.textContent, key: sel ? '' : lk.textContent, link: sel ? lk.textContent : '', reserve: lk.textContent, invite: document.getElementById('key').textContent, cls: st.className, picker: !document.getElementById('picker').hidden, game: !document.getElementById('game').hidden,
     tallyShown: !document.getElementById('tally').hidden, level: document.getElementById('level-text').textContent,
-    tally: ['tally-naked', 'tally-hidden', 'tally-pointing'].map(function (id) { return document.getElementById(id).textContent; }),
+    tally: ['tally-naked', 'tally-hidden', 'tally-pointing', 'tally-claiming'].map(function (id) { return document.getElementById(id).textContent; }),
     notes: document.getElementById('notes').textContent, pressed: document.getElementById('notes').getAttribute('aria-pressed'),
     clash: at('clash'), target: at('hint-target'), area: at('hint-area'), hatched: at('hint-hatched'), digit: at('hint-digit'), linked: at('hint-linked'), ruled: at('hint-ruled'), confined: at('hint-confined'), removed: at('hint-removed'),
     dattr: tds.map(function (t, i) { return t.hasAttribute('data-d') ? i : -1; }).filter(function (i) { return i >= 0; }),
@@ -84,7 +84,7 @@ const noHint = (s) => { assert.deepStrictEqual([s.key, s.link, s.invite], ['', '
 const KEY_S1 = 'Key: dashed purple = the only places for 2 in the box; struck grey 2 = this step rules 2 out there; hatched = a purple ring rules 2 out there (a 2 already in the same row, column or box).'; // Tricky seed 1 after 4 hints
 const KEY_M1 = 'Key: hatched = a purple ring rules 5 out there (a 5 already in the same row, column or box).'; // Medium seed 1, hidden single
 const INVITE = 'Click or tap a hatched cell to see what rules it out (solid purple), or a ring to see which cells it rules out.';
-const TALLY0 = ['Naked single: 0 on your own, 0 with a hint', 'Hidden single: 0 on your own, 0 with a hint', 'Pointing: 0 on your own, 0 with a hint'];
+const TALLY0 = ['Naked single: 0 on your own, 0 with a hint', 'Hidden single: 0 on your own, 0 with a hint', 'Pointing: 0 on your own, 0 with a hint', 'Claiming: 0 on your own, 0 with a hint'];
 
 describe('page (headless Chrome)', () => {
   const it = (name, fn) => base(name, { skip: found.skip || false }, fn); // each test shows as skipped, with the reason
@@ -129,6 +129,7 @@ describe('page (headless Chrome)', () => {
     await click('[data-level=tricky]');
     s = await read();
     assert.deepStrictEqual([s.picker, s.game, s.tallyShown, s.level, s.tally], [false, true, true, 'Difficulty: Tricky', TALLY0]);
+    assert.strictEqual(await page.eval('document.getElementById("definition-claiming").textContent'), S.TECHNIQUE_DEFINITIONS.claiming); // the fourth line and its definition show from 0
     await click('#hint');
     await click('#new-puzzle');
     s = await read();
@@ -150,7 +151,7 @@ describe('page (headless Chrome)', () => {
     const s = await read();
     assert.match(s.status, /^Well spotted!/);
     assert.strictEqual(s.cls, 'ok');
-    assert.deepStrictEqual(s.tally, ['Naked single: 1 on your own, 0 with a hint', TALLY0[1], TALLY0[2]]);
+    assert.deepStrictEqual(s.tally, ['Naked single: 1 on your own, 0 with a hint', TALLY0[1], TALLY0[2], TALLY0[3]]);
   });
 
   it('b. an own hidden single is green and the tally goes up by 1', async () => {
@@ -160,7 +161,7 @@ describe('page (headless Chrome)', () => {
     const s = await read();
     assert.match(s.status, /^Well spotted!/);
     assert.strictEqual(s.cls, 'ok');
-    assert.deepStrictEqual(s.tally, [TALLY0[0], 'Hidden single: 1 on your own, 0 with a hint', TALLY0[2]]);
+    assert.deepStrictEqual(s.tally, [TALLY0[0], 'Hidden single: 1 on your own, 0 with a hint', TALLY0[2], TALLY0[3]]);
   });
 
   it('c/d. a clash is outlined, Verify marks only the own cell, Hint clears the red, clearing the slip clears the outline', async () => {
@@ -276,6 +277,30 @@ describe('page (headless Chrome)', () => {
     s = await read();
     assert.strictEqual(s.status, 'Well done! You applied pointing: row 1, column 5 is 7.');
     assert.strictEqual(s.tally[2], 'Pointing: 0 on your own, 1 with a hint');
+  });
+
+  // Hard seeds where Hint falls back to claiming once its own singles and pointing steps are typed: [seed, target, confined, removed, hatched, D].
+  const CLAIMING = [[57, 45, [27, 28, 29], [37, 38, 45, 46], [31, 33, 34], 8], [184, 37, [63, 65], [54, 73, 74], [10, 66, 67], 5]];
+  it('f5. claiming is the fallback on the page (Hard seed 57 naked, seed 184 hidden): staged marks, key, Next step, focus, hinted entry counted', async () => {
+    for (const [seed, target, confined, removed, hatched, d] of CLAIMING) {
+      const grid = game('hard', seed).puzzle.map((row) => row.slice()), typed = [];
+      for (let h; (h = S.hintFor(grid, 2, 'naked', 'hard')).technique !== 'claiming'; grid[h.r][h.c] = h.digit) typed.push([h.r * 9 + h.c, String(h.digit)]);
+      await open('hard', seed);
+      await keys(typed);
+      await hints(2);
+      let s = await read();
+      const key = 'Key: dashed purple = the only places for ' + d + ' in the row';
+      assert.deepStrictEqual([s.target, s.confined, s.removed, s.hatched, s.key, await nextStep()], [[target], confined, [], [], key + '.', 'Next step (2 of 3)|BUTTON']);
+      await hints(1);
+      s = await read();
+      assert.deepStrictEqual([s.removed, s.hatched, s.key.startsWith(key + '; struck grey ' + d), await nextStep()], [removed, [], true, 'Next step (3 of 3)|BUTTON']);
+      await hints(1);
+      s = await read();
+      assert.deepStrictEqual([s.hatched, s.active, s.key.includes('; hatched = a purple ring'), await nextStep()], [hatched, String(target), true, null]);
+      await keys([[target, String(S.hintFor(grid, 2).digit)]]);
+      s = await read();
+      assert.deepStrictEqual([s.status.startsWith('Well done! You applied claiming: '), s.tally[3], s.target], [true, 'Claiming: 0 on your own, 1 with a hint', []]);
+    }
   });
 
   it('f1a. Hint advances the steps like Next step (hidden form, seed 8); a value change clears the button; at 360x740 the stage-2 Next step button is in the viewport', async () => {
