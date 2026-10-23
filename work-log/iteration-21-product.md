@@ -86,3 +86,8 @@ Tech debt: unchanged from the snapshot.
 3. Explanation follow-ups (snapshot item 2).
 4. Mobile remainder (snapshot item 3; five-button picker wrap at 360/375; watch: 3-line step-2 texts put Next step 20 px below 360x740, pointing and claiming, Hard seeds 14/108).
 5-8. Unchanged (snapshot items 4-7). Tech debt: unchanged; test ratio at cap.
+
+## #103 scope questions (lead, branch head cc1f9f2)
+- D10 (Q1, AC 5 failed for Tough seed 4: 4-line step 2, Next step bottom 759.9): accept the developer's rule `#status.steps { font-size: 1rem; }` below 560 px, all levels, as part of #103. Shot stage2-s4-360x740 checked: 1rem step text reads well. AC 5 extended: tester also measures Hard seeds 14/108 (D7 3-line case) at 360x740 and runs the shared f1a/f1h/f4 layout tests; if they pass, the D7 watch item closes. Developer figures: seeds 1/7 701.3, 3/4 719.3.
+- D11 (Q2): AC 3 = "first claiming Hint when following Hint from the start" (seeds 1/3 first Hint, seed 4 after 3 hinted entries, seed 7 after 1); pins.js and the page walk agree; pin data unchanged. My original "first Hint" wording was imprecise for seeds 4/7 (pins were walk positions, the log said "start positions").
+- Issue body AC 3/5 + Change log updated; comment posted.
