@@ -2,6 +2,16 @@
 
 ## Entries (newest first)
 
+### A one-off action propagates when the work log is the input
+- **Seen:** 2026-10-23
+- **Means:** It is essential to manage the source of truth for an agent. In iteration 19 the director told the curator to commit, so it ran the git close. In iteration 20, with no such instruction, the curator looked up its own close in the iteration 19 work log and did it again. The second issue lead skipped memory entirely and took its process from the previous issue's work log.
+- **Response:** Lead definition changed to read the WIP and the wiki index first. Pending: make the curated memory the agents' source of truth.
+
+### Keep it short is not a target
+- **Seen:** 2026-10-23
+- **Means:** Told to keep memory short and crisp, the curator added navigation (read lists per role in the index) while every page grew, two iterations in a row: 58.8K to 65.7K to 71.0K characters. Without a concrete goal the team doesn't know what to aim for.
+- **Response:** Pending: a size target for memory, counted in characters.
+
 ### Lessons accrete into process unless memory is pruned
 - **Seen:** 2026-10-20
 - **Means:** Regular pruning is essential to avoid bloat and pollution. Each iteration's lesson becomes the next iteration's step, and curated memory carries it forward more reliably than the work logs did. In iteration 11 the wiki's lessons drove three rounds of user checks in scoping, and scoping cost tripled. It is the same mechanism as the test growth in iteration 7.
