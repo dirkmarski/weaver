@@ -75,3 +75,8 @@
 - work-log/iteration-19-product.md (whole, 105): last PM decisions and live candidate list (format template). No other work logs; governance/LOG.md not read.
 - sudoku.js lines 320-361 (pointingHint), 820-870 (showSteps/clearResults/unlink), 1150-1177 (exports), grep for "removed": spec accuracy. index.html 15-43, style.css 55-80: layout order and reserve. README.md grep for key/link lines: what the README states. tests/page.test.js 15-60: seeding pattern for spike briefs. gh issue #91 body: issue format.
 - Spike reports A, B, B2, B3 and persona reports a/b/c (agent replies); screenshots viewed: shots2/X-s1-375-stage2, shots2/Y-s1-375-stage3, shots3/Y-s1-360-stage3.
+
+## #96 review-gate decision (2026-10-23, lead question)
+- D7 Option A: with W5 text, 360x740 seed 8 stage 3 `#status` ends 17.5 px below the fold (one extra line). Not required in #96 (AC6 stage-2 button guard stays; f1a renamed, stage-3 assertion removed). Layout change (B) rejected: that is #97's job; shorter wording rejected: W5 won the persona round. Carried into #97: AC5/AC9 now name `#status` in view after the last step (#97 Change log 1). Interim (between #96 and #97 merges) the user scrolls for the end of step 3: accepted, same iteration.
+- D8 AC4: spike case (seed 38 after 13 hints) did not reproduce with the page walk (spike walk likely differed); developer pins seeds 33, 7, 12 (3/3/4 cells) accepted. #96 Change log 1.
+- A5 Concern A2 materialised at stage 3, not stage 2: watch stage-2 button fit on 3+ cell seeds at #96 acceptance.
