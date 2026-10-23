@@ -321,10 +321,16 @@ describe('page (headless Chrome)', () => {
       await page.send('Emulation.setDeviceMetricsOverride', { width: 360, height: 740, deviceScaleFactor: 1, mobile: true });
       for (const [level, seed, n] of [['tricky', 1, 4], ['tricky', 8, 4], ['medium', 1, 2]]) {
         await open(level, seed);
-        await hints(n);
+        await hints(n - 1);
+        assert.strictEqual(await page.eval('scrollY'), 0, level + ' seed ' + seed + ': no scroll before the invitation appears');
+        await hints(1);
         const [invite, status, target] = await page.eval('["key", "status"].map(function (id) { return document.getElementById(id).getBoundingClientRect(); }).concat(document.activeElement.getBoundingClientRect()).map(function (r) { return [r.top, r.bottom]; })');
         [invite, status, target].forEach(([top, bottom]) => assert.ok(top >= 0 && bottom <= 740, level + ' seed ' + seed + ': inside the 740 px viewport: ' + [invite, status, target]));
       }
+      await page.send('Emulation.setDeviceMetricsOverride', { width: 360, height: 560, deviceScaleFactor: 1, mobile: true });
+      await open('medium', 1);
+      await hints(2); // the hidden single: the Hint handler scrolls the invitation into view
+      assert.ok(await page.eval('scrollY > 0 && document.getElementById("key").getBoundingClientRect().bottom <= 560'));
     } finally {
       await page.send('Emulation.clearDeviceMetricsOverride');
     }
@@ -361,7 +367,10 @@ describe('page (headless Chrome)', () => {
     await click('#hint');
     s = await read();
     assert.deepStrictEqual([s.invite, s.key, s.link, s.linked], [INVITE, KEY_M1, '', []]);
+    const look1 = () => page.eval('(function (cs) { return cs.color + "|" + cs.fontWeight; })(getComputedStyle(document.getElementById("link")))');
+    assert.strictEqual(await look1(), 'rgb(68, 68, 68)|400'); // the key: grey
     await focus(2, 3);
+    assert.strictEqual(await look1(), 'rgb(74, 15, 138)|500'); // the link sentence: purple
     s = await read();
     assert.deepStrictEqual([s.invite, s.key], [INVITE, '']); // the sentence replaces the key, the invitation stays
     assert.deepStrictEqual(s.linked, [pos(2, 8), pos(9, 3)]);
