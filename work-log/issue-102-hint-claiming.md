@@ -97,3 +97,4 @@ Issue: https://github.com/dirkmarski/weaver/issues/102. Branch: `issue-102-hint-
 - The two removed assertions were part A's own new ones (none existed at 61f2db8); reviewer and tester confirmed redundant.
 
 ## Lead: acceptance and merge
+- PM accepted on head ec5633a (PR #105 comment 6358568993; personas understand 4.33, marks match 4.78; PM log 9a4ddac, work-log only). Verified on GitHub: comment author weaver-agents, PR head 9a4ddac, diff ec5633a..9a4ddac is work-log only. Merge with a merge commit on the head after this log commit (`sha` pinned).
