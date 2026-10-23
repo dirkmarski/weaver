@@ -290,6 +290,13 @@ describe('page (headless Chrome)', () => {
     await hints(4);
     s = await read();
     assert.deepStrictEqual([s.target, s.removed, s.status.includes('not in row 7, column 5; row 9, columns 4 and 5 (struck).'), s.status.includes('the only cell in column 4 where 6 fits')], [[39], [58, 75, 76], true, true]);
+    try { // 360x740: seed 4 reaches claiming after three hinted entries; its long step 2 still leaves the Next step button in view
+      await page.send('Emulation.setDeviceMetricsOverride', { width: 360, height: 740, deviceScaleFactor: 1, mobile: true });
+      await open('tough', 4);
+      for (let i = 0; i < 3; i++) { await click('#hint'); const q = (await read()).target[0]; await keys([[q, String(game('tough', 4).solution.flat()[q])]]); }
+      await hints(3);
+      assert.ok(await page.eval('document.getElementById("next-step").getBoundingClientRect().bottom') <= 740);
+    } finally { await page.send('Emulation.clearDeviceMetricsOverride'); }
   });
 
   // Hard seeds where Hint falls back to claiming once its own singles and pointing steps are typed: [seed, target, confined, removed, hatched, D].

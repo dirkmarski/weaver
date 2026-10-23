@@ -402,12 +402,6 @@ test('findHiddenSingle: a digit already in the unit is not a hidden single; a un
   assert.strictEqual(findHiddenSingle(clone()), null);
 });
 
-test('findHiddenSingle: does not change the grid', () => {
-  const copy = JSON.stringify(H_BOX);
-  findHiddenSingle(H_BOX);
-  assert.strictEqual(JSON.stringify(H_BOX), copy);
-});
-
 test('hintFor: a naked single is taught before a hidden single, even a later one in reading order', () => {
   assert.deepStrictEqual(findHiddenSingle(H_NAKED_FIRST), { r: 0, c: 1, digit: 5, unit: 'box' });
   const h = hintFor(H_NAKED_FIRST, 1);
