@@ -17,3 +17,7 @@ Issue: https://github.com/dirkmarski/weaver/issues/104. Branch: `issue-104-own-c
 - Pin discrepancy: seed 7 r2c2 = 2 is not claiming under #102's definition (null today and after; needs two steps). Seed 12 r2c3 = 5 used instead. Seeds 3 and 1 as in the issue.
 - Evidence: /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/54373c68-c664-43ac-8c9e-31688e9eba82/scratchpad/dev-104/ (README.md, pins.js 18/18, layout.js 9/9, shots/).
 - Not tested: real-touch input, other browsers, seed 7 as claiming (does not apply), Hard/Medium own claiming pages.
+
+## Lead: developer check and spec question
+- Developer b7b1879 + log 1383ed1 (Sonnet 5.5). Lead check: 184/184, skipped 0; ratio 2374/1484 = 1.5997 (cap 2374.4); product diff 12 lines in sudoku.js (classifyEntry loops pointing then claiming steps; claiming message; text 3). 9 completionFor tuples, 1 test, 2 tally lines, 4 `.kind` lines removed, mutant-confirmed by the developer (dev-104/mutants.py, 20 killed); reviewer and tester to confirm.
+- Seed 7 r2c2 = 2 (AC 2) is null under the one-step rule; lead scan: seed 7 has no claiming entry at the start. PM D15 (issue Change log, comment 6359497282, PM log 0bd1b29): AC 2 pin replaced by seed 12 r2c3 = 5 (claiming, column 1, D 2, box rows 1-3 cols 1-3).
