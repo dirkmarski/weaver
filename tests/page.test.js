@@ -64,7 +64,8 @@ const read = () => page.eval(`(function () {
   var tds = [].slice.call(document.querySelectorAll('#sudoku td')), st = document.getElementById('status');
   function at(c) { return tds.map(function (t, i) { return t.classList.contains(c) ? i : -1; }).filter(function (i) { return i >= 0; }); }
   var a = document.activeElement;
-  return { status: st.textContent, key: document.getElementById('key').textContent, link: document.getElementById('link').textContent, cls: st.className, picker: !document.getElementById('picker').hidden, game: !document.getElementById('game').hidden,
+  var lk = document.getElementById('link'), sel = lk.classList.contains('selected');
+  return { status: st.textContent, key: sel ? '' : lk.textContent, link: sel ? lk.textContent : '', reserve: lk.textContent, invite: document.getElementById('key').textContent, cls: st.className, picker: !document.getElementById('picker').hidden, game: !document.getElementById('game').hidden,
     tallyShown: !document.getElementById('tally').hidden, level: document.getElementById('level-text').textContent,
     tally: ['tally-naked', 'tally-hidden', 'tally-pointing'].map(function (id) { return document.getElementById(id).textContent; }),
     notes: document.getElementById('notes').textContent, pressed: document.getElementById('notes').getAttribute('aria-pressed'),
@@ -79,7 +80,9 @@ const read = () => page.eval(`(function () {
 // The Next step button: label, or null while it is hidden (the button sits in #next, under #status).
 const nextStep = () => page.eval('(function () { var p = document.getElementById("next"), b = document.getElementById("next-step"); return p.hidden ? null : b.textContent + "|" + b.tagName; })()');
 const focusAt = (p) => page.eval('document.querySelector(\'input[data-pos="' + p + '"]\').focus()');
-const noHint = (s) => { assert.deepStrictEqual([s.key, s.link], ['', '']); ['linked', 'ruled', 'target', 'area', 'hatched', 'digit', 'confined', 'removed', 'dattr'].forEach((k) => assert.deepStrictEqual(s[k], [], k)); };
+const noHint = (s) => { assert.deepStrictEqual([s.key, s.link, s.invite], ['', '', '']); ['linked', 'ruled', 'target', 'area', 'hatched', 'digit', 'confined', 'removed', 'dattr'].forEach((k) => assert.deepStrictEqual(s[k], [], k)); };
+const KEY_S1 = 'Key: dashed purple = the only places for 2 in the box; struck grey 2 = this step rules 2 out there; hatched = a purple ring rules 2 out there (a 2 already in the same row, column or box).'; // Tricky seed 1 after 4 hints
+const KEY_M1 = 'Key: hatched = a purple ring rules 5 out there (a 5 already in the same row, column or box).'; // Medium seed 1, hidden single
 const INVITE = 'Click or tap a hatched cell to see what rules it out (solid purple), or a ring to see which cells it rules out.';
 const TALLY0 = ['Naked single: 0 on your own, 0 with a hint', 'Hidden single: 0 on your own, 0 with a hint', 'Pointing: 0 on your own, 0 with a hint'];
 
@@ -242,7 +245,7 @@ describe('page (headless Chrome)', () => {
     s = await read();
     assert.strictEqual(s.status, 'Pointing: row 1, column 5 must be 7.\n1. In the box of rows 1-3 and columns 7-9, the digit 2 fits only in row 1.');
     assert.strictEqual(await nextStep(), 'Next step (2 of 3)|BUTTON');
-    const staged = (s) => [s.confined, s.removed, s.hatched, s.digit, s.dattr, s.link];
+    const staged = (s) => [s.confined, s.removed, s.hatched, s.digit, s.dattr, s.invite];
     assert.deepStrictEqual(staged(s), [[7, 8], [], [], [], [7, 8], '']); // step 1: dashed confined cells only
     assert.strictEqual(s.key, 'Key: dashed purple = the only places for 2 in the box.');
     await focusAt(15); // a cell that is hatched later: no link yet
@@ -282,7 +285,7 @@ describe('page (headless Chrome)', () => {
       await click('#hint');
       await click('#hint');
       const fits = (id) => page.eval('document.getElementById("' + id + '").getBoundingClientRect().bottom');
-      const tops = () => page.eval('["sudoku", "link", "buttons"].map(function (id) { return document.getElementById(id).getBoundingClientRect().top; })');
+      const tops = () => page.eval('["sudoku", "link", "buttons"].map(function (id) { return document.getElementById(id).getBoundingClientRect().top + scrollY; })'); // page-relative: the last step scrolls
       const still = await tops();
       assert.strictEqual((await read()).status.split('\n').length, 2);
       assert.strictEqual(await nextStep(), 'Next step (2 of 3)|BUTTON');
@@ -313,6 +316,20 @@ describe('page (headless Chrome)', () => {
     assert.ok((await read()).status.startsWith('Hint: try pointing'));
   });
 
+  it('f1f. 360x740 phone: after the last step the invitation, the whole step text and the target cell are in view (Tricky seeds 1 and 8, Medium seed 1)', async () => {
+    try {
+      await page.send('Emulation.setDeviceMetricsOverride', { width: 360, height: 740, deviceScaleFactor: 1, mobile: true });
+      for (const [level, seed, n] of [['tricky', 1, 4], ['tricky', 8, 4], ['medium', 1, 2]]) {
+        await open(level, seed);
+        await hints(n);
+        const [invite, status, target] = await page.eval('["key", "status"].map(function (id) { return document.getElementById(id).getBoundingClientRect(); }).concat(document.activeElement.getBoundingClientRect()).map(function (r) { return [r.top, r.bottom]; })');
+        [invite, status, target].forEach(([top, bottom]) => assert.ok(top >= 0 && bottom <= 740, level + ' seed ' + seed + ': inside the 740 px viewport: ' + [invite, status, target]));
+      }
+    } finally {
+      await page.send('Emulation.clearDeviceMetricsOverride');
+    }
+  });
+
   it('f1b. pins on the page: P1 pointing (hatched cells, key line, stripe and tint layers) and P3 hidden single (hatched, key line, a value change clears both)', async () => {
     const all = (...rc) => rc.map(([r, c]) => (r - 1) * 9 + c - 1);
     await open('tricky', 8);
@@ -339,12 +356,14 @@ describe('page (headless Chrome)', () => {
     const focus = (r, c) => page.eval('document.querySelector("input[data-pos=\\"' + pos(r, c) + '\\"]").focus()');
     await open('medium', 1);
     await click('#hint');
-    assert.strictEqual((await read()).link, ''); // the nudge
-    await click('#hint');
     let s = await read();
-    assert.deepStrictEqual([s.link, s.linked], [INVITE, []]);
+    assert.deepStrictEqual([s.reserve, s.invite], ['', '']); // the nudge
+    await click('#hint');
+    s = await read();
+    assert.deepStrictEqual([s.invite, s.key, s.link, s.linked], [INVITE, KEY_M1, '', []]);
     await focus(2, 3);
     s = await read();
+    assert.deepStrictEqual([s.invite, s.key], [INVITE, '']); // the sentence replaces the key, the invitation stays
     assert.deepStrictEqual(s.linked, [pos(2, 8), pos(9, 3)]);
     assert.strictEqual(s.link, 'Hatched cell row 2, column 3: no 5 here, because the 5 at row 2, column 8 is in the same row, and the 5 at row 9, column 3 is in the same column.');
     const look = await page.eval('(function () { var td = document.querySelectorAll("#sudoku td")[' + pos(2, 8) + ']; var cs = getComputedStyle(td);' +
@@ -353,11 +372,11 @@ describe('page (headless Chrome)', () => {
     assert.deepStrictEqual(look, [true, 'rgb(106, 31, 181)', 'rgb(255, 255, 255)', 'rgb(255, 255, 255)']);
     await focus(1, 2); // the target
     s = await read();
-    assert.deepStrictEqual([s.link, s.linked], [INVITE, []]);
+    assert.deepStrictEqual([s.invite, s.key, s.link, s.linked], [INVITE, KEY_M1, '', []]); // reverted: the key is back
     await focus(2, 3);
     await page.eval('document.activeElement.blur()'); // focus leaves the grid
     s = await read();
-    assert.deepStrictEqual([s.link, s.linked], [INVITE, []]);
+    assert.deepStrictEqual([s.invite, s.key, s.link, s.linked], [INVITE, KEY_M1, '', []]); // reverted: the key is back
     await focus(2, 3);
     await keys([[pos(1, 2), '5']]);
     noHint(await read());
@@ -375,11 +394,11 @@ describe('page (headless Chrome)', () => {
   it('f1e. reverse link (Tricky seed 1, R3): click a ring, switch, hatched focus shows the forward link, target ends; outside click ends; re-click keeps', async () => {
     const pos = (r, c) => (r - 1) * 9 + c - 1;
     const tap = (r, c) => page.eval('document.querySelectorAll("#sudoku td")[' + pos(r, c) + '].click()');
-    const state = async () => { const s = await read(); return [s.linked, s.ruled, s.link]; };
+    const state = async () => { const s = await read(); assert.strictEqual(s.invite, INVITE); return [s.linked, s.ruled, s.reserve]; }; // the reserve: the key, or the sentence of a selection
     const badges = () => page.eval('[].slice.call(document.querySelectorAll("#sudoku td")).map(function (t, i) { var s = getComputedStyle(t, "::after"); return s.color === "rgb(74, 15, 138)" && s.content === \'"2"\' ? i : -1; }).filter((i) => i >= 0)'); // the purple "2" badges
     await open('tricky', 1);
     await hints(4);
-    assert.deepStrictEqual(await state(), [[], [], INVITE]); // the Hint click leaves nothing selected
+    assert.deepStrictEqual(await state(), [[], [], KEY_S1]); // the Hint click leaves nothing selected
     await tap(2, 2);
     assert.deepStrictEqual(await state(), [[pos(2, 2)], [pos(2, 7), pos(2, 8), pos(2, 9)],
       'The 2 at row 2, column 2 rules 2 out of three hatched cells: row 2, column 7 (same row), row 2, column 8 (same row) and row 2, column 9 (same row).']);
@@ -400,13 +419,13 @@ describe('page (headless Chrome)', () => {
     assert.deepStrictEqual(await state(), [[pos(9, 7)], [],
       'Hatched cell row 3, column 7: no 2 here, because the 2 at row 9, column 7 is in the same column.']);
     await focusAt(pos(1, 5)); // the target
-    assert.deepStrictEqual(await state(), [[], [], INVITE]);
+    assert.deepStrictEqual(await state(), [[], [], KEY_S1]);
     await tap(2, 2);
     await page.eval('document.body.click()'); // outside the grid
-    assert.deepStrictEqual(await state(), [[], [], INVITE]);
+    assert.deepStrictEqual(await state(), [[], [], KEY_S1]);
     await tap(2, 2);
     await tap(1, 1); // a given that is no ring
-    assert.deepStrictEqual(await state(), [[], [], INVITE]);
+    assert.deepStrictEqual(await state(), [[], [], KEY_S1]);
     await tap(2, 2);
     await click('#verify');
     noHint(await read()); // clearing leaves no data-d behind

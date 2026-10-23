@@ -801,8 +801,9 @@
   function render() {
     var table = document.getElementById('sudoku');
     var status = document.getElementById('status');
-    var keyLine = document.getElementById('key');
-    var linkLine = document.getElementById('link');
+    var reserve = document.getElementById('link'); // under the board: the link sentence while a selection is active, else the key
+    var invite = document.getElementById('key');   // after the steps: the invitation
+    var keyText = ''; // key line of the explanation showing, else ''
     var button = document.getElementById('verify');
     var picker = document.getElementById('picker');
     var game = document.getElementById('game');
@@ -833,12 +834,25 @@
       document.getElementById('definition-pointing').textContent = TECHNIQUE_DEFINITIONS.pointing;
     }
 
-    // Un-links the rings and the ruled cells and shows the invitation (or nothing, when no hatched cell is showing).
+    // Un-links the rings and the ruled cells; shows the key under the board and the invitation (or nothing, when no hatched cell is showing).
     var INVITE = 'Click or tap a hatched cell to see what rules it out (solid purple), or a ring to see which cells it rules out.';
     function unlink() {
       table.querySelectorAll('.hint-ruled').forEach(function (el) { el.removeAttribute('data-d'); });
       table.querySelectorAll('.hint-linked, .hint-ruled').forEach(function (el) { el.classList.remove('hint-linked', 'hint-ruled'); });
-      linkLine.textContent = hatchedRings ? INVITE : '';
+      reserve.textContent = keyText;
+      reserve.className = '';
+      invite.textContent = hatchedRings ? INVITE : '';
+    }
+
+    // Replaces the key under the board by a link sentence (purple).
+    function showLink(text) {
+      reserve.textContent = text;
+      reserve.className = 'selected';
+    }
+
+    // Brings the invitation fully into view with the least scroll, once it has appeared (after the focus call, which may scroll too).
+    function showInvite() {
+      if (hatchedRings) invite.scrollIntoView({ block: 'nearest' });
     }
 
     // Shows the conclusion line and the first `shown` steps; the Next step button stays until all three show.
@@ -854,8 +868,8 @@
       steps = null;
       nextRow.hidden = true;
       hatchedRings = null;
+      keyText = '';
       unlink();
-      keyLine.textContent = '';
       status.textContent = '';
       status.className = '';
       // data-d is always set together with hint-confined / hint-removed, so [data-d] finds those cells too.
@@ -1068,7 +1082,7 @@
       if (hatchedRings.hatched.indexOf(p) < 0) return;
       var link = ringLink(p, hatchedRings.rings, hatchedRings.d);
       link.partners.forEach(function (q) { cellAt(q).classList.add('hint-linked'); });
-      linkLine.textContent = link.text;
+      showLink(link.text);
     });
     table.addEventListener('focusout', unlink);
 
@@ -1079,7 +1093,7 @@
         cellAt(p).classList.add('hint-ruled');
         cellAt(p).setAttribute('data-d', hatchedRings.d);
       });
-      linkLine.textContent = rule.text;
+      showLink(rule.text);
     }
 
     // A click selects the ring under it (givens take no focus). It comes after the focusout of the cell that lost focus, so
@@ -1105,7 +1119,10 @@
           cellAt(q).setAttribute('data-d', hint.pointDigit);
         });
       });
-      if (hint.kind === 'explain' && hint.technique !== 'naked') keyLine.textContent = hintKey(hint, marks.hatched.length, stage);
+      if (hint.kind === 'explain' && hint.technique !== 'naked') {
+        keyText = hintKey(hint, marks.hatched.length, stage);
+        unlink();
+      }
       if (stage < 3) return;
       marks.hatched.forEach(function (q) { cellAt(q).classList.add('hint-hatched'); });
       marks.digits.forEach(function (q) { cellAt(q).classList.add('hint-digit'); });
@@ -1120,6 +1137,7 @@
       showSteps();
       showMarks(steps.marks, steps.shown);
       if (steps.shown >= 3) inputs[hint.r][hint.c].focus();
+      showInvite();
     }
     nextStep.addEventListener('click', revealStep);
 
@@ -1142,6 +1160,7 @@
       if (steps) steps.marks = marks;
       showMarks(marks, steps ? 1 : 3);
       inputs[res.r][res.c].focus();
+      showInvite();
     });
 
     button.addEventListener('click', function () {

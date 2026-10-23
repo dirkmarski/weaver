@@ -62,8 +62,9 @@ h1 { margin: 0 0 1rem; font-weight: 600; }
 /* Next step (#90): its own line under #status (so #status holds only the steps shown), aligned with the steps. */
 #next { max-width: 36rem; margin: -0.5rem auto 0; text-align: left; }
 #next-step { font: inherit; padding: 0.4rem 1rem; min-height: 2.15rem; cursor: pointer; }
-#key { margin: 0.25rem auto 0; max-width: 36rem; font-size: 0.85rem; font-weight: 400; color: #444; }
-#link { margin: 0.25rem auto 0; min-height: 4lh; max-width: 36rem; font-size: 0.85rem; font-weight: 500; color: #4a0f8a; }
+#key { scroll-margin-bottom: 1px; margin: 0.25rem auto 0; max-width: 36rem; font-size: 0.85rem; font-weight: 500; color: #4a0f8a; }
+#link { margin: 0.25rem auto 0; min-height: 4lh; max-width: 36rem; font-size: 0.85rem; font-weight: 400; color: #444; }
+#link.selected { font-weight: 500; color: #4a0f8a; }
 #buttons { display: flex; justify-content: center; gap: 0.75rem; margin-top: 0.5rem; }
 
 #sudoku caption {
