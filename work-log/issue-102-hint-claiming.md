@@ -11,6 +11,12 @@ Issue: https://github.com/dirkmarski/weaver/issues/102. Branch: `issue-102-hint-
 
 ## Developer
 
+### Part A (logic, texts, rewards, README)
+- Model Claude Sonnet 5.5, session 54373c68-c664-43ac-8c9e-31688e9eba82. Commit d3279a8 (code, tests, README).
+- Done: `findClaiming` (shares `firstTarget` with `findPointing`; `singleAfterStep` got a `skip` argument so claiming never gives a box-form target), claiming after pointing in `hintFor` on all levels, new "none" text, `claimingHint` (nudge and 4-line explanation, same result shape as pointing, `technique: 'claiming'`), generic `struckCells(removed)` (also used by pointing, same output), hinted-claiming reward via `hintApplied`, fourth tally line and `TECHNIQUE_DEFINITIONS.claiming`, completion sum, `index.html` `#tally-claiming` / `#definition-claiming` and `showTally` wiring, README (Hint, tally, API).
+- Tests: 181/181, skipped 0. Ratio 2324 / 1471 = 1.58 (cap 2353.6). Six existing assertions only extended for the fourth tally key (tally deepEquals, tallyLines, MIXED, completion helper, definitions) and the new none text; none removed. Positions are Hard-seed walks (provenance in test comments); steps cross-checked against the PM's spike-lib on 20000 random partial grids (0 differences, box-form aside). 16 mutants of the new logic run, all killed (one survivor found a missing count-accumulation test, added).
+- Not tested here: marks/key for claiming, step reveal wiring, page rendering of the fourth line (part B); own claiming (#104).
+
 ## Reviewer
 
 ## Tester
