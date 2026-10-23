@@ -35,6 +35,21 @@
 
 ## Tester
 
+- Model: Claude Sonnet 5.5, session 541fd2f9-8dfe-4936-a1b6-0c535e8f682f, head tested f6cea9b (detached worktree). Verdict: PASS (AC1-AC8; AC9 is PM).
+- Scripts and README: scratchpad i96/test-96 (README.md there: setup, env, re-run line). Real CDP input (mouse; touch emulation on for the touch runs), mobile viewports.
+- Plan: AC1-AC3 literals + grammar on the page; AC4 seeds 33/7/12 on the page; AC5 diff of every stage snapshot vs a552c1d; AC6 button fit; AC7 README diff read; AC8 suite.
+- Evidence: 42 check.js assertions pass over 6 states (seeds 1, 8 native; 33, 7, 12 and 1 by replaying the unit pointingState singles then Hint x2 + Next step). Step 2 text == literals; cells in text == grey D badges (hint-removed with data-d = D) == independent grid oracle (empty cells of the line outside the box where D is not blocked). AC5: for seeds 1 and 8 (and the 4 others) the nudge, step 1, step 3, conclusion, key, link line, marks and button labels are identical to a552c1d; only line 3 of the status at stages 2 and 3 differs.
+- Fit (button bottom / spare, same on all five seeds, mouse and touch): 360x740 738.9 / 1.1 (main: 717.9 / 22.1); 375x812 753.9 / 58.1. Stage-3 #status bottom (info): 360x740 seeds 1 and 33 778.5 (38.5 below fold), seeds 8, 7, 12 757.5 (17.5 below); 375x812 793.6 (seeds 1, 33) and 751.6 (others), inside 812. Carried by #97 per Change log 1.
+- Suite: node --test 174 pass, 0 fail, 0 skipped.
+
+Findings
+1. Info (low): the 360x740 button spare is 1.1 px on every pointing seed (step 2 now wraps to the same line count on all; main had 22.1). The only guard is the f1a assertion (<= 740); any one-line growth breaks it. Seeds 33, 7 and 12 behave like 1 and 8.
+2. Low: test f1a at tests/page.test.js:278 still has "at 360x740 the whole text fits" in its title (rename pending per the lead log); its stage-3 #status check is gone, so the title now overstates.
+3. Info: the Hint-walk pointing steps for seeds 33, 7, 12 are the unit pointingState walk (unit omits the level argument, so a real Tricky Hint click shows an earlier pointing step: 4, 1 and 18 typed singles on the page natively, other digits). The pinned steps are reached on the page by typing the unit walk's singles (32, 6, 23 hints); then the first Hint is the stated pointing nudge. Both routes use the same code path.
+No defects against the ACs.
+
+Not tested: AC9 persona round (PM); desktop widths above 560 px; stage-3 fold fix (#97); other seeds beyond the 6 states; real device scrollbars/keyboard focus path; mutation checks (reviewer); README read only as a diff against the AC7 text.
+
 ## Lead review
 
 ## Lead: acceptance and merge
