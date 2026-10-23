@@ -20,6 +20,18 @@
 - Seed 38 / 13 hints spike claim not reproduced (my walk gives 2 removed cells there); 3+ cases used are listed in the test.
 
 ## Reviewer
+- Claude Sonnet 5.5, session 541fd2f9-8dfe-4936-a1b6-0c535e8f682f. Head reviewed 66529bc (code 71a9612 vs 98114a4). Verdict: approve.
+- Findings:
+  1. (info) sudoku.js:333-338 `struckCells` is correct for 1, 2, 3+ cells, row and column lines, no Oxford comma. `s.removed` comes from `spotsFor` over UNITS (row/column index order), so it is always ascending; the same list feeds `hintMarks` (sudoku.js:458/469) and the board strike.
+  2. (info) AC5: the diff in sudoku.js touches only the step-2 line (now shared by both forms); step 1, step 3, conclusion, box clause, nudge, key and button text are untouched.
+  3. (info) AC7: one README line changed (second-click paragraph), accurate; nothing else changed. AC8: new test covers naked/hidden, row/column, 1/2/3/4 cells, with the seed 1/8 literals in page tests.
+  4. (low, known rework) tests/page.test.js f1a title still says "the whole text fits"; agree it must be renamed (AC6) because the stage-3 `#status <= 740` check is gone.
+  5. (info) Removals (tests diff '-' lines): only the f1a stage-3 `#status <= 740` assertion (PM-accepted) plus 7 literal lines replaced by updated step-2 literals. Nothing else removed.
+  6. (info) Ratio 2204 / 1379 = 1.598 (<= 1.6); no line packing seen.
+- Mutants (all killed by `node --test`, restored by git checkout): Oxford comma (5 fail); swap rows/columns word (5); rc instead of struckCells (6); reverse order (5); off-by-one (6); swapped one-cell row/column (3); drop last-but-one cell (5); `n.length <= 2` (4); line index off-by-one (5); drop "(struck)" (6); swap row/col derivation (6); only first 2 removed (2).
+- Suite: 174 tests, 174 pass, 0 fail, skipped 0.
+- Not checked: real-page rendering, stage-2 fit at 360x740/375x812 (tester), persona round (PM).
+
 
 ## Tester
 
