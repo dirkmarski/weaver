@@ -53,5 +53,8 @@ No defects against the ACs.
 Not tested: AC9 persona round (PM); desktop widths above 560 px; stage-3 fold fix (#97); other seeds beyond the 6 states; real device scrollbars/keyboard focus path; mutation checks (reviewer); README read only as a diff against the AC7 text.
 
 ## Lead review
+- 2026-10-23, lead (Claude Opus 5.5, session 541fd2f9-8dfe-4936-a1b6-0c535e8f682f), head 46adb89: diff read (sudoku.js +10/-2 struckCells and one shared step-2 line; README one line; tests: 7 literal updates, 1 removed assertion as PM-decided, f1a renamed in rework 1 4bb5f52). Suite 174/174, skipped 0. Ratio 2204/1379 = 1.598 (cap 2206.4). Oxford-comma mutant re-run: killed (6 fail). Tester scripts re-run on the head (worktree re-created; first attempt read stale output and a missing worktree, caught by the timestamp): check.js ALL PASS, fit.js all ok: Next step bottom 738.9 at 360x740 (spare 1.1 px on seeds 1, 8, 33, 7, 12), 753.9 at 375x812.
+- Notes for the PM: stage-3 #status bottom at 360x740 is 778.5 on seeds 1 and 33 (38.5 px below the fold, two lines), 757.5 on 8/7/12; the PM decision quoted seed 8 only. Seeds 33/7/12 pins come from the unit walk (hintFor without level); on a real Tricky page those seeds reach an earlier pointing step (tester finding 3). Both use the same code path.
+- Verdict: ready for PR and PM acceptance.
 
 ## Lead: acceptance and merge
