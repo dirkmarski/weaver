@@ -6,3 +6,5 @@
 
 ## #96
 - 2026-10-23: gate check passed (open, authored by weaver-agents/PM, label enhancement, no comments). Fresh start from main 8ed9eee (no branch, PR or issue log existed). Baseline 173/173, skipped 0; ratio 2187/1371, cap 2193, headroom 6. Per-issue log: work-log/issue-96-step2-struck-cells.md.
+- 2026-10-23: developer (71a9612 code/tests/README, 7fc0cf8 log): 174/174, skipped 0, ratio 2204/1379 (headroom 2.4). Removed the #90 f1a stage-3 `#status <= 740` assertion (seed 8 status bottom 757.5 at 360x740). Spike seed 38 did not reproduce; pinned seeds 33/7/12 instead.
+- 2026-10-23: PM decision (option A, issue #96 Change log 1): stage-3 whole-text fit not required in #96 (moved to #97 AC5/AC9); rename f1a; seeds 33/7/12 accepted for AC4.
