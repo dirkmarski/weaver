@@ -77,3 +77,4 @@ Issue: https://github.com/dirkmarski/weaver/issues/103. Branch: `issue-103-tough
 - Deferred: g1 seed-1 struck cells (reviewer nit 5; covered by tester t3; no ratio room). Ready for PM acceptance.
 
 ## Lead: acceptance and merge
+- PM accepted on a1331d5 (PR #106 comment 6359286840; PM log e8e369c only adds the PM log). Personas: learn claiming 4/4/4, picker 4/4/4 (both exactly 4.0). D7 watch closed (D10/D13). Merged PR #106 with a merge commit on the final head (logs only after a1331d5).
