@@ -117,3 +117,6 @@ Tech debt: unchanged from the snapshot.
 - pm-accept-103 brief (whole; task); issue #103 body (whole; spec); product-strategy.md (whole, 6 lines; currency); this log (whole; state, D-numbering); test-103/README.md (whole; how to re-run); work-log/issue-103-tough-level.md sections Reviewer, Tester, Lead review (whole sections; verdicts); dev-103 README, stage2.js, walk.js, pagelib.js lines 17-95 (to reuse the page driver for shots and play-through).
 - Screenshots viewed: pm-103 picker-375, stage3-375; test-103 picker-1280; dev-103 stage3-s1-360x740.
 - Personas a, b, c: brief.md and the nine shots in pm-103/persona/ only (each confirmed; no other file, no LOG.md).
+
+## #104 AC 2 pin (lead question, head 1383ed1)
+- D15: AC 2 pin seed 7 r2c2 = 2 replaced by seed 12 r2c3 = 5 (claiming, column 1, D 2, top-left box). Seed 7 r2c2 is a two-step chain (column 8 D2 leaves 2 in r2c5); seed 7 has no single-step claiming entry at the start (my scan: 0). My original pin was wrong (I checked null-today only, not claiming-after). Seed 12 checked: null on 93744fb, claiming on 1383ed1. Seeds 3/1 unchanged. Issue body + Change log updated; comment 6359497282. Lesson: pin checks must verify the intended outcome, not only the current one.
