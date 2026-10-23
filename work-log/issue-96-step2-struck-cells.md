@@ -18,6 +18,8 @@
 - Ratio: tests 2204 / product 1379 = 1.598 (cap 2206.4, headroom 2.4). 174/174 pass, skipped 0.
 - Deviation: page test f1a asserted `#status` bottom <= 740 at 360x740 after step 3; with the longer step 2 on seed 8 it is 757.5 (one more wrapped line). Removed that one assertion (AC6 only requires Next step inside the viewport at stage 2, still asserted in f1a). Lead decision needed if a whole-text guard is wanted.
 - Seed 38 / 13 hints spike claim not reproduced (my walk gives 2 removed cells there); 3+ cases used are listed in the test.
+- Rework 1 (4bb5f52): renamed test f1a title to end "at 360x740 the stage-2 Next step button is in the viewport" (tests/page.test.js:278, title only).
+- Rework 1 check: 174/174 pass, skipped 0; ratio 2204/1379 = 1.598.
 
 ## Reviewer
 - Claude Sonnet 5.5, session 541fd2f9-8dfe-4936-a1b6-0c535e8f682f. Head reviewed 66529bc (code 71a9612 vs 98114a4). Verdict: approve.
