@@ -26,7 +26,7 @@ Charter: `governance/CHARTER.md`. The agents build the site; Dirk (human) owns a
 - Merge commits made by agents carry the `[<agent>][session <id>]` prefix too; give the message in the prompt (it14).
 - Agent and persona briefs are files in the session scratchpad with literal absolute paths; the prompt is one line pointing at the brief. Never rely on `$WEAVER_SCRATCHPAD` inside an agent: a persona could not resolve it (echo denied, it19).
 - Every agent prompt ends with a fixed-format evidence report (commits, files changed, tests incl. skipped, ratio, AC -> evidence map, removed assertions, what was NOT tested, deviations, LOG.md confirmation); the lead spot-checks it rather than reading transcripts or logs (lead.md supervisor strategy, it15).
-- Agents read the wiki and WIP, not the work log, unless specifically needed. Reviewers and testers read only the Lead section of the issue log. The PM scopes from `memory/wiki/backlog.md` and leaves an up-to-date ordered list at the end of its product log for the lead's snapshot.
+- Agents read the wiki and WIP, not the work log, unless specifically needed. Reviewers and testers read only the Lead section of the issue log. The PM scopes from `memory/wiki/backlog.md` and leaves an up-to-date ordered list at the end of its product log for the curator's snapshot.
 
 ## Per-issue flow
 1. Gate check: issue is open and authored by Dirk Marski or weaver-agents (the PM); otherwise abandon. Iteration issues carry `enhancement`.
