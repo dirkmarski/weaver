@@ -69,5 +69,11 @@ Issue: https://github.com/dirkmarski/weaver/issues/103. Branch: `issue-103-tough
 - Not tested: classifyEntry on Tough claiming (out of scope, #104); real touch input (touch events) on the picker; browsers other than headless Chrome; generation timing beyond the 10-seed batch test; wider Tough batches than seeds 1-10 on the walk; screen readers.
 
 ## Lead review
+- Lead check on 2f83b69 (product code = 87f6fa6; rework tests + README only). Product diff read in full: `hintFor` tough adds useful claiming before Tricky's useful pointing (3 lines), `LEVELS.tough` = Tricky entry, picker button, one CSS rule (PM D10). Suite 183/183, skipped 0; ratio 2368/1480 = 1.600 (at the cap); longest lines = 9ccab0c maxima (README 8482).
+- Rework 1 (e3949f4) closed reviewer F1 (seed 13 Tough = Tricky pointing), F2 (computed-style pin in g1), F3 (README line split) and the README:33 nit. Lead found two packed lines (two statements per line) in e3949f4: rework 1b (2f83b69) folds them into single assertions, same line count.
+- Mutants re-run by the lead on 2f83b69: M3 killed (issue 103 unit test); M9, M12, M13 killed by g1 (the developer's 1b report credited M12 to f1: misread, g1 is the failing test).
+- Tester scripts re-run (ROOT = main checkout at 2f83b69, 16:46-16:47, shot timestamps inside the window): t1 47/47, t3 48/48, t4 22/22, t5 50/50, t6 21/21, t8 14/14 (the README FAIL is gone). t7 (removal mutants) not re-run: the rework removed no assertions.
+- Screenshots looked at: stage2-Tough_s3-360x740 (marks, struck badges, 16 px step text, Next step in view), picker-360x740 (3+2 wrap, in order).
+- Deferred: g1 seed-1 struck cells (reviewer nit 5; covered by tester t3; no ratio room). Ready for PM acceptance.
 
 ## Lead: acceptance and merge
