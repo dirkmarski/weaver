@@ -11,6 +11,11 @@
 - Then reviewer, tester (one at a time, detached worktrees), lead check, PR, PM acceptance (AC9 persona round).
 
 ## Developer
+- Claude Sonnet 5.5, session 541fd2f9-8dfe-4936-a1b6-0c535e8f682f. Code commit 71a9612.
+- sudoku.js: new `struckCells(s)` builds <cells> from `s.removed` (the list the board strikes); step 2 line is now one shared string for both forms (steps 1, 3, conclusion unchanged). README line 41 gives the rule. Tests: new test "issue 96" (8 first-pointing states on Tricky seeds 13, 18, 11, 3, 1, 33, 7, 12: both forms, row/column, 1 / 2 / 3 / 4 cells), existing step-2 literals updated (sudoku.test.js 3, page.test.js 3).
+- Ratio: tests 2204 / product 1379 = 1.598 (cap 2206.4, headroom 2.4). 174/174 pass, skipped 0.
+- Deviation: page test f1a asserted `#status` bottom <= 740 at 360x740 after step 3; with the longer step 2 on seed 8 it is 757.5 (one more wrapped line). Removed that one assertion (AC6 only requires Next step inside the viewport at stage 2, still asserted in f1a). Lead decision needed if a whole-text guard is wanted.
+- Seed 38 / 13 hints spike claim not reproduced (my walk gives 2 removed cells there); 3+ cases used are listed in the test.
 
 ## Reviewer
 
