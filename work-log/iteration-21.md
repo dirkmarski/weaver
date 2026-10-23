@@ -24,3 +24,5 @@ Lead: Claude Opus 5.5 (lead agent). Scope: claiming (box-line reduction): #102, 
 
 ## #104 Rewards: own claiming (session 54373c68-c664-43ac-8c9e-31688e9eba82, new lead run)
 - 2026-10-23 gate: #104 open, author weaver-agents (PM). Fresh start. Baseline main 1bf9174: 183/183, skipped 0; ratio 2368/1480 = 1.600 (0 headroom). Branch `issue-104-own-claiming`. Grading solver out of scope (not in the issue).
+- Developer (Sonnet 5.5) b7b1879 + log 1383ed1: 184/184, ratio 2374/1484 = 1.5997; removals mutant-confirmed. Seed 7 AC 2 pin wrong (null under one-step rule, no claiming entry at seed 7 start): PM D15 replaced it with seed 12 r2c3 = 5 (0bd1b29, issue Change log).
+- Review fb3dbc5 approve with nits (F2 pre-existing hint-match row/column unguarded). Test a7e00df pass (oracle 49200 cells, 0 mismatches). Lead check: suite, tester scripts re-run, mutant killed. No rework.
