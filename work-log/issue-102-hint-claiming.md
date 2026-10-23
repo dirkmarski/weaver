@@ -30,6 +30,54 @@ Issue: https://github.com/dirkmarski/weaver/issues/102. Branch: `issue-102-hint-
 
 ## Tester
 
+## Reviewer
+- Reviewer: Claude Sonnet 5.5, session 54373c68-c664-43ac-8c9e-31688e9eba82. Head reviewed: d2844da (diff 61f2db8..HEAD). Suite on that head: 183/183, skipped 0.
+- Verdict: approve with nits.
+- Findings:
+  1. should-fix (shared code, also pre-existing for pointing): the hidden-form unit order "row, then column" in `singleAfterStep` (sudoku.js, `var kind = [2, 0, 1][k]`) is unpinned: swapping to `[2, 1, 0]` survives the whole suite. Spec: "tried row then column". A position where a cell is a hidden single in both its row and column after a claiming step (and for pointing, after a pointing step) is needed to kill it. Lead may defer as pre-existing for pointing; for claiming it is a spec rule with no test.
+  2. nit (tests): naked-form claiming on a column line has no marks or key assertion (CL.B is only in finder and text tests; the page seeds 57 and 184 are row lines). Mutants that make the marks or key depend on form for a column line survive, but the product code has no such branch (marks and key are form-independent and the hidden column line CL.D is pinned), so the risk is low. AC5 is met in substance: row key at stage 1 (CL.A) plus column key at stage 3 (CL.D, which includes the stage-2 clause) and the page test pins stage 2 on rows.
+  3. nit: README and comment prose are consistent with behaviour; no mismatch found. No line longer than the file's longest at 61f2db8 (sudoku.js 250 vs 267, others unchanged).
+  4. Pointing output unchanged: `skip` defaults to 0 (`skip || 0`) so pointing walks box, row, column as before; the generic `struckCells(removed)` gives the same strings for pointing (single cell, one row, one column; confirmed by the untouched pointing and issue-96 tests, and mutant 22 below kills a deviation).
+- Removals confirmed redundant: (a) `hintApplied(hint, '8') === ''`: mutant removing the `String(hint.digit) !== value` guard is killed by `hintApplied: reward only for the hinted digit` and `hintApplied: hidden single reward text ...`; the guard is shared by all techniques. (b) `tallyLines(r.tally)[4]`: mutants swapping own/hint or using pointing counts in the Claiming line are killed by `tallyLines: heading and four lines` and the page tests (a, f5); the cell-once count is still pinned by `again`.
+- Mutants (run in the review worktree, restored each time, `git status` clean at the end):
+| # | Mutant | Result |
+|---|---|---|
+| 1 | rows/columns order swapped | killed: findClaiming order test |
+| 2 | digits descending | killed: findClaiming order test |
+| 3 | no single-box confinement | killed: page + none-text test |
+| 4 | removed may be empty | killed: findClaiming no-step test |
+| 5 | min spots 1 instead of 2 | killed: findClaiming no-step test |
+| 6 | box-form allowed (skip 0) | killed: findClaiming no-step / box-form test |
+| 7 | `useful` ignored | killed: findClaiming useful test |
+| 8 | removed includes confined | killed: page f5 + none-text test |
+| 9 | reasons from box not line | killed: claiming marks test + page |
+| 10 | key says "box" | killed: claiming marks/key test + page |
+| 11 | key stage-2 clause at stage 1 | killed: hintKey tests + page |
+| 12 | hatched clause at stage 2 | killed: hintKey tests + page |
+| 13 | `hatchedRings.d` = hint.digit | killed: page f1d |
+| 14 | hintApplied without claiming | killed: claiming rewards test + page |
+| 15 | box-case suffix never / always | both killed: claiming text test |
+| 16 | hidden unit number r/c swapped | killed: claiming text test |
+| 17 | pointingExplain without claiming | killed: page f5 |
+| 18 | claiming before pointing | killed: pointing tests + page |
+| 19 | completion sum drops claiming | killed: completionFor sums |
+| 20 | tint drops the line | killed: hintMarks tests |
+| 21 | hidden reasons ignore removed | killed: hintMarks tests + page |
+| 22 | struck single cell worded as column | killed: pointing column / issue-96 tests |
+| 23 | target not in reading order | killed: page + pointing tests |
+| 24 | hidden unit order column before row | SURVIVED (finding 1) |
+| 25 | key fixed to "row" | killed: claiming marks/key test |
+| 26 | credit copy drops claiming | killed: claiming rewards test |
+| 27 | definition text cut | killed: definitions test |
+| 28 | wrong-digit guard in hintApplied | killed (removal a) |
+| 29 | tally line 4 swap / pointing counts / page element | all killed (removal b, page a) |
+| 30 | naked-column marks/key form-dependent (artificial) | SURVIVED (finding 2, nit) |
+| 31 | skip 2 | killed |
+| 32 | definition element removed from index.html | killed: page |
+- AC 1-8 adequately tested: yes, with the two gaps above (AC1 "rows/columns" hidden order within the unit, AC5 naked column).
+- Not checked: ratio recomputed with the lead's counting method (my count differs; trusted the lead's 2360/1475), screenshots and 360x740 fit (AC7 page evidence), visual CSS, real-input (CDP) behaviour, Tricky useful pointing beyond the existing tests, performance of `findClaiming`.
+- Read: lessons.md Review and Testing sections; the Lead section of this log; issue #102; the full diff of sudoku.js, index.html, README.md, tests. LOG.md not read.
+
 ## Lead review
 
 ## Lead: acceptance and merge
