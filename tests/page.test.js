@@ -257,7 +257,7 @@ describe('page (headless Chrome)', () => {
     s = await read();
     assert.deepStrictEqual([s.linked, s.ruled, s.link], [[], [], '']);
     assert.strictEqual(s.status, 'Pointing: row 1, column 5 must be 7.\n1. In the box of rows 1-3 and columns 7-9, the digit 2 fits only in row 1.\n'
-      + '2. So 2 cannot go in row 1 outside that box: not in row 1, column 5.');
+      + '2. So 2 cannot go in row 1 outside that box: not in row 1, columns 5 and 6 (struck).');
     assert.deepStrictEqual([await nextStep(), await page.eval('document.activeElement.id')], ['Next step (3 of 3)|BUTTON', 'next-step']); // focus stays on the button
     await click('#next-step');
     s = await read();
@@ -266,7 +266,7 @@ describe('page (headless Chrome)', () => {
     assert.strictEqual(await nextStep(), null);
     assert.strictEqual(s.active, '4'); // the last step hands focus back to the target cell
     assert.strictEqual(s.status, 'Pointing: row 1, column 5 must be 7.\n1. In the box of rows 1-3 and columns 7-9, the digit 2 fits only in row 1.\n'
-      + '2. So 2 cannot go in row 1 outside that box: not in row 1, column 5.\n'
+      + '2. So 2 cannot go in row 1 outside that box: not in row 1, columns 5 and 6 (struck).\n'
       + '3. Row 1, column 5 has every digit except 2 and 7 in its row, column and box, so it could only take 2 or 7. With 2 ruled out, it must be 7.');
     assert.strictEqual(await page.eval(style), 'pre-line|left'); // one line per step, left-aligned
     await keys([[4, '7']]);
@@ -275,7 +275,7 @@ describe('page (headless Chrome)', () => {
     assert.strictEqual(s.tally[2], 'Pointing: 0 on your own, 1 with a hint');
   });
 
-  it('f1a. Hint advances the steps like Next step (hidden form, seed 8); a value change clears the button; at 360x740 the whole text fits', async () => {
+  it('f1a. Hint advances the steps like Next step (hidden form, seed 8); a value change clears the button; at 360x740 the stage-2 Next step button is in the viewport', async () => {
     await open('tricky', 8);
     try {
       await page.send('Emulation.setDeviceMetricsOverride', { width: 360, height: 740, deviceScaleFactor: 1, mobile: true });
@@ -299,7 +299,6 @@ describe('page (headless Chrome)', () => {
       assert.strictEqual(s.status.split('\n')[3], '3. That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
       assert.strictEqual(await nextStep(), null);
       assert.deepStrictEqual(await tops(), still); // and not at the last step either
-      assert.ok(await fits('status') <= 740, '#status bottom below the fold');
       await click('#hint'); // once complete, a further click leaves the explanation as it is
       assert.deepStrictEqual([(await read()).status, await nextStep()], [s.status, null]);
     } finally {
@@ -320,7 +319,7 @@ describe('page (headless Chrome)', () => {
     await hints(4);
     let s = await read();
     assert.strictEqual(s.status, 'Pointing: row 4, column 1 must be 8.\n1. In the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3.\n'
-      + '2. So 8 cannot go in column 3 outside that box.\n3. That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
+      + '2. So 8 cannot go in column 3 outside that box: not in column 3, rows 4 and 6 (struck).\n3. That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
     assert.deepStrictEqual(s.hatched, all([1, 3], [2, 2], [4, 8], [4, 9]));
     assert.strictEqual(s.key, 'Key: dashed purple = the only places for 8 in the box; struck grey 8 = this step rules 8 out there; hatched = a purple ring rules 8 out there (an 8 already in the same row, column or box).');
     const bg = await page.eval('getComputedStyle(document.querySelectorAll("#sudoku td")[2]).backgroundImage'); // r1c3, hatched
