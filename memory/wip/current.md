@@ -3,7 +3,7 @@
 Last updated: 2026-10-23, #102 merge (lead, session 54373c68-c664-43ac-8c9e-31688e9eba82)
 
 ## Active run
-- Iteration 21: #102 delivered and accepted (PR #105, merged; 183/183, skipped 0). Next: #103 Tough level (new lead run), then #104.
+- Iteration 21: #102 merged (PR #105). #103 Tough level in progress (branch issue-103-tough-level, lead session 54373c68): review stage (dev b1d9c62, 0144447; PM D10/D11 4ad81db). Then #104.
 
 ## Streams
 | Stream | Status | Next step | Owner |
