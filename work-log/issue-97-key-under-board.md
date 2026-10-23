@@ -15,9 +15,10 @@
 
 ## Developer
 - Claude Sonnet 5.5, session 541fd2f9-8dfe-4936-a1b6-0c535e8f682f. Code+tests+README commit 0b1e19e.
-- Changed: ids stable. `#link` (under the board, 4lh) holds the key, or the link sentence (class `selected`, purple) during a selection; `#key` (after `#next`) holds the invitation (purple). `keyText` state; `unlink()` restores key and invitation; `showLink`; `showInvite()` = `scrollIntoView({block:'nearest'})` called after the focus call in Hint and `revealStep`; `#key` has `scroll-margin-bottom: 1px` (without it the invitation ended 0.1 px below the fold). Tests: `read()` splits key/link/reserve/invite; f, f1, f1a (page-relative tops), f1c, f1e adapted; new f1f (360x740, seeds 1, 8, Medium 1). README Hint section and files list.
+- Changed: ids stable. `#link` (under the board, 4lh) holds the key, or the link sentence (class `selected`, purple) during a selection; `#key` (after `#next`) holds the invitation (purple). `keyText` state; `unlink()` restores key and invitation; `showLink`; `showInvite()` = `scrollIntoView({block:'nearest'})` called after the focus call in Hint and `revealStep`; `#key` has `scroll-margin-bottom: 1px` (without it the invitation ended 0.1 px below the fold). Tests: `read()` splits key/link/reserve/invite; f, f1, f1a (page-relative tops), f1c, f1e adapted; new f1h (360x740, seeds 1, 8, Medium 1). README Hint section and files list.
 - Ratio: product 1399 (+20), tests 2223 (+19), cap 2238.4, headroom 15. Note the brief labels were swapped (tests 2204, product 1379 at baseline).
 - Removals: none. Deviations: none.
+- Rework 1 (tests only, db4c00c): f1c asserts #link colour/weight (key grey 400, link sentence purple 500; kills f); f1h asserts scrollY 0 before the last Hint (kills i) and a 360x560 Medium seed 1 hidden single scrolls the invitation into view (kills b). Ratio 2232/1399 = 1.595 (headroom 6.4). Mutants b, f, i each fail 1 test; suite 175/175, skipped 0. f1f mentions fixed to f1h.
 
 ## Reviewer
 - Claude Sonnet 5.5 (claude-sonnet-5-5), session 541fd2f9-8dfe-4936-a1b6-0c535e8f682f. Head reviewed 2d3bf49 (base 400f386). Full suite at 2d3bf49: 175 pass, 0 fail, 0 skipped.
