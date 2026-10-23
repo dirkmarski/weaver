@@ -53,3 +53,27 @@ Mutants (apply, `node --test`, `git checkout`)
 Mutant f: removing the `#link.selected` CSS rule survives, so the purple style of the link sentence (AC1a "today's purple style") is not pinned; the test checks only text and the className-driven state. Low; a getComputedStyle color check on the reserve during a selection (and grey for the key) would kill it and also covers AC1's key-style requirement. Recommend lead rules; about 2 test lines.
 
 Not checked: real touch/mouse input and visual screenshots (PM/tester AC10), 375x812 and 1280 layouts, steady-page tops across all states (AC6, only the existing f1a page-relative check was read), rule-level CSS cascade beyond the diff, the other README prose outside the Hint section and files list, governance/LOG.md (not read by design).
+
+## Tester
+- Claude Sonnet 5.5 (claude-sonnet-5-5), session 541fd2f9-8dfe-4936-a1b6-0c535e8f682f. Head tested 0364e9f (detached worktree wt-test97), baseline main 5656017. Scripts and README: scratchpad i97/test-97 (`run.sh`: ALL PASS, 588 step snapshots in 33 runs, 24 clearing cases; suite 175 pass, 0 fail, 0 skipped).
+- Method: real page, real CDP input (touch at 360x740 and 375x812 with mobile emulation; mouse at 1280x900); walk of tests/page.test.js (real Hint clicks, singles typed until the pointing nudge); Tricky seeds 1, 8, 33, 7, 12 by two paths (Hint, and Next step x2) plus Medium seed 1; each action starts from scrollY 0; the same actions replayed on main for board comparison.
+- Verdict: AC1 PASS, AC2 PASS, AC3 PASS, AC4 PASS, AC5 PASS, AC6 PASS, AC7 PASS, AC8 PASS, AC9 PASS. AC10 is PM.
+
+Evidence
+- AC1/AC3: key text literal per stage (seed 1 digit 2, seed 8 digit 8, Medium 1 digit 5), grey rgb(68,68,68) weight 400 13.6px; link sentence purple rgb(74,15,138) weight 500 while selected; #link empty at no hint and nudge; invitation (purple, 500) only at stage 3 with hatching and the hidden single, below #status, kept during selection.
+- AC2: selection (hatched cell, ring) replaces the key; reverts by another empty cell, a non-ring given and an outside click (h1) bring it back. Per action, board classes (td class + data-d), status text and focused cell are identical to main in all 588 snapshots.
+- AC4 (scrollY from 0 to after the arrival step, Next step path = Hint path): 360x740 seed 1 105 (inv bottom 739.11/740), seed 8 84 (739.11), Medium 1 0 (inv bottom 697.11); 375x812 seed 1 32 (811.16/812), seed 8 0 (801.16), Medium 1 0; 1280x900 seed 1 57 (899.17/900), seed 8 78 (899.17), Medium 1 0 (851.17). Seeds 33/7/12 likewise (84/105 at 360, 0/32 at 375, 57/78 at 1280). Scroll amount is the minimum (bottom within 0.9 px of the fold) and none when in view. Every other action (nudge, Hint stage 1/2, Next step 1-2, 3 selections, 3 reverts, Notes on/off, second Hint) leaves scrollY unchanged (0). At 1280 the stage-2 Next step button is below the fold (known, out of scope): the harness scrolled it into view first (9 or 30 px), the app then scrolled only the remainder. Focus after the last step is the target cell in every run.
+- AC5 (360x740, 375x812 touch): key text inside the viewport at every stage, e.g. 360 seed 1 stage 3 key 340.7..404.7, seed 8 361.7..425.7; after the last step: seed 1 inv bottom 739.1, #status 463.5..673.5, target 10.3..46.7; seed 8 739.1, 484.5..673.5, 139.6..176.0; Medium 1 697.1, 568.5..631.5, 115.3..151.7 (vh 740). 375x812: seed 1 inv bottom 811.2, #status 551.6..761.6, target 83.3..121.4; seed 8 801.2, 583.6..751.6, 228.6..266.7; Medium 1 696.2, 583.6..646.6, 115.3..153.4 (vh 812). Seeds 33, 7, 12 pass too.
+- AC6: page-relative tops constant within every run across no hint, nudge, stages 1-3, selections, reverts, Notes, second Hint (tolerance 0.01 px): 360x740 grid 79.80, buttons 517.73; 375x812 grid 79.80, buttons 532.78; 1280x900 grid 106.80, buttons 729.80; #link height 64.00 everywhere.
+- AC7: value change, New puzzle, Verify and difficulty change clear key, link sentence and invitation and all hint marks, with and without a selection (both Tricky 1 and Medium 1); Notes toggle and a note keep key and invitation (a selection ends, as on main); every outcome equals main's.
+- AC8: README diff vs 5656017 is 3 lines (two Hint-section sentences, one files-list entry); changes are only the key/link/invitation placement and the scroll; read sentence by sentence against behaviour, accurate ("the least needed ... not at all if it already is, nothing else scrolls", key back after selection, invitation stays, `#link` reserve / `#key` invitation in the files list).
+- AC9: `node --test` in the worktree: 175 tests, 175 pass, 0 fail, skipped 0.
+- Screenshots (360x740, in scratchpad i97/test-97/shots): last-step-tricky-seed1, last-step-tricky-seed8, last-step-medium-seed1, stage2-seed1, selection-seed1.
+
+Findings
+1. Info. Clicking Notes while a hatched cell is selected ends the selection (key returns) though the cell keeps focus; a second tap on the already focused cell does not reselect. Identical to main for the link sentence; not a regression.
+2. Info. Ids #link (reserve) and #key (invitation) are swapped in meaning (reviewer noted; follow-up chore, not in scope).
+No blocking or medium findings.
+
+Not tested
+- Persona/PM acceptance (AC10). Real keyboard (arrow key) selection. Desktop widths other than 1280x900, phone heights other than 740/812 (the page test covers 360x560 for the hidden single). Safari/Firefox (Chrome headless only). Scroll starting from a non-zero scrollY (each action started at 0). Mutation testing (reviewer did).
