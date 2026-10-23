@@ -10,7 +10,7 @@
 - Plan: today #link (under board) = invitation/link, #key (after #next) = key. Swap: #link = link sentence else key (key style), #key slot = invitation (purple), scroll-once (minimal) when the invitation first appears. Ratio: headroom 2.4, so new tests must be paid by adapting existing tests (f1/f1b/f1c/f1e/f1a-tops) and listed removals confirmed by reviewer and tester.
 - Walk naming: pins use the page walk of tests/page.test.js (real Hint clicks), not the unit pointingState walk.
 - Lesson applied: tester scripts are re-run by the lead with the tester worktree still present; check output timestamps.
-- 2026-10-23: developer done (0b1e19e code, 119c6aa log, 2d3bf49 test rename f1f->f1h). 175/175, skipped 0; ratio 2223/1399 (headroom 15.4); no removals. Lead diff check: product +20 (sudoku.js reserve/invite/keyText, showLink, showInvite after focus; style.css swap + #link.selected + #key scroll-margin-bottom 1px). Open for review: ids now semantically swapped (#link = key, #key = invitation); 1px scroll-margin; log mentions f1f (should be f1h). Sequence: reviewer, then rework if any, then tester.
+- 2026-10-23: developer done (0b1e19e code, 119c6aa log, 2d3bf49 test rename f1f->f1h). 175/175, skipped 0; ratio 2223/1399 (headroom 15.4); no removals. Lead diff check: product +20 (sudoku.js reserve/invite/keyText, showLink, showInvite after focus; style.css swap + #link.selected + #key scroll-margin-bottom 1px). Open for review: ids now semantically swapped (#link = key, #key = invitation); 1px scroll-margin; log mentions f1f (should be f1h; fixed in Developer section, this line kept as history). Sequence: reviewer, then rework if any, then tester.
 - Persona follow-ups from #96 (out of scope, backlog): "(3 of 3)" at step 2, "(struck)" jargon, struck badge on amber cell, "7-"/"9" hyphen break at 360px, step 1 wording.
 
 ## Developer
@@ -77,3 +77,10 @@ No blocking or medium findings.
 
 Not tested
 - Persona/PM acceptance (AC10). Real keyboard (arrow key) selection. Desktop widths other than 1280x900, phone heights other than 740/812 (the page test covers 360x560 for the hidden single). Safari/Firefox (Chrome headless only). Scroll starting from a non-zero scrollY (each action started at 0). Mutation testing (reviewer did).
+
+## Lead review
+- 2026-10-23, lead (Claude Opus 5.5, session 541fd2f9-8dfe-4936-a1b6-0c535e8f682f), head 026ebda: product diff read (sudoku.js reserve/invite/keyText, showLink, showInvite after the focus call in revealStep and the Hint handler; style.css). Reviewer approve (b07728c) with 3 surviving mutants (b, f, i); rework 1 (tests only, db4c00c, log 0364e9f) kills all three; lead re-ran mutant i: killed (1 fail), restored green.
+- Decisions: keep ids #link (reserve: key/link) and #key (invitation), per reviewer (rename ~13 lines, AC8 limits README); backlog chore candidate. Keep scroll-margin-bottom 1px (minimum scroll per AC4; guarded by f1h, mutant g killed).
+- Suite 175/175, skipped 0. Ratio 2232/1399 = 1.595 (cap 2238.4); no removals (the one '-' line is a modified hints(n) call).
+- Tester PASS AC1-AC9 (026ebda). Lead re-run of test-97/run.sh with worktree present: started 12:13:44, check.out 12:16, finished 12:17:03, ALL PASS (588 snapshots, 33 runs, 24 clearing cases). Stage-3 fold at 360x740 fixed: seed 1 invitation 739.1/740 after scrollY 105, #status ends 673.5. Screenshot last-step seed 1 viewed: as specified. Worktree removed after the re-run.
+- Verdict: ready for PR and PM acceptance.
