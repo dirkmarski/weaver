@@ -296,9 +296,9 @@ describe('page (headless Chrome)', () => {
       await open('tough', 4);
       for (let i = 0; i < 3; i++) { await click('#hint'); const q = (await read()).target[0]; await keys([[q, String(game('tough', 4).solution.flat()[q])]]); }
       await hints(3);
-      assert.ok(await page.eval('document.getElementById("next-step").getBoundingClientRect().bottom') <= 740);
-      const stepsSize = await statusSize(); await click('#verify'); // #status.steps is 1 rem below 560 px; other messages keep 1.1 rem
-      assert.deepStrictEqual([stepsSize, await page.eval('document.getElementById("status").className !== "steps"'), await statusSize()], ['16px', true, '17.6px']);
+      assert.deepStrictEqual([await page.eval('document.getElementById("next-step").getBoundingClientRect().bottom <= 740'), await statusSize()], [true, '16px']); // #status.steps is 1 rem below 560 px
+      await click('#verify'); // other messages keep 1.1 rem
+      assert.deepStrictEqual([await page.eval('document.getElementById("status").className !== "steps"'), await statusSize()], [true, '17.6px']);
     } finally { await page.send('Emulation.clearDeviceMetricsOverride'); }
   });
 

@@ -22,6 +22,7 @@ Issue: https://github.com/dirkmarski/weaver/issues/103. Branch: `issue-103-tough
 - F1: issue 103 unit test now also uses Tough seed 13 (useful pointing, no useful claiming): asserted, and Tough equals Tricky for steps 1 and 2. Mutant M3 killed by it.
 - F2: g1 pins computed font-size of #status: 17.6px at default (>= 560 px) with steps, 16px with steps at 360 px, 17.6px without steps (after Verify) at 360 px. M9, M12, M13 each killed by g1.
 - F3/nit: README line 41 back to 8482 (the 1 rem sentence is its own bullet); line 33 now names Tough. Item 5 (optional) not done: ratio allows no lines.
+- Rework 1b: two lines that packed two statements (sudoku.test.js issue 103 seed 13 assertion; page.test.js g1 steps-size check) split to one statement per line; M3 and M12 re-run, both killed.
 - Suite 183/183, skipped 0. Tests 2368 lines / product 1480 = 1.6 (cap).
 
 ## Reviewer
