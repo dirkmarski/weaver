@@ -28,13 +28,14 @@
 - **Hint mark / ring**: amber target, tinted area; on the explanation, a purple ring and digit on cells holding the key digit that rule out a reason cell (#56).
 - **Reason cell**: an empty cell a ring helps to rule out (hidden single: other empty cells of its unit; pointing: non-confined empty box cells and, in the hidden form, the hidden unit's other empty cells except removed ones).
 - **Confined / removed**: pointing explanation marks: the box cells where D fits (dashed purple, purple badge) and the line cells that lose D (struck grey badge). The badge sits in D's note slot.
-- **Key line**: the `#key` legend under the status during a pointing or hidden-single explanation (`hintKey`, #65; introduced in #56 for pointing).
+- **Key line**: the legend during a pointing or hidden-single explanation (`hintKey`, #65; introduced in #56), shown in the reserve under the board (`#link`, since #97).
+- **Invitation**: the purple "Click or tap a hatched cell..." line in `#key` under `#status` and Next step, scrolled into view when it first appears (#97).
 - **Hatched cells / reason cells**: the empty cells the purple rings rule the hint digit out of; striped purple on the second click (`hintMarks(...).hatched`, `td.hint-hatched`, #65).
-- **Partners / link line / linked**: a hatched cell's partners are the ringed cells sharing a row, column or box with it (1 or 2); focusing the cell gives them `td.hint-linked` (solid purple) and `#link` names them (`ringLink`, #68).
+- **Partners / link line / linked**: a hatched cell's partners are the ringed cells sharing a row, column or box with it (1 or 2); focusing the cell gives them `td.hint-linked` (solid purple) and the link sentence in the reserve names them (`ringLink`, #68).
 - **Ring selection / ruled cells / reverse link** (#72): clicking a ring (or focusing an entered one) selects it; it takes `hint-linked`, and the hatched cells it rules out (the reverse of partners, 1-4) get `td.hint-ruled` (a struck purple D badge, #78; was an inset border); the link line names them (`ringRules`).
 - **Useful pointing step**: a pointing step whose target is not already a naked or hidden single; on Tricky Hint teaches it before singles (#60).
 - **Stage / step reveal**: a pointing explanation shows one numbered step at a time (#90, Next step button); stage 1-3 = steps shown, and the board marks and key line follow the stage (#91). **Staging P** = marks added per step (delivered); **staging Q** = rings and hatching already at step 1 (not wanted).
-- **Link reserve**: the 4-line fixed height of the link line under the grid (#76), so the buttons do not move; empty until hatching shows.
+- **Link reserve**: the 4-line fixed height of `#link` under the grid (#76), so the buttons do not move; holds the key line, or the link sentence while selected (#97); empty with no explanation (nudge, naked single).
 - **Page tests**: `tests/page.test.js`, the real page in headless Chrome via `tests/chrome.js` (#55); skipped with a reason without Chrome.
 - **Persona (user-a/b/c)**: simulated user agents used by the PM for scoping and acceptance; not real users.
 - **Play tool**: the PM's headless replay driver of the real page (session scratchpad), used for persona sessions and acceptance; it can switch prototype and wording variants.

@@ -1,6 +1,6 @@
 # Memory
 
-Implements `governance/memory-architecture.md`. The lead manages this directory.
+Implements `governance/memory-architecture.md`. The curator manages this directory at iteration closes; the lead keeps WIP current in between.
 
 | Tier | Where | Purpose | Rule of thumb |
 |---|---|---|---|
@@ -10,9 +10,10 @@ Implements `governance/memory-architecture.md`. The lead manages this directory.
 | Session | the agent's context | Working memory of one run | Anything worth keeping goes to WIP (in flight) or the wiki (durable) before the session ends. |
 
 ## Who updates what
-- Lead: curates the wiki; keeps `wip/current.md` up to date at every hand-off; reviews each session for learnings and folds them into the wiki at the end of the iteration (or the issue run).
+- Curator: closes each iteration: folds the session learnings into the wiki, refreshes the backlog snapshot, prunes, resets `wip/current.md` and reviews agents' read lists against `wiki/index.md` (tightening the index where agents over-read).
+- Lead: keeps the wiki correct during an iteration; keeps `wip/current.md` up to date at every hand-off; records learnings as "Memory notes for the closing lead" in its log for the curator (or folds them in itself on a single-issue run).
 - Other agents: read the wiki pages relevant to their task. They propose wiki changes in their reply to the lead and do not edit the wiki directly. They keep their own work-log entries.
-- PM: owns the product backlog content; `wiki/backlog.md` is the lead's snapshot of it.
+- PM: owns the product backlog content; `wiki/backlog.md` is the curator's snapshot of it.
 
 ## Restart procedure (lead)
 1. Read `memory/wip/current.md`.
