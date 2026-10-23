@@ -18,3 +18,37 @@
 - Changed: ids stable. `#link` (under the board, 4lh) holds the key, or the link sentence (class `selected`, purple) during a selection; `#key` (after `#next`) holds the invitation (purple). `keyText` state; `unlink()` restores key and invitation; `showLink`; `showInvite()` = `scrollIntoView({block:'nearest'})` called after the focus call in Hint and `revealStep`; `#key` has `scroll-margin-bottom: 1px` (without it the invitation ended 0.1 px below the fold). Tests: `read()` splits key/link/reserve/invite; f, f1, f1a (page-relative tops), f1c, f1e adapted; new f1f (360x740, seeds 1, 8, Medium 1). README Hint section and files list.
 - Ratio: product 1399 (+20), tests 2223 (+19), cap 2238.4, headroom 15. Note the brief labels were swapped (tests 2204, product 1379 at baseline).
 - Removals: none. Deviations: none.
+
+## Reviewer
+- Claude Sonnet 5.5 (claude-sonnet-5-5), session 541fd2f9-8dfe-4936-a1b6-0c535e8f682f. Head reviewed 2d3bf49 (base 400f386). Full suite at 2d3bf49: 175 pass, 0 fail, 0 skipped.
+- Verdict: approve (no blocking findings; two test gaps for the lead to rule on).
+
+Findings
+1. Low, sudoku.js:1119-1123 and 1137, 1160 (scroll scope). Scroll is called only from revealStep and the Hint handler, and only does anything when `hatchedRings` is set, i.e. at stage 3 (and a hidden single). Checked by reading: second Hint at stage 3 (`steps.shown >= 3`) skips revealStep and does not call showInvite; Next step at stages 1-2 and selection/revert/Verify/Notes/value change never call it. Focus-then-scroll is safe: focus() brings the target in first, nearest-scroll then moves the least, and f1h pins target, `#status` and invitation in view at 360x740 for seeds 1, 8 and Medium 1. One edge: pressing Hint again on a hidden-single explanation (hint set, no steps) re-runs the handler, so the invitation reappears and is scrolled to again if the user had scrolled away; arguably not "first appears" but harmless (focus() on the target scrolls there anyway). No change requested.
+2. Low (test gap, AC4), tests/page.test.js f1h. Mutant (b) survives: the Hint handler's own showInvite is only reached by the hidden single, and Medium seed 1's invitation is already in view at 360x740, so the call is never needed. AC4 names the hidden-single explanation, so a test needing a scroll there (e.g. a shorter viewport for Medium seed 1, or a hidden-single seed whose invitation is below the fold) would guard it. Recommend lead decides; cost about 3 test lines.
+3. Low (test gap, AC4), mutant (i) survives: removing the `if (hatchedRings)` guard still passes. Without it the empty `#key` would be scrolled to at stages 1-2 and on every Hint. No test asserts scrollY unchanged by an action that must not scroll. Mutant (j) (extra showInvite on a second stage-3 Hint) also survives; it is behaviourally near-equivalent because focus() scrolls to the target anyway. A single assertion (scrollY before/after the stage 1 and 2 clicks, or after the second Hint at stage 3 with the page scrolled to top) would kill (i).
+4. Info, style.css:65 `scroll-margin-bottom: 1px` on #key. Sound but a sub-pixel workaround: without it the invitation ends 0.1 px below the fold (mutant (g) killed by f1h, so it is guarded). Alternatives (padding-bottom on the invitation or on body, or scroll-margin-bottom of 0.5rem) are equally valid; a larger margin would give a little visual breathing room and robustness to fractional layout. Keep; optional improvement to a rem value.
+5. Info, naming. See recommendation below.
+6. Info, ratio. tests 2223 / product 1399 (sudoku.js+index.html+style.css) = 1.589, within 1.6. 24 '-' lines in sudoku.js, style.css and tests; all are modified lines paired with a '+' replacement (selectors, key/link fields, expected values); no assertion or behaviour removed. No line packing seen: new code is multi-line, one statement per line; the long `read()` return line was already packed before and only gained fields.
+7. Info, README (AC8). Changes are confined to the Hint section key-line/link-line/invitation descriptions and the files-list entry; they state the new places and the scroll, and say the key returns after a selection ends and the invitation stays. Wording accurate against the code.
+
+Naming recommendation: keep `#link` (reserve) and `#key` (invitation) for #97. The ids are misleading now, but the code carries comments at the declarations (sudoku.js:804-805) and the README files list names the roles. A rename (e.g. #reserve / #invite) costs about 13 changed lines, net zero: index.html 2, sudoku.js 2 declarations (+ comments), style.css 3 selectors, tests about 5 getElementById/selector uses (the state field names s.key/s.link are not ids), README 1; it also touches the files-list sentence, which AC8 limits to the key/link descriptions. Suggest a small follow-up chore if the lead wants it, not in this issue.
+
+Mutants (apply, `node --test`, `git checkout`)
+| # | Mutant | Result |
+|---|---|---|
+| a | drop showInvite in revealStep | killed (f1h) |
+| b | drop showInvite in Hint handler | SURVIVED (finding 2) |
+| c | scrollIntoView block 'start' | killed (f1h) |
+| d | unlink sets reserve.textContent = '' | killed (6 tests) |
+| e | invite not set during selection (showLink clears it) | killed (2 tests); my first form of this mutant was a no-op, discarded |
+| f | remove `#link.selected` rule | SURVIVED (see below) |
+| f2 | remove `reserve.className = 'selected'` | killed (3 tests) |
+| g | remove scroll-margin-bottom | killed (f1h) |
+| h | keyText not cleared in clearHint | killed (5 tests) |
+| i | drop `if (hatchedRings)` guard | SURVIVED (finding 3) |
+| j | extra showInvite on second stage-3 Hint | SURVIVED (finding 3, near-equivalent) |
+
+Mutant f: removing the `#link.selected` CSS rule survives, so the purple style of the link sentence (AC1a "today's purple style") is not pinned; the test checks only text and the className-driven state. Low; a getComputedStyle color check on the reserve during a selection (and grey for the key) would kill it and also covers AC1's key-style requirement. Recommend lead rules; about 2 test lines.
+
+Not checked: real touch/mouse input and visual screenshots (PM/tester AC10), 375x812 and 1280 layouts, steady-page tops across all states (AC6, only the existing f1a page-relative check was read), rule-level CSS cascade beyond the diff, the other README prose outside the Hint section and files list, governance/LOG.md (not read by design).
