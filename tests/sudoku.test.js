@@ -4,7 +4,7 @@ const assert = require('node:assert');
 const {
   isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle,
   preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, solvableBy,
-  seededRng, findPointing, hintMarks, hintKey, ringLink, ringRules, statusClass, clashCells, fixedMessage
+  seededRng, findPointing, findClaiming, hintMarks, hintKey, ringLink, ringRules, statusClass, clashCells, fixedMessage
 } = require('../sudoku.js');
 const { SOLUTION, PUZZLE } = require('./fixture.js');
 
@@ -339,13 +339,13 @@ test('hintFor: full grid without conflicts', () => {
   assert.strictEqual(h.text, 'Every cell is filled. Click Verify to check the grid.');
 });
 
-test('hintFor: no naked single, hidden single or pointing step', () => {
+test('hintFor: no naked single, hidden single, pointing or claiming step', () => {
   // The last grid has a pointing step (top-left box, digit 1, row 1) that makes no cell a single.
   const stepOnly = grid81('000000000456000000789000000' + '0'.repeat(54));
   for (const g of [emptyGrid(), blank(...TWO_CANDIDATES), stepOnly]) {
     const h = hintFor(g, 1);
     assert.strictEqual(h.kind, 'none');
-    assert.strictEqual(h.text, 'No naked single, hidden single or pointing step right now. At this point the puzzle needs another technique.');
+    assert.strictEqual(h.text, 'No naked single, hidden single, pointing or claiming step right now. At this point the puzzle needs another technique.');
     assert.strictEqual(hintFor(g, 2).kind, 'none');
   }
 });
@@ -566,9 +566,9 @@ test('creditEntry: with a hint, right cell and digit', () => {
   const hint = hintFor(H_BOX, 1);
   const res = creditEntry(T0, {}, hint, H_BOX, 4, 5, '5');
   assert.strictEqual(res.text, 'Well done! You applied a hidden single: row 5, column 6 is 5.');
-  assert.deepStrictEqual(res.tally, { naked: { own: 0, hint: 0 }, hidden: { own: 0, hint: 1 }, pointing: { own: 0, hint: 0 } });
+  assert.deepStrictEqual(res.tally, { naked: { own: 0, hint: 0 }, hidden: { own: 0, hint: 1 }, pointing: { own: 0, hint: 0 }, claiming: { own: 0, hint: 0 } });
   assert.deepStrictEqual(res.credited, { 41: true });
-  assert.deepStrictEqual(T0, { naked: { own: 0, hint: 0 }, hidden: { own: 0, hint: 0 }, pointing: { own: 0, hint: 0 } }); // inputs untouched
+  assert.deepStrictEqual(T0, { naked: { own: 0, hint: 0 }, hidden: { own: 0, hint: 0 }, pointing: { own: 0, hint: 0 }, claiming: { own: 0, hint: 0 } }); // inputs untouched
   const g = clone();
   g[4][7] = 0;
   const nh = hintFor(g, 2);
@@ -582,10 +582,10 @@ test('creditEntry: on your own (naked and hidden texts)', () => {
   g[2][3] = 0;
   const n = creditEntry(T0, {}, null, g, 2, 3, String(SOLUTION[2][3]));
   assert.strictEqual(n.text, 'Well spotted! You found a naked single on your own: row 3, column 4 is ' + SOLUTION[2][3] + '.');
-  assert.deepStrictEqual(n.tally, { naked: { own: 1, hint: 0 }, hidden: { own: 0, hint: 0 }, pointing: { own: 0, hint: 0 } });
+  assert.deepStrictEqual(n.tally, { naked: { own: 1, hint: 0 }, hidden: { own: 0, hint: 0 }, pointing: { own: 0, hint: 0 }, claiming: { own: 0, hint: 0 } });
   const h = creditEntry(T0, {}, null, H_ALL, 2, 3, '2');
   assert.strictEqual(h.text, 'Well spotted! You found a hidden single in its box on your own: row 3, column 4 is 2.');
-  assert.deepStrictEqual(h.tally, { naked: { own: 0, hint: 0 }, hidden: { own: 1, hint: 0 }, pointing: { own: 0, hint: 0 } });
+  assert.deepStrictEqual(h.tally, { naked: { own: 0, hint: 0 }, hidden: { own: 1, hint: 0 }, pointing: { own: 0, hint: 0 }, claiming: { own: 0, hint: 0 } });
   assert.strictEqual(creditEntry(T0, {}, null, H_ROWCOL, 0, 4, '7').text,
     'Well spotted! You found a hidden single in its row on your own: row 1, column 5 is 7.');
   assert.strictEqual(creditEntry(T0, {}, null, H_COL, 0, 5, '4').text,
@@ -634,24 +634,26 @@ test('creditEntry: a cell is credited once; the message shows again', () => {
   assert.deepStrictEqual(other.tally.hidden, { own: 2, hint: 0 });
 });
 
-test('tallyLines: heading and three lines, including zeros', () => {
+test('tallyLines: heading and four lines, including zeros', () => {
   assert.deepStrictEqual(tallyLines(emptyTally()), [
     'Techniques applied in this puzzle',
     'Naked single: 0 on your own, 0 with a hint',
     'Hidden single: 0 on your own, 0 with a hint',
-    'Pointing: 0 on your own, 0 with a hint'
+    'Pointing: 0 on your own, 0 with a hint',
+    'Claiming: 0 on your own, 0 with a hint'
   ]);
-  assert.deepStrictEqual(tallyLines({ naked: { own: 3, hint: 12 }, hidden: { own: 1, hint: 0 }, pointing: { own: 2, hint: 5 } }).slice(1), [
+  assert.deepStrictEqual(tallyLines({ naked: { own: 3, hint: 12 }, hidden: { own: 1, hint: 0 }, pointing: { own: 2, hint: 5 }, claiming: { own: 4, hint: 6 } }).slice(1), [
     'Naked single: 3 on your own, 12 with a hint',
     'Hidden single: 1 on your own, 0 with a hint',
-    'Pointing: 2 on your own, 5 with a hint'
+    'Pointing: 2 on your own, 5 with a hint',
+    'Claiming: 4 on your own, 6 with a hint'
   ]);
 });
 
 // ---- completionFor (issue #25) ----
 const SOLVED_0 = 'Puzzle solved! Techniques applied: 0 on your own, 0 with a hint.';
 const CONFLICT_TEXT = 'Every cell is filled, but some numbers break the rules. Click Verify to see which.';
-const MIXED = { naked: { own: 3, hint: 2 }, hidden: { own: 1, hint: 4 }, pointing: { own: 2, hint: 1 } };
+const MIXED = { naked: { own: 3, hint: 2 }, hidden: { own: 1, hint: 4 }, pointing: { own: 2, hint: 1 }, claiming: { own: 0, hint: 0 } };
 
 test('completionFor: any empty cell gives null, wherever it is', () => {
   const t = emptyTally();
@@ -679,7 +681,7 @@ test('completionFor: full valid grid says solved with exact text', () => {
 });
 
 test('completionFor: own and hint sums are kept apart; same wording for 0, 1 and many', () => {
-  const t = (nO, nH, hO, hH, pO = 0, pH = 0) => ({ naked: { own: nO, hint: nH }, hidden: { own: hO, hint: hH }, pointing: { own: pO, hint: pH } });
+  const t = (nO, nH, hO, hH, pO = 0, pH = 0, cO = 0, cH = 0) => ({ naked: { own: nO, hint: nH }, hidden: { own: hO, hint: hH }, pointing: { own: pO, hint: pH }, claiming: { own: cO, hint: cH } });
   assert.strictEqual(completionFor(clone(), t(1, 0, 0, 0)).text, 'Puzzle solved! Techniques applied: 1 on your own, 0 with a hint.');
   assert.strictEqual(completionFor(clone(), t(0, 1, 0, 0)).text, 'Puzzle solved! Techniques applied: 0 on your own, 1 with a hint.');
   assert.strictEqual(completionFor(clone(), t(0, 0, 1, 0)).text, 'Puzzle solved! Techniques applied: 1 on your own, 0 with a hint.');
@@ -688,7 +690,9 @@ test('completionFor: own and hint sums are kept apart; same wording for 0, 1 and
   assert.strictEqual(completionFor(clone(), t(12, 13, 14, 15)).text, 'Puzzle solved! Techniques applied: 26 on your own, 28 with a hint.');
   assert.strictEqual(completionFor(clone(), t(0, 0, 0, 0, 1, 0)).text, 'Puzzle solved! Techniques applied: 1 on your own, 0 with a hint.');
   assert.strictEqual(completionFor(clone(), t(0, 0, 0, 0, 0, 1)).text, 'Puzzle solved! Techniques applied: 0 on your own, 1 with a hint.');
-  assert.strictEqual(completionFor(clone(), t(2, 3, 4, 5, 6, 7)).text, 'Puzzle solved! Techniques applied: 12 on your own, 15 with a hint.');
+  assert.strictEqual(completionFor(clone(), t(2, 3, 4, 5, 6, 7, 8, 9)).text, 'Puzzle solved! Techniques applied: 20 on your own, 24 with a hint.');
+  assert.strictEqual(completionFor(clone(), t(0, 0, 0, 0, 0, 0, 1, 0)).text, 'Puzzle solved! Techniques applied: 1 on your own, 0 with a hint.');
+  assert.strictEqual(completionFor(clone(), t(0, 0, 0, 0, 0, 0, 0, 1)).text, 'Puzzle solved! Techniques applied: 0 on your own, 1 with a hint.');
 });
 
 test('completionFor: a full grid with a conflict says conflict, never solved, whatever the tally', () => {
@@ -724,11 +728,12 @@ test('completionFor: the last entry is counted first, so the final single is in 
   assert.strictEqual(completionFor(clone(), before).text, SOLVED_0);
 });
 
-test('TECHNIQUE_DEFINITIONS: the three texts, byte for byte', () => {
+test('TECHNIQUE_DEFINITIONS: the four texts, byte for byte', () => {
   assert.deepStrictEqual(TECHNIQUE_DEFINITIONS, {
     naked: 'Only one digit fits this cell: its row, column and box already hold the other eight.',
     hidden: 'This digit fits in only one cell of a row, column or box, even if that cell could take other digits.',
-    pointing: 'In a box, a digit fits only in one row (or column), so it cannot go anywhere else in that row (column); that can leave a single.'
+    pointing: 'In a box, a digit fits only in one row (or column), so it cannot go anywhere else in that row (column); that can leave a single.',
+    claiming: 'In a row (or column), a digit fits only inside one box, so it cannot go anywhere else in that box (pointing in reverse); that can leave a single.'
   });
 });
 
@@ -1307,4 +1312,91 @@ test('fixedMessage with completionFor: a fix that fills the grid is decided by c
   const before = withCells(full, [[0, 2, 5]]); // row 0 repeats 5, grid full
   assert.strictEqual(fixedMessage(before, full), FIXED);
   assert.strictEqual(completionFor(full, emptyTally()).kind, 'solved');
+});
+
+// ---- Issue 102: claiming (box-line reduction) ----
+// Positions are Hard-seed walks (singles and pointing followed until Hint had nothing else), so Hint falls back to claiming.
+const CL = {
+  A: grid81('007000041810457093049000785635142978978365124421009356000000839193528467780000512'), // naked, row 3, struck in one row
+  B: grid81('105060407364719080700040001600007800510000006470056900247681009936070128851392004'), // naked, column 9, struck over 3 rows
+  C: grid81('003408010028005030000030980030742108002083000847100020300007069000300001209800070'), // hidden (column 4), one struck cell
+  D: grid81('809030500635428007704590803578010230092370085063852070287065300341080050956043708'), // hidden (row 4), struck in one column
+  E: grid81('061008073740013860839600041324009156158364020976001438490136080013000690687005314'), // hidden (column 6), row 9 has no other empty cells
+  F: grid81('295714638783265149164300527030001052500630081010050063350100874879543216001800395') // hidden (row 5), column 4 has no other empty cells
+};
+const CL_X = grid81('010905200000372500400608000000009030008020160000000005006000000320100000080097000'); // column 1 step, row 2 D1 (two targets, both single), D4, row 9 D3 and D6
+const CL_PC = grid81('090600030002005000050008091000003080070500300230007400689174003703000000000300078'); // pointing and claiming steps, no single
+const CL_Z = grid81('003027400000304600000000005020051000040600009000000084500093000000200000610000000'); // r1c4 would be a box-form hidden single
+
+test('findClaiming: golden path, both forms, row and column lines (result shape as findPointing)', () => {
+  const shape = (s) => [s.box, s.line, s.index, s.pointDigit, s.confined, s.removed, s.form, s.unit, s.r, s.c, s.digit];
+  assert.deepStrictEqual(shape(findClaiming(CL.A)), [1, 'row', 2, 6, [21, 23], [3, 5], 'naked', undefined, 0, 5, 3]);
+  assert.deepStrictEqual(shape(findClaiming(CL.B)), [5, 'column', 8, 3, [35, 53], [34, 42, 43, 52], 'naked', undefined, 5, 7, 1]);
+  assert.deepStrictEqual(shape(findClaiming(CL.C)), [4, 'row', 5, 9, [49, 50], [39], 'hidden', 'column', 1, 3, 9]);
+  assert.deepStrictEqual(shape(findClaiming(CL.D)), [5, 'column', 6, 4, [42, 51], [35, 53], 'hidden', 'row', 3, 5, 4]);
+  assert.deepStrictEqual([CL.E, CL.F].map((g) => shape(findClaiming(g)).slice(1, 4)), [['row', 8, 2], ['column', 3, 9]]);
+});
+
+test('findClaiming: no step when the digit spans two boxes or no cell is struck; none on an empty grid; never a box-form target', () => {
+  const span = CL.A.map((r) => r.slice()); span[2][6] = 0; // 6 now also fits in row 3 outside the box
+  const noStrike = CL.A.map((r) => r.slice()); noStrike[0][3] = 2; noStrike[0][5] = 3; // the two struck cells are filled
+  for (const g of [span, noStrike, emptyGrid()]) assert.strictEqual(findClaiming(g), null);
+  const z = findClaiming(CL_Z);
+  assert.deepStrictEqual([z.line, z.index, z.pointDigit, z.r, z.c, z.form, z.unit], ['row', 1, 5, 0, 3, 'hidden', 'row']);
+});
+
+test('findClaiming: rows before columns, digits ascending, targets in reading order; useful skips targets already single', () => {
+  const pick = (o) => { const s = findClaiming(CL_X, o); return [s.line, s.index, s.pointDigit, s.r, s.c]; };
+  assert.deepStrictEqual(pick(), ['row', 1, 1, 2, 4]); // despite an earlier column; D1 before D4; two targets, r3c5 first
+  assert.deepStrictEqual(pick({ useful: true }), ['row', 8, 6, 8, 6]); // the earlier steps only reach cells that are single already
+  assert.deepStrictEqual(findClaiming(CL_X, { useful: false }), findClaiming(CL_X));
+});
+
+test('hintFor: claiming is the fallback on every level, after singles and pointing; the new none text', () => {
+  for (const level of ['easy', 'medium', 'tricky', 'hard']) {
+    assert.strictEqual(hintFor(CL.C, 1, 'hidden', level).technique, 'claiming', level);
+    assert.strictEqual(hintFor(CL_PC, 1, 'hidden', level).technique, 'pointing', level);
+  }
+  assert.ok(['naked', 'hidden'].includes(hintFor(CL_X, 1).technique));
+  assert.deepStrictEqual(hintFor(CL.A, 2).kind, 'explain');
+  assert.strictEqual(hintFor(emptyGrid(), 1).text, 'No naked single, hidden single, pointing or claiming step right now. At this point the puzzle needs another technique.');
+});
+
+test('hintFor claiming: nudge and explanation texts, naked and hidden, row and column lines, struck cells, box-case suffix', () => {
+  const box = (l, c) => 'the box of rows ' + l + ' and columns ' + c;
+  const nudge = (line, d, b, tail) => 'Hint: try claiming. In ' + line + ', the digit ' + d + ' fits only in ' + b + ', so it cannot go anywhere else in that box. ' + tail + ' Click Hint again to see why.';
+  const both = (g, n, e) => { assert.strictEqual(hintFor(g, 1).text, n); assert.strictEqual(hintFor(g, 2).text, e.join('\n')); };
+  const naked = (rc, d, x) => '3. ' + rc + ' has every digit except ' + d + ' and ' + x + ' in its row, column and box, so it could only take ' + d + ' or ' + x + '. With ' + d + ' ruled out, it must be ' + x + '.';
+  both(CL.A, nudge('row 3', 6, box('1-3', '4-6'), 'That means 6 cannot go in row 1, column 6, and only one other digit fits there now.'), [
+    'Claiming: row 1, column 6 must be 3.', '1. In row 3, the digit 6 fits only in ' + box('1-3', '4-6') + '.',
+    '2. So 6 cannot go anywhere else in that box: not in row 1, columns 4 and 6 (struck).', naked('Row 1, column 6', 6, 3)]);
+  both(CL.B, nudge('column 9', 3, box('4-6', '7-9'), 'That means 3 cannot go in row 6, column 8, and only one other digit fits there now.'), [
+    'Claiming: row 6, column 8 must be 1.', '1. In column 9, the digit 3 fits only in ' + box('4-6', '7-9') + '.',
+    '2. So 3 cannot go anywhere else in that box: not in row 4, column 8; row 5, columns 7 and 8; row 6, column 8 (struck).', naked('Row 6, column 8', 3, 1)]);
+  both(CL.C, nudge('row 6', 9, box('4-6', '4-6'), 'Then look at column 4: 9 now has only one place left there.'), [
+    'Claiming: row 2, column 4 must be 9.', '1. In row 6, the digit 9 fits only in ' + box('4-6', '4-6') + '.',
+    '2. So 9 cannot go anywhere else in that box: not in row 5, column 4 (struck).',
+    '3. That leaves row 2, column 4 as the only cell in column 4 where 9 fits, so it must be 9.']);
+  both(CL.D, nudge('column 7', 4, box('4-6', '7-9'), 'Then look at row 4: 4 now has only one place left there.'), [
+    'Claiming: row 4, column 6 must be 4.', '1. In column 7, the digit 4 fits only in ' + box('4-6', '7-9') + '.',
+    '2. So 4 cannot go anywhere else in that box: not in column 9, rows 4 and 6 (struck).',
+    '3. That leaves row 4, column 6 as the only cell in row 4 where 4 fits, so it must be 4.']);
+  const lines = (g) => hintFor(g, 2).text.split('\n');
+  assert.deepStrictEqual([lines(CL.E)[1], lines(CL.E)[2]], ['1. In row 9, the digit 2 fits only in ' + box('7-9', '4-6') + ' (the row has no other empty cells).',
+    '2. So 2 cannot go anywhere else in that box: not in row 8, columns 4, 5 and 6 (struck).']);
+  assert.deepStrictEqual([lines(CL.F)[1], lines(CL.F)[2]], ['1. In column 4, the digit 9 fits only in ' + box('4-6', '4-6') + ' (the column has no other empty cells).',
+    '2. So 9 cannot go anywhere else in that box: not in row 4, column 5; row 5, column 6; row 6, column 6 (struck).']);
+  assert.ok(!hintFor(CL.E, 1).text.includes('no other empty'));
+});
+
+test('claiming rewards: hinted entry message and one count per cell, four tally lines, definition, completion sum', () => {
+  const hint = hintFor(CL.C, 2), r = creditEntry(emptyTally(), {}, hint, CL.C, 1, 3, '9');
+  assert.deepStrictEqual([r.text, r.kind, r.tally.claiming, r.tally.pointing], ['Well done! You applied claiming: row 2, column 4 is 9.', 'reward', { own: 0, hint: 1 }, { own: 0, hint: 0 }]);
+  assert.strictEqual(hintApplied(hintFor(CL.C, 1), '9'), r.text);
+  assert.strictEqual(hintApplied(hint, '8'), '');
+  const again = creditEntry(r.tally, r.credited, hint, CL.C, 1, 3, '9');
+  assert.deepStrictEqual([again.text, again.tally], [r.text, r.tally]);
+  const two = creditEntry(r.tally, r.credited, hintFor(CL.A, 2), CL.A, 0, 5, '3'); // another cell: the count adds up
+  assert.strictEqual(tallyLines(two.tally)[4], 'Claiming: 0 on your own, 2 with a hint');
+  assert.strictEqual(tallyLines(r.tally)[4], 'Claiming: 0 on your own, 1 with a hint');
 });
