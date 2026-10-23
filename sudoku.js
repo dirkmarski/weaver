@@ -436,7 +436,7 @@
   // a single or pointing step is found). A naked single is taught before a hidden single, unless
   // prefer === 'hidden' and a hidden single that is not a naked single exists. With no single, a pointing step
   // (findPointing), else a claiming step (findClaiming, same result shape, technique 'claiming'), is taught; on level 'tricky' a useful pointing step (findPointing with useful: true) comes
-  // before any single; its result adds technique 'pointing', form, box, line, index, pointDigit. Returns
+  // before any single, and on 'tough' a useful claiming step (findClaiming with useful: true) comes before that; its result adds technique 'pointing', form, box, line, index, pointDigit. Returns
   // { kind, technique, unit, r, c, digit, text } where kind is
   // 'conflict' | 'full' | 'none' | 'nudge' | 'explain'. For the last two, r/c are
   // 0-based, technique is 'naked' | 'hidden' | 'pointing' | 'claiming' and unit ('box' | 'row' | 'column') is set for hidden.
@@ -447,7 +447,9 @@
         + '. Change or clear one of them first, then click Hint again.' + clash.extra };
     }
     if (verify(grid).complete) return { kind: 'full', text: 'Every cell is filled. Click Verify to check the grid.' };
-    var s = level === 'tricky' ? findPointing(grid, { useful: true }) : null;
+    var s = level === 'tough' ? findClaiming(grid, { useful: true }) : null;
+    if (s) return claimingHint(s, step, grid);
+    s = level === 'tricky' || level === 'tough' ? findPointing(grid, { useful: true }) : null;
     if (s) return pointingHint(s, step, grid);
     s = prefer === 'hidden' ? findHiddenSingle(grid, { notNaked: true }) : null;
     var technique = 'hidden';
@@ -716,6 +718,7 @@
     easy:   { min: 36, max: 40, technique: 'naked',   beyond: null },     // naked singles only
     medium: { min: 30, max: 35, technique: 'singles', beyond: 'naked' },  // needs hidden singles
     tricky: { min: 27, max: 31, technique: 'pointing', beyond: 'singles' }, // needs pointing
+    tough:  { min: 27, max: 31, technique: 'pointing', beyond: 'singles' }, // as tricky; Hint practises claiming
     hard:   { min: 22, max: 29, technique: null,      beyond: 'pointing' } // unique, needs more than pointing
   };
   var TIME_CAP_MS = 1000; // generation never runs past this (click-to-render must stay < 2 s)
@@ -812,7 +815,7 @@
     return toGrid(out);
   }
 
-  // Generate a puzzle for 'easy' | 'medium' | 'tricky' | 'hard'.
+  // Generate a puzzle for 'easy' | 'medium' | 'tricky' | 'tough' | 'hard'.
   // options: { rng: () => [0,1), maxMs: time cap }.
   // Returns { level, puzzle, solution, givens, capped, attempts } (9x9 arrays, 0 = empty).
   // The puzzle always has exactly one solution. Normally it also meets the
