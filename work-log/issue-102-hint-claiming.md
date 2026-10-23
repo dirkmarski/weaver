@@ -29,6 +29,17 @@ Issue: https://github.com/dirkmarski/weaver/issues/102. Branch: `issue-102-hint-
 ## Reviewer
 
 ## Tester
+- Tester: Claude Sonnet 5.5, session 54373c68-c664-43ac-8c9e-31688e9eba82. Head tested: cdd6a42 (baseline 61f2db8). Scripts, shots and README: /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/54373c68-c664-43ac-8c9e-31688e9eba82/scratchpad/test-102/ (re-run: see its README). Suite on head: 183/183, skipped 0, 3.5 s.
+- Verdict: pass with findings (no defect against AC 1-8; one low finding, informational notes).
+- Checks: t1 oracle 66/66, t2 real page (real CDP input) 157/157, t3 layout 90 (87 pass, 3 fail = finding 1), t4 screenshots 8/8, t5 regression vs 61f2db8 18/18, t6 AC 8 12/12, t7 mutants 3/3.
+- Findings:
+  1. (low) Claiming column naked Hard seed 108 at 360x740: after step 2 the Next step (3 of 3) button is 725.1-759.9, 19.9 px below the 740 viewport; the user scrolls. Pointing hidden Hard seed 14 does the same on main 61f2db8 (759.9), so the fit depends on text length and AC 7 pins only the developer cases (seeds 57 and 184: bottom 738.9, 1.1 px spare, in view). Not fixed here.
+  2. (info) 360x740: 675.9 is the Next step bottom after step 1 (label 2 of 3), 738.9 after step 2 (label 3 of 3); numbers identical with emulation set before or after load. This reconciles the PM's 675.9 with the memory's 738.9.
+  3. (info) Ratio is exactly 2360 / 1475 = 1.6000, cap 2360.0, zero headroom: any further product line needs 1.6 test lines or a trim.
+  4. (info) Hidden-unit order (row before column): no position exists where a taught claiming target (Hint reaches claiming only when no single exists) is a hidden single in both row and column after the step; reasoned and checked on 33448 walk states (every dual target was already single before the step). One exists only through a direct findClaiming call on a grid that still has a single (Hard seed 1 start grid); there the product returns row, as the oracle does. No seeded test pins it; low risk.
+  5. (info) At 1280x900 the step-2 Next step button is below the fold (909.0, same as pointing on main); the stage-3 invitation is in view.
+- Removed assertions: both (`hintApplied(hint, '8') === ''`, `tallyLines(r.tally)[4]`) were added in d3279a8 and dropped in d7dba1a; neither exists at 61f2db8, so no existing assertion was removed. Redundant: mutants (digit guard removed; claiming line own/hint swapped; page claiming line wired to lines[3]) are killed by the hintApplied and tallyLines tests and page f5/a/b.
+- Not tested: touch input, screen readers, DPR other than 1, claiming on Easy/Medium/Tricky pages (no fallback arises there), own claiming credit (#104), the Tough level (#103), the box-case suffix and the 3-row cells list on a page (unit tests only).
 
 ## Reviewer
 - Reviewer: Claude Sonnet 5.5, session 54373c68-c664-43ac-8c9e-31688e9eba82. Head reviewed: d2844da (diff 61f2db8..HEAD). Suite on that head: 183/183, skipped 0.
