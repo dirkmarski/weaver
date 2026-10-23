@@ -316,7 +316,7 @@ describe('page (headless Chrome)', () => {
     assert.ok((await read()).status.startsWith('Hint: try pointing'));
   });
 
-  it('f1f. 360x740 phone: after the last step the invitation, the whole step text and the target cell are in view (Tricky seeds 1 and 8, Medium seed 1)', async () => {
+  it('f1h. 360x740 phone: after the last step the invitation, the whole step text and the target cell are in view (Tricky seeds 1 and 8, Medium seed 1)', async () => {
     try {
       await page.send('Emulation.setDeviceMetricsOverride', { width: 360, height: 740, deviceScaleFactor: 1, mobile: true });
       for (const [level, seed, n] of [['tricky', 1, 4], ['tricky', 8, 4], ['medium', 1, 2]]) {
