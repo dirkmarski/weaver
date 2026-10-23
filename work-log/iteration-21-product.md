@@ -91,3 +91,29 @@ Tech debt: unchanged from the snapshot.
 - D10 (Q1, AC 5 failed for Tough seed 4: 4-line step 2, Next step bottom 759.9): accept the developer's rule `#status.steps { font-size: 1rem; }` below 560 px, all levels, as part of #103. Shot stage2-s4-360x740 checked: 1rem step text reads well. AC 5 extended: tester also measures Hard seeds 14/108 (D7 3-line case) at 360x740 and runs the shared f1a/f1h/f4 layout tests; if they pass, the D7 watch item closes. Developer figures: seeds 1/7 701.3, 3/4 719.3.
 - D11 (Q2): AC 3 = "first claiming Hint when following Hint from the start" (seeds 1/3 first Hint, seed 4 after 3 hinted entries, seed 7 after 1); pins.js and the page walk agree; pin data unchanged. My original "first Hint" wording was imprecise for seeds 4/7 (pins were walk positions, the log said "start positions").
 - Issue body AC 3/5 + Change log updated; comment posted.
+
+## Acceptance #103 (PR #106, head a1331d5): ACCEPTED
+- Product code at a1331d5 = 87f6fa6 (diff from it: work-log and memory/wip only). PM runs on a1331d5: suite 183/183, skipped 0; tester scripts with ROOT = main checkout: t1 47/47, t3 48/48, t4 22/22, t5 50/50, t6 21/21, t8 14/14 (ratio 2368/1480 = 1.600, longest lines = 9ccab0c maxima).
+- AC1 pass (t1: 3 seeds tough = tricky, unique, band, not singles; generator batch; mutants M6/M15 killed). AC2 pass (t1 oracle on ~1200 walk states, pass-over case; reviewer M1-M4/M16 killed, M3 killed after rework 1). AC3 pass (t3 page walk = unit walk, all four pins; my seed 3 shots show step 2/3 texts word for word). AC4 pass (t4 + shots at 360/375 wrap 3+2 in order, 1280 one line; checked by eye). AC5 pass (t5: Tough 1/7 701.3, 3/4 719.3; Hard 14/108 719.3 (main 759.9); computed 16 px below 560 px, 17.6 px above; g1 pins it; f1a/f1h/f4 pass). AC6 pass (t6 regression main vs branch 21/21; 8 removed assertions confirmed redundant by reviewer and tester mutants (D12); ratio at cap, skipped 0).
+- Play-through (PM; pm-103/play.js, Tough seed 5, 1280x900, real input, Hint only): 54 entries, 27 naked, 19 hidden, 8 claiming, 0 pointing; every page nudge = unit hint, every digit = solution; "Puzzle solved!", tally Claiming 8 with a hint. Claiming texts at stage 3 read correctly (hidden column and naked forms).
+- Personas (brief pm-103/persona/brief.md; real-page shots: pickers 375/360/1280, Tough seed 3 nudge + steps 1-3 at 375 and step 3 at 1280, seed 1 naked step 3 at 360): learn claiming a/b/c 4/4/4 = 4.0; picker 4/4/4 = 4.0. Both >= 4.0 (at the threshold). Marks in the naked case 3/3/3; separate Tough level makes sense 3/3/3.
+- Claims checked: all three explained seed 3 correctly (row 5, column 4 = 6, via column 6 confined to the bottom-middle box). Naked case: "no 7 visible to back 'must be 7'" (b, a) correct, by design (no candidates shown); c's "struck 7 mark" and a's "second mark" are the r1c6 badge next to the target (misread, but the cramped badges cause it); b's "row 2 band" is row 3 (misread). Picker 3+2 wrap "lopsided" (a, b, c).
+- D12: the 8 removed assertions accepted (redundant per mutants on both trees; none AC-required). D13: D7 watch item (3-line step-2 Next step off-screen at 360x740) closed by D10 (Hard 14/108 719.3). Stage-3 invitation has 1.5 px spare at 360x740 (new watch). D14: reviewer nit 5 (g1 seed-1 struck cells) deferred, tester t3 covers it.
+- A2 watch outcome: personas do not feel Tough as harder; all three ask the picker to say what Tough is ("Tricky difficulty, claiming hints"). Not a blocker (they would pick it to practise claiming); backlog item 2, first candidate after #104.
+
+## Backlog (PM, after #103 acceptance)
+1. Claiming, it21: #104 (next); #102, #103 accepted.
+2. Claiming follow-ups: one-line level descriptions on the picker ("Tough: Tricky puzzles, hints teach claiming"; a, b, c at #103, A2); struck badge inside the naked target is cramped/confusing (now 3/3/3 on Tough, b, c at #102 too; consider showing the two candidates in the target); block compression of struck lists; pointing hidden step 3 "its U" -> name unit (D4); plain "what claiming is" cue on the hint; target highlight easy to miss; step numbers on marks; key with three legends is long (a, c again); hidden step 3 does not say why the unit's other cells are out (watch).
+3. Explanation follow-ups (snapshot item 2).
+4. Mobile remainder (snapshot item 3; picker 3+2 wrap looks lopsided (3/3); watch: stage-3 invitation 1.5 px spare at 360x740). D7 watch closed.
+5-8. Unchanged (snapshot items 4-7). Tech debt: test ratio at cap (0 headroom); g1 seed-1 struck cells (deferred nit).
+
+## Notes for #104
+- Ratio has 0 headroom: 1.6 test lines per added product line, or a trim first (adapt existing tests; mutant-confirm any removal as in #103).
+- Tough gives many claiming chances (tester walk seeds 1-10: 58 claiming; my seed 5: 8), so recognising own claiming on Tough is the natural page pin; classifyEntry on Tough claiming is untested today.
+- Personas keep flagging the naked-target badge; if #104 touches marks, do not widen it; keep scope.
+
+## Documents read (#103 acceptance)
+- pm-accept-103 brief (whole; task); issue #103 body (whole; spec); product-strategy.md (whole, 6 lines; currency); this log (whole; state, D-numbering); test-103/README.md (whole; how to re-run); work-log/issue-103-tough-level.md sections Reviewer, Tester, Lead review (whole sections; verdicts); dev-103 README, stage2.js, walk.js, pagelib.js lines 17-95 (to reuse the page driver for shots and play-through).
+- Screenshots viewed: pm-103 picker-375, stage3-375; test-103 picker-1280; dev-103 stage3-s1-360x740.
+- Personas a, b, c: brief.md and the nine shots in pm-103/persona/ only (each confirmed; no other file, no LOG.md).
