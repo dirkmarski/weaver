@@ -17,6 +17,13 @@ Issue: https://github.com/dirkmarski/weaver/issues/103. Branch: `issue-103-tough
 - Evidence: /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/54373c68-c664-43ac-8c9e-31688e9eba82/scratchpad/dev-103/ (README.md; pins 29/29, picker 13/13, stage2 8/8; shots/).
 - Not tested: classifyEntry on Tough claiming (out of scope, #104); a full Hint walk to the end on Tough (only to the first claiming Hint); wider Tough batches than 10 seeds; Chrome other than headless; real touch input on the picker.
 
+### Rework 1
+- Developer: Claude Sonnet 5.5, session 54373c68-c664-43ac-8c9e-31688e9eba82. Tests and README only.
+- F1: issue 103 unit test now also uses Tough seed 13 (useful pointing, no useful claiming): asserted, and Tough equals Tricky for steps 1 and 2. Mutant M3 killed by it.
+- F2: g1 pins computed font-size of #status: 17.6px at default (>= 560 px) with steps, 16px with steps at 360 px, 17.6px without steps (after Verify) at 360 px. M9, M12, M13 each killed by g1.
+- F3/nit: README line 41 back to 8482 (the 1 rem sentence is its own bullet); line 33 now names Tough. Item 5 (optional) not done: ratio allows no lines.
+- Suite 183/183, skipped 0. Tests 2368 lines / product 1480 = 1.6 (cap).
+
 ## Reviewer
 - Reviewer: Claude Sonnet 5.5, session 54373c68-c664-43ac-8c9e-31688e9eba82. Head reviewed 87f6fa6 (diff 9ccab0c..HEAD). Suite on head: 183/183, skipped 0. Verdict: approve with nits (two should-fix test gaps, one should-fix line length; no must-fix).
 - Findings:

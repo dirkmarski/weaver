@@ -998,7 +998,8 @@ test('issue 103: on Tough a useful claiming step comes before pointing and singl
   assert.deepStrictEqual([tough(pz(1), 1).kind, show(tough(pz(1), 2))], ['nudge', ['claiming', 'row', 2, 0, 4, 7]]); // seed 1, the first Hint
   assert.ok(findClaiming(pz(2))); assert.strictEqual(findClaiming(pz(2), { useful: true }), null); // seed 2: its claiming step is passed over
   assert.strictEqual(findClaiming(blank([4, 7])), null); // no claiming step at all (one gap, a naked single)
-  for (const g of [pz(2), blank([4, 7])]) for (const step of [1, 2]) assert.deepStrictEqual(tough(g, step), hintFor(g, step, 'hidden', 'tricky'));
+  assert.ok(findPointing(pz(13), { useful: true })); assert.strictEqual(findClaiming(pz(13), { useful: true }), null); // seed 13: a useful pointing step, no useful claiming step
+  for (const g of [pz(2), pz(13), blank([4, 7])]) for (const step of [1, 2]) assert.deepStrictEqual(tough(g, step), hintFor(g, step, 'hidden', 'tricky'));
   assert.strictEqual(tough(SOLUTION, 1).kind, 'full');
   assert.strictEqual(tough(clone().map((r, i) => (i ? r : [r[1], r[1], ...r.slice(2)])), 1).kind, 'conflict');
 });
