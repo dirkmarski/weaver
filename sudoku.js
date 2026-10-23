@@ -330,6 +330,13 @@
     return boxName(s.box) + ', the digit ' + s.pointDigit + ' fits only in ' + s.line + ' ' + (s.index + 1);
   }
 
+  // "row R, column C" for one struck cell, else "row N, columns A, B and C" ("column N, rows ...") for a line.
+  function struckCells(s) {
+    var col = s.line === 'column', n = s.removed.map(function (q) { return (col ? Math.floor(q / 9) : q % 9) + 1; });
+    if (n.length === 1) return 'row ' + (col ? n[0] : s.index + 1) + ', column ' + (col ? s.index + 1 : n[0]);
+    return s.line + ' ' + (s.index + 1) + ', ' + (col ? 'rows ' : 'columns ') + n.slice(0, -1).join(', ') + ' and ' + n[n.length - 1];
+  }
+
   // The hintFor result for a pointing step (see findPointing).
   function pointingHint(s, step, grid) {
     var line = s.line + ' ' + (s.index + 1), d = s.pointDigit;
@@ -341,9 +348,10 @@
     if (step === 2) {
       var rc = 'row ' + (s.r + 1) + ', column ' + (s.c + 1);
       text = 'Pointing: ' + rc + ' must be ' + s.digit + '.\n1. In ' + box + '.\n';
+      text += '2. So ' + d + ' cannot go in ' + line + ' outside that box: not in ' + struckCells(s) + ' (struck).\n';
       text += s.form === 'naked'
-        ? '2. So ' + d + ' cannot go in ' + line + ' outside that box: not in ' + rc + '.\n3. Row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' has every digit except ' + d + ' and ' + s.digit + ' in its row, column and box, so it could only take ' + d + ' or ' + s.digit + '. With ' + d + ' ruled out, it must be ' + s.digit + '.'
-        : '2. So ' + d + ' cannot go in ' + line + ' outside that box.\n3. That leaves ' + rc + ' as the only cell in its ' + s.unit + ' where ' + d + ' fits, so it must be ' + d + '.';
+        ? '3. Row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' has every digit except ' + d + ' and ' + s.digit + ' in its row, column and box, so it could only take ' + d + ' or ' + s.digit + '. With ' + d + ' ruled out, it must be ' + s.digit + '.'
+        : '3. That leaves ' + rc + ' as the only cell in its ' + s.unit + ' where ' + d + ' fits, so it must be ' + d + '.';
     } else {
       var tail;
       if (s.form === 'naked') {

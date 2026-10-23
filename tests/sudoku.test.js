@@ -930,7 +930,7 @@ test('pointing, row line, naked form: finder, nudge, explain on the same cell, n
   assert.strictEqual(one.text, 'Hint: try pointing. ' + BOX_INTRO + '3 fits only in row 1, so it cannot go anywhere else in row 1. '
     + 'That means 3 cannot go in row 1, column 5, and only one other digit fits there now. Click Hint again to see why.');
   assert.strictEqual(two.text, 'Pointing: row 1, column 5 must be 7.\n1. In the box of rows 1-3 and columns 1-3, the digit 3 fits only in row 1.\n'
-    + '2. So 3 cannot go in row 1 outside that box: not in row 1, column 5.\n'
+    + '2. So 3 cannot go in row 1 outside that box: not in row 1, columns 5 and 6 (struck).\n'
     + '3. Row 1, column 5 has every digit except 3 and 7 in its row, column and box, so it could only take 3 or 7. With 3 ruled out, it must be 7.');
   assert.deepStrictEqual([two.r, two.c, two.digit, two.form], [one.r, one.c, one.digit, one.form]);
   assert.strictEqual(JSON.stringify(WALL_ROW), snap);
@@ -943,7 +943,7 @@ test('pointing, column line, hidden form: the earlier digit 6 step in the same b
     + 'Then look at row 4: 8 now has only one place left there. Click Hint again to see why.');
   const two = hintFor(WALL_COL, 2);
   assert.strictEqual(two.text, 'Pointing: row 4, column 1 must be 8.\n1. In the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3 (the box has no other empty cells).\n' // issue 56: every empty box cell is confined
-    + '2. So 8 cannot go in column 3 outside that box.\n3. That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
+    + '2. So 8 cannot go in column 3 outside that box: not in row 4, column 3 (struck).\n3. That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
   assert.deepStrictEqual([two.r, two.c, two.digit, two.unit], [3, 0, 8, 'row']);
   assert.ok(hintFor(WALL_UNIT_COL, 1).text.includes(' Then look at column 3: 6 now has only one place left there.')); // column unit names the column, not the row
 });
@@ -1215,6 +1215,24 @@ function pointingState(seed) {
 }
 const cells = (...rc) => rc.map(([r, c]) => at(r - 1, c - 1)); // 1-based [row, column] to flat
 
+test('issue 96: pointing step 2 names every struck cell, same wording in both forms, row and column lines, 1 / 2 / 3+ cells', () => {
+  const step2 = (seed) => pointingState(seed).h.text.split('\n')[2];
+  const pins = [
+    [13, 'naked', 'row', '2. So 2 cannot go in row 6 outside that box: not in row 6, column 8 (struck).'],
+    [18, 'naked', 'column', '2. So 5 cannot go in column 7 outside that box: not in row 9, column 7 (struck).'],
+    [11, 'hidden', 'row', '2. So 7 cannot go in row 7 outside that box: not in row 7, column 7 (struck).'],
+    [3, 'hidden', 'row', '2. So 1 cannot go in row 9 outside that box: not in row 9, columns 4 and 5 (struck).'],
+    [1, 'naked', 'column', '2. So 1 cannot go in column 3 outside that box: not in column 3, rows 2 and 3 (struck).'],
+    [33, 'naked', 'row', '2. So 4 cannot go in row 5 outside that box: not in row 5, columns 1, 2 and 3 (struck).'],
+    [7, 'hidden', 'column', '2. So 2 cannot go in column 9 outside that box: not in column 9, rows 1, 2 and 3 (struck).'],
+    [12, 'hidden', 'row', '2. So 9 cannot go in row 3 outside that box: not in row 3, columns 1, 4, 5 and 6 (struck).']
+  ];
+  for (const [seed, form, line, text] of pins) {
+    const h = pointingState(seed).h;
+    assert.deepStrictEqual([h.form, h.line, step2(seed)], [form, line, text], 'seed ' + seed);
+  }
+});
+
 test('issue 56 pins P(1), P(3), P(4), P(8), P(10): rings, key line and the box-case sentence', () => {
   const pin = (seed, rings, parenthesis) => {
     const { g, h } = pointingState(seed), m = hintMarks(h, g);
@@ -1227,11 +1245,11 @@ test('issue 56 pins P(1), P(3), P(4), P(8), P(10): rings, key line and the box-c
   pin(10, cells([6, 6], [7, 7], [8, 1], [9, 4]), false);
   const p4 = pin(4, [], true), p8 = pin(8, cells([5, 8]), true);
   assert.strictEqual(p4.h.text, 'Pointing: row 4, column 5 must be 7.\n1. In the box of rows 7-9 and columns 4-6, the digit 9 fits only in column 5 (the box has no other empty cells).\n'
-    + '2. So 9 cannot go in column 5 outside that box: not in row 4, column 5.\n'
+    + '2. So 9 cannot go in column 5 outside that box: not in column 5, rows 4, 5 and 6 (struck).\n'
     + '3. Row 4, column 5 has every digit except 9 and 7 in its row, column and box, so it could only take 9 or 7. With 9 ruled out, it must be 7.');
   assert.deepStrictEqual(p4.m.confined.concat(p4.m.removed), cells([8, 5], [9, 5], [4, 5], [5, 5], [6, 5]));
   assert.strictEqual(p8.h.text, 'Pointing: row 4, column 1 must be 8.\n1. In the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3 (the box has no other empty cells).\n'
-    + '2. So 8 cannot go in column 3 outside that box.\n3. That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
+    + '2. So 8 cannot go in column 3 outside that box: not in row 4, column 3 (struck).\n3. That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
   // first click, "Well done!" and own-pointing ("Well spotted!") texts carry no parenthesis, box case or not
   const { g, h } = pointingState(4), first = hintFor(g, 1, 'hidden');
   assert.ok(!first.text.includes('no other empty cells') && first.text.includes('fits only in column 5, so it cannot go anywhere else in column 5.'));
