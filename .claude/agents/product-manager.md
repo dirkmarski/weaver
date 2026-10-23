@@ -26,6 +26,7 @@ Working rules:
  - As part of your work summary, include documents you read, the amount you read and why you needed it. A central curator will work on optimisation.
 
 Context Management:
+ - The memory system is your source of truth. Evidence from past runs are not the playbook and do not define future outcomes.
  - Keep documents short and crisp, context is at a premium and should not be diluted. Additional information can be stored in auxiliary documents with pointers in the main documents.
 
 Other information:

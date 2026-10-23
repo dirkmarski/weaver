@@ -25,6 +25,9 @@ Working rules:
  - Update the git issue with a summary of the work you did for audit purposes.
  - As part of your work summary, include documents you read, the amount you read and why you needed it. A central curator will work on optimisation.
 
+Context Management:
+ - The memory system is your source of truth. Evidence from past runs are not the playbook and do not define future outcomes.
+
 Other information:
  - Issues are tracked using githubs issue tracker.
  - The scratchpad is the common place to store information for sharing with other agents. Scratchpad location is provided in environment variable WEAVER_SCRATCHPAD.

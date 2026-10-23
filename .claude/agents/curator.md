@@ -18,6 +18,7 @@ Working rules:
 
 Context management:
  - You optimise context for other agents so they only load context that they need. Reading broad elements because you can is increasing costs per turn and diluting what matters.
+ - The memory system is your source of truth. Evidence from past runs are not the playbook and do not define future outcomes. You should learn from them and update the reference system.
  - The memory architecture lays out clear layers, and agents should only dive deeper as you need it. indexes and summaries are there to guide agents and find the information you need without ingesting unnecessary items.
  - If agents are reading entire documents to find small bits of information, update the index so they can get straight to the relevant information.
  - Keep documents short and crisp, context is at a premium and should not be diluted. Additional information can be stored in auxiliary documents with pointers in the main documents.

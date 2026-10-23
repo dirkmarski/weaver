@@ -16,5 +16,8 @@ Working rules:
  - As part of your work summary, include documents you read, the amount you read and why you needed it. A central curator will work on optimisation.
  - Invoke the curator at the end, after collating information from all the agents. They have been instructed to specifically track documents read into context and the reasons for it.
 
+Context Management:
+ - The memory system is your source of truth. Evidence from past runs are not the playbook and do not define future outcomes.
+
 Other information:
  - Scratchpad location is provided in environment variable WEAVER_SCRATCHPAD.

@@ -6,6 +6,6 @@
       "Bash(gh *)",
       "Bash(git *)"
     ],
-    "deny": ["Read(./governance/LOG.md)"]
+    "deny": ["Read(./governance/LOG.md)", "Read(./governance/CHARTER.md)"]
   }
 }

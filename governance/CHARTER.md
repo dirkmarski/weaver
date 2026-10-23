@@ -22,7 +22,7 @@ and its controls are the subject.
 | Agent definitions and the settings that launch or restrict them (`.claude/`) | The application, its tests and its pipeline |
 | The product context the team works within (`governance/context/`) | What goes into each iteration: the product manager decides it and writes the issues |
 | Any issue I write directly | Documentation, including the README |
-| This charter and the log (`governance/`) | Their work log (`work-log/`) |
+| This charter and the log (`governance/`) | Their curated memory (`memory/`) and their work log (`work-log/`) |
 | The rule on `main`: changes arrive by pull request | Merging, when they judge the work done |
 
 ## How I steer
@@ -35,18 +35,23 @@ question this repository exists to explore.
 
 ## How a run works
 
-One session per run, started one of two ways. *Deliver the next iteration*: the
-product manager decides what the iteration is and writes its issues, the lead
-delivers them, and the product manager accepts the result. *Complete task #N*: the
-lead delivers one issue I wrote. Either way the lead plans, delegates and merges.
-Every commit and pull request names the agent and the session. A later session picks
-up unfinished work from GitHub and the work log.
+One session per run, started one of two ways. *Deliver the next iteration*: a
+director has the product manager decide what the iteration is and write its issues,
+then launches one lead per issue, one at a time, and the product manager accepts each
+result. *Complete task #N*: a lead delivers one issue I wrote. Either way the lead
+plans, delegates and merges its issue. At the end of the session a curator folds the
+learnings into the team's memory and a closing lead reviews that and finalises git.
+Every commit and pull request names the agent and the session.
+
+The curated memory is the agents' source of truth. A later session picks up
+unfinished work from GitHub and that memory. The work log is the audit trail, not a
+source to learn from.
 
 ## Environment
 
 Claude Code, unmodified, on my own subscription. The repository's settings define
-everything else: no personal instructions, and agent memory and claude.ai connectors
-off. Claude Code's own built-in instructions are part of the platform and change
+everything else: no personal instructions, and Claude Code's auto-memory and claude.ai
+connectors off. Claude Code's own built-in instructions are part of the platform and change
 with its versions.
 
 ## Not yet in place
