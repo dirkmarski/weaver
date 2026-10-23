@@ -288,6 +288,10 @@ describe('page (headless Chrome)', () => {
     let s = await read();
     assert.deepStrictEqual([s.level, s.target, s.status.startsWith('Hint: try claiming. In row 3, the digit 2 fits only in the box of rows 1-3 and columns 4-6')], ['Difficulty: Tough', [4], true]);
     await open('tough', 3);
+    await keys([[39, '6']]); // r5c4 = 6 typed on your own: claiming (#104)
+    s = await read();
+    assert.deepStrictEqual([s.status, s.cls, s.tally[3]], ['Well spotted! You applied claiming on your own: in column 6, the digit 6 fits only in the box of rows 7-9 and columns 4-6, so row 5, column 4 is 6.', 'ok', 'Claiming: 1 on your own, 0 with a hint']);
+    await keys([[39, 'Backspace']]);
     await hints(4);
     s = await read();
     assert.deepStrictEqual([s.target, s.removed, s.status.includes('not in row 7, column 5; row 9, columns 4 and 5 (struck).'), s.status.includes('the only cell in column 4 where 6 fits'), await statusSize()], [[39], [58, 75, 76], true, true, '17.6px']); // 1.1 rem at >= 560 px
