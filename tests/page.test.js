@@ -275,7 +275,7 @@ describe('page (headless Chrome)', () => {
     assert.strictEqual(s.tally[2], 'Pointing: 0 on your own, 1 with a hint');
   });
 
-  it('f1a. Hint advances the steps like Next step (hidden form, seed 8); a value change clears the button; at 360x740 the whole text fits', async () => {
+  it('f1a. Hint advances the steps like Next step (hidden form, seed 8); a value change clears the button; at 360x740 the stage-2 Next step button is in the viewport', async () => {
     await open('tricky', 8);
     try {
       await page.send('Emulation.setDeviceMetricsOverride', { width: 360, height: 740, deviceScaleFactor: 1, mobile: true });
