@@ -48,3 +48,8 @@ Issue: https://github.com/dirkmarski/weaver/issues/104. Branch: `issue-104-own-c
 ## Lead review
 - Review fb3dbc5: approve with nits (F1 no `skip` for claiming is equivalent, confirmed; F2 pre-existing: hint match ignoring row or column survives on main and branch, out of scope; F3 hinted case covered by the existing test). Test a7e00df: pass (oracle 49200 cells 0 mismatches; page 39/39; 32 paired mutants; ratio 2374/1484 = 1.5997).
 - Lead check on a7e00df: 184/184, skipped 0; tester scripts re-run t1-oracle 9/9, t2-page 39/39, t8-ac6 11/11 (shots rewritten after the run start); lead mutant "claiming before pointing" killed (4 unit tests + page pins). No rework round: no must-fix or should-fix; F2 goes to the backlog tech debt (PM).
+
+## Lead: acceptance and merge
+- PM accepted on 96d7557 (PR #107 comment 6359817316; PM log c4b955c, only the log changed after the accepted head). AC 1-6 pass. Persona gate missed: "reward makes sense" 3 (a), 4 (b), average 3.5 vs 4.0: the own message skips the final step (seed 12: "digit 2 ... so ... is 5" reads as a non sequitur). PM D16 accepts anyway (the same gap exists in the shipped own-pointing message; fixing it is new scope) and opened follow-up #108 (it22 item 1, same 4.0 gate). D17: reviewer F2 to tech debt.
+- Lead concern (recorded, PM's call): the acceptance gate was waived, not met; #108 must close it.
+- Merged PR #107 with a merge commit on the head carrying this log (logs after the accepted code head, process.md).
