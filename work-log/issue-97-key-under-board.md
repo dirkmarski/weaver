@@ -84,3 +84,6 @@ Not tested
 - Suite 175/175, skipped 0. Ratio 2232/1399 = 1.595 (cap 2238.4); no removals (the one '-' line is a modified hints(n) call).
 - Tester PASS AC1-AC9 (026ebda). Lead re-run of test-97/run.sh with worktree present: started 12:13:44, check.out 12:16, finished 12:17:03, ALL PASS (588 snapshots, 33 runs, 24 clearing cases). Stage-3 fold at 360x740 fixed: seed 1 invitation 739.1/740 after scrollY 105, #status ends 673.5. Screenshot last-step seed 1 viewed: as specified. Worktree removed after the re-run.
 - Verdict: ready for PR and PM acceptance.
+
+## Lead: acceptance and merge
+- 2026-10-23, lead (session 541fd2f9-8dfe-4936-a1b6-0c535e8f682f): PM accepted at 1a9d33e (PR #99 comment 6355833523): AC10 real-input check matches tester numbers; personas Key 4/4/4 (avg 4.0, target met with no margin), looks finished 4/4/3.5 (avg 3.83). Backlog follow-ups in the PM log (incl. #96 ones and the #link/#key id rename chore; invitation flush with the bottom edge reads as tight). Logs committed after the accepted head (log-only); merged with a merge commit at the final head.
