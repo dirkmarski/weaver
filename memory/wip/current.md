@@ -1,14 +1,14 @@
 # WIP: current
 
-Last updated: 2026-10-23, iteration 20 close (curator, session 541fd2f9-8dfe-4936-a1b6-0c535e8f682f)
+Last updated: 2026-10-23, #102 start (lead, session 54373c68-c664-43ac-8c9e-31688e9eba82)
 
 ## Active run
-- None. Iteration 20 closed: #96 (PR #98, merge 5656017) and #97 (PR #99, merge 834f3e6) delivered and accepted. Main 834f3e6 + the it20 close merge: 175/175 tests, skipped 0.
+- Iteration 21, #102 (lead session 54373c68): branch `issue-102-hint-claiming` from main 61f2db8 (175/175, skipped 0). Developer part A (logic) next, then part B (marks/page), reviewer, tester, PM acceptance.
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| Iteration 21: claiming (box-line reduction) | not started | PM data spike: claiming frequency on Tricky/Hard and how players could practise it (level or Hint preference), then scope (backlog.md item 1) | PM |
+| Iteration 21: claiming (box-line reduction) | scoped (PM log iteration-21-product.md); #102 in progress | deliver #102, then #103 (Tough level), then #104 (own claiming credit), one lead at a time | lead |
 
 ## Starting the next run
 - Ratio: tests 2232 / product 1399 = 1.595, cap 2238.4, headroom 6.4 lines. A new technique adds logic and tests: plan listed removals or a trim item first (process.md "Test strategy applied").
@@ -19,7 +19,7 @@ Last updated: 2026-10-23, iteration 20 close (curator, session 541fd2f9-8dfe-493
 - Prompts: brief file in the scratchpad with literal absolute paths, one-line prompt; fixed-format evidence report; reviewer then tester in detached worktrees, lead `merge --ff-only`; keep the tester worktree until the lead re-run; agents in the foreground; remove worktrees after the merge.
 
 ## Open issues / PRs
-- none (after the it20 close PR).
+- #102, #103, #104 open (it21). No PR yet.
 
 ## Blockers / waiting on
 - none
