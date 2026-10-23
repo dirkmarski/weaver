@@ -90,5 +90,10 @@ Issue: https://github.com/dirkmarski/weaver/issues/102. Branch: `issue-102-hint-
 - Read: lessons.md Review and Testing sections; the Lead section of this log; issue #102; the full diff of sudoku.js, index.html, README.md, tests. LOG.md not read.
 
 ## Lead review
+- Head a216dc4. Suite 183/183, skipped 0 (lead run). Ratio 2360/1475 = 1.600 = cap (0 headroom; #103/#104 must budget test lines per product line or trim first). Longest lines: none above the 61f2db8 maximum per file (export line wrapped in part B).
+- Re-ran the tester's t2-page (157/157), t5-regress (18/18), t3-layout (87/90, the same 3 findings) from test-102/ while wt-test exists; output live at 15:55. Lead mutants: confinement minimum 3 (31 fail), claiming skip 0 = box-form allowed (1 fail): both killed.
+- No rework round. Reviewer F1 (hidden-unit row before column unpinned): the tester shows a dual row/column target is not reachable by Hint (claiming only runs with no single); direct-call order matches the spec (row); deferred (ratio at cap). Reviewer F2 (naked column marks not asserted): nit, accepted (no column-specific branch; CL.D pins the column key). Tester F1 (column-line naked seed 108 at 360x740: step-2 Next step bottom 759.9 > 740): same on main for pointing hidden seed 14, so a pre-existing fit limit for 3-line step-2 texts, not introduced here; AC7 met on the evidence cases (738.9). Raised to the PM at acceptance.
+- PM layout question: 675.9 = button bottom after step 1, 738.9 = after step 2 (tester: same with emulation before or after load).
+- The two removed assertions were part A's own new ones (none existed at 61f2db8); reviewer and tester confirmed redundant.
 
 ## Lead: acceptance and merge
