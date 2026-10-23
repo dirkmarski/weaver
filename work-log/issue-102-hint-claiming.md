@@ -17,6 +17,15 @@ Issue: https://github.com/dirkmarski/weaver/issues/102. Branch: `issue-102-hint-
 - Tests: 181/181, skipped 0. Ratio 2324 / 1471 = 1.58 (cap 2353.6). Six existing assertions only extended for the fourth tally key (tally deepEquals, tallyLines, MIXED, completion helper, definitions) and the new none text; none removed. Positions are Hard-seed walks (provenance in test comments); steps cross-checked against the PM's spike-lib on 20000 random partial grids (0 differences, box-form aside). 16 mutants of the new logic run, all killed (one survivor found a missing count-accumulation test, added).
 - Not tested here: marks/key for claiming, step reveal wiring, page rendering of the fourth line (part B); own claiming (#104).
 
+### Part B (marks, key, step reveal, page tests, page evidence)
+- Model Claude Sonnet 5.5, session 54373c68-c664-43ac-8c9e-31688e9eba82. Commit d7dba1a (code, tests, README); this log entry follows.
+- Done: `hintMarks` and `hintKey` handle claiming (the pointing branch widened to "pointing or claiming"; the first reason set comes from the line, tint = box + line + hidden unit); the page: `pointingExplain` true for claiming, `hatchedRings.d` = `pointDigit` for both. Every other `technique === 'pointing'` site checked: the creditEntry/classifyEntry/generator ones are logic for own pointing, left alone. AC 8: export line wrapped, longest line in sudoku.js 250 (was 295; 267 before #102).
+- Tests: 183/183, skipped 0. Ratio 2360 / 1475 = 1.600 (exactly the cap). New: unit `hintMarks and hintKey, claiming` (naked row, hidden row, hidden column, key stage 1 row and stage 3 column) and page `f5` (Hard seeds 57 naked and 184 hidden: stages 1-3 classes, keys, Next step labels, focus, hinted entry counted on the fourth line). Existing page assertions extended for the fourth tally id (TALLY0 4 entries, two `b.` tests, the zero-tally test also pins the claiming definition on the page).
+- Removed from part A's tests to stay under the cap (each covered): `tallyLines(r.tally)[4]` (covered by page f5 `tally[3]` and the `two` line), `hintApplied(hint, '8') === ''` (the digit-mismatch branch is shared and pinned by the pointing/single tests), plus three own assertions dropped while writing (naked column marks, key stage 2 column, key without hatched clause; covered by CL.D key, page f5 and the pointing key test).
+- Mutants run (all killed): line vs box reason set, key "in the row" vs box, `pointingExplain`, the pointing-branch widening in hintMarks and in hintKey. Survivor by design: `hatchedRings.d` fallback for claiming alone (killed only by the pointing f1d; claiming link digit not pinned).
+- Evidence (AC 7): /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/54373c68-c664-43ac-8c9e-31688e9eba82/scratchpad/dev-b/ (README.md, shots/, evidence.js). 360x740: Next step button after step 2 (label 3 of 3) top 704.1, bottom 738.9 (<= 740), after step 1 bottom 675.9, scrollY 0, both seeds.
+- Not tested: claiming link sentences on the page, notes-keep and clearing paths for claiming specifically (shared code with pointing, f and f1a cover those), own claiming (#104).
+
 ## Reviewer
 
 ## Tester
