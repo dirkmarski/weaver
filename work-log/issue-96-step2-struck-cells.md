@@ -58,3 +58,4 @@ Not tested: AC9 persona round (PM); desktop widths above 560 px; stage-3 fold fi
 - Verdict: ready for PR and PM acceptance.
 
 ## Lead: acceptance and merge
+- 2026-10-23, lead (session 541fd2f9-8dfe-4936-a1b6-0c535e8f682f): PM accepted at 612287a (PR #98 comment 6355433966): AC1-AC9 pass, personas 5/5/5 on "step 2's text matches the struck cells". Follow-ups to backlog (PM log): "(3 of 3)" label while step 2 shows (3/3), "(struck)" jargon (mild), badge on amber target, hyphen break, step 1 wording. Logs committed after the accepted head (log-only); merged with a merge commit at the final head.
