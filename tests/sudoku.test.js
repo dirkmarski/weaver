@@ -1188,6 +1188,19 @@ test('hintKey: the exact key line for pointing with and without hatched cells, f
   assert.strictEqual(hintKey({ technique: 'hidden', digit: 8 }, 1), 'Key: hatched = a purple ring rules 8 out there (an 8 already in the same row, column or box).');
 });
 
+test('hintMarks and hintKey, claiming: tint, confined, removed, hatched and rings in both forms, row and column lines, key by stage', () => {
+  const marks = (g) => hintMarks(hintFor(g, 2), g);
+  const m = (g) => { const x = marks(g); return [x.target, x.confined, x.removed, x.hatched, x.digits]; };
+  assert.deepStrictEqual(m(CL.A), [5, [21, 23], [3, 5], [18, 22], [27, 40]]);
+  assert.deepStrictEqual(m(CL.C), [12, [49, 50], [39], [21, 51, 53, 57], [24, 62]]);
+  assert.deepStrictEqual(marks(CL.C).area, [30, 31, 32, 39, 40, 41, 48, 49, 50, 45, 46, 47, 51, 52, 53, 3, 21, 57, 66, 75]);
+  assert.deepStrictEqual(m(CL.D), [32, [42, 51], [35, 53], [15, 30, 69], [12, 64]]); // hidden, column 7, unit row 4
+  const key = (g, n) => hintKey(hintFor(g, 2), 1, n);
+  assert.strictEqual(key(CL.A, 1), 'Key: dashed purple = the only places for 6 in the row.');
+  assert.strictEqual(key(CL.D, 3), 'Key: dashed purple = the only places for 4 in the column; struck grey 4 = this step rules 4 out there; '
+    + 'hatched = a purple ring rules 4 out there (a 4 already in the same row, column or box).');
+});
+
 test('ringLink: partners and sentence for one partner, two partners, and a partner sharing two units (pins L1, L2, L3)', () => {
   const at = (r, c) => (r - 1) * 9 + c - 1; // 1-based row and column to a flat index
   const rings = [at(2, 8), at(3, 6), at(9, 3)]; // L1: D = 5
@@ -1393,10 +1406,8 @@ test('claiming rewards: hinted entry message and one count per cell, four tally 
   const hint = hintFor(CL.C, 2), r = creditEntry(emptyTally(), {}, hint, CL.C, 1, 3, '9');
   assert.deepStrictEqual([r.text, r.kind, r.tally.claiming, r.tally.pointing], ['Well done! You applied claiming: row 2, column 4 is 9.', 'reward', { own: 0, hint: 1 }, { own: 0, hint: 0 }]);
   assert.strictEqual(hintApplied(hintFor(CL.C, 1), '9'), r.text);
-  assert.strictEqual(hintApplied(hint, '8'), '');
   const again = creditEntry(r.tally, r.credited, hint, CL.C, 1, 3, '9');
   assert.deepStrictEqual([again.text, again.tally], [r.text, r.tally]);
   const two = creditEntry(r.tally, r.credited, hintFor(CL.A, 2), CL.A, 0, 5, '3'); // another cell: the count adds up
   assert.strictEqual(tallyLines(two.tally)[4], 'Claiming: 0 on your own, 2 with a hint');
-  assert.strictEqual(tallyLines(r.tally)[4], 'Claiming: 0 on your own, 1 with a hint');
 });

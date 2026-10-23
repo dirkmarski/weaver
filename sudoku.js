@@ -500,16 +500,19 @@
   //   digits: the ringed cells (ascending), on explain only,
   //   hatched: the reason cells (ascending), on explain only,
   //   confined, removed: a pointing explain's box cells where the digit fits and line cells that lose it (else empty) }.
-  // Tint: a naked single's row, column and box; a hidden single's unit; a pointing step's box and line, plus its hidden-form unit.
+  // Tint: a naked single's row, column and box; a hidden single's unit; a pointing or claiming step's box and line, plus its hidden-form unit.
+  // Claiming: confined = the line cells where D fits, removed = the box cells that lose it, and the first reason set is the
+  // empty cells of the line that are not confined (pointing: of the box).
   // Reason cells (none for a naked single): a hidden single's are the other empty cells of its unit; a pointing step's are the
   // empty box cells that are not confined and, in the hidden form, the empty cells of the hidden unit other than the target
   // and the removed cells. They are hatched on the page.
   // Ringed digits, for D = the hidden single's digit or the pointing digit: a cell holding D that shares a row, column or box
   // with a reason cell (an empty cell that D helps to rule out).
   function hintMarks(hint, grid) {
-    var p = hint.r * 9 + hint.c, units, pointing = hint.technique === 'pointing';
+    var p = hint.r * 9 + hint.c, units, claiming = hint.technique === 'claiming', pointing = claiming || hint.technique === 'pointing';
     var hidden = hint.unit ? [CELL_UNITS[p][UNIT_NAMES.indexOf(hint.unit)]] : [];
-    if (pointing) units = [hint.box * 3 + 2, hint.index * 3 + (hint.line === 'row' ? 0 : 1)].concat(hidden);
+    var lineUnit = hint.index * 3 + (hint.line === 'row' ? 0 : 1);
+    if (pointing) units = [hint.box * 3 + 2, lineUnit].concat(hidden);
     else units = hint.technique === 'hidden' ? hidden : CELL_UNITS[p];
     var area = [], digits = [], d = pointing ? hint.pointDigit : hint.technique === 'hidden' ? hint.digit : 0;
     units.forEach(function (u) { UNITS[u].forEach(function (q) { if (q !== p && area.indexOf(q) < 0) area.push(q); }); });
@@ -520,7 +523,7 @@
     }
     if (d && hint.kind === 'explain') {
       if (pointing) {
-        addReasons(UNITS[hint.box * 3 + 2], hint.confined);
+        addReasons(UNITS[claiming ? lineUnit : hint.box * 3 + 2], hint.confined);
         addReasons(hidden.length ? UNITS[hidden[0]] : [], hint.removed);
       } else addReasons(UNITS[hidden[0]], []);
       for (var q = 0; q < 81; q++) {
@@ -543,11 +546,11 @@
   // Pointing names its dashed and struck marks, and the hatching only when a cell is hatched; a hidden single always has some.
   // For a pointing step, `stage` (1-3, default 3) is the number of revealed steps: 1 names only the dashed marks, 2 adds the struck.
   function hintKey(hint, hatchedCount, stage) {
-    var pointing = hint.technique === 'pointing', d = pointing ? hint.pointDigit : hint.digit;
+    var pointing = hint.technique === 'pointing' || hint.technique === 'claiming', d = pointing ? hint.pointDigit : hint.digit;
     stage = stage || 3;
     var hatch = 'hatched = a purple ring rules ' + d + ' out there (' + aDigit(d) + ' already in the same row, column or box)';
     if (!pointing) return 'Key: ' + hatch + '.';
-    return 'Key: dashed purple = the only places for ' + d + ' in the box'
+    return 'Key: dashed purple = the only places for ' + d + ' in the ' + (hint.technique === 'claiming' ? hint.line : 'box')
       + (stage > 1 ? '; struck grey ' + d + ' = this step rules ' + d + ' out there' : '')
       + (stage > 2 && hatchedCount ? '; ' + hatch : '') + '.';
   }
@@ -1197,7 +1200,7 @@
       marks.hatched.forEach(function (q) { cellAt(q).classList.add('hint-hatched'); });
       marks.digits.forEach(function (q) { cellAt(q).classList.add('hint-digit'); });
       if (!marks.hatched.length) return;
-      hatchedRings = { hatched: marks.hatched, rings: marks.digits, d: hint.technique === 'pointing' ? hint.pointDigit : hint.digit };
+      hatchedRings = { hatched: marks.hatched, rings: marks.digits, d: hint.pointDigit || hint.digit };
       unlink();
     }
 
@@ -1220,7 +1223,7 @@
       }
       var res = hintFor(currentGrid(), hint ? 2 : 1, preferredTechnique(tally, currentLevel), currentLevel);
       clearResults();
-      var pointingExplain = res.technique === 'pointing' && res.kind === 'explain';
+      var pointingExplain = (res.technique === 'pointing' || res.technique === 'claiming') && res.kind === 'explain';
       status.textContent = res.text;
       status.className = pointingExplain ? 'steps' : '';
       if (pointingExplain) { steps = { lines: res.text.split('\n'), shown: 1, marks: null }; showSteps(); }
@@ -1261,7 +1264,8 @@
     LEVELS: LEVELS, isValidSolution: isValidSolution,
     findConflicts: findConflicts, clashCells: clashCells, fixedMessage: fixedMessage, namedClash: namedClash, verify: verify, sanitizeDigit: sanitizeDigit, buildGrid: buildGrid,
     noteDigits: noteDigits, applyEntry: applyEntry, nextCell: nextCell,
-    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, findClaiming: findClaiming, hintMarks: hintMarks, hintKey: hintKey, ringLink: ringLink, ringRules: ringRules, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
+    findNakedSingle: findNakedSingle, findHiddenSingle: findHiddenSingle, findPointing: findPointing, findClaiming: findClaiming, hintMarks: hintMarks, hintKey: hintKey,
+    ringLink: ringLink, ringRules: ringRules, preferredTechnique: preferredTechnique, hintFor: hintFor, hintApplied: hintApplied,
     classifyEntry: classifyEntry, emptyTally: emptyTally, creditEntry: creditEntry, completionFor: completionFor, tallyLines: tallyLines, statusClass: statusClass,
     TECHNIQUE_DEFINITIONS: TECHNIQUE_DEFINITIONS
   };
