@@ -1,24 +1,25 @@
 # WIP: current
 
-Last updated: 2026-10-23, #104 merge (lead, session 54373c68-c664-43ac-8c9e-31688e9eba82)
+Last updated: 2026-10-23, iteration 21 close (curator, session 54373c68-c664-43ac-8c9e-31688e9eba82)
 
 ## Active run
-- ITERATION 21 COMPLETE: #102 (PR #105), #103 (PR #106), #104 (PR #107, 184/184, skipped 0) merged and accepted. Next: iteration 21 close (curator + closing lead), then it22 (PM: #108 first).
+- None. Iteration 21 (claiming: #102, #103, #104) is closed. Next: iteration 22, PM scoping from `memory/wiki/backlog.md`, #108 first.
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| Iteration 21: claiming (box-line reduction) | complete: #102, #103, #104 done (PR #105, #106, #107) | close iteration 21 | curator / closing lead |
+| #108 own pointing and claiming rewards state the final step | open issue, not started | PM confirms scope and ACs, then lead delivers; persona gate 4.0 must pass (closes D16) | PM, lead |
 
 ## Starting the next run
-- Ratio after #104: tests 2374 / product 1484 = 1.5997 (0.4 lines headroom): each new product line earns 1.6 test lines; plan listed removals (mutant-confirmed) or a trim first. #103 removed 8, #104 16 redundant assertions/tuples (see iteration-21.md memory notes).
-- Layout at 360x740 (emulation before load): step texts are 1rem below 560 px (#103 D10); stage-2 Next step bottom 701.3-719.3 (Tough 1/3/4/7, Hard 14/108; D7 closed). Stage-3 invitation bottom 738.5/740 (1.5 px spare, PM watch). Picker wraps 3+2 at 360/375 (personas: lopsided, mobile backlog).
-- Ids are swapped relative to their roles (`#link` = reserve with key/link sentence, `#key` = invitation); rename chore in backlog tech debt. Read architecture.md before touching them.
-- Seed pins in specs: name the walk (unit vs page) and verify before writing the issue (lessons "Scoping and spec").
-- it20 scratch scripts (PM spikes pm-it20/, tester test-96/, test-97/ with READMEs) lived in session 541fd2f9's scratchpad; a new session has none: rebuild from the README pattern in process.md.
-- #102 evidence scripts (dev-b/, test-102/ with READMEs; claiming fallback seeds Hard 57 naked, 184 hidden, 108 column naked, 58 column hidden) are in session 54373c68's scratchpad.
-- #103 evidence: test-103/ (t1 oracle walks, t3 pins, t4 picker, t5 layout, t6 regression, t8 AC6; README), dev-103/, pm-103/ (play.js full Hint play-through) in session 54373c68's scratchpad. #104 evidence: dev-104/, test-104/ (oracle.js walk, t2 page, t7 Python mutants; README), pm-104/. #104 PM D16 waived the persona gate (3.5 < 4.0: own messages skip the final step) -> #108 (it22 item 1).
-- Prompts: brief file in the scratchpad with literal absolute paths, one-line prompt; fixed-format evidence report; reviewer then tester in detached worktrees, lead `merge --ff-only`; keep the tester worktree until the lead re-run; agents in the foreground; remove worktrees after the merge.
+- Ratio at main 96a311c: tests 2374 / product 1484 = 1.5997 (0.4 lines headroom). #108 changes product text lines: plan mutant-confirmed removals (or a trim) before adding tests.
+- Layout at 360x740 is tight (product.md "Known product gaps", Mobile): stage-3 invitation 1.5 px spare; if #108 lengthens the own-reward message, measure the status/tally at 360x740 and 375x812 on the longest message first.
+- Ids are swapped relative to their roles (`#link` = reserve, `#key` = invitation); rename chore in backlog tech debt. Read architecture.md before touching them.
+- Reusable it21 scripts (session-scoped, under `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/54373c68-c664-43ac-8c9e-31688e9eba82/scratchpad/`; gone once /tmp is cleared, then rebuild from the README pattern in process.md). Copy, do not edit in place:
+  - `test-104/pagelib.js`: CDP page driver (picker click, real mouse/key input, emulation before load, screenshots); `test-104/README.md` for setup.
+  - `test-104/oracle.js` + `t1-oracle.js`: independent candidate-set oracle with one-step pointing/claiming classifier (own rewards; #108 regression).
+  - `test-104/t7-mutants.py`, `dev-104/mutants.py`: Python mutant runners (paired main/branch removal checks).
+  - `test-104/t2-page.js`: own-reward texts on the page (seeds 3, 12, 1, 7); `test-103/t5-layout.js`: 360x740 stage-2/stage-3 layout table.
+  - `pm-103/play.js`: full Hint-only play-through on the page; `pm-it21/spike-lib.js`: claiming model used for pins.
 
 ## Open issues / PRs
 - #108 open (it22 item 1, PM): own pointing and claiming rewards state the final step.

@@ -7,7 +7,8 @@
 - **Naked single**: an empty cell with exactly one candidate.
 - **Hidden single**: a digit with only one possible cell in a box, row or column, even if that cell has other candidates. Checked box, then row, then column. A cell that is both is reported as naked.
 - **Pointing**: in a box, a digit not yet placed fits only in cells of one row (or column); so it cannot go elsewhere in that line, which can make another cell a single. Naked form: a cell outside the box in that line left with one candidate. Hidden form: a unit where the digit now fits one cell only.
-- **Claiming** (box-line reduction): the reverse of pointing; not yet taught.
+- **Claiming** (box-line reduction): the reverse of pointing: in a row or column, a digit fits only inside one box, so it is ruled out of that box's other cells. Taught, practised (Tough) and counted since it21 (#102-#104).
+- **Tough**: level between Tricky and Hard (#103): Tricky's puzzles, Hint prefers a useful claiming step.
 - **Naked/hidden pair**: later techniques, not yet taught.
 - **Reading order**: row by row from the top, left to right within a row; used to pick the first cell, box (0-8) or step.
 - **Solvable by (technique)**: the puzzle can be completed using only that technique (`solvableBy`).
