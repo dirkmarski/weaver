@@ -48,6 +48,17 @@ Issue: https://github.com/dirkmarski/weaver/issues/103. Branch: `issue-103-tough
 - Not checked: tester-scope acceptance measurements (AC 4 screenshots at three sizes, AC 5 measured fit for seeds 1/3/7 and Hard 14/108, seed 4/7 pins by walk); Chrome other than the local one; README prose outside the sections named in the issue beyond a grep for Tricky/Hard lists; real touch input.
 
 ## Tester
+- Tester: Claude Sonnet 5.5, session 54373c68-c664-43ac-8c9e-31688e9eba82. Head tested 201652e (product code 87f6fa6), baseline main 9ccab0c. Scripts and shots: /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/54373c68-c664-43ac-8c9e-31688e9eba82/scratchpad/test-103/ (README.md).
+- Verdict: pass with findings (AC 1-5 pass; AC 6 passes except one process rule, finding 1).
+- Checks: t1-unit 47/47, t3-pins 48/48, t4-picker 22/22, t5-layout 50/50, t6-regress 21/21, t7-mutants 13/13, t8-ac6 13/14 (the FAIL is finding 1). `node --test`: 183/183, skipped 0, about 3.8 s; f1a, f1h, f4 pass. Ratio 2364/1480 = 1.5973.
+- Findings:
+  1. Low (process rule): the longest README.md line (line 41, the Hint/Pointing/Claiming bullet) grew from 8482 to 8618 characters, longer than the file's longest line at 9ccab0c (the AC 6 / line-packing rule in the brief). No functional effect; split the added text over a new line.
+  2. Info: step-2 Next step on 360x740: Tough seeds 1/7 bottom 701.3, seeds 3/4 719.3 (slack 20.7 px); Hard 14 and 108: 719.3 on the branch, 759.9 on main (outside the viewport; pre-existing defect, now fixed). Negative control: with the 1 rem rule overridden back to 1.1 rem, Tough seed 4 measures 759.9 (does not fit), so the rule is what makes AC 5 hold.
+  3. Info: stage-3 invitation bottom is 738.5 of 740 (slack 1.5 px) on every measured Tough case and Hard 108: it fits, but with little room. Hard seed 14 has no hatched cell at stage 3, so no invitation (as before).
+  4. Info: a full Hint walk on Tough seeds 1-10 never gets stuck, every hint equals an independent oracle and every digit the solution; claiming lessons 4-8 per puzzle (58 in total), pointing 0-3 (12).
+  5. Info: AC 2 had no pinned case for "useful pointing, no useful claiming"; checked on 1178 walk states (26 states, 16 of them with a claiming step passed over): Tough equals Tricky for step 1 and 2. Mutants (claiming not useful, pointing not useful, claiming on Hard) are killed by the oracle script.
+  6. The 8 removed assertions: all confirmed redundant. Paired mutants on main 9ccab0c and the branch (same mutant, each tree's own suite) were killed on both trees for usedMask, findNakedSingle, nextCell edge, hintFor step-1 label, hard.beyond (two), findHiddenSingle writes into the grid, findConflicts (once per group, boxes), verify (complete, conflicts only when full); one nextCell mutant (never reaches column 8) survives on both trees (not coverage lost). Removing the CSS rule, the Tough button, or swapping the button order fails g1.
+- Not tested: classifyEntry on Tough claiming (out of scope, #104); real touch input (touch events) on the picker; browsers other than headless Chrome; generation timing beyond the 10-seed batch test; wider Tough batches than seeds 1-10 on the walk; screen readers.
 
 ## Lead review
 
