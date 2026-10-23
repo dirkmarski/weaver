@@ -522,7 +522,7 @@ test('classifyEntry agrees with Hint at every step of 6 seeded Medium puzzles', 
 const T0 = emptyTally();
 // Issue 31: the two "not counted" texts, byte for byte (R, C 1-based).
 const NOT_SINGLE = (r, c, d) => 'Entered: row ' + r + ', column ' + c + ' is ' + d
-  + '. It was not a naked single, a hidden single or a pointing step at this point, so it is not counted.';
+  + '. It was not a naked single, a hidden single, a pointing step or a claiming step at this point, so it is not counted.';
 const CLASH = (r, c, d, u, r2, c2) => 'Entered: row ' + r + ', column ' + c + ' is ' + d + '. ' + d
   + ' is already in this cell\'s ' + u + ', at row ' + r2 + ', column ' + c2 + ', so it breaks the rules. It is not counted.';
 // Issue 50: the entry is fine but the grid before it is broken; `named` is the named clash, `more` adds the extra sentence.
@@ -568,14 +568,6 @@ test('creditEntry: wrong digit in the hinted cell is judged on its own', () => {
   const own = creditEntry(T0, {}, fake, H_BOX, 4, 5, '5');
   assert.strictEqual(own.text, 'Well spotted! You found a hidden single in its box on your own: row 5, column 6 is 5.');
   assert.deepStrictEqual(own.tally.hidden, { own: 1, hint: 0 });
-  assert.deepStrictEqual(own.tally.naked, { own: 0, hint: 0 });
-});
-
-test('creditEntry: a single in another cell while a hint shows counts on your own', () => {
-  const hint = hintFor(H_BOX, 1); // (4,5)
-  const res = creditEntry(T0, {}, hint, H_BOX, 5, 4, '9');
-  assert.strictEqual(res.text, 'Well spotted! You found a hidden single in its box on your own: row 6, column 5 is 9.');
-  assert.deepStrictEqual(res.tally.hidden, { own: 1, hint: 0 });
 });
 
 test('creditEntry: no judgement for overwrite, clearing or non-digits', () => {
@@ -594,7 +586,6 @@ test('creditEntry: a cell is credited once; the message shows again', () => {
   const second = creditEntry(first.tally, first.credited, null, H_BOX, 4, 5, '5');
   assert.strictEqual(second.text, first.text);
   assert.deepStrictEqual(second.tally, first.tally);
-  assert.deepStrictEqual(second.tally.hidden, { own: 1, hint: 0 });
   const third = creditEntry(first.tally, first.credited, hintFor(H_BOX, 1), H_BOX, 4, 5, '5');
   assert.strictEqual(third.text, 'Well done! You applied a hidden single: row 5, column 6 is 5.');
   assert.deepStrictEqual(third.tally, first.tally);
@@ -651,16 +642,7 @@ test('completionFor: full valid grid says solved with exact text', () => {
 test('completionFor: own and hint sums are kept apart; same wording for 0, 1 and many', () => {
   const t = (nO, nH, hO, hH, pO = 0, pH = 0, cO = 0, cH = 0) => ({ naked: { own: nO, hint: nH }, hidden: { own: hO, hint: hH }, pointing: { own: pO, hint: pH }, claiming: { own: cO, hint: cH } });
   assert.strictEqual(completionFor(clone(), t(1, 0, 0, 0)).text, 'Puzzle solved! Techniques applied: 1 on your own, 0 with a hint.');
-  assert.strictEqual(completionFor(clone(), t(0, 1, 0, 0)).text, 'Puzzle solved! Techniques applied: 0 on your own, 1 with a hint.');
-  assert.strictEqual(completionFor(clone(), t(0, 0, 1, 0)).text, 'Puzzle solved! Techniques applied: 1 on your own, 0 with a hint.');
-  assert.strictEqual(completionFor(clone(), t(0, 0, 0, 1)).text, 'Puzzle solved! Techniques applied: 0 on your own, 1 with a hint.');
-  assert.strictEqual(completionFor(clone(), t(30, 0, 10, 0)).text, 'Puzzle solved! Techniques applied: 40 on your own, 0 with a hint.');
-  assert.strictEqual(completionFor(clone(), t(12, 13, 14, 15)).text, 'Puzzle solved! Techniques applied: 26 on your own, 28 with a hint.');
-  assert.strictEqual(completionFor(clone(), t(0, 0, 0, 0, 1, 0)).text, 'Puzzle solved! Techniques applied: 1 on your own, 0 with a hint.');
-  assert.strictEqual(completionFor(clone(), t(0, 0, 0, 0, 0, 1)).text, 'Puzzle solved! Techniques applied: 0 on your own, 1 with a hint.');
   assert.strictEqual(completionFor(clone(), t(2, 3, 4, 5, 6, 7, 8, 9)).text, 'Puzzle solved! Techniques applied: 20 on your own, 24 with a hint.');
-  assert.strictEqual(completionFor(clone(), t(0, 0, 0, 0, 0, 0, 1, 0)).text, 'Puzzle solved! Techniques applied: 1 on your own, 0 with a hint.');
-  assert.strictEqual(completionFor(clone(), t(0, 0, 0, 0, 0, 0, 0, 1)).text, 'Puzzle solved! Techniques applied: 0 on your own, 1 with a hint.');
 });
 
 test('completionFor: a full grid with a conflict says conflict, never solved, whatever the tally', () => {
@@ -1086,12 +1068,8 @@ test('statusClass: reward is green (ok); not counted and not judged are neutral'
   assert.strictEqual(statusClass('reward'), 'ok');
   assert.strictEqual(statusClass('notCounted'), '');
   assert.strictEqual(statusClass(''), '');
-  assert.strictEqual(creditEntry(T0, {}, null, H_BOX, 4, 5, '5').kind, 'reward');
-  assert.strictEqual(creditEntry(T0, {}, hintFor(H_BOX, 1), H_BOX, 4, 5, '5').kind, 'reward');
-  assert.strictEqual(creditEntry(T0, {}, null, H_BOX, 4, 5, '4').kind, 'notCounted');
   const g = clone(); g[8][8] = 0; g[0][0] = g[0][1];
   assert.strictEqual(creditEntry(T0, {}, null, g, 8, 8, '9').kind, 'notCounted'); // (b)
-  assert.strictEqual(creditEntry(T0, {}, null, H_BOX, 4, 5, '').kind, '');
 });
 
 test('hintMarks: tint and marked digits for pointing (box and line, pointing digit) and for singles', () => {
@@ -1394,4 +1372,28 @@ test('claiming rewards: hinted entry message and one count per cell, four tally 
   assert.deepStrictEqual([again.text, again.tally], [r.text, r.tally]);
   const two = creditEntry(r.tally, r.credited, hintFor(CL.A, 2), CL.A, 0, 5, '3'); // another cell: the count adds up
   assert.strictEqual(tallyLines(two.tally)[4], 'Claiming: 0 on your own, 2 with a hint');
+});
+
+// ---- Issue 104: claiming on your own ----
+
+test('classifyEntry claiming: naked and hidden forms; pointing wins; a chain, a wrong digit and a conflict give null', () => {
+  const claim = (box, line, index, pointDigit) => ({ technique: 'claiming', box, line, index, pointDigit });
+  assert.deepStrictEqual(classifyEntry(CL.A, 0, 5, 3), claim(1, 'row', 2, 6)); // naked
+  assert.deepStrictEqual(classifyEntry(CL.C, 1, 3, 9), claim(4, 'row', 5, 9)); // hidden
+  assert.strictEqual(classifyEntry(CL_PC, 7, 4, 5).technique, 'pointing'); // also a claiming step
+  assert.strictEqual(classifyEntry(CL.A, 2, 4, 1), null); // single only after r1c6 = 3: a second step
+  assert.strictEqual(classifyEntry(CL.A, 0, 5, 4), null);
+  assert.strictEqual(classifyEntry(withCells(CL.A, [[0, 0, 7]]), 0, 5, 3), null);
+});
+
+test('creditEntry own claiming: Tough seeds 3 and 12 claiming, seed 1 pointing; counted once; seed 7 r2c2 = 2 is no single step', () => {
+  const pz = (n) => generatePuzzle('tough', { rng: seededRng(n) }).puzzle;
+  const a = creditEntry(T0, {}, null, pz(3), 4, 3, '6'), b = creditEntry(T0, {}, null, pz(12), 1, 2, '5');
+  assert.strictEqual(a.text, 'Well spotted! You applied claiming on your own: in column 6, the digit 6 fits only in the box of rows 7-9 and columns 4-6, so row 5, column 4 is 6.');
+  assert.strictEqual(b.text, 'Well spotted! You applied claiming on your own: in column 1, the digit 2 fits only in the box of rows 1-3 and columns 1-3, so row 2, column 3 is 5.');
+  assert.deepStrictEqual([a.tally.claiming, a.kind, a.credited], [{ own: 1, hint: 0 }, 'reward', { 39: true }]);
+  assert.strictEqual(creditEntry(T0, {}, null, pz(1), 0, 4, '7').text, 'Well spotted! You applied pointing on your own: in the box of rows 1-3 and columns 7-9, the digit 2 fits only in row 1, so row 1, column 5 is 7.');
+  const again = creditEntry(a.tally, a.credited, null, pz(3), 4, 3, '6'); // re-entry after clearing
+  assert.deepStrictEqual([again.text, again.tally], [a.text, a.tally]);
+  assert.deepStrictEqual(creditEntry(a.tally, a.credited, hintFor(pz(3), 1, 'hidden', 'tough'), pz(3), 4, 3, '6').tally, a.tally);
 });

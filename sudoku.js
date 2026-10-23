@@ -590,10 +590,10 @@
   // Which technique makes `digit` in the empty cell (r, c) of `grid` (the grid
   // just before the entry, 0 = empty) a single? Returns { technique: 'naked' },
   // { technique: 'hidden', unit: 'box' | 'row' | 'column' },
-  // { technique: 'pointing', box, line, index, pointDigit } (as findPointing; the first pointing step
-  // in findPointing order that makes the entered digit a single in this cell) or null (also null
+  // { technique: 'pointing' | 'claiming', box, line, index, pointDigit } (as findPointing / findClaiming; the first such step
+  // in their order that makes the entered digit a single in this cell, ONE step, no chains) or null (also null
   // when the grid has a conflict, the cell is filled or digit is not 1-9).
-  // Precedence: naked, hidden (units tried box, row, column), pointing.
+  // Precedence: naked, hidden (units tried box, row, column), pointing, claiming.
   function classifyEntry(grid, r, c, digit) {
     if (!Number.isInteger(digit) || digit < 1 || digit > 9) return null;
     if (findConflicts(grid).length || grid[r][c] !== 0) return null;
@@ -607,10 +607,12 @@
       if (spots.length === 1 && spots[0] === p) return { technique: 'hidden', unit: UNIT_NAMES[order[k]] };
     }
     var found = null;
-    pointingSteps(cells, function (step) {
-      var res = singleAfterStep(cells, p, step.removed, step.pointDigit);
-      if (res && res.digit === digit) found = { technique: 'pointing', box: step.box, line: step.line, index: step.index, pointDigit: step.pointDigit };
-      return found;
+    [['pointing', pointingSteps], ['claiming', claimingSteps]].forEach(function (t) { // a box-form single here would be a hidden single already
+      if (!found) t[1](cells, function (step) {
+        var res = singleAfterStep(cells, p, step.removed, step.pointDigit);
+        if (res && res.digit === digit) found = { technique: t[0], box: step.box, line: step.line, index: step.index, pointDigit: step.pointDigit };
+        return found;
+      });
     });
     return found;
   }
@@ -631,7 +633,7 @@
       return where + digit + ' is not in this cell\'s row, column or box, but ' + clash.phrase + ', so it is not counted. '
         + 'Change or clear one of them first. Entries after that count again; this one stays uncounted.' + clash.extra;
     }
-    return where + 'It was not a naked single, a hidden single or a pointing step at this point, so it is not counted.';
+    return where + 'It was not a naked single, a hidden single, a pointing step or a claiming step at this point, so it is not counted.';
   }
 
   // Decide the reward for `value` ('' or '1'-'9') entered in cell (r, c).
@@ -660,6 +662,8 @@
       var where = 'row ' + (r + 1) + ', column ' + (c + 1) + ' is ' + digit + '.';
       if (technique === 'pointing') {
         text = 'Well spotted! You applied pointing on your own: in ' + pointingClause(res) + ', so ' + where;
+      } else if (technique === 'claiming') {
+        text = 'Well spotted! You applied claiming on your own: in ' + res.line + ' ' + (res.index + 1) + ', the digit ' + res.pointDigit + ' fits only in ' + boxName(res.box) + ', so ' + where;
       } else {
         var unit = technique === 'hidden' ? ' in its ' + res.unit : '';
         text = 'Well spotted! You found a ' + technique + ' single' + unit + ' on your own: ' + where;

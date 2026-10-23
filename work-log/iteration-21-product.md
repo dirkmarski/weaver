@@ -117,3 +117,28 @@ Tech debt: unchanged from the snapshot.
 - pm-accept-103 brief (whole; task); issue #103 body (whole; spec); product-strategy.md (whole, 6 lines; currency); this log (whole; state, D-numbering); test-103/README.md (whole; how to re-run); work-log/issue-103-tough-level.md sections Reviewer, Tester, Lead review (whole sections; verdicts); dev-103 README, stage2.js, walk.js, pagelib.js lines 17-95 (to reuse the page driver for shots and play-through).
 - Screenshots viewed: pm-103 picker-375, stage3-375; test-103 picker-1280; dev-103 stage3-s1-360x740.
 - Personas a, b, c: brief.md and the nine shots in pm-103/persona/ only (each confirmed; no other file, no LOG.md).
+
+## #104 AC 2 pin (lead question, head 1383ed1)
+- D15: AC 2 pin seed 7 r2c2 = 2 replaced by seed 12 r2c3 = 5 (claiming, column 1, D 2, top-left box). Seed 7 r2c2 is a two-step chain (column 8 D2 leaves 2 in r2c5); seed 7 has no single-step claiming entry at the start (my scan: 0). My original pin was wrong (I checked null-today only, not claiming-after). Seed 12 checked: null on 93744fb, claiming on 1383ed1. Seeds 3/1 unchanged. Issue body + Change log updated; comment 6359497282. Lesson: pin checks must verify the intended outcome, not only the current one.
+
+## Acceptance #104 (PR #107, head 96d7557): ACCEPTED (persona gate missed, D16)
+- Product code at 96d7557 = b7b1879. PM runs on 96d7557: suite 184/184, skipped 0; tester scripts with ROOT = main checkout: t1-oracle 9/9, t2-page 39/39, t8-ac6 11/11.
+- AC1 pass (t1 oracle 49200 cells, 0 mismatches, 102 pointing+claiming cells return pointing; reviewer mutants: order, naked/hidden form, chain, conflict killed). AC2 pass (t2 real page: seed 3 r5c4 = 6 and seed 12 r2c3 = 5 exact text, seed 1 r1c5 = 7 pointing = main; D15 pin). AC3 pass (t2 once per cell, re-entry message without count, hinted claiming 0/1; reviewer finding 3 test at tests/sudoku.test.js:1369). AC4 pass (t2 text 3 exact on seed 7 r2c2 = 2, texts 1/2 = main). AC5 pass (page test g1 + t2 at 375x812 and 360x740: green rgb(26,127,55), "1 on your own, 0 with a hint"). AC6 pass (2374/1484 = 1.5997, skipped 0; removals confirmed redundant by developer, reviewer and tester mutants: accepted).
+- Play check (PM): seed 3 and seed 12 shots checked by hand: column 6 D6 confined to rows 7-9 box clears r9c4, r5c4 is the only 6 in column 4 (hidden); column 1 D2 confined to top-left box clears 2 from r2c3, leaving {5} (naked). Messages correct.
+- Personas (brief pm-104/persona-brief.md; shots seed 3 at 375x812, -full, 360x740; seed 12 at 375x812 -full): "the reward makes sense" a 3, b 4 = avg 3.5 (< 4.0). Both verified both boards correctly; both say the message skips the final step (a: seed 12 "digit 2 ... is 5" looks wrong or unexplained). Tally line clear (a, b); "pointing in reverse" jargon (a, b); Claiming line below the fold (a, b; known, tester F4); b: no row/column numbers, highlight the named column/box, gap above the buttons.
+- D16: accept despite the persona gate miss. All ACs pass and every message is correct; the gap is the message shape I specified, shared with own pointing (it9). Fixing only claiming in #104 would make the two inconsistent; fixing both is new scope. Follow-up #108 (own pointing and claiming state the final step, as hinted step 3 does) is it22 item 1 with the same persona gate. Risk accepted: one iteration with a terse own-claiming reward.
+- D17: reviewer F2 / tester F2 (hint match in creditEntry unguarded for row or column alone; pre-existing) -> tech debt. Tester F4 (tally lines below the fold on phones) -> mobile backlog watch.
+- it21 complete: #102, #103, #104 accepted.
+
+## Backlog (PM, after #104 acceptance; it21 closed)
+1. #108 own pointing and claiming rewards state the final step (it22 item 1; persona gate 3.5 at #104).
+2. Claiming follow-ups: one-line level descriptions on the picker (Tough; a, b, c at #103); "pointing in reverse" is jargon (a, b at #104; plain "what claiming is" cue); struck badge in the naked target cramped; block compression of struck lists; pointing hidden step 3 "its U" -> name unit (D4; fold into #108); target highlight easy to miss; highlight the named line/box on own rewards (b at #104); step numbers on marks; key with three legends long; hidden step 3 does not say why the unit's other cells are out (watch).
+3. Explanation follow-ups (snapshot item 2).
+4. Mobile remainder (snapshot item 3; picker 3+2 wrap lopsided; tally lines below the fold at 360/375, incl. Claiming (tester F4, a, b); gap between board and buttons (b); watch: stage-3 invitation 1.5 px spare at 360x740).
+5-8. Unchanged (snapshot items 4-7).
+Tech debt: test ratio 0.4 lines headroom (2374/1484); creditEntry hint match unguarded for row/column alone (D17, add a test when touching creditEntry); g1 seed-1 struck cells (deferred nit).
+
+## Documents read (#104 acceptance)
+- pm-accept-104 brief (whole; task); issue #104 body (whole; spec); work-log/issue-104-own-claiming.md Reviewer/Tester/Lead review sections (whole sections; verdicts); test-104/README.md first 60 lines (re-run); this log (whole; state, D-numbering, backlog); sudoku.js grep for message texts and lines 650-672 (own message code, for #108).
+- Screenshots: test-104 own-claiming-375x812 and -full; dev-104 own-claiming-seed12-375x812-full.
+- Personas a, b: persona-brief.md and the four shots in pm-104/shots/ only (each confirmed; no other file, no LOG.md).
