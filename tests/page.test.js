@@ -56,6 +56,7 @@ async function open(level, seed) {
   if (level) await click('[data-level=' + level + ']');
 }
 const click = (sel) => page.eval('document.querySelector(' + J(sel) + ').click()');
+const statusSize = () => page.eval('getComputedStyle(document.getElementById("status")).fontSize');
 const hints = async (n) => { for (let i = 0; i < n; i++) await click('#hint'); };
 // Keydown on the cell input (the page's own key handler): list of [pos, key].
 const keys = (list) => page.eval('(' + J(list) + ').forEach(function (k) { document.querySelector("input[data-pos=\\"" + k[0] + "\\"]")' +
@@ -277,6 +278,28 @@ describe('page (headless Chrome)', () => {
     s = await read();
     assert.strictEqual(s.status, 'Well done! You applied pointing: row 1, column 5 is 7.');
     assert.strictEqual(s.tally[2], 'Pointing: 0 on your own, 1 with a hint');
+  });
+
+  it('g1. Tough through the picker (fifth button, in order): seed 1 and seed 3 first Hint are claiming (pins), steps 2 and 3 name the struck cells', async () => {
+    await open(null, 1);
+    assert.deepStrictEqual(await page.eval('[].map.call(document.querySelectorAll("#picker button"), function (b) { return b.dataset.level; })'), ['easy', 'medium', 'tricky', 'tough', 'hard']);
+    await click('[data-level=tough]');
+    await click('#hint');
+    let s = await read();
+    assert.deepStrictEqual([s.level, s.target, s.status.startsWith('Hint: try claiming. In row 3, the digit 2 fits only in the box of rows 1-3 and columns 4-6')], ['Difficulty: Tough', [4], true]);
+    await open('tough', 3);
+    await hints(4);
+    s = await read();
+    assert.deepStrictEqual([s.target, s.removed, s.status.includes('not in row 7, column 5; row 9, columns 4 and 5 (struck).'), s.status.includes('the only cell in column 4 where 6 fits'), await statusSize()], [[39], [58, 75, 76], true, true, '17.6px']); // 1.1 rem at >= 560 px
+    try { // 360x740: seed 4 reaches claiming after three hinted entries; its long step 2 still leaves the Next step button in view
+      await page.send('Emulation.setDeviceMetricsOverride', { width: 360, height: 740, deviceScaleFactor: 1, mobile: true });
+      await open('tough', 4);
+      for (let i = 0; i < 3; i++) { await click('#hint'); const q = (await read()).target[0]; await keys([[q, String(game('tough', 4).solution.flat()[q])]]); }
+      await hints(3);
+      assert.deepStrictEqual([await page.eval('document.getElementById("next-step").getBoundingClientRect().bottom <= 740'), await statusSize()], [true, '16px']); // #status.steps is 1 rem below 560 px
+      await click('#verify'); // other messages keep 1.1 rem
+      assert.deepStrictEqual([await page.eval('document.getElementById("status").className !== "steps"'), await statusSize()], [true, '17.6px']);
+    } finally { await page.send('Emulation.clearDeviceMetricsOverride'); }
   });
 
   // Hard seeds where Hint falls back to claiming once its own singles and pointing steps are typed: [seed, target, confined, removed, hatched, D].
