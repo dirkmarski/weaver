@@ -1,15 +1,15 @@
 # WIP: current
 
-Last updated: 2026-10-28, iteration 22, #110 merged (PR #112) (lead, session d2424c00-a6fb-45e6-86ab-53111ee2576f)
+Last updated: 2026-10-28, iteration 22, #108 PR #113 at PM acceptance (lead, session d2424c00-a6fb-45e6-86ab-53111ee2576f)
 
 ## Active run
 - Iteration 22, PM order: #110 ATDD foundation -> #108 own pointing/claiming rewards state the final step -> #111. One lead invocation per issue, in that order.
-- #110 done: PR #112 merged (code head 53d7b63, PM accepted a1b3474). Next: #108 lead invocation.
+- #110 done: PR #112 merged. #108: PR #113 open (code head f60491b), reviewed, tested, lead-checked; PM acceptance with personas (gate 4.0) pending.
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #108 own pointing and claiming rewards state the final step | next | PM writes specs on the #108 branch; lead merges main into it first so specs fail on assertions, not missing steps; persona gate 4.0 (closes D16) | PM, lead |
+| #108 own pointing and claiming rewards state the final step | PR #113, PM acceptance | PM accepts on a stated head (personas, gate mean >=4.0, no case <3.5); lead merges with merge commit | PM, lead |
 | #111 pointing explanation names the unit in step 3 (hidden form) | waiting on #108 | same: merge main first, red specs before development | PM, lead |
 
 ## Starting the next run
@@ -20,7 +20,7 @@ Last updated: 2026-10-28, iteration 22, #110 merged (PR #112) (lead, session d24
 - Reusable it22 scripts (session-scoped, under `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/d2424c00-a6fb-45e6-86ab-53111ee2576f/scratchpad/test-110/`, see its README): `errcase.sh` (32 runner error cases), `mutate.py`, `oracle.js` (node + real Chrome page check of spec texts on a fixed puzzle). it21 scripts (pagelib.js, oracles, mutant runners) are in the it21 session scratchpad listed in the it21 close log, if /tmp still holds them.
 
 ## Open issues / PRs
-- #108 open (it22 item 2), #111 open (item 3). #110 closed by PR #112.
+- #108 open, PR #113 (it22 item 2), #111 open (item 3). #110 closed by PR #112.
 
 ## Blockers / waiting on
 - none

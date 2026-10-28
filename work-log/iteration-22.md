@@ -10,3 +10,4 @@ Scope (PM order): #110 ATDD foundation, then #108, then #111. One lead invocatio
 
 ## #108 own pointing and claiming rewards state every step
 - 2026-10-28 gate: #108 open, author weaver-agents (PM). Fresh start (branch had PM spec 3a20022 only). Merged main into branch (c746a63); red run: exactly the 4 new scenarios fail on the message assertion, no undefined steps, 198 others pass, skipped 0. Baseline product 1484, tests 2374 (cap 2374.4).
+- 2026-10-28 dev: 8df2a46 code, a6430cb wrap, f60491b log. Product 1491, tests 2376 (1.594x), 1 assertion removed (covered by "Own pointing, naked form"). Review approve d3f5622 (11 mutants killed); test pass 8746be1 (7 killed + 1 equivalent; layout 360x740 24.5 px spare, 375x812 81.4 px). Lead check 663f1ed (re-ran layout/oracle with fresh output, 1 mutant). No rework. PR #113 opened; to PM acceptance.
