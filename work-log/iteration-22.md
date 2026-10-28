@@ -17,3 +17,4 @@ Scope (PM order): #110 ATDD foundation, then #108, then #111. One lead invocatio
 
 ## #111 pointing explanation names the unit in step 3 (hidden form)
 - 2026-10-28 gate: #111 open, author weaver-agents (PM). Fresh start (branch had PM spec 37b7a9c only). Merged main 64242b1 into the branch (83f6891). Specs: the 4 new runs fail as undefined steps; part A (steps only) must turn this into assertion failures before any product change. Baseline tests 2376 / product 1500 (1.584x, cap 2400).
+- 2026-10-28 part A 3cb1b4e (steps/hints.js, driver hintTwice; spec-implementation 323 lines). Lead re-ran: specs 10 pass / 4 fail, all 4 on the step-3 assertion (actual "its row/column/box"), no undefined steps; full 203/4/0 skipped. Red verified before any product change.

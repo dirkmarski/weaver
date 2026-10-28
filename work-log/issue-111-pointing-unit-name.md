@@ -17,6 +17,9 @@ Issue: https://github.com/dirkmarski/weaver/issues/111. Branch: `issue-111-point
 - Red run: specs 14 runs, 10 pass, 4 fail on assertions: actual "in its row/column/box where" vs expected "in row 4 / column 1 / the box of rows 1-3 and columns 1-3 where"; steps 1-2 and the conclusion of the whole-explanation run match. Full suite 207: 203 pass, 4 fail, 0 skipped.
 - Sanity: temporarily normalising the unit phrase in the last-line step made the 3 outline runs pass (13 pass), reverted; the real step fails.
 
+## Lead red check
+- Lead re-ran part A 3cb1b4e: specs 10 pass / 4 fail, each on the step-3 text only (actual "its row/column/box"), no undefined or ambiguous steps; full suite 203 pass / 4 fail / 0 skipped. Red runs saved in the session scratchpad 111/red-specs.txt and red-full.txt.
+
 ## Reviewer
 
 ## Tester
