@@ -1,28 +1,30 @@
 # Weaver wiki: index
 
 Durable facts and learnings about the weaver project. History of events lives in the work log (`work-log/`), not here.
-Snapshot basis: end of iteration 21 (main at 96a311c, 184 tests passing; tests 2374 / product 1484, cap 2374.4, 0.4 lines of headroom). Pruned at the it21 close. Next: iteration 22 starts with #108 (backlog item 1).
+Snapshot basis: end of iteration 22 (main at cc3f269, 207 tests passing incl. 14 spec scenarios; `tests/` 2376 / product 1500 = 1.584x, cap 2400, 24 lines of headroom; `spec-implementation/` 323, outside the cap). Pruned at the it22 close. Next: iteration 23 scoping from backlog.md item 1.
 All pages live under `memory/wiki/` (there is no top-level `wiki/`).
 
 ## Pages
 - [product.md](product.md): what weaver is today: levels (incl. Tough), techniques taught (singles, pointing, claiming), Hint, rewards and counts, known gaps and layout figures.
-- [architecture.md](architecture.md): files, main exports of `sudoku.js`, how `index.html` wires them, tests, sizes.
-- [process.md](process.md): how the team works: run types, roles, branch/PR/commit conventions, per-issue flow.
-- [lessons.md](lessons.md): durable lessons from iterations 1-21, compressed by theme (scoping, testing, review, coordination, tooling).
-- [backlog.md](backlog.md): PM candidate list and open tech debt (owned by the PM; snapshot at iteration 21 end, with the last persona evidence per candidate). Scoping starts here.
-- [glossary.md](glossary.md): sudoku terms and project terms.
+- [architecture.md](architecture.md): sections "Files" (sizes), "Exports", "How index.html wires it", "ATDD" (runner, steps, drivers), "Tests".
+- [page-tests.md](page-tests.md): which page test pins what (auxiliary to architecture.md "Tests").
+- [process.md](process.md): how the team works: run types, roles, conventions (incl. the brief skeleton), per-issue flow (red first), test strategy applied (ATDD, ratio), rework re-checks, work-log format.
+- [lessons.md](lessons.md): durable lessons from iterations 1-22, compressed by theme (scoping, testing, review, coordination, tooling).
+- [backlog.md](backlog.md): PM candidate list and open tech debt (owned by the PM; snapshot at iteration 22 end, with the last persona evidence per candidate). Scoping starts here.
+- [glossary.md](glossary.md): sudoku terms and project terms (incl. ATDD terms).
+- Outside the wiki: `specs/README.md` (spec conventions, PM-owned) and the `.feature` files.
 
 ## What to read, by role (sections, not whole pages)
 List a page's sections with `grep -n '^## ' <file>`, then print only the one you need: `awk '/^## Testing/{f=1;print;next} /^## /{f=0} f' memory/wiki/lessons.md`. Whole-page reads are for the pages marked whole below.
-- Lead (every new run, even in the same session): `wip/current.md` and this index; process.md "Per-issue flow" and "Conventions" ("Rework re-checks" only when a rework round starts; not the whole page); lessons "Coordination". Briefs: the skeleton in process.md "Conventions", not earlier briefs. Issue logs: the section you need (template in process.md "Work-log entry format"), never whole logs; earlier iteration logs only for diagnosis.
-- PM (scoping): backlog.md whole; product.md "Hint", "Rewards and counts" and "Known product gaps" (not the whole page); lessons "Scoping and spec"; process.md: grep `ratio` and the PM line of "Work-log entry format". Never open an earlier `work-log/iteration-*-product.md`, not even for its format (it20 and it21 PMs did: the format is the PM line above, scores are in backlog.md). Code: architecture.md "Exports" first for result shapes, then `grep -n` the function and read only its range (it21 scoping read about 600 lines of sudoku.js).
-- Developer: architecture.md whole; lessons "Testing" (and the ratio rule in process.md "Test strategy applied").
-- Reviewer: lessons "Review" and "Testing"; the issue log's `## Lead` section only.
-- Tester: process.md "Test strategy applied" (tester line); lessons "Testing" and "Tooling" only (not "Review", "Coordination" or the whole page); the previous tester's scratch README if the brief gives one.
+- Lead (every new run, even in the same session): `wip/current.md` and this index; process.md "Per-issue flow" and "Conventions" ("Rework re-checks" only when a rework round starts; "Test strategy applied" when planning the red run or a ratio question; not the whole page); lessons "Coordination". Briefs: the skeleton in process.md "Conventions", not earlier briefs; list each section to read as its `awk` command. Issue logs: the section you need (template in process.md "Work-log entry format"), never whole logs; earlier iteration logs only for diagnosis.
+- PM (scoping): backlog.md whole; product.md "Hint", "Rewards and counts" and "Known product gaps" (not the whole page); lessons "Scoping and spec"; process.md "Test strategy applied" (specs and ratio lines) and the PM line of "Work-log entry format". Specs: `specs/README.md`, the feature in the area you change, and `grep -rn 'define(' spec-implementation/steps/` to reuse step texts. Never open an earlier `work-log/iteration-*-product.md`. Code: architecture.md "Exports" first for result shapes, then `grep -n` the function and read only its range.
+- Developer: architecture.md "Files" and "Exports", plus "How index.html wires it" for UI work and "ATDD" for steps/drivers (not the whole page); page-tests.md only when adding or changing a page test; lessons "Testing"; process.md "Test strategy applied" (developer, specs and ratio lines).
+- Reviewer: lessons "Review" and "Testing"; the issue log's `## Lead` section only; architecture.md "ATDD" when the diff touches `spec-implementation/`.
+- Tester: process.md "Test strategy applied" (tester and specs lines); lessons "Testing" and "Tooling" only; the previous tester's scratch README if the brief gives one. Mutants go into the file the brief names, never into `specs/`.
 - Personas: their brief and screenshots only.
 
 ## How to use / maintain
-- The lead curates the wiki. Read the page you need; follow the links to the work log for evidence.
+- The curator curates the wiki at each close; the lead keeps it correct during an iteration. Read the section you need; follow the links to the work log for evidence.
 - Keep pages short and factual (about 40-120 lines). One fact in one place.
 - When a fact changes, update the page. Do not append history ("in iteration 9 we changed..."); that belongs in the work log.
 - A lesson replaced by a later one is rewritten to its current form, with one line on what it replaced.

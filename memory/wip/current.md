@@ -1,26 +1,24 @@
 # WIP: current
 
-Last updated: 2026-10-28, iteration 22, #111 merged (PR #114) (lead, session d2424c00-a6fb-45e6-86ab-53111ee2576f)
+Last updated: 2026-10-28, iteration 22 close (curator, session d2424c00-a6fb-45e6-86ab-53111ee2576f)
 
 ## Active run
-- Iteration 22, PM order: #110 ATDD foundation -> #108 own pointing/claiming rewards state the final step -> #111. One lead invocation per issue, in that order.
-- #110 done: PR #112 merged. #108 done: PR #113 merged (code a3e4b0d, PM accepted 578db0f after one rejection and a spec rework, AC6 4.23). #111 done: PR #114 merged (code b2de413, PM accepted ebc876c, D10-D12). Iteration 22 items all delivered; next: iteration 22 close (curator, PM backlog order in iteration-22-product.md).
+- Iteration 22 closed: #110 (PR #112), #108 (PR #113), #111 (PR #114) merged; main cc3f269, 207 tests pass. Wiki refreshed to the it22 state.
+- Next: iteration 23 scoping by the PM from `memory/wiki/backlog.md` (item 1: highlight the named cells on the grid).
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| it22 close | next | closing lead: wiki/WIP/backlog snapshot via iteration-22-close branch | lead, curator |
+| it22 close | done | wiki/WIP merged via `iteration-22-close` (closing lead) | lead |
+| it23 | not started | PM scoping | PM |
 
 ## Starting the next run
-- ATDD (from #110): `node --test` runs `specs/**/*.feature` via `spec-implementation/specs.test.js`; specs-only `node --test spec-implementation/specs.test.js`. specs/ is PM-only (hook). Steps hold assertions, `drivers/` alone loads `sudoku.js`. spec-implementation/ is not under the tests/ 1.6x cap (PM D2), measured on its own (303 lines after #110; PM D5: growth should be steps/drivers, any runner change justified in the PR). PM D6 spec rules: every Examples column used by a step, no `|` in cells. Step texts are global across features: a new steps file must not redefine an existing text (ambiguous); reuse `the message reads "..."` etc. from `steps/own-singles.js`.
-- Ratio (tests/ only) after #108: tests 2376 / product 1500 = 1.584 (cap 2400, 24 lines headroom). New behaviour can be pinned by specs instead of unit tests.
-- Layout at 360x740 is tight: after #108 the longest own reward (pointing hidden, 269 chars) is 7 lines, #status bottom 715.5, 24.5 px spare. Own rewards use U+2011 in box ranges, hints use "-" (PM C2, open). After #111 (D10): 360x740 box-case pointing step 3 leaves grid top 5.8 px, #key 1.5 px spare; no further step-3 growth without shorter box names or a grid highlight.
-- Ids are swapped relative to their roles (`#link` = reserve, `#key` = invitation); read architecture.md before touching them.
-- Reusable #108 scripts: session scratchpad `test-108/` and `test-108/r1/` (README: lib.js 5 positions, oracle.js, layout.js with range-split check, mutate.py). `gh pr view/edit` fails on token scopes; use `gh api` REST.
-- Reusable it22 scripts (session-scoped, under `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/d2424c00-a6fb-45e6-86ab-53111ee2576f/scratchpad/test-110/`, see its README): `errcase.sh` (32 runner error cases), `mutate.py`, `oracle.js` (node + real Chrome page check of spec texts on a fixed puzzle). it21 scripts (pagelib.js, oracles, mutant runners) are in the it21 session scratchpad listed in the it21 close log, if /tmp still holds them.
+- Method and rules: process.md "Per-issue flow" (red first) and "Test strategy applied" (ATDD, ratio); runner facts: architecture.md "ATDD".
+- Layout is at its limit at 360x740 (product.md "Known product gaps", D10): any longer pointing-hidden step 3 needs backlog item 1 or 2 first.
+- Reusable it22 scripts (session scratchpad `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/d2424c00-a6fb-45e6-86ab-53111ee2576f/scratchpad/`, if /tmp still holds them; copy, do not edit in place): `test-110/` (errcase.sh 32 runner error cases, mutate.py, oracle.js), `test-108/` (README covers r1/; lib.js 5 positions, oracle.js, layout.js, mutate.py; the 5th-position pre-fill order matters: tally 2 if r1c5 is entered first), `111/test/` (pos.js layout, texts.js, oracle.js, mutate.py), PM `pm-it22/` (spike.js, check.js spec-example check, layout/; no README). The other folders have a README.
 
 ## Open issues / PRs
-- none open for it22: #111 closed by PR #114, #108 by PR #113, #110 by PR #112. #111 tester scripts: session scratchpad `111/test/` (README). Agent worktrees removed after the merge. #108 closed by PR #113, #110 by PR #112.
+- none open (check GitHub on restart).
 
 ## Blockers / waiting on
 - none
