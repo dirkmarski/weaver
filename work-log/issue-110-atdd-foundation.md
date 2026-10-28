@@ -43,6 +43,13 @@ Issue: https://github.com/dirkmarski/weaver/issues/110 . Branch: issue-110-atdd-
 - Counts: product 1484, tests/ 2374 (unchanged), spec-implementation/ 208 (gherkin 75, specs.test 71, driver 28, steps 34). Layering grep: only drivers/game.js requires sudoku.js; no "assert" in drivers/.
 - Not tested: Windows path separators, escaped pipes in tables, tags on Background/Rule, Linux Chrome, node 18/22 (Node 24.21 only), slow-machine timing, page driver (out of scope).
 
+### Re-test (rework 1)
+- Claude Sonnet 5.5, session d2424c00-a6fb-45e6-86ab-53111ee2576f, head e457f2b. Verdict: pass (no blocker). Full run (Chrome) 197 tests, 197 pass, 0 fail, 0 skipped, 3.8 s; specs-only 5/5. The 8 `ATDD runner:` self-checks are distinct from the 5 spec tests; no test name appears twice.
+- Findings F1 and F2 closed: placeholder without column now `specs/x/nomatch_silent.feature:4: no Examples column for placeholder <y>: value <y>`; assertion failure now `specs/x/failing_assert.feature:4: Then value is 5` with `[cause]: AssertionError` (and for a plain Error `failing_step.feature:4: When fail step`). New: step after Examples -> `step_after_examples.feature:7: step after Examples` parse error.
+- Mutants (a) naked text and (b) step definition removed: identical results to the first test (1 fail; 2 undefined), (a) now with file:line. Oracle: ORACLE PASS, output identical. Error cases: 31 old plus 1 new, only changes are the two fixes above and old-run artifacts (mis-named cases, a since-edited case).
+- Counts: spec-implementation 286 (gherkin 76, runner 79, runner.test 55, specs.test 14, driver 28, steps 34), tests/ 2374 unchanged, product unchanged. Layering grep clean.
+- Not tested: as before, plus runner self-check mutants (reviewer did them), Windows paths.
+
 ## Lead review
 
 ## Lead: acceptance and merge
