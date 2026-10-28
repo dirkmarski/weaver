@@ -27,6 +27,33 @@ Issue: https://github.com/dirkmarski/weaver/issues/111. Branch: `issue-111-point
 - Lead re-ran part A 3cb1b4e: specs 10 pass / 4 fail, each on the step-3 text only (actual "its row/column/box"), no undefined or ambiguous steps; full suite 203 pass / 4 fail / 0 skipped. Red runs saved in the session scratchpad 111/red-specs.txt and red-full.txt.
 
 ## Reviewer
+- Reviewer: Claude Sonnet 5.5 (claude-sonnet-5-5), session d2424c00-a6fb-45e6-86ab-53111ee2576f. Head reviewed: b2de413. 2026-10-28.
+- Verdict: approve (no blocking findings).
+- Findings:
+  1. (info) sudoku.js: `unitName` is hoisted above the explain/nudge branch and shared; naked form gets '' and never uses it. Nudge text byte-identical to before. Step 3 uses boxName with default ASCII "-". Correct and a net reduction in duplication.
+  2. (info) README Hint paragraph: step 3 text and the U definition match the code (row N, column N, box wording); the first-click description is unchanged. Only this sentence changed.
+  3. (info) Tests adapted, not duplicated: 5 assertions edited in place (page.test.js 2, sudoku.test.js 3), no lines added or removed. tests 2376 / product 1500 = 1.584 (cap 1.6). No assertion removed.
+  4. (info) Step definitions: 4 new steps in steps/hints.js, no clash with own-singles.js; assertions live in the steps; driver hintTwice asserts nothing. Steps can fail (see D1).
+  5. (low) Step 3 for the column unit is pinned by the spec (seed 14) only; unit/page tests pin row and box. Column index mutants are killed by the spec and by the existing nudge test. No action.
+  6. (low) Driver mutant D2 (preferredTechnique level 'easy' instead of the given level) survives: the 3 positions have a fresh tally and give the same teaching at either level. Not an AC; no action.
+- Mutants (each diff non-empty, applied with Python, reverted; `node --test` per mutant):
+| id | change | result | killed by |
+|----|--------|--------|-----------|
+| M1 | box unit name -> "its box" | killed | spec outline (box row); sudoku.test "the unit is the box when box, row and column all qualify" |
+| M2 | row/column index +2 | killed (7) | spec outline rows 1-2, whole-explanation; page f1a, f1b; sudoku "pointing, column line, hidden form"; "issue 56 pins" |
+| M3 | swap row/column index | killed (7) | same as M2 |
+| M4 | step 3 reverts to "its <unit>" | killed (9) | spec outline x3, whole-explanation; page f1a, f1b |
+| M5 | column index +1 extra (column only) | killed (2) | spec outline column row; sudoku "pointing, column line, hidden form" |
+| M6 | box branch never taken | killed (2) | spec outline box row; sudoku box test |
+| M7 | step 3 "its box"/"its <unit>" via other expression | killed (9) | spec outline, page f1a/f1b |
+| M8 | nudge "Then look at its <unit>" | killed (2) | sudoku "column line, hidden form"; "box when box, row and column qualify" |
+| M10 | U+2011 in boxName for hints | killed (2) | spec outline box row; sudoku box test |
+| M11 | hidden branch uses naked text (condition inverted) | killed (11) | spec outline, whole-explanation, page, sudoku |
+| M12 | box index with r and c swapped | killed (1) | sudoku "unit is the box ... (row line, box 7)" only (spec box position is symmetric, box 0) |
+| D1 | driver hintTwice returns step 1 | killed (4) | all 4 spec runs (the last-line / whole-explanation steps) |
+| D2 | driver hintTwice uses level 'easy' | survived | equivalent on these positions (finding 6) |
+- Suite on clean head b2de413: tests 207, pass 207, fail 0, skipped 0.
+- Not tested: layout (tester, AC5), page rendering of the box case, naked-form step 3 beyond the existing tests, README sentences other than Hint pointing, claiming and hidden-single code paths (only checked unchanged by diff).
 
 ## Tester
 
