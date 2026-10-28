@@ -1,0 +1,9 @@
+# Iteration 22: lead log
+
+Lead: Claude Opus 5.5 (claude-opus-5-5), session d2424c00-a6fb-45e6-86ab-53111ee2576f.
+Scope (PM order): #110 ATDD foundation, then #108, then #111. One lead invocation per issue. Branch rule: `issue-N-<slug>`, logs travel on the issue branch.
+
+## #110 ATDD foundation
+- 2026-10-28 gate: #110 open, author weaver-agents (PM). Branch issue-110-atdd-foundation at 24383ae (PM spec + PM log). Fresh start (no prior lead work). Baseline: 184 pass / 0 skipped, 4.4 s; product 1484, tests 2374 (cap 2374.4). spec-implementation/ measured separately (PM D2, about 250 lines).
+- 2026-10-28 dev: red 8dc30a1, green b5eb831 (+a8f48e3 comment). Review approve (714fc3c, 2 survivors on runner guards, placeholder silent pass); test pass (8c63ffc, assertion failures lacked feature file:line). Rework 1 d3e4da0 (R1-R4, runner self-checks); re-review approve e457f2b, re-test pass 67d5d06. Rework 2 53d7b63 (empty feature fails), lead delta re-check (deviation logged in issue log). Code head 53d7b63, 198/198, spec-implementation 303 lines (budget ~250, justified).
+- 2026-10-28 #110 PM accepted a1b3474 (D5 budget 303, D6 limits); merged PR #112 with a merge commit. Memory notes for the closing lead: tester r1 mutant (a) edited specs/ in a worktree instead of sudoku.js (brief should name the file and forbid specs/ edits in copies too); tester r1 skipped assigned wiki reads; lead delta re-check for rework 2 (deviation). ATDD facts for architecture.md/process.md: runner layout, specs-only command, global step registry, PM D5/D6.
