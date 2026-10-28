@@ -101,6 +101,17 @@ The page tests (`tests/page.test.js`) load the real `index.html` in one headless
     CHROME_PATH=/path/to/chrome node --test
     WEAVER_NO_CHROME=1 node --test     # page tests skipped, unit tests only
 
+Executable specifications (ATDD): `node --test` also runs every `specs/**/*.feature` straight from the file (`spec-implementation/specs.test.js` with the parser `gherkin.js`), one test per scenario and per Examples row. Three layers:
+- `specs/` - the Gherkin feature files. Owned and written by the product manager only; the team never edits them (a gap goes to the PM).
+- `spec-implementation/steps/` - the DSL: step definitions that read like the domain and hold all the assertions. An undefined or ambiguous step fails its scenario, with the file and line.
+- `spec-implementation/drivers/` - the protocol driver (game logic only for now): the only code that loads `sudoku.js`, with no assertions.
+
+Run only the specs:
+
+    node --test spec-implementation/specs.test.js
+
+The runner checks itself in `spec-implementation/runner.test.js` (tests named `ATDD runner: ...`, inline features and throwaway steps; they are not spec scenarios). A failing step is reported with its feature file:line and step text; an Examples placeholder with no column, and a step after an Examples block, fail with file:line.
+
 Later UI work adds its page checks to `tests/page.test.js`. Chrome and its temporary profile are removed when the run ends, also after a failed test or on Ctrl-C / SIGTERM (not after `kill -9`).
 
 ## Files
