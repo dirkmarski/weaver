@@ -56,6 +56,26 @@ Issue: https://github.com/dirkmarski/weaver/issues/111. Branch: `issue-111-point
 - Not tested: layout (tester, AC5), page rendering of the box case, naked-form step 3 beyond the existing tests, README sentences other than Hint pointing, claiming and hidden-single code paths (only checked unchanged by diff).
 
 ## Tester
+- Tester: Claude Sonnet 5.5 (claude-sonnet-5-5), session d2424c00-a6fb-45e6-86ab-53111ee2576f. Tree: detached 2929cf0 (code b2de413); main 64242b1 for comparison.
+- Verdict: pass. The box case fits at 360x740 and 375x812; see finding 1 for the 1.5 px margin (unchanged from main, by design).
+- Findings:
+  1. Layout, info (PM may want to know): at 360x740 the invitation bottom is 738.5 (1.5 px spare) in every case, on main and on the branch, because the page scrolls it into view with a 1 px scroll margin. The longer box text is absorbed by scrolling: scrollY 56 -> 74, grid top 23.8 -> 5.8, target row still in view (78.2-112.7), #status bottom 674.5, no clipping, no horizontal scroll. The real headroom left is the grid top (5.8 px, one more 18 px line would push row 1 off screen). At 375x812 the box case needs no scroll: invitation bottom 793.6, 18.4 px spare (main 36.4).
+  2. Texts: on the real page the explanation reads exactly as the spec for row (seed 8), column (seed 14) and box (seed 1, 9 hinted fills); nudge, steps 1-2 and the line count are identical to main; only step 3 differs.
+  3. Mutant C (box index transposed in the unit name) is killed by one test only (tests/sudoku.test.js:906, the WALL_BOX position); the spec box scenario survives it because rows 1-3/columns 1-3 is symmetric under transposition. Low.
+  4. Mutant G (step 3 unit name upper-cased) and the others die on the spec runs and several tests; no survivors.
+- Measurements (px, Tricky, stage 3 after the last Hint; key = #key bottom, st = #status bottom; main in brackets):
+  | position | viewport | key | st | viewport h | spare key | scrollY | grid top |
+  | box (seed 1 + 9) | 360x740 | 738.5 (738.5) | 674.5 (674.5) | 740 | 1.5 (1.5) | 74 (56) | 5.8 (23.8) |
+  | row (seed 8) | 360x740 | 738.5 (738.5) | 674.5 | 740 | 1.5 (1.5) | 20 (20) | 59.8 (59.8) |
+  | column (seed 14) | 360x740 | 738.5 (738.5) | 674.5 | 740 | 1.5 (1.5) | 20 (38) | 59.8 (41.8) |
+  | box | 375x812 | 793.6 (775.6) | 745.6 (727.6) | 812 | 18.4 (36.4) | 0 (0) | 79.8 |
+  | row, column | 375x812 | 757.6 | 709.6 | 812 | 54.4 | 0 | 79.8 |
+  | extra Tricky 44 (box, 326 chars), 20 (row) | 360x740 | 738.5 | 674.5 | 740 | 1.5 | 56, 38 | 23.8, 41.8 |
+  Step 3 text lengths: spec box 358 (main 330), row/column 290 (292).
+- Oracle: 5 positions (3 spec grids, Tricky 20 row, Tricky 44 box), plain rules plus the pointing elimination: the named unit holds the cell as the only place for the digit in all 5.
+- Mutants (sudoku.js only, reverted, tree clean): A column named as row, B pointing line named, C box transposed, D box wording "column", E old text restored, F index off by one, G upper-cased unit: all killed. Suite on the clean head: 207 tests, 207 pass, 0 fail, 0 skipped, 3.9 s.
+- Not tested: the longest own-reward #status (#108 scope), Tough/Hard hidden pointing walks beyond the scanned first hints, desktop widths, 320 px, a real device, screenshots by eye other than the box case.
+- Scripts and re-run: scratchpad 111/test/README.md.
 
 ## Lead review
 
