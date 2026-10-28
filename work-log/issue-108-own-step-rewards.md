@@ -54,5 +54,8 @@ Not tested: layout and screenshots (tester), persona ratings (PM), claiming-box-
 Not tested: personas (PM), touch input, other Chrome versions, the real (unpatched) random generation without seeding, mobile browsers other than Chrome emulation.
 
 ## Lead review
+- Lead check at 8746be1 (code head f60491b): diff stat matches the developer's list (README, sudoku.js, tests/page.test.js, tests/sudoku.test.js); specs/ and spec-implementation/ diff empty; `git diff | grep '^-'` in tests: 1 removed assertion (old sudoku.test.js:1395), the rest adapted. Full suite 202/202, skipped 0, 3.9 s. Ratio tests/ 2376 / product 1491 = 1.594 (cap 2385.6). spec-implementation/ 303 (unchanged).
+- Re-ran tester's layout.js and oracle.js (start 17:49:18, shots rewritten 17:49:20): LAYOUT PASS (360x740 pointing-hidden: bottom 715.5, 24.5 px spare; 375x812: 81.4 px; button row fixed), ORACLE PASS. Re-ran one mutant (hidden column unit uses the row number): killed by sudoku.test.js:1390/1393 and page.test.js:293, worktree clean. Screenshot checked.
+- Concerns for PM: (1) the hidden column unit has no spec scenario (guarded by unit and page tests only; tester d1, reviewer M4); (2) the issue's position wording ("seed 2 after 2 filled singles", etc.) does not match the grids (3, 2 and 8 cells differ); the grids are the source of truth and the tester entered them as real entries. Neither blocks. No rework round needed.
 
 ## Lead: acceptance and merge
