@@ -351,9 +351,10 @@
   }
 
   // "the box of rows R1-R2 and columns C1-C2" for box b (0-8).
-  function boxName(b) {
-    var r = 3 * Math.floor(b / 3), c = 3 * (b % 3);
-    return 'the box of rows ' + (r + 1) + '-' + (r + 3) + ' and columns ' + (c + 1) + '-' + (c + 3);
+  // dash: the character between the range numbers ('-' by default; the own pointing and claiming rewards pass U+2011).
+  function boxName(b, dash) {
+    var r = 3 * Math.floor(b / 3), c = 3 * (b % 3), h = dash || '-';
+    return 'the box of rows ' + (r + 1) + h + (r + 3) + ' and columns ' + (c + 1) + h + (c + 3);
   }
 
   // "the box of ..., the digit D fits only in row L" for a pointing step.
@@ -610,7 +611,8 @@
     [['pointing', pointingSteps], ['claiming', claimingSteps]].forEach(function (t) { // a box-form single here would be a hidden single already
       if (!found) t[1](cells, function (step) {
         var res = singleAfterStep(cells, p, step.removed, step.pointDigit);
-        if (res && res.digit === digit) found = { technique: t[0], box: step.box, line: step.line, index: step.index, pointDigit: step.pointDigit, form: res.form };
+        if (res && res.digit === digit) found = { technique: t[0], box: step.box, line: step.line, index: step.index, pointDigit: step.pointDigit, form: res.form,
+          confined: step.confined, removed: step.removed };
         if (found && res.unit) found.unit = res.unit;
         return found;
       });
@@ -662,13 +664,20 @@
       how = 'own';
       var where = 'row ' + (r + 1) + ', column ' + (c + 1) + ' is ' + digit + '.';
       if (technique === 'pointing' || technique === 'claiming') {
-        text = 'Well spotted! You applied ' + technique + ' on your own: in ' + (technique === 'pointing' ? pointingClause(res)
-          : res.line + ' ' + (res.index + 1) + ', the digit ' + res.pointDigit + ' fits only in ' + boxName(res.box)) + ', so ' + res.pointDigit;
+        var NB = '\u2011', d = res.pointDigit, clause;
+        if (technique === 'pointing') clause = boxName(res.box, NB) + ', the digit ' + d + ' fits only in ' + struckCells(res.confined);
+        else {
+          var along = res.confined.map(function (q) { return (res.line === 'row' ? q % 9 : Math.floor(q / 9)) + 1; });
+          clause = res.line + ' ' + (res.index + 1) + ', the digit ' + d + ' fits only in ' + (res.line === 'row' ? 'columns ' : 'rows ')
+            + andList(along) + ', inside ' + boxName(res.box, NB);
+        }
+        text = 'Well spotted! You applied ' + technique + ' on your own: in ' + clause + ', so ' + d + ' cannot go in ';
         if (res.form === 'naked') {
-          text += ' cannot go in row ' + (r + 1) + ', column ' + (c + 1) + '. That leaves ' + digit + ' as the only digit there.';
+          text += 'row ' + (r + 1) + ', column ' + (c + 1) + '. That leaves ' + digit + ' as the only digit there.';
         } else {
-          var cellUnit = { row: 'row ' + (r + 1), column: 'column ' + (c + 1), box: boxName(3 * Math.floor(r / 3) + Math.floor(c / 3)) }[res.unit];
-          text += ' cannot go anywhere else in ' + (technique === 'pointing' ? res.line + ' ' + (res.index + 1) : 'that box')
+          var kind = UNIT_NAMES.indexOf(res.unit), mine = UNITS[CELL_UNITS[r * 9 + c][kind]];
+          var cellUnit = { row: 'row ' + (r + 1), column: 'column ' + (c + 1), box: boxName(3 * Math.floor(r / 3) + Math.floor(c / 3), NB) }[res.unit];
+          text += struckCells(res.removed.filter(function (q) { return mine.indexOf(q) >= 0; }))
             + '. That leaves row ' + (r + 1) + ', column ' + (c + 1) + ' as the only cell in ' + cellUnit + ' where ' + digit + ' fits.';
         }
       } else {
