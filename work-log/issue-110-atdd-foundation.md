@@ -9,6 +9,11 @@ Issue: https://github.com/dirkmarski/weaver/issues/110 . Branch: issue-110-atdd-
 - Specs are PM-only (specs-guard hook); any step wording question goes to the PM via the lead.
 
 ## Developer
+- Claude Sonnet 5.5, session d2424c00-a6fb-45e6-86ab-53111ee2576f.
+- Commits: 8dc30a1 (parser + runner, no steps: red, 184 pass / 5 fail "undefined step"), b5eb831 (driver, steps, README: green, 189 pass / 0 fail / 0 skipped), then a comment-only driver tweak (so the `assert` grep finds nothing in drivers/) and this entry.
+- Decisions: runner auto-discovered as `spec-implementation/specs.test.js` (run once; 184 + 5 = 189); steps are `define(regex, fn)` files in steps/, matched on the step text without the keyword; a parse error or a missing specs/ is a failing test with file:line; all steps are resolved before a scenario runs so undefined or ambiguous steps always fail; a scenario with no steps or an outline without rows fails.
+- Mutant (a) changes the naked-single text only; it also fails the unit test `creditEntry: on your own`, as expected. Mutant (b) removes "the message is shown as a reward" (3 scenarios fail as undefined).
+- Not tested: Windows paths, escaped pipes in tables, multiple Examples blocks and tags on Examples (parsed, not exercised), a page driver.
 
 ## Reviewer
 
