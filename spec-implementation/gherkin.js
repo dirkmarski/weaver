@@ -42,6 +42,7 @@ function parse(text, file) {
       ex = { line: n, tags, rows: [] }; cur.examples.push(ex); tags = []; step = null;
     } else if ((m = STEP.exec(t))) {
       if (!cur) fail(n, 'step outside a Background or Scenario');
+      if (cur.examples && cur.examples.length) fail(n, 'step after Examples');
       step = { keyword: m[1], text: m[2], line: n, table: null, doc: null };
       cur.steps.push(step); ex = null;
     } else if (t[0] === '|') {

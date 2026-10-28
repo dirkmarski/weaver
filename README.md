@@ -110,6 +110,8 @@ Run only the specs:
 
     node --test spec-implementation/specs.test.js
 
+The runner checks itself in `spec-implementation/runner.test.js` (tests named `ATDD runner: ...`, inline features and throwaway steps; they are not spec scenarios). A failing step is reported with its feature file:line and step text; an Examples placeholder with no column, and a step after an Examples block, fail with file:line.
+
 Later UI work adds its page checks to `tests/page.test.js`. Chrome and its temporary profile are removed when the run ends, also after a failed test or on Ctrl-C / SIGTERM (not after `kill -9`).
 
 ## Files
