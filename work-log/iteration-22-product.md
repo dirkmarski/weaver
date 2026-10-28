@@ -50,3 +50,8 @@ PM: claude-opus-5-5, session d2424c00-a6fb-45e6-86ab-53111ee2576f. Started 2026-
 - Concern 1 (no scenario for the hidden column unit): accepted as covered by unit and page tests for now. A column-unit scenario is added in the spec revision (backlog, with D7).
 - Concern 2 (the issue's position wording does not match the grids): issue body corrected (Change log); the feature grids are the source of truth.
 - Assumption: AC1-5 evidence stays valid for the parts of the code a wording-only respec does not touch. The red/green, ratio and layout must be re-shown on the revised spec.
+
+## #108 rework 1: spec revision (PM, 2026-10-28, in progress)
+- Candidates (`pm-108/r1/texts.js`): C0 = current spec (control); V1 = confined cells named in clause 1 ("row 1, columns 8 and 9"; claiming "rows 1 and 2, inside the box of ..."), hidden forms name the removed cells in the target unit ("so 2 cannot go in row 7, columns 8 and 9") instead of "anywhere else in ...", box ranges with U+2011; V2 = V1 but keeps "anywhere else in X, including <cells>". New 5th case: pointing hidden, column unit (Tricky seed 1 walk, r2c8 = 5).
+- Layout (`pm-108/r1/measure.js`, injected text, Tricky): at 360x740 V1 is at most 7 lines (ph 269 chars, ch 256, pc 242: 715.5, 24.5 px spare), V2 is 8 lines on ph and ch (3.5 px spare, fails AC4). V2 dropped before the A/B; U+2011 renders as a hyphen and does not split (`r1/shots/ph-V1.png`).
+- A/B C0 vs V1 (`pm-108/r1/persona-brief.md`, text plus ASCII grids, X/Y order mixed): running.
