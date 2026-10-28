@@ -56,4 +56,13 @@ Issue: https://github.com/dirkmarski/weaver/issues/110 . Branch: issue-110-atdd-
 
 ## Lead review
 
+## Lead review
+- Code head 53d7b63 (after rework 2). Suite 198/198, 0 skipped, 3.9 s (Chrome). Product 1484, tests/ 2374, both unchanged; specs/ touched only by PM 24383ae. spec-implementation/ 303 lines (gherkin 76, runner 83, runner.test 68, specs.test 14, driver 28, steps 34), longest line 133.
+- Red at 8dc30a1 re-run by lead: 184 pass + 5 fail, all `own-singles.feature:8: undefined step`. Layering grep: only drivers/game.js requires sudoku.js; no `assert` in drivers/.
+- Rework 1 (R1 unbound placeholder, R2 assertion failures carry feature file:line + step text, R3 step after Examples, R4 runner self-checks): reviewer F1/F2/F3 + tester F1/F2. Full delta re-review (approve, e457f2b) and re-test (pass, 67d5d06).
+- Rework 2 (R5, tester re-test info: a feature with no scenarios passed silently, against AC3): 4-line runner change + 1 self-check. Deviation: lead delta re-check instead of a third reviewer/tester round (whole delta read; R5 mutant killed per developer; tester errcase.sh re-run over 32 cases, only empty_feature changed, now fails at :1; oracle.js ORACLE PASS; outputs newer than start time).
+- Lead mutants: ambiguity check off -> 1 self-check fails (killed); AC mutant (a) on sudoku.js (naked unit text ' alone') at 53d7b63 -> among specs only the naked scenario fails (:22), plus the existing unit test creditEntry own texts.
+- Concern: the tester's rework-1 re-run of mutant (a) edited specs/rewards/own-singles.feature in its worktree (restored) instead of sudoku.js; not the AC mutant and against specs/ ownership. AC6 (a) is covered by the reviewer (both rounds), tester round 1 (sudoku.js) and the lead re-run above. Also: tester round 1 skipped its assigned wiki reads (process/lessons); for the closing lead.
+- Decisions: line budget 303 vs about 250 accepted (runner split + 9 self-checks kill runner mutants that survived the 5 specs; reviewer judged it justified); reported to PM in the PR. Runner self-checks hold asserts outside steps/; reviewer agrees AC4 is about the spec chain (DSL vs driver). Known limits left: unused Examples column passes; escaped pipes in tables; node's "test at" header points at runner.js; "no technique count has changed" step is only killed by product mutants.
+
 ## Lead: acceptance and merge

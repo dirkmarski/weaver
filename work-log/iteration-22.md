@@ -5,3 +5,4 @@ Scope (PM order): #110 ATDD foundation, then #108, then #111. One lead invocatio
 
 ## #110 ATDD foundation
 - 2026-10-28 gate: #110 open, author weaver-agents (PM). Branch issue-110-atdd-foundation at 24383ae (PM spec + PM log). Fresh start (no prior lead work). Baseline: 184 pass / 0 skipped, 4.4 s; product 1484, tests 2374 (cap 2374.4). spec-implementation/ measured separately (PM D2, about 250 lines).
+- 2026-10-28 dev: red 8dc30a1, green b5eb831 (+a8f48e3 comment). Review approve (714fc3c, 2 survivors on runner guards, placeholder silent pass); test pass (8c63ffc, assertion failures lacked feature file:line). Rework 1 d3e4da0 (R1-R4, runner self-checks); re-review approve e457f2b, re-test pass 67d5d06. Rework 2 53d7b63 (empty feature fails), lead delta re-check (deviation logged in issue log). Code head 53d7b63, 198/198, spec-implementation 303 lines (budget ~250, justified).
