@@ -16,10 +16,10 @@
 - **Clash / slip**: a digit that also appears in another cell of its row, column or box (`findConflicts`, givens included). A slip is a player entry that creates a clash.
 
 ## Project terms
-- **Level**: Easy, Medium, Tricky, Hard (see product.md). `LEVELS` holds the band and `technique`/`beyond`.
+- **Level**: Easy, Medium, Tricky, Tough, Hard (see product.md). `LEVELS` holds the band and `technique`/`beyond`.
 - **Seed**: input to `seededRng(seed)` for reproducible generation and tests.
 - **Capped**: generation hit the 1000 ms limit and returned the best unique puzzle so far (`capped: true`).
-- **Tally**: per-puzzle counts of naked singles, hidden singles and pointing, "on your own" vs "with a hint".
+- **Tally**: per-puzzle counts of naked singles, hidden singles, pointing and claiming, "on your own" vs "with a hint".
 - **Credited**: a cell already counted in the tally this puzzle; counted once per cell.
 - **Not counted**: neutral "Entered: ... not counted" message for a judged entry that earns no reward.
 - **Nudge / explain**: first and second Hint click.
@@ -45,3 +45,7 @@
 - **Iteration branch**: `iteration-N`, held the work logs up to it17; since it18 logs travel on the issue branches and the close uses `iteration-N-close`.
 - **Scratchpad**: session-specific shared folder for temporary files; not in the repo.
 - **Wiki / WIP / work log / session**: the memory tiers (`governance/memory-architecture.md`).
+- **Spec / scenario / step**: a Gherkin `.feature` file in `specs/` (PM-only), its scenarios (one test each, per Examples row) and their lines, each matched by exactly one step definition in `spec-implementation/steps/` (ATDD, #110).
+- **Driver**: code in `spec-implementation/drivers/` that acts on the game and reports what it says, with no assertions; the only code that loads `sudoku.js`.
+- **Red run**: the new scenarios failing on their assertions on the issue branch before product work (red first).
+- **Test summary report**: the PR section the PM verifies at acceptance: red and green runs, spec and suite counts, ratio, `spec-implementation/` size, mutants.
