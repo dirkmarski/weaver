@@ -1,6 +1,6 @@
 'use strict';
 // Protocol driver for the game logic: the only code that loads sudoku.js.
-// It performs actions and reports what the game says. No assertions here.
+// It performs actions and reports what the game says. It checks nothing.
 const Sudoku = require('../../sudoku.js');
 
 // rows: 9 strings of 9 characters, "." = empty.
