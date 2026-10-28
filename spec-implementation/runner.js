@@ -70,6 +70,10 @@ function register(test, defs, root) {
       test(rel + ': parse error', () => { throw e; });
       return;
     }
+    if (!feature.scenarios.length) {
+      test(rel + ': no scenarios', () => { throw new Error(rel + ':' + feature.line + ': feature has no scenarios'); });
+      return;
+    }
     feature.scenarios.forEach((s) => expand(s).forEach((run) => {
       test(feature.name + ': ' + run.title, () => execute(defs, feature, run, rel));
     }));

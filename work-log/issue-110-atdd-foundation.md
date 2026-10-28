@@ -20,6 +20,10 @@ Issue: https://github.com/dirkmarski/weaver/issues/110 . Branch: issue-110-atdd-
 - R1 Examples placeholder without a column fails with file:line and name; R2 a failing step is rethrown with file:line, step text and the original message/diff (cause kept); R3 step after Examples is a parse error. README notes the self-check.
 - Runner mutants (undefined check no-op, ambiguity off, errors swallowed, placeholder check off) each fail 1-2 self-checks. Full run 197 pass, 0 fail. spec-implementation is 286 lines (target 250): the runner split plus 8 self-checks.
 
+### Rework 2
+- R5: a `.feature` file with a Feature but no Scenario/Scenario Outline now fails as `<file>:<line>: feature has no scenarios` (runner.js `register`); new self-check `ATDD runner: a feature with no scenarios fails with file:line` (temp specs/ dir, runs the registered test).
+- Mutant (check removed) is killed by that self-check (1 fail). Full run 198 pass, 0 fail, 0 skipped, 3.9 s.
+
 ## Reviewer
 - Claude Sonnet 5.5, session d2424c00-a6fb-45e6-86ab-53111ee2576f, reviewed head a8f48e3. Verdict: approve (no blocker).
 - Findings: (1) should-fix, specs.test.js:28 `sub`: an Examples placeholder with no matching column is left as literal `<x>` and not reported; a loose step regex such as `(.*)` could then pass on it. Fail the run when `<...>` remains. (2) nit, specs.test.js:64: swallow-errors and ambiguity/undefined checks have no negative test of the runner itself (mutants M3, M6, M7 below survive the 5 specs; detection verified by hand, e.g. a duplicate definition fails 2 scenarios as ambiguous). Accepted for the MVP. (3) nit, gherkin.js:45-46: a step after an Examples block is attached to the outline instead of failing. (4) nit, gherkin.js:7: `\|` is not unescaped in table cells (not required by AC2). (5) nit: own-singles.js:31 "no technique count has changed" is vacuous against a driver that never changes counts, but killed by a product mutant (not-counted path increments naked: 2 scenarios fail).

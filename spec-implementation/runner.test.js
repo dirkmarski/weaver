@@ -3,7 +3,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { parse } = require('./gherkin');
-const { expand, execute } = require('./runner');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { expand, execute, register } = require('./runner');
 
 const hits = [];
 const defs = [
@@ -52,4 +55,14 @@ test('ATDD runner: Examples values are substituted per row', () => {
 test('ATDD runner: a step after an Examples block is a parse error with file:line', () => {
   assert.throws(() => parse('Feature: x\nScenario Outline: s\n  Given a\n  Examples:\n    | x |\n    | 1 |\n  And b\n', 'f.feature'),
     /^Error: f\.feature:7: step after Examples/);
+});
+test('ATDD runner: a feature with no scenarios fails with file:line', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'atdd-'));
+  fs.mkdirSync(path.join(root, 'specs'));
+  fs.writeFileSync(path.join(root, 'specs', 'empty.feature'), 'Feature: empty\n');
+  const tests = [];
+  register((name, fn) => tests.push({ name, fn }), defs, root);
+  fs.rmSync(root, { recursive: true });
+  assert.equal(tests.length, 1);
+  assert.throws(tests[0].fn, /^Error: specs[\\/]empty\.feature:1: feature has no scenarios/);
 });
