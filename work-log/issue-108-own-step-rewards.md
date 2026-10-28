@@ -60,6 +60,15 @@ Not tested: layout and screenshots (tester), persona ratings (PM), claiming-box-
 7. Spec grids for seeds 2 and 4 differ from the generated puzzle by 3, 2 and 8 cells (the "filled singles"), counts differ from the issue wording ("2 filled singles" for the 3-cell diff); the feature grids were used.
 Not tested: personas (PM), touch input, other Chrome versions, the real (unpatched) random generation without seeding, mobile browsers other than Chrome emulation.
 
+### Rework 1 (tester, 2026-10-28)
+- Tester Claude Sonnet 5.5, session d2424c00-a6fb-45e6-86ab-53111ee2576f. Head tested a7f9955 (code a3e4b0d). Verdict: pass. Scratch: `test-108/r1/` (README.md there).
+1. Red/green: at 5dc04b8 specs 10 run, 5 pass, 5 fail (feature :27 :44 :61 :78 :95, all `the message reads`, no undefined steps); full 203/198/5, skipped 0, 3.9 s. At a7f9955 specs 10/10 (0.05 s) and full 203/203, skipped 0, 3.8 s, Chrome running.
+2. Oracle: all 5 positions on the real page (Tricky, seeded, real CDP mouse and key input) give exactly the feature texts including U+2011, class `ok`, tally 1 on your own. The new column position needs 10 filled cells beyond the generated puzzle; r1c5 = 7 must be entered last, otherwise it earns an own pointing credit and the tally reads 2.
+3. Mutants (sudoku.js only, Python-applied, restored, diff non-empty), 7 of 7 killed: U+2011 in the hint box range (two places: pointingClause, the explain box; killed by hint unit and page tests), U+2010 instead of U+2011 (all 5 scenarios and unit/page), claiming clause line number off by one (scenarios :44 :78), hidden box-unit index swapped (scenario :61 only), column unit label uses the row (scenario :95 and unit), plural "columns" forced for one cell (scenarios :61 :95 and many unit).
+4. AC4: 360x740 pointing-hidden (269 chars) #status bottom 715.5, 24.5 px spare, 7 lines, not clipped; claiming-hidden 715.5 / 24.5; column 715.5 / 24.5; naked 694.5 / 45.5. 375x812: 730.6 / 81.4 for both hidden box and row. Button row unchanged (517.7 at 360, 532.8 at 375), scrollY 0, no horizontal overflow; no U+2011 box range splits across lines (Range rects; control: ASCII ranges split at 31 widths).
+5. Screenshots: scratch `test-108/r1/shots/`.
+Not tested: personas (PM), touch input, Chrome versions other than the local one, real unseeded generation.
+
 ## Lead review
 - Lead check at 8746be1 (code head f60491b): diff stat matches the developer's list (README, sudoku.js, tests/page.test.js, tests/sudoku.test.js); specs/ and spec-implementation/ diff empty; `git diff | grep '^-'` in tests: 1 removed assertion (old sudoku.test.js:1395), the rest adapted. Full suite 202/202, skipped 0, 3.9 s. Ratio tests/ 2376 / product 1491 = 1.594 (cap 2385.6). spec-implementation/ 303 (unchanged).
 - Re-ran tester's layout.js and oracle.js (start 17:49:18, shots rewritten 17:49:20): LAYOUT PASS (360x740 pointing-hidden: bottom 715.5, 24.5 px spare; 375x812: 81.4 px; button row fixed), ORACLE PASS. Re-ran one mutant (hidden column unit uses the row number): killed by sudoku.test.js:1390/1393 and page.test.js:293, worktree clean. Screenshot checked.
