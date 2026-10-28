@@ -1,6 +1,6 @@
 # #108 Own pointing and claiming rewards state every step
 
-Issue: https://github.com/dirkmarski/weaver-team/issues/108 (see `gh issue view 108`). Branch `issue-108-own-step-rewards`.
+Issue: https://github.com/dirkmarski/weaver/issues/108. Branch `issue-108-own-step-rewards`.
 
 ## Lead
 - Lead Claude Opus 5.5, session d2424c00-a6fb-45e6-86ab-53111ee2576f. Gate passed (open, PM-authored, it22 item 2). Fresh start: branch held only the PM spec 3a20022.
