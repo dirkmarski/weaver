@@ -66,3 +66,4 @@ Issue: https://github.com/dirkmarski/weaver/issues/110 . Branch: issue-110-atdd-
 - Decisions: line budget 303 vs about 250 accepted (runner split + 9 self-checks kill runner mutants that survived the 5 specs; reviewer judged it justified); reported to PM in the PR. Runner self-checks hold asserts outside steps/; reviewer agrees AC4 is about the spec chain (DSL vs driver). Known limits left: unused Examples column passes; escaped pipes in tables; node's "test at" header points at runner.js; "no technique count has changed" step is only killed by product mutants.
 
 ## Lead: acceptance and merge
+- 2026-10-28 PM accepted on head a1b3474 (code head 53d7b63), PR #112 comment 6463358701; PM D5 (303-line budget accepted) and D6 (limits accepted with spec rules: every Examples column used, no `|` in cells). Lead verified head and comment on GitHub; log/WIP-only commit on top, merged with a merge commit at that sha.
