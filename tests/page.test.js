@@ -352,7 +352,7 @@ describe('page (headless Chrome)', () => {
       assert.strictEqual(await nextStep(), 'Next step (3 of 3)|BUTTON');
       await click('#hint');
       const s = await read();
-      assert.strictEqual(s.status.split('\n')[3], '3. That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
+      assert.strictEqual(s.status.split('\n')[3], '3. That leaves row 4, column 1 as the only cell in row 4 where 8 fits, so it must be 8.');
       assert.strictEqual(await nextStep(), null);
       assert.deepStrictEqual(await tops(), still); // and not at the last step either
       await click('#hint'); // once complete, a further click leaves the explanation as it is
@@ -395,7 +395,7 @@ describe('page (headless Chrome)', () => {
     await hints(4);
     let s = await read();
     assert.strictEqual(s.status, 'Pointing: row 4, column 1 must be 8.\n1. In the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3.\n'
-      + '2. So 8 cannot go in column 3 outside that box: not in column 3, rows 4 and 6 (struck).\n3. That leaves row 4, column 1 as the only cell in its row where 8 fits, so it must be 8.');
+      + '2. So 8 cannot go in column 3 outside that box: not in column 3, rows 4 and 6 (struck).\n3. That leaves row 4, column 1 as the only cell in row 4 where 8 fits, so it must be 8.');
     assert.deepStrictEqual(s.hatched, all([1, 3], [2, 2], [4, 8], [4, 9]));
     assert.strictEqual(s.key, 'Key: dashed purple = the only places for 8 in the box; struck grey 8 = this step rules 8 out there; hatched = a purple ring rules 8 out there (an 8 already in the same row, column or box).');
     const bg = await page.eval('getComputedStyle(document.querySelectorAll("#sudoku td")[2]).backgroundImage'); // r1c3, hatched

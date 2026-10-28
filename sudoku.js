@@ -382,6 +382,9 @@
   function pointingHint(s, step, grid) {
     var line = s.line + ' ' + (s.index + 1), d = s.pointDigit;
     var box = pointingClause(s);
+    var unitName = s.form === 'naked' ? '' : s.unit === 'box'
+      ? boxName(3 * Math.floor(s.r / 3) + Math.floor(s.c / 3))
+      : s.unit + ' ' + ((s.unit === 'row' ? s.r : s.c) + 1);
     // The box has no empty cell outside the confined cells: the clause then says so (an explain only).
     var empties = UNITS[s.box * 3 + 2].filter(function (q) { return grid[Math.floor(q / 9)][q % 9] === 0; });
     if (step === 2 && empties.length === s.confined.length) box += ' (the box has no other empty cells)';
@@ -392,15 +395,12 @@
       text += '2. So ' + d + ' cannot go in ' + line + ' outside that box: not in ' + struckCells(s.removed) + ' (struck).\n';
       text += s.form === 'naked'
         ? '3. Row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' has every digit except ' + d + ' and ' + s.digit + ' in its row, column and box, so it could only take ' + d + ' or ' + s.digit + '. With ' + d + ' ruled out, it must be ' + s.digit + '.'
-        : '3. That leaves ' + rc + ' as the only cell in its ' + s.unit + ' where ' + d + ' fits, so it must be ' + d + '.';
+        : '3. That leaves ' + rc + ' as the only cell in ' + unitName + ' where ' + d + ' fits, so it must be ' + d + '.';
     } else {
       var tail;
       if (s.form === 'naked') {
         tail = 'That means ' + d + ' cannot go in row ' + (s.r + 1) + ', column ' + (s.c + 1) + ', and only one other digit fits there now.';
       } else {
-        var unitName = s.unit === 'box'
-          ? boxName(3 * Math.floor(s.r / 3) + Math.floor(s.c / 3))
-          : s.unit + ' ' + ((s.unit === 'row' ? s.r : s.c) + 1);
         tail = 'Then look at ' + unitName + ': ' + d + ' now has only one place left there.';
       }
       text = 'Hint: try pointing. In ' + box + ', so it cannot go anywhere else in ' + line + '. ' + tail + ' Click Hint again to see why.';
