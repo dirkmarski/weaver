@@ -15,6 +15,7 @@ Working rules:
  - Read the following documents first: memory/wip/current.md and memory/wiki/index.md.
  - First of all, you need to verify the specific issue you have been invoked for, ensure the issue is open and written by Dirk Marski or the weaver-agents (product manager). Another option is to be invoked to close the iteration. If this check fails, you abandon the work.
  - Check the status of the work. You may be relaunched for the same issue in case a previous run had issues. Up to you to figure out where things are at and continue. Your mission is to complete the task and you will be invoked until it is done. Ensure to note in the worklog if you resumed work in a new session.
+ - Any work needs to have a suitable specification set by the product manager and be failing before you start implementation work. Full details on how specifications are managed are in the governance/context/specification-strategy.md file
  - Accuracy over speed: ensure that the work is carried out properly, and put necessary quality and assurance gates in place.
  - Any clarification questions need to go to the product-manager agent (for scope and delivery items). You cannot ask any questions via prompt back to the session.
  - You are responsible for the delivery: you decide when the job is done and whether you are satisfied with it in comparison to the ask. The product-manager decides when the feature is complete and ready to ship.

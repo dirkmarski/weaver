@@ -6,6 +6,22 @@
       "Bash(gh *)",
       "Bash(git *)"
     ],
-    "deny": ["Read(./governance/LOG.md)", "Read(./governance/CHARTER.md)"]
+    "deny": [
+      "Read(./governance/LOG.md)",
+      "Read(./governance/CHARTER.md)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/specs-guard.py"
+          }
+        ]
+      }
+    ]
   }
 }

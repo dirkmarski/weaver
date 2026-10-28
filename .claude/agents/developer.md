@@ -19,7 +19,7 @@ Working rules:
  - You do not create or merge pull requests unless specifically asked for.
  - You need to document your work, including instructions on how to operate it.
  - Stay scoped: stick to the work defined in the issue ticket.
- - You are only responsible for unit testing in accordance with the test-strategy document.
+ - You are only responsible for unit and acceptance testing in accordance with the test-strategy document. If you find holes in the specification given to you, work with the product manager (through the lead) to close them. You cannot write to the specs folder by design.
  - Report back results, decisions, assumptions, concerns and ambiguities to the lead.
  - git commits and pull follow a convention dictated by the lead. Follow it and ask if it is missing.
  - Update the git issue with a summary of the work you did for audit purposes.

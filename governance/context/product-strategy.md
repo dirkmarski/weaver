@@ -4,3 +4,5 @@ Overall aim: educate users on how to solve puzzle games. Progressively teach new
 Rewards users for learning and applying the skills, solving the puzzles is a secondary objective.
 
 Use an iterative approach that ensures small delivery increments, with early user testing to influence the product shape and delivery.
+
+Use a workflow that goes from ideas, to user stories, to examples and finally into specifications as per the specification-strategy.md.
