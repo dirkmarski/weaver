@@ -43,6 +43,15 @@ Paired removal mutants (own-pointing text; old tree b7c409b in a temp worktree, 
 Not tested: layout and screenshots (tester), persona ratings (PM), claiming-box-unit unreachability by exhaustive search (argued only), Chrome versions other than the local one.
 
 ## Tester
+- Tester Claude Sonnet 5.5, session d2424c00-a6fb-45e6-86ab-53111ee2576f. Head tested d3f5622 (code f60491b). Verdict: pass. Scratch: session scratchpad `test-108/` (README.md there).
+1. AC1/AC2: at b7c409b the specs run is 9 run, 5 pass, 4 fail (feature :23, :40, :57, :74, all `the message reads`, no undefined/ambiguous steps); full 202/198/4, skipped 0. At d3f5622 specs 9/9 and full 202/202, skipped 0, 3.8 s.
+2. Oracle: the 4 spec positions on the real page (Tricky via the level button, seeded Math.random, real CDP mouse click plus key events; the cells filled beyond the generated puzzle entered the same way) give exactly the feature texts, class `ok`, tally line 1 on your own. Page generates Tricky and Tough identically for these seeds (grid 1 = tricky seed 1 = tough seed 1).
+3. Mutants (sudoku.js only, restored, diff non-empty): naked text "only digit there" changed (killed by feature :23, :40 and unit tests); hidden pointing "that box" (feature :57, unit); box unit name wrong (feature :57 only); column unit uses row number (unit test creditEntry own claiming and page g1; no spec scenario covers the column unit); pointDigit replaced by digit (feature :23, :40, unit); naked cell row/column swapped (feature :23, :40, unit). One mutant survived and is equivalent (`res.form === 'naked'` -> `res.unit === undefined`: naked has no unit).
+4. AC3 removal (old tests/sudoku.test.js:1395, Tough seed 1 r1c5 = 7): pointing-only row/column swap of the named cell is killed on b7c409b by that assertion (plus others) and on d3f5622 by the scenario "Own pointing, naked form" (feature :23) alone.
+5. AC4: 360x740 pointing-hidden: #status bottom 715.5, 24.5 px spare, 7 lines, not clipped (scrollHeight = clientHeight = 147), button row 517.7 before and after; 375x812: bottom 730.6, 81.4 spare. Longest message is pointing-hidden (262 chars); others at 360x740: 673.5 / 694.5. Document scrolls (1064 > 740; tally below the fold, as the issue says) but scrollY stays 0 and no horizontal overflow.
+6. Screenshots of the 4 positions at 375x812 saved in the scratch shots/ folder.
+7. Spec grids for seeds 2 and 4 differ from the generated puzzle by 3, 2 and 8 cells (the "filled singles"), counts differ from the issue wording ("2 filled singles" for the 3-cell diff); the feature grids were used.
+Not tested: personas (PM), touch input, other Chrome versions, the real (unpatched) random generation without seeding, mobile browsers other than Chrome emulation.
 
 ## Lead review
 
