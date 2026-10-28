@@ -12,6 +12,11 @@ Issue: https://github.com/dirkmarski/weaver/issues/111. Branch: `issue-111-point
 
 ## Developer
 
+### Part A (step definitions, red run)
+- Files: new `spec-implementation/steps/hints.js` (steps: `the level is (Tricky)`, `the player asks for a hint twice`, `the explanation's last line reads "..."`, `the explanation reads:`); `spec-implementation/drivers/game.js` gains `hintTwice(game, level)` (hintFor step 1 then 2 with `preferredTechnique`, as the page does). No change to sudoku.js, index.html, README, tests/, runner.
+- Red run: specs 14 runs, 10 pass, 4 fail on assertions: actual "in its row/column/box where" vs expected "in row 4 / column 1 / the box of rows 1-3 and columns 1-3 where"; steps 1-2 and the conclusion of the whole-explanation run match. Full suite 207: 203 pass, 4 fail, 0 skipped.
+- Sanity: temporarily normalising the unit phrase in the last-line step made the 3 outline runs pass (13 pass), reverted; the real step fails.
+
 ## Reviewer
 
 ## Tester

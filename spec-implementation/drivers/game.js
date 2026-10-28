@@ -21,8 +21,15 @@ function enter(game, row, column, digit) {
   game.shown = { text: res.text, kind: res.kind, cssClass: Sudoku.statusClass(res.kind) };
 }
 
+// The player presses Hint twice (nudge, then explanation) at a level ('tricky'...), as the page does.
+function hintTwice(game, level) {
+  const prefer = Sudoku.preferredTechnique(game.tally, level);
+  Sudoku.hintFor(game.grid, 1, prefer, level);
+  game.hint = Sudoku.hintFor(game.grid, 2, prefer, level);
+}
+
 // The tally lines as shown, without the heading.
 const lines = (game) => Sudoku.tallyLines(game.tally).slice(1);
 const linesBeforeLastEntry = (game) => game.linesBefore.slice(1);
 
-module.exports = { start, enter, lines, linesBeforeLastEntry };
+module.exports = { start, enter, hintTwice, lines, linesBeforeLastEntry };
