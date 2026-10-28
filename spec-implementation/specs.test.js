@@ -43,7 +43,7 @@ function resolve(step, where) {
     throw new Error(where + ': ambiguous step: ' + step.text + '\n  matches '
       + hits.map((h) => h.d.re).join('\n  and '));
   }
-  return { fn: hits[0].d.fn, args: hits[0].m.slice(1).concat(step.table || step.doc || []) };
+  return { fn: hits[0].d.fn, args: hits[0].m.slice(1).concat(step.table || step.doc ? [step.table || step.doc] : []) };
 }
 
 const files = features(path.join(root, 'specs'));
