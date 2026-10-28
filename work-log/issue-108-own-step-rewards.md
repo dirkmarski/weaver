@@ -18,6 +18,29 @@ Issue: https://github.com/dirkmarski/weaver/issues/108. Branch `issue-108-own-st
 - Not tested by me: layout at 360x740/375x812 (tester), persona rating (PM).
 
 ## Reviewer
+- Reviewer Claude Sonnet 5.5, session d2424c00-a6fb-45e6-86ab-53111ee2576f. Head reviewed f60491b. Verdict: approve.
+- Baseline at f60491b: `node --test` 202 run, 202 pass, 0 fail, 0 skipped.
+1. (nit) sudoku.js:614 `if (found && res.unit)` is a second statement after the `found =` assignment; works (res is non-null whenever found is set) but could be one expression. No action needed.
+2. (info) The `box` key of `cellUnit` (sudoku.js ~line 670) is reachable for pointing only; for claiming a box unit cannot occur (a box single after a claiming step is already a hidden single in the line, so classifyEntry returns hidden first). README says so and matches.
+3. (info) classifyEntry callers: only creditEntry (sudoku.js:659) and tests; the added `form`/`unit` keys affect no other consumer. README lines 44 and 51 match the code texts; counts, colour, single and hinted texts untouched.
+4. (info) Removal of old sudoku.test.js:1395 (Tough seed 1 r1c5 = 7): the spec grid for "Own pointing, naked form" is identical to generatePuzzle('tough', seededRng(1)); the scenario carries it. No other assertion removed: the other 13 `-` lines are the same assertions adapted to the new texts/shapes. No packing: added lines are at most 241 chars (file max 255), long texts wrapped with `+`.
+5. Ratio: product 1491 (sudoku.js 1292 + index.html 46 + style.css 153), tests/ 2376, 1.594x (cap 2385.6).
+Mutants (sudoku.js only, Python-applied, restored; diff non-empty each time):
+| Mutant | Killed by |
+|---|---|
+| M1 naked/hidden branch swapped | all 4 scenarios, unit 1011, 1238, 1390ff, page g1 |
+| M2 pointing hidden names "that box" | scenarios hidden-box, hidden-row(claiming text shared), unit 1011, 1238, 1390ff, page |
+| M3 cellUnit row -> box name | scenario claiming hidden row, unit 1238 |
+| M4 cellUnit column uses row number | unit 1390ff, page g1 (spec scenarios do not: unit row/box only) |
+| M5 `form` dropped | naked scenarios, unit 1011, classifyEntry 1017ff and 1387ff, 1390ff |
+| M6 `unit` not set | hidden scenarios, unit and page |
+| M7 naked D = entered digit | both naked scenarios, unit 1011, 1390ff |
+| M8 naked V = pointDigit | both naked scenarios, unit 1011, 1390ff |
+| M9 hidden r/c swapped | both hidden scenarios, unit 1238, 1390ff, page |
+| M10 box unit name uses swapped indices | hidden-box scenario only (sole guard of the box unit) |
+| M11 claiming hidden names the line | claiming hidden scenario, unit 1390ff, page |
+Paired removal mutants (own-pointing text; old tree b7c409b in a temp worktree, branch f60491b): T1 (pointing "Well spotted" -> "Well done") main killed by unit 1011/1216/1237/1389(1395) and the (red) specs; branch killed by pointing naked and hidden scenarios + unit 1011, 1238. T2 (row/column swapped in pointing tail; r1c5 is asymmetric, s1 r3c3 and s3 r5c5 are not): main killed by 1237 (r4c1) and 1395; branch killed by the naked scenarios (same grid and position) and the claiming unit test 1395 (b, r2c3). In both trees other tests kill it as well as the removed assertion, and on the branch the spec carries the same position: the removal is redundant.
+Not tested: layout and screenshots (tester), persona ratings (PM), claiming-box-unit unreachability by exhaustive search (argued only), Chrome versions other than the local one.
 
 ## Tester
 
