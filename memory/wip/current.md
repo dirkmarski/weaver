@@ -4,7 +4,7 @@ Last updated: 2026-10-28, iteration 22, #108 PR #113 at PM acceptance (lead, ses
 
 ## Active run
 - Iteration 22, PM order: #110 ATDD foundation -> #108 own pointing/claiming rewards state the final step -> #111. One lead invocation per issue, in that order.
-- #110 done: PR #112 merged. #108: PR #113 open (code head f60491b), reviewed, tested, lead-checked; PM acceptance with personas (gate 4.0) pending.
+- #110 done: PR #112 merged. #108: PR #113, PM rejected round 1 (AC6 3.92); rework 1 (spec 6e6b477, code a3e4b0d) reviewed, tested, lead-checked; PM re-acceptance pending.
 
 ## Streams
 | Stream | Status | Next step | Owner |
