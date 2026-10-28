@@ -10,6 +10,12 @@ Issue: https://github.com/dirkmarski/weaver/issues/108. Branch `issue-108-own-st
 - Rule for all agents: `specs/` is PM-only, never edited, not even in a worktree copy or temp copy.
 
 ## Developer
+- Developer Claude Sonnet 5.5, session d2424c00-a6fb-45e6-86ab-53111ee2576f. Code commits 8df2a46 (change) and a6430cb (wrap 3 over-long test lines to the file's longest).
+- `sudoku.js`: `classifyEntry` pointing/claiming results now carry `form` ('naked'|'hidden') and, for hidden, `unit` (kind) from `singleAfterStep`; `creditEntry` builds the two-sentence texts (naked: "so D cannot go in row R, column C. That leaves V as the only digit there."; hidden: "so D cannot go anywhere else in <line L | that box>. That leaves row R, column C as the only cell in <unit> where D fits."). Counts, colour, single and hinted texts unchanged. README lines 44 and 51 updated.
+- Specs: 9 run, 9 pass (the 4 scenarios green). Full: 202 run, 202 pass, 0 fail, 0 skipped, 3.8 s. No change to spec-implementation/ (303 lines) or specs/.
+- Ratio: product 1491 (sudoku.js 1292), tests/ 2376, 1.594x (cap 2385.6).
+- Removed: tests/sudoku.test.js creditEntry own claiming test, old line 1395 (Tough seed 1 r1c5 = 7 own pointing text), covered by scenario "Own pointing, naked form". Adapted (not removed): old-text assertions at sudoku.test.js 1011, 1012, 1238, 1392, 1393 and page.test.js 293 (new texts); classifyEntry deepStrictEqual shapes at 1017, 1021, 1022, 1025, 1387-1388 gained `form`/`unit`.
+- Not tested by me: layout at 360x740/375x812 (tester), persona rating (PM).
 
 ## Reviewer
 
