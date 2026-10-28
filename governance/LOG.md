@@ -19,7 +19,7 @@
 
 ### Simple instructions were very effective
 - **Seen:** 2026-10-20
-- **Means:** A seven-line test strategy and one line in each of three definitions changed how the whole team tests within one iteration. The first piece of work the team chose was to right-size its own test suite (2,025 to 1,041 lines of tests, 15 s to 0.6 s), and no role brute-forced its checks.
+- **Means:** A seven-line test strategy and one line in each of three definitions changed how the whole team tests within one iteration. The first piece of work the team chose was to right-size its own test suite (2,025 to 1,041 lines of tests, 15 s to 0.6 s), and no role brute-forced its checks. Seen again on 2026-10-23: one line in each definition, that the memory system is the source of truth, changed where every agent starts within one iteration. In iteration 21 all three leads opened the WIP and the index first, and only one earlier work log was read in the whole run.
 - **Response:** None.
 
 ### Testing grows out of proportion to the product
