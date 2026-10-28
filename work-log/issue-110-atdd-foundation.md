@@ -23,6 +23,14 @@ Issue: https://github.com/dirkmarski/weaver/issues/110 . Branch: issue-110-atdd-
 - Not tested: Chrome page tests, Windows paths, multiple Examples blocks, tags on Examples, CRLF run end to end (parser probe only).
 
 ## Tester
+- Claude Sonnet 5.5, session d2424c00-a6fb-45e6-86ab-53111ee2576f, head 714fc3c. Verdict: pass (no blocker).
+- Red (8dc30a1, Chrome): 189 tests, 184 pass, 5 fail, 0 skipped, 4.3 s; all 5 "undefined step ... own-singles.feature:8". Green (714fc3c): 189 pass, 0 fail, 0 skipped, 3.8 s; specs-only command: 5 pass. Each scenario/row is one test `<Feature>: <Scenario>` (+ `[row=1, column=9, digit=1, unit=row]`), not run twice.
+- Mutants (specs only, restored, git status clean): (a) naked-single text -> exactly the naked scenario fails; (b) remove "no technique count has changed" -> its 2 scenarios fail "undefined step ...:45 / :51"; extra (c) statusClass always '' -> the 3 reward scenarios fail, the 2 not-counted pass.
+- Oracle: all 5 scenarios agree with creditEntry called as index.html does and with a real Chrome run (page puzzle replaced by the spec puzzle in a temp copy): text, status class, tally.
+- Error paths (25 temp feature files): malformed, unsupported keyword (Rule), undefined, ambiguous, table, doc string, tags, comments, 2 Examples blocks, unterminated doc string, bad tag, ragged row, late Background all behave; parse and resolve errors name file:line.
+- Findings: (1) low: an Examples placeholder with no matching column stays literal `<y>`; it passes silently when the step regex accepts any text (confirmed with `And value <y>`); an unused Examples column also passes silently. (2) low: an assertion failure (assert.equal etc.) does not show the feature file:line or step text: the e.message edit in specs.test.js:62 does not reach node's printed output (stack shows steps/own-singles.js only); only plain Errors and undefined/ambiguous steps show file:line. AC3 does not require it, but it makes failures harder to locate. (3) info: a `Key: text` line between Feature and the first Scenario is read as description, not as an unsupported keyword; `# ` after step text is not a comment (as in Gherkin); duplicate scenario names both run. (4) info: all 5 undefined-step failures cite the Background line 8, not the scenario's own steps (the first unresolved step).
+- Counts: product 1484, tests/ 2374 (unchanged), spec-implementation/ 208 (gherkin 75, specs.test 71, driver 28, steps 34). Layering grep: only drivers/game.js requires sudoku.js; no "assert" in drivers/.
+- Not tested: Windows path separators, escaped pipes in tables, tags on Background/Rule, Linux Chrome, node 18/22 (Node 24.21 only), slow-machine timing, page driver (out of scope).
 
 ## Lead review
 
