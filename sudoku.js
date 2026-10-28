@@ -610,7 +610,8 @@
     [['pointing', pointingSteps], ['claiming', claimingSteps]].forEach(function (t) { // a box-form single here would be a hidden single already
       if (!found) t[1](cells, function (step) {
         var res = singleAfterStep(cells, p, step.removed, step.pointDigit);
-        if (res && res.digit === digit) found = { technique: t[0], box: step.box, line: step.line, index: step.index, pointDigit: step.pointDigit };
+        if (res && res.digit === digit) found = { technique: t[0], box: step.box, line: step.line, index: step.index, pointDigit: step.pointDigit, form: res.form };
+        if (found && res.unit) found.unit = res.unit;
         return found;
       });
     });
@@ -660,10 +661,16 @@
       technique = res.technique;
       how = 'own';
       var where = 'row ' + (r + 1) + ', column ' + (c + 1) + ' is ' + digit + '.';
-      if (technique === 'pointing') {
-        text = 'Well spotted! You applied pointing on your own: in ' + pointingClause(res) + ', so ' + where;
-      } else if (technique === 'claiming') {
-        text = 'Well spotted! You applied claiming on your own: in ' + res.line + ' ' + (res.index + 1) + ', the digit ' + res.pointDigit + ' fits only in ' + boxName(res.box) + ', so ' + where;
+      if (technique === 'pointing' || technique === 'claiming') {
+        text = 'Well spotted! You applied ' + technique + ' on your own: in ' + (technique === 'pointing' ? pointingClause(res)
+          : res.line + ' ' + (res.index + 1) + ', the digit ' + res.pointDigit + ' fits only in ' + boxName(res.box)) + ', so ' + res.pointDigit;
+        if (res.form === 'naked') {
+          text += ' cannot go in row ' + (r + 1) + ', column ' + (c + 1) + '. That leaves ' + digit + ' as the only digit there.';
+        } else {
+          var cellUnit = { row: 'row ' + (r + 1), column: 'column ' + (c + 1), box: boxName(3 * Math.floor(r / 3) + Math.floor(c / 3)) }[res.unit];
+          text += ' cannot go anywhere else in ' + (technique === 'pointing' ? res.line + ' ' + (res.index + 1) : 'that box')
+            + '. That leaves row ' + (r + 1) + ', column ' + (c + 1) + ' as the only cell in ' + cellUnit + ' where ' + digit + ' fits.';
+        }
       } else {
         var unit = technique === 'hidden' ? ' in its ' + res.unit : '';
         text = 'Well spotted! You found a ' + technique + ' single' + unit + ' on your own: ' + where;
