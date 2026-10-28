@@ -1009,7 +1009,8 @@ test('pointing counted with a hint (first and second click), naked form and hidd
 test('pointing on your own: the exact texts on the seed 1 and seed 3 walls; row and column wording', () => {
   const s1 = creditEntry(T0, {}, null, SEED1_WALL, 2, 2, '7'), s3 = creditEntry(T0, {}, null, SEED3_WALL, 4, 4, '1');
   assert.strictEqual(s1.text, 'Well spotted! You applied pointing on your own: in the box of rows 7-9 and columns 1-3, the digit 1 fits only in column 3, so 1 cannot go in row 3, column 3. That leaves 7 as the only digit there.');
-  assert.strictEqual(s3.text, 'Well spotted! You applied pointing on your own: in the box of rows 7-9 and columns 1-3, the digit 1 fits only in row 9, so 1 cannot go anywhere else in row 9. That leaves row 5, column 5 as the only cell in column 5 where 1 fits.');
+  assert.strictEqual(s3.text, 'Well spotted! You applied pointing on your own: in the box of rows 7-9 and columns 1-3, the digit 1 fits only in row 9, '
+    + 'so 1 cannot go anywhere else in row 9. That leaves row 5, column 5 as the only cell in column 5 where 1 fits.');
   for (const res of [s1, s3]) {
     assert.deepStrictEqual([res.tally.pointing, res.tally.naked, res.tally.hidden, res.kind], [{ own: 1, hint: 0 }, T0.naked, T0.hidden, 'reward']);
   }
@@ -1389,7 +1390,8 @@ test('classifyEntry claiming: naked and hidden forms; pointing wins; a chain, a 
 test('creditEntry own claiming: Tough seeds 3 and 12 claiming, seed 1 pointing; counted once; seed 7 r2c2 = 2 is no single step', () => {
   const pz = (n) => generatePuzzle('tough', { rng: seededRng(n) }).puzzle;
   const a = creditEntry(T0, {}, null, pz(3), 4, 3, '6'), b = creditEntry(T0, {}, null, pz(12), 1, 2, '5');
-  assert.strictEqual(a.text, 'Well spotted! You applied claiming on your own: in column 6, the digit 6 fits only in the box of rows 7-9 and columns 4-6, so 6 cannot go anywhere else in that box. That leaves row 5, column 4 as the only cell in column 4 where 6 fits.');
+  assert.strictEqual(a.text, 'Well spotted! You applied claiming on your own: in column 6, the digit 6 fits only in the box of rows 7-9 and columns 4-6, '
+    + 'so 6 cannot go anywhere else in that box. That leaves row 5, column 4 as the only cell in column 4 where 6 fits.');
   assert.strictEqual(b.text, 'Well spotted! You applied claiming on your own: in column 1, the digit 2 fits only in the box of rows 1-3 and columns 1-3, so 2 cannot go in row 2, column 3. That leaves 5 as the only digit there.');
   assert.deepStrictEqual([a.tally.claiming, a.kind, a.credited], [{ own: 1, hint: 0 }, 'reward', { 39: true }]);
   const again = creditEntry(a.tally, a.credited, null, pz(3), 4, 3, '6'); // re-entry after clearing
