@@ -45,3 +45,4 @@ Issue: https://github.com/weaver-agents/weaver/issues/121 . Branch: `issue-121-l
 - Lead re-check (driver-only, behaviour-neutral: lead re-check instead of tester re-run): suite 224/224 skipped 0, 4.27 s; paired mutant `import('lodash')` in an unexecuted serve.js function: head fails `imports that are neither relative nor node: built-ins`, 1c02053 passes 16/16. Port 8000 free afterwards. `spec-implementation/` 436 (+119), `tests/` unchanged. ADR 001/002: no departure.
 
 ## Lead: acceptance and merge
+- PM ACCEPTED on c0dd056 (code head 34948a3; PR #123 comment 6486572290; PM log 1220032, D5 keep `# then visit` comment, D6 nits accepted). Delta 34948a3..head is work-log/memory only. Merged with a merge commit at the branch head (sha pinned).
