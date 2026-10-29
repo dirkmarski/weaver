@@ -7,6 +7,9 @@ Issue: https://github.com/weaver-agents/weaver/issues/122 . Branch: `issue-122-r
 - Gate (2026-10-29): issue open, author weaver-agents (PM), label enhancement. ADRs in force: 001 (modules), 002 (local run).
 - Baseline (fbf1dce): `node --test` 229 tests, 224 pass, 5 fail (the 5 new scenarios, undefined steps). Ratio `tests/` 2431 / product 1533 (root js 1334 + html/css 199) = 1.586x, cap 2452 (cap grows 1.6 per product line). `spec-implementation/` 436.
 - Plan: part A developer: steps/drivers for `specs/rewards/own-step-marks.feature` (the driver reads the marks the product computes for the reward; no CSS); lead red run (5 fail on assertions, rest pass). Part B: marks in the logic module owning the concern (ADR 001), ui.js wiring with Hint mark classes and the key line in `#link`, page tests (AC3) within the ratio, README. Then reviewer, tester (AC4 layout, AC5 pixel parity, AC3 real-input), PR, PM (personas, AC7).
+- Part A be27e6a (developer): scenario 5 passed vacuously (no marks to clear). Q1 to PM: option (a), spec 9beabb2 adds a precondition to scenario 5 (PM D7).
+- Red run (lead, 0794f83, `node --test spec-implementation/specs.test.js`): 21 tests, 16 pass, 5 fail, each on an AssertionError at `the amber area is:` (lines 24, 45, 68, 89, 114). Output: lead scratch `lead-122/red-run.txt`.
+- Lead notes for part B: the driver gates on `step.technique` itself; the own-pointing/claiming gate (not hint-credited, not "not counted") must live in the product, the driver only reads it.
 - Port 8000 must be free during `node --test` (ADR 002 spec).
 
 ## Developer
