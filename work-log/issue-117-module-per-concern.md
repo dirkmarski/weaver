@@ -86,4 +86,13 @@ Not tested: other browsers, touch input, real-device phone, mutants beyond the A
 Scratch: /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/daff0a10-2135-459c-80b7-137f621f7088/scratchpad/test-117/ (README.md)
 Read: process.md "Test strategy applied", lessons.md "Testing" and "Tooling", this log "Lead", #116 tester README.
 
+### Re-check d1de93a
+- Suite: node --test 222 tests, 222 pass, 0 fail, 0 skipped, 4.2 s; spec tests 14/14.
+- Screenshots main vs branch (served by tools/serve.js), 4 states x 2 sizes: all 8 pairs 0 differing px; console errors 0 on all 16 runs.
+- PM Q1 acceptance: `node tools/serve.js` in the branch worktree, 10 fresh-profile cache-disabled Chrome loads: each 13 resources all 200, 0 errors, 81 cells after choosing Tricky.
+- serve.js: /%00 404 and server keeps serving; /?x=1 200 page; /missing.js 404; /ui.js?v=2 200; bad %-escape 404.
+- Guard mutants on texts.js (a document ref, b import ui.js, c extra root module): each fails (rc 1), clean after revert.
+- Not tested: old python server contrast, other browsers.
+
+
 ## Lead review
