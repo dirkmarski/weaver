@@ -15,6 +15,7 @@ Issue: https://github.com/weaver-agents/weaver/issues/121 . Branch: `issue-121-l
 - Model Claude Sonnet 5.5, session c62cf25c-8b8e-4cda-905a-5ce306a4299f. Part A: steps/local-run.js, drivers/local-run.js (spec-implementation 317 -> 433 lines; tests/ untouched).
 - Runner steps are synchronous, so the driver runs start+crawl+stop in a helper process of itself (`--crawl`, try/finally kill); no runner change. Port 8000 busy: fails with a clear message.
 - Result: scenario 1 fails on the missing Node version; scenario 2 passes; mutants (package.json dependency, non-node: import, 404 on hints.js) each fail scenario 2 on an assertion.
+- Part B: README View now states the command, Node 22+ with nothing to install, and http://localhost:8000; full node --test 224 pass, 0 skipped.
 
 ## Reviewer
 
