@@ -30,3 +30,19 @@ for (const f of files) {
     }
   });
 }
+
+test('modules: README "## Modules" lists exactly the product files, one concern each', () => {
+  const sec = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8').split(/^## Modules\s*$/m)[1] ?? '';
+  const listed = [...sec.split(/^## /m)[0].matchAll(/^- `([^`]+\.js)`: \S.*$/gm)].map((m) => m[1]).sort();
+  assert.deepStrictEqual(listed, files);
+});
+
+test('modules: imports between product modules are acyclic and nothing re-exports', () => {
+  const deps = (f) => [...src(f).matchAll(IMPORT)].map((m) => path.basename(m[1])).filter((d) => files.includes(d));
+  const visit = (f, stack) => {
+    assert.ok(!stack.includes(f), 'import cycle: ' + [...stack, f].join(' -> '));
+    deps(f).forEach((d) => visit(d, [...stack, f]));
+  };
+  files.forEach((f) => visit(f, []));
+  files.forEach((f) => assert.ok(!/^\s*export\s+(\*|\{[^}]*\})\s*(as\s+\w+\s*)?from\b/m.test(src(f)), f + ' re-exports'));
+});
