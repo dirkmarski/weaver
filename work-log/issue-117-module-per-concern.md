@@ -54,5 +54,14 @@ Formatting: former IIFE 2-space offset gone; lines >120: 77 in total, none new b
 Not checked: screenshots/console (tester), PR text, page behaviour beyond the suite, per-line count of long lines by file.
 
 ## Tester
+- Model Sonnet 5.5, session daff0a10-2135-459c-80b7-137f621f7088, head 810dbf4 (main bfd7b54). Verdict: PASS, no defects.
+1. `node --test`: 221 tests, 221 pass, 0 fail, 0 skipped, 4.3 s. Specs alone: 14/14, 0 skipped.
+2. AC4: main vs branch over http, real CDP input, seed 1, states picker, hint3, entry, verify (clash by a given, Notes On, notes 3 and 7, Verify clicked; exercises clashes, entry, validation, completion, hintmarks) at 360x740 and 1280x900: 8 pairs byte-identical, 0 differing pixels; page text/status/tally/scroll height equal. Console errors/exceptions 0 on all 16 runs.
+3. AC2 mutants on completion.js (and a new root module), all reverted, git status clean: (a) `typeof document` appended: rc 1, 2 fail; (b) `import './ui.js'`: rc 1, killed by "imports ui.js" and "import cycle completion.js -> ui.js -> completion.js"; (c) new root extra.js with `window`: rc 1, 15 tests, 3 fail, no test edit. Baseline rc 0.
+4. Network: all 13 files (index.html, style.css, 11 modules) served 200, 0 non-200 in the server log. file:// 0 cells (CORS block of ui.js), http 81 cells.
+Note: python http.server dropped module bursts (ERR_CONNECTION_RESET, test-server backlog 5, not product); runs use scripts/serve.mjs.
+Not tested: other browsers, touch input, real-device phone, mutants beyond the AC2 guard, visual states beyond the four.
+Scratch: /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/daff0a10-2135-459c-80b7-137f621f7088/scratchpad/test-117/ (README.md)
+Read: process.md "Test strategy applied", lessons.md "Testing" and "Tooling", this log "Lead", #116 tester README.
 
 ## Lead review
