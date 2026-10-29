@@ -150,6 +150,7 @@ function render() {
       // (the cell.value guard is defensive: an empty cell leaves a 0 in the grid, so completionFor is null anyway)
       var done = cell.value ? completionFor(after, tally) : null;
       if (done) { status.textContent = done.text; status.className = done.kind === 'solved' ? 'ok' : 'fail'; }
+      else if (credit && credit.marks) showRewardMarks(credit.marks);
     }
   }
 
@@ -341,6 +342,18 @@ function render() {
     marks.digits.forEach(function (q) { cellAt(q).classList.add('hint-digit'); });
     if (!marks.hatched.length) return;
     hatchedRings = { hatched: marks.hatched, rings: marks.digits, d: hint.pointDigit || hint.digit };
+    unlink();
+  }
+
+  // After an own pointing or claiming reward: the Hint's mark classes on the named cells and the key in the reserve (no rings or links).
+  function showRewardMarks(marks) {
+    [['area', marks.area], ['confined', marks.confined], ['removed', marks.removed]].forEach(function (m) {
+      m[1].forEach(function (q) {
+        cellAt(q).classList.add('hint-' + m[0]);
+        if (m[0] !== 'area') cellAt(q).setAttribute('data-d', marks.digit);
+      });
+    });
+    keyText = marks.key;
     unlink();
   }
 

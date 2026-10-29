@@ -15,7 +15,7 @@ function unitCells(name) {
 const cellOf = (name) => {
   const m = name.match(/^row (\d), column (\d)$/);
   assert.ok(m, 'unknown cell: ' + name);
-  return (m[1] - 1) * 9 + m[2] - 1;
+  return (m[1] - 1) * 9 + Number(m[2]) - 1;
 };
 const sorted = (cells) => [...new Set(cells)].sort((a, b) => a - b);
 

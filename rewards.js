@@ -5,6 +5,7 @@ import { claimingSteps, pointingSteps, singleAfterStep } from './techniques.js';
 import { namedClash } from './clashes.js';
 import { sanitizeDigit } from './entry.js';
 import { hintApplied } from './hints.js';
+import { rewardMarks } from './hintmarks.js';
 import { boxName, andList, struckCells } from './texts.js';
 
 // Which technique makes `digit` in the empty cell (r, c) of `grid` (the grid
@@ -63,7 +64,8 @@ function notCounted(grid, r, c, digit) {
 //  hint: the hintFor result showing now (nudge/explain) or null
 //  grid: the grid just before the entry
 // Only a digit entered in an empty cell is judged. Returns the new
-// { tally, credited, text, kind } (inputs are not changed); text is '' when the entry is not judged.
+// { tally, credited, text, kind, marks } (inputs are not changed); text is '' when the entry is not judged.
+// marks: for an own pointing or claiming reward the hintmarks rewardMarks result, else null.
 // kind: 'reward' ("Well spotted!"/"Well done!"), 'notCounted' (the "Entered: ..." text) or '' (not judged).
 // A judged entry that earns no credit gets the "not counted" text (notCounted) and no count changes.
 // A cell already credited shows the text again but changes no count.
@@ -104,14 +106,14 @@ function creditEntry(tally, credited, hint, grid, r, c, value) {
       text = 'Well spotted! You found a ' + technique + ' single' + unit + ' on your own: ' + where;
     }
   }
-  var p = r * 9 + c;
-  if (credited[p]) return { tally: tally, credited: credited, text: text, kind: 'reward' };
+  var p = r * 9 + c, marks = how === 'own' && (technique === 'pointing' || technique === 'claiming') ? rewardMarks(res, r, c) : null;
+  if (credited[p]) return { tally: tally, credited: credited, text: text, kind: 'reward', marks: marks };
   var t = emptyTally(), cr = {};
   ['naked', 'hidden', 'pointing', 'claiming'].forEach(function (k) { t[k].own = tally[k].own; t[k].hint = tally[k].hint; });
   Object.keys(credited).forEach(function (k) { cr[k] = true; });
   t[technique][how]++;
   cr[p] = true;
-  return { tally: t, credited: cr, text: text, kind: 'reward' };
+  return { tally: t, credited: cr, text: text, kind: 'reward', marks: marks };
 }
 
 // The status class for a creditEntry kind: a reward is green ('ok'), anything else neutral.
