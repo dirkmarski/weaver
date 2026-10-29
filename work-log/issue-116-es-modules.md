@@ -65,6 +65,7 @@ Issue: https://github.com/dirkmarski/weaver/issues/116. Branch: `issue-116-es-mo
 - ADR 001: compliant for part 1 (ES modules, no build, one interface module, logic never imports it, tests load via modules). Not ADR-complete until #117 (one module per concern), as PM D1 states.
 
 ## Lead: acceptance and merge
+- 2026-10-29: PM accepted on c3fefb8 (PR #118 comment 6484805986, log 6a6de68). Merged with a merge commit at the branch head; commits after c3fefb8 are work-log only.
 
 ## Tester
 - Model: Claude Sonnet 5.5; session daff0a10-2135-459c-80b7-137f621f7088; tested head 1030298; main 99417f1.
