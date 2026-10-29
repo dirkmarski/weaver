@@ -12,6 +12,7 @@ Issue: https://github.com/weaver-agents/weaver/issues/121 . Branch: `issue-121-l
 - Lead notes on part A: runner unchanged (steps are sync, so the driver re-runs itself as a `--crawl` helper via execFileSync with try/finally kill). Readiness keys on the `Serving ` stdout line of serve.js. Edge: if execFileSync's 30 s timeout kills the helper, its server child may outlive it (helper `finally` does not run on SIGTERM); asked the reviewer to judge.
 
 ## Developer
+- Rework r1: helper now stops the server on SIGTERM/SIGINT and bounds each fetch to 5 s; importsOf also finds dynamic import(). Proofs: orphan on 8000 before, none after; lodash dynamic import fails scenario 2.
 - Model Claude Sonnet 5.5, session c62cf25c-8b8e-4cda-905a-5ce306a4299f. Part A: steps/local-run.js, drivers/local-run.js (spec-implementation 317 -> 433 lines; tests/ untouched).
 - Runner steps are synchronous, so the driver runs start+crawl+stop in a helper process of itself (`--crawl`, try/finally kill); no runner change. Port 8000 busy: fails with a clear message.
 - Result: scenario 1 fails on the missing Node version; scenario 2 passes; mutants (package.json dependency, non-node: import, 404 on hints.js) each fail scenario 2 on an assertion.

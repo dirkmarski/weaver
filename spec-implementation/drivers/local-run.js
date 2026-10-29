@@ -39,7 +39,8 @@ export function packageFacts() {
 
 function importsOf(source) {
   const re = /^\s*(?:import|export)\s+(?:[^'";]*?\s+from\s+)?['"]([^'"]+)['"]/gm;
-  return [...source.matchAll(re)].map((m) => m[1]);
+  const dynamic = /\bimport\(\s*['"]([^'"]+)['"]\s*\)/g;
+  return [...source.matchAll(re), ...source.matchAll(dynamic)].map((m) => m[1]);
 }
 
 // Helper process: start the command, wait for it to listen, crawl, always stop it, print JSON.
@@ -50,6 +51,8 @@ async function crawl(args) {
   child.stdout.on('data', (d) => { log += d; });
   child.stderr.on('data', (d) => { log += d; });
   child.on('exit', (code) => { exited = code; });
+  // SIGTERM (the caller's timeout) and SIGINT skip the finally below, so stop the command here.
+  for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => { child.kill(); process.exit(1); });
   try {
     for (let i = 0; !/Serving /.test(log); i++) {
       if (exited !== null) {
@@ -64,7 +67,7 @@ async function crawl(args) {
     while (queue.length) {
       const p = queue.shift();
       if (seen.has(p)) continue;
-      const res = await fetch('http://127.0.0.1:' + PORT + p);
+      const res = await fetch('http://127.0.0.1:' + PORT + p, { signal: AbortSignal.timeout(5000) });
       const body = await res.text();
       seen.set(p, { path: p, status: res.status, type: res.headers.get('content-type') || '', bytes: body.length });
       if (res.status !== 200) continue;
