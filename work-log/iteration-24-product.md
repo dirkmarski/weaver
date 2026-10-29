@@ -24,6 +24,7 @@ PM scratch: `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/c62cf25c-8b8e-4cda
 - D4: pointing and claiming in one issue: same marks, the key differs by one word.
 - D5 (#121 acceptance): the View command line keeps its pre-existing `# then visit http://localhost:8000` comment. Kept: it names the same address, and AC2 forbids other README changes; removing it is not worth an issue.
 - D6 (#121 acceptance): reviewer nits accepted, no scope change: a second README address line would survive the spec (the code-block line already holds the address); fixed port 8000 stays (port option is out of scope, backlog watch).
+- D7 (#122 Q1): scenario 5 passed red vacuously; added a precondition (amber area + key line of scenario 1) after its Given so it proves the clear and fails red. AC1 unchanged. Commit 9beabb2. FYI accepted: entered cell tinted when in a named unit; gate moves into product in part B.
 - Assumption A1: the key text reuses the Hint's "struck grey D = this step rules D out there" for consistency, although personas found the double "=" slightly awkward.
 
 ## Concerns
