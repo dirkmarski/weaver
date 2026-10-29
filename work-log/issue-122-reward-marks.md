@@ -19,6 +19,7 @@ Issue: https://github.com/weaver-agents/weaver/issues/122 . Branch: `issue-122-r
 - Part B: `hintmarks.rewardMarks`, `creditEntry` returns `marks` (gate in the product; driver only reads it), `ui.js showRewardMarks` with the Hint classes and key in `#link`; fixed `cellOf` in the steps (string concatenation, `m[2]` not a number). Specs 21/21 pass.
 - Tests: page test r1 (seed 1 Tricky, hidden form), one unit assertion line for the gate. README paragraph "Marks on the board". Layout identical to main at 360x740 and 1280x900; longest key 155 chars, #link scrollHeight = clientHeight = 64.
 - Ratio: tests/ 2431 -> 2470, product 1533 -> 1564, 1.579 (cap 2502).
+- Rework r1: page test r1 pins data-d literal "9" on a confined (r7c1) and a removed (r4c1) cell and the full key text literal; dead `q !== p` dropped from rewardMarks. Mutants (data-d constant 1; "gray" in the key) now fail r1. tests/ 2470 -> 2472, product 1564 unchanged.
 
 ## Reviewer
 - Reviewer: Claude Sonnet 5.5 (claude-sonnet-5-5), session c62cf25c-8b8e-4cda-905a-5ce306a4299f. Head reviewed: 86df9f1 (part B diff 5ce7a6a..86df9f1, part A be27e6a). Verdict: approve (no must findings); two should, two nit.

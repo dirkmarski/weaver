@@ -714,7 +714,9 @@ describe('page (headless Chrome)', () => {
     assert.ok(s.status.startsWith('Well spotted! You applied pointing on your own'));
     const shown = data(s);
     assert.deepStrictEqual(shown, [sorted(marks.area), sorted(marks.confined), sorted(marks.removed), sorted([...marks.confined, ...marks.removed]), marks.key, '', [], [], []]);
-    assert.ok(marks.removed.length && marks.key.includes('; struck grey '));
+    assert.ok(marks.removed.length);
+    assert.strictEqual(marks.key, 'Key: amber = the box, rows and columns the message names; dashed purple = the only places for 9 in the box; struck grey 9 = this step rules 9 out there.'); // seed 2: entry 9 at r4c8
+    assert.deepStrictEqual(await page.eval('[54, 27].map(function (q) { return document.querySelectorAll("#sudoku td")[q].getAttribute("data-d"); })'), ['9', '9']); // a confined and a removed cell
     for (const act of [() => focusAt(other), () => page.eval('document.body.click()'), async () => { await click('#notes'); await keys([[other, '3']]); }]) {
       await act();
       assert.deepStrictEqual(data(await read()), shown);

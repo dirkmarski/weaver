@@ -54,7 +54,7 @@ function rewardMarks(step, r, c) {
   var units = [step.box * 3 + 2, step.index * 3 + (step.line === 'row' ? 0 : 1)];
   if (step.form === 'hidden') units.push(CELL_UNITS[p][UNIT_NAMES.indexOf(step.unit)]);
   units.forEach(function (u) { UNITS[u].forEach(function (q) { if (area.indexOf(q) < 0) area.push(q); }); });
-  var removed = step.removed.filter(function (q) { return q !== p && units.length > 2 && UNITS[units[2]].indexOf(q) >= 0; });
+  var removed = step.removed.filter(function (q) { return units.length > 2 && UNITS[units[2]].indexOf(q) >= 0; });
   return {
     area: area, confined: step.confined, removed: removed, digit: d,
     key: 'Key: amber = the box, rows and columns the message names; dashed purple = the only places for ' + d + ' in the '
