@@ -30,6 +30,7 @@
 - **Reason cell**: an empty cell a ring helps to rule out (hidden single: other empty cells of its unit; pointing: non-confined empty box cells and, in the hidden form, the hidden unit's other empty cells except removed ones).
 - **Confined / removed**: pointing explanation marks: the box cells where D fits (dashed purple, purple badge) and the line cells that lose D (struck grey badge). The badge sits in D's note slot.
 - **Key line**: the legend during a pointing or hidden-single explanation (`hintKey`, #65; introduced in #56), shown in the reserve under the board (`#link`, since #97).
+- **Reward marks**: the Hint mark classes and a key line shown after an own pointing or claiming reward on the cells the message names (`rewardMarks`, #122); cleared by the next value change.
 - **Invitation**: the purple "Click or tap a hatched cell..." line in `#key` under `#status` and Next step, scrolled into view when it first appears (#97).
 - **Hatched cells / reason cells**: the empty cells the purple rings rule the hint digit out of; striped purple on the second click (`hintMarks(...).hatched`, `td.hint-hatched`, #65).
 - **Partners / link line / linked**: a hatched cell's partners are the ringed cells sharing a row, column or box with it (1 or 2); focusing the cell gives them `td.hint-linked` (solid purple) and the link sentence in the reserve names them (`ringLink`, #68).

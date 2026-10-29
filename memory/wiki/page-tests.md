@@ -13,3 +13,4 @@ Auxiliary to `architecture.md` "Tests". Read only when adding or changing a page
 - f1 (seed 1, naked) pins the #91 stages 1-3 (classes, literal keys, no link on a later-hatched cell or ring before stage 3); `hints(n)` clicks Hint n times.
 - f5 (#102): claiming fallback on Hard seeds 57 (naked) and 184 (hidden): staged marks, key, Next step, focus, hinted entry counted.
 - g1 (#103/#104): Tough via the picker (fifth button), seeds 1/3 first Hint is claiming, struck-cell steps, the 1rem rule, own claiming reward.
+- r1 (#122): own pointing reward on Tricky seed 2 (hidden form): mark classes, `data-d` literal 9 on a confined (54) and a removed (27) cell, literal key, no target/rings/hatching; kept on focus, body click, notes; cleared by Backspace, another entry, Verify, Hint, New puzzle, level choice. Naked and claiming forms are spec-only.

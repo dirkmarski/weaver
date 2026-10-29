@@ -1,13 +1,13 @@
 # Backlog
 
-The PM owns this list. This page is the curator's snapshot of it at the end of iteration 23 (from `work-log/iteration-23-product.md`, "Backlog (PM, after it23 scoping)"; items 2-10 unchanged since it22). Start the next scoping here; do not open earlier product logs (scores are inline: the last persona evidence per candidate is kept in brackets; "raised 3/3" = flagged unprompted by that many personas; letters a/b/c = personas). During an iteration the PM's live list at the bottom of its latest product log supersedes this page; the curator refreshes it at close. Pruning rule (governance/context/memory-architecture.md): delivered items are dropped, related ones merged.
+The PM owns this list. This page is the curator's snapshot of it at the end of iteration 24 (from `work-log/iteration-24-product.md`, "Backlog (PM, after it24 scoping)", plus the acceptance concerns C2/C3; items 2-10 unchanged since it22/it23). Start the next scoping here; do not open earlier product logs (scores are inline: the last persona evidence per candidate is kept in brackets; "raised 3/3" = flagged unprompted by that many personas; letters a/b/c = personas). During an iteration the PM's live list at the bottom of its latest product log supersedes this page; the curator refreshes it at close. Pruning rule (governance/context/memory-architecture.md): delivered items are dropped, related ones merged.
 
-Delivered in it23 (dropped): ADR 001 migration, no behaviour change (#116 ES modules and one interface module; #117 one module per concern, `tools/serve.js`). ADR 001 is complete; feature work may resume.
+Delivered in it24 (dropped): ADR 002 local run (#121: README View states command, Node 22+, address; spec guard); own pointing/claiming rewards mark the named cells (#122, the it23 item 1; product.md "Rewards and counts").
 
 ## Product candidates (PM, ordered)
-1. **it24 candidate (PM):** highlight on the grid the cells a reward or hint names; persona A/B first, then the spec (3/3 at #108; earlier: target highlight easy to miss, a, c #102; highlight the named line/box on own rewards, b #104). Shortens the text the player must read.
+1. Reward/hint marks follow-ups (it24 R1-R3 and #122 acceptance): one even amber shade over the box shading (3/3; Hint has the same look); larger struck badge on phones (3/3; clean look fell to 3.42); shorter key wording (3/3: "the areas named in the message", "crossed-out D = D can't go here"; double "=" awkward); tell the claim line from the hidden unit apart ("column" unclear with two amber columns, 2/3; c); show why the entered cell gets its digit (blocking digits; naked "only digit left"; b, c); marks for singles rewards.
 2. Shorter box names in all texts ("the box of rows 4-6 and columns 1-3" is heavy, a, b, c at it22; "top-left box" or similar). Persona A/B first. Settles one box-name form (PM C2/C4: rewards use U+2011, hints "-"; "7-"/"9" breaks at 360 px, c #96) and frees layout at 360x740 (grid top 5.8 px in the pointing-hidden box case, D10).
-3. Hidden-form rewards and hint step 3 say why the unit's other cells are out (e.g. "rows 5 and 6 already have a 5"; raised 3/3 at it22, lifts hidden forms from about 3.67). Only after 1 or 2 (layout limit, D10); spike message length at 360x740 first.
+3. Hidden-form rewards and hint step 3 say why the unit's other cells are out (e.g. "rows 5 and 6 already have a 5"; raised 3/3 at it22, lifts hidden forms from about 3.67). Only after 2 (layout limit, D10); spike message length at 360x740 first.
 4. Claiming follow-ups (it21 personas):
    - One-line level descriptions on the picker, e.g. "Tough: Tricky puzzles, hints teach claiming" (a, b, c at #103; Tough not felt harder than Tricky).
    - A plain "what claiming is" line on the hint; "pointing in reverse" reads as jargon (a, b at #102 and #104).
@@ -31,7 +31,9 @@ Delivered in it23 (dropped): ADR 001 migration, no behaviour change (#116 ES mod
 9. Small wording items: F3 the two-partner "and" (watch); shared "not counted" ending; re-entering a hint-credited cell says "on your own"; "(see below)" in the finish text; fold away definitions once learned; heavy naked-single digit list; solid rings shown before the key mentions them (watch).
 10. Long-term: a practice puzzle per technique; a middle hint level; progress across puzzles; pairs (next technique), each with its own level or Hint preference.
 
-Watch: `tests/` ratio 1.586x at main 52f8c6a (2431/1533; cap 1.6x = 2452, about 21 lines of headroom; current figures in architecture.md "Files"); `spec-implementation/` 317 and `tools/` 32 lines, measured separately (PM D2; no cap revisit decision logged). New behaviour can be pinned by specs instead of unit tests; removals stay listed and mutant-confirmed (process.md "Test strategy applied").
+Watch: `tests/` ratio 1.581x at main 65a90a6 (2472/1564; cap 1.6x = 2502, about 30 lines of headroom; current figures in architecture.md "Files"); `spec-implementation/` 483 and `tools/` 32 lines, measured separately (PM D2; no cap revisit decision logged). New behaviour can be pinned by specs instead of unit tests; removals stay listed and mutant-confirmed (process.md "Test strategy applied").
+
+Watch (ADR 002): port 8000 is hard-coded in `tools/serve.js`; a busy port gives a plain error, no friendly message (PM D6, out of scope at #121).
 
 Not wanted: instant red on a wrong entry (it10); counting entries made during a clash (it11); retroactive counting after a fix (it11).
 
@@ -39,7 +41,9 @@ Not wanted: instant red on a wrong entry (it10); counting entries made during a 
 - ADR 001 guard and server (#117, accepted survivors): `tests/modules.test.js` misses a `!function(){}()` wrapper; the path-traversal guard in `tools/serve.js` is unreachable over HTTP, so its mutant survives. 77 lines in the root `*.js` exceed 120 characters (pre-existing; 90 in the old `sudoku.js`): shorten when touching them, never by packing.
 - ATDD runner (PM D6): an unused Examples column passes silently (PM rule: every column used); no `|` in cells. Add a runner guard if a second outline needs it.
 - Thin guards (it22): the box-unit index in #111 step 3 and the U+2011 box ranges in #108 rewards rest on few tests (a transposed box index is killed only by `sudoku.test.js` `WALL_BOX`); the level step in the hint spec is equivalent (D12).
-- `creditEntry`'s hint match is unguarded for a row or column alone (#104 reviewer F2 / tester F2, pre-existing; D17): add a test when next touching `creditEntry`.
+- `creditEntry`'s hint match is unguarded for a row or column alone (#104 reviewer F2 / tester F2, pre-existing; D17; #122 touched `creditEntry` without adding it): add the test next time.
+- #121 accepted nits (D6): the README's new address line is unguarded (the code-block line already holds the address); the "needs Node 22 or newer" step matches anywhere in the section; SIGKILL of the `--crawl` helper can orphan the server on 8000; only Node 24.21.0 on macOS tested (not Node 22.x, Windows, Linux).
+- #122 accepted survivors: the `else` before `showRewardMarks` (equivalent: a completing entry is always a naked single, so marks are null); `[data-d]` in the `clearResults` selector (equivalent for reward marks: badge cells are always inside `.hint-area`). Page test r1 covers the hidden pointing form only (Tricky seed 2, literal key, `data-d` 9 on cells 54/27); naked and claiming wiring rest on the specs and unit test.
 - #102 deferred (D8): hidden-unit row-before-column order not pinned (unreachable via Hint, reviewer F1); naked-form column marks have no column branch test (F2). #103 D14: g1 seed-1 struck cells nit (tester t3 covers it).
 - Chore (PM D11, it20): rename ids to their roles: `#link` is now the reserve (key or link sentence), `#key` the invitation; tests and README, about 13 lines.
 - `tests/chrome.js` nits (#55 L4): declare `watchdog` above `close`; `gone` is always false in the exit handler; the ppid watchdog is optional (the EPIPE listeners are the essential part).
@@ -61,6 +65,6 @@ Not wanted: instant red on a wrong entry (it10); counting entries made during a 
 ## Open concerns for Dirk
 - The #97 scroll is checked in headless Chrome only; iOS Safari URL-bar resizing is not modelled (PM A1).
 - Only headless Chrome is tested: iOS Safari may not blur the focused cell on a tap of a (non-focusable) given; then a ring selection could persist while a hatched cell keeps focus (reviewer #72, unverified, no code).
-- GitHub Pages is not checked or enabled, so there are no real users and all evidence is simulated. Since ADR 001 (it23) `file://` no longer works, so a player needs a served URL: PM C1 recommends Dirk enables Pages.
+- GitHub Pages is not checked or enabled, so there are no real users and all evidence is simulated. Since ADR 001 (it23) `file://` no longer works, so a player needs a served URL: PM C1 recommends Dirk enables Pages (still open at it24; ADR 002 covers the local run only).
 - ADR 001 does not define how fine "one concern" is; the team's map is README "## Modules". A clarifying ADR is Dirk's call (PM C2, it23).
 - Agent safety: addressed by Dirk's run-task changes (9c5542b per-session TMPDIR; ac56a00 removes it on exit, which also clears Chrome's leftover items). The lead still passes the explicit-temp-dir / `${VAR:?}` rule in prompts (macOS mktemp ignores TMPDIR).
