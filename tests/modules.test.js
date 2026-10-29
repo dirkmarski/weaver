@@ -13,7 +13,7 @@ const PAGE = /\b(document|window|globalThis|self|navigator|history|addEventListe
 const IMPORT = /\b(?:from|import)\s*\(?\s*['"]([^'"]+)['"]/g;
 
 test('modules: the product files are listed, with exactly one interface module', () => {
-  assert.ok(files.includes(UI) && files.includes('sudoku.js'), files.join());
+  assert.ok(files.includes(UI) && files.includes('board.js'), files.join());
   assert.deepStrictEqual(files.filter((f) => PAGE.test(src(f))), [UI]);
 });
 
@@ -22,7 +22,9 @@ for (const f of files) {
     const s = src(f);
     assert.ok(/^export\s/m.test(s) || f === UI, f + ' has no export');
     assert.ok(!/module\.exports|\btypeof module\b|\brequire\(/.test(s), f + ' is CommonJS');
-    assert.ok(!/^;?\(\s*(async\s*)?(function\b|\(\s*\)\s*=>)|^\}\s*\)\s*\(\s*\)/m.test(s), f + ' has an IIFE wrapper (at column 0)');
+    // A wrapper opens at column 0 or closes at the end of the file; an initialiser such as `var X = (function () {...})();` may not.
+    assert.ok(!/^;?\(\s*(async\s*)?(function\b|\(\s*\)\s*=>)/m.test(s) && !/\}\s*\)\s*\(\s*\)\s*;?\s*$/.test(s),
+      f + ' has an IIFE wrapper (at column 0)');
     assert.ok(!/\b(window|globalThis)\s*\.\s*\w+\s*=[^=]/.test(s), f + ' sets a global');
     if (f !== UI) {
       assert.ok(!PAGE.test(s), f + ' touches the page');

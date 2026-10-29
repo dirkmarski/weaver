@@ -1,10 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert';
-import {
-  isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle,
-  preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, solvableBy,
-  seededRng, findPointing, findClaiming, hintMarks, hintKey, ringLink, ringRules, statusClass, clashCells, fixedMessage
-} from '../sudoku.js';
+import { clashCells, fixedMessage } from '../clashes.js';
+import { completionFor } from '../completion.js';
+import { sanitizeDigit, applyEntry, noteDigits, nextCell } from '../entry.js';
+import { generatePuzzle, solvableBy, seededRng } from '../generation.js';
+import { hintMarks, hintKey, ringLink, ringRules } from '../hintmarks.js';
+import { preferredTechnique, hintFor, hintApplied } from '../hints.js';
+import { classifyEntry, emptyTally, creditEntry, tallyLines, TECHNIQUE_DEFINITIONS, statusClass } from '../rewards.js';
+import { findNakedSingle, findHiddenSingle, findPointing, findClaiming } from '../techniques.js';
+import { isValidSolution, findConflicts, verify, buildGrid } from '../validation.js';
 import { SOLUTION, PUZZLE } from './fixture.js';
 
 const clone = () => SOLUTION.map((r) => r.slice());
@@ -197,7 +201,7 @@ test('verify ignores notes: a notes-only cell is empty in the grid verify checks
 });
 
 test('buildGrid accepts the UI shape: given cells have no input and yield "" in values', () => {
-  // The Verify handler maps a missing input (given cell) to '' - see sudoku.js.
+  // The Verify handler maps a missing input (given cell) to '' - see ui.js.
   const values = PUZZLE.map((row) => row.map((v) => ''));
   const r = PUZZLE.findIndex((row) => row.includes(0));
   const c = PUZZLE[r].indexOf(0);

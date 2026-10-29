@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert';
 import { PUZZLE } from './fixture.js';
-import * as S from '../sudoku.js';
+import * as S from '../generation.js';
+import { hintFor, preferredTechnique } from '../hints.js';
+import { emptyTally } from '../rewards.js';
+import { findConflicts, isValidSolution } from '../validation.js';
 
 const LEVELS = ['easy', 'medium', 'tricky', 'tough', 'hard'];
 const flat = (g) => g.flat();
@@ -27,8 +30,8 @@ LEVELS.forEach((l) => { batches[l] = batch(l, N, SEED_BASE[l]); });
 test('generated full grid is valid, and varies with the seed', () => {
   const a = S.generateSolution(S.seededRng(1));
   const b = S.generateSolution(S.seededRng(2));
-  assert.ok(S.isValidSolution(a));
-  assert.ok(S.isValidSolution(b));
+  assert.ok(isValidSolution(a));
+  assert.ok(isValidSolution(b));
   assert.notDeepStrictEqual(a, b);
 });
 
@@ -39,10 +42,10 @@ for (const level of LEVELS) {
 
   test(level + ': unique solution, givens consistent with it, no conflicts', () => {
     for (const r of batches[level]) {
-      assert.ok(S.isValidSolution(r.solution));
+      assert.ok(isValidSolution(r.solution));
       assert.strictEqual(S.countSolutions(r.puzzle, 2), 1);
       r.puzzle.forEach((row, i) => row.forEach((v, j) => { if (v) assert.strictEqual(v, r.solution[i][j]); }));
-      assert.deepStrictEqual(S.findConflicts(r.puzzle), []);
+      assert.deepStrictEqual(findConflicts(r.puzzle), []);
       assert.strictEqual(r.givens, givens(r.puzzle));
     }
   });
@@ -92,10 +95,10 @@ test('tough: the same puzzle as tricky for the same seed', () => {
 test('tricky: following Hint (Tricky preference), entering each hinted digit, solves the puzzle and never returns none', () => {
   let most = 0;
   for (const r of batches.tricky.slice(0, 3)) {
-    const g = r.puzzle.map((row) => row.slice()), tally = S.emptyTally();
+    const g = r.puzzle.map((row) => row.slice()), tally = emptyTally();
     let pointing = 0;
     for (let n = 0; n < 81 && g.flat().includes(0); n++) {
-      const h = S.hintFor(g, 1, S.preferredTechnique(tally, 'tricky'), 'tricky');
+      const h = hintFor(g, 1, preferredTechnique(tally, 'tricky'), 'tricky');
       assert.strictEqual(h.kind, 'nudge');
       if (h.technique === 'pointing') pointing++;
       tally[h.technique].hint++;

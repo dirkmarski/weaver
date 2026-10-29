@@ -96,7 +96,7 @@ Requires Node 22+ (no packages needed):
 
 The tests are targeted: hand-built grids for the behaviour rules (golden path, edge cases, error conditions) and at most 10 seeded generated puzzles per level for the generator properties. The whole run takes about 2 seconds with Chrome (about 0.6 seconds without it, when the page tests are skipped).
 
-The page tests (`tests/page.test.js`) load the real `index.html` in one headless Chrome, served over http from a local server the tests start and stop (random free port), with `Math.random` replaced by `seededRng` (taken from the `sudoku.js` module), press keys and click buttons, and check the DOM (status text and class, tally lines, cell classes). They need Node 22+ (global `WebSocket`) and Google Chrome or Chromium, and use only Node built-ins (no packages). Chrome is looked up in `CHROME_PATH`, then in the usual macOS and Linux locations. Without Chrome the page tests are reported as skipped, with the reason; the other tests still run. To force the skip, set `WEAVER_NO_CHROME=1`; with `CHROME_PATH` set to a missing file they are skipped too, with no other lookup:
+The page tests (`tests/page.test.js`) load the real `index.html` in one headless Chrome, served over http from a local server the tests start and stop (random free port), with `Math.random` replaced by `seededRng` (taken from the `generation.js` module), press keys and click buttons, and check the DOM (status text and class, tally lines, cell classes). They need Node 22+ (global `WebSocket`) and Google Chrome or Chromium, and use only Node built-ins (no packages). Chrome is looked up in `CHROME_PATH`, then in the usual macOS and Linux locations. Without Chrome the page tests are reported as skipped, with the reason; the other tests still run. To force the skip, set `WEAVER_NO_CHROME=1`; with `CHROME_PATH` set to a missing file they are skipped too, with no other lookup:
 
     CHROME_PATH=/path/to/chrome node --test
     WEAVER_NO_CHROME=1 node --test     # page tests skipped, unit tests only
@@ -104,7 +104,7 @@ The page tests (`tests/page.test.js`) load the real `index.html` in one headless
 Executable specifications (ATDD): `node --test` also runs every `specs/**/*.feature` straight from the file (`spec-implementation/specs.test.js` with the parser `gherkin.js`), one test per scenario and per Examples row. Three layers:
 - `specs/` - the Gherkin feature files. Owned and written by the product manager only; the team never edits them (a gap goes to the PM).
 - `spec-implementation/steps/` - the DSL: step definitions that read like the domain and hold all the assertions. An undefined or ambiguous step fails its scenario, with the file and line.
-- `spec-implementation/drivers/` - the protocol driver (game logic only for now): the only code that loads `sudoku.js`, with no assertions.
+- `spec-implementation/drivers/` - the protocol driver (game logic only for now): the only code that loads the product modules, with no assertions.
 
 Run only the specs:
 
@@ -114,11 +114,27 @@ The runner checks itself in `spec-implementation/runner.test.js` (tests named `A
 
 Later UI work adds its page checks to `tests/page.test.js`. Chrome and its temporary profile are removed when the run ends, also after a failed test or on Ctrl-C / SIGTERM (not after `kill -9`).
 
+## Modules
+One module per concern (ADR 001), all at the repo root, each importing only what it uses; imports run one way (no cycles) and nothing imports `ui.js`:
+- `board.js`: board primitives: units, peers, candidate masks, cell naming
+- `validation.js`: validation: `isValidSolution`, `findConflicts`, `verify`, `buildGrid`
+- `clashes.js`: clashes: `namedClash`, `clashCells`, `fixedMessage`
+- `entry.js`: entry: `sanitizeDigit`, `applyEntry`, `noteDigits`, `nextCell`
+- `techniques.js`: techniques: finding naked and hidden singles, pointing and claiming steps
+- `hints.js`: hints: `preferredTechnique`, `hintFor`, `hintApplied` and the hint texts
+- `hintmarks.js`: hint marks: `hintMarks`, `hintKey`, `ringLink`, `ringRules`
+- `rewards.js`: rewards: `classifyEntry`, `creditEntry`, the tally, `TECHNIQUE_DEFINITIONS`, `statusClass`
+- `completion.js`: completion: `completionFor`
+- `generation.js`: generation: `LEVELS`, the generators, `solvableBy`, `countSolutions`, `seededRng`
+- `ui.js`: interface: the page (DOM, events), the only module that touches it
+
+Tests and the spec driver import each function from the module that owns it; there is no module that re-exports the others.
+
 ## Files
 - `index.html`, `style.css` - page and styling (`td.clash`: the orange clash outline; `#link`: the reserved space under the grid, holding the key line (a pointing or hidden-single explanation) or, while a hatched cell or ring is selected, the link sentence, cleared with the hint; `#key`: the invitation line under the status message and the Next step button (scrolled into view when it first appears); and `td.hint-linked`: the solid-purple partner rings of the focused hatched cell, or the selected ring; `td.hint-ruled`: the hatched cells the selected ring rules out)
 - `ui.js` - the interface module (ADR 001): the only code that touches the page (`render()`: DOM, events); loaded by `index.html` with `<script type="module">`. `package.json` holds only `"type": "module"`, so all `.js` files are ES modules (tests and `spec-implementation/` use `import`).
 - `tests/modules.test.js` - ADR 001 guard: every `*.js` at the repo root is an ES module without wrapper or globals; only `ui.js` references the page; no other module imports it
-- `sudoku.js` - pure logic, an ES module imported by `ui.js` and by Node:
+- Logic modules (see Modules), ES modules imported by `ui.js` and by Node; their functions:
   - `generatePuzzle(level, {rng, maxMs})` (level `'easy'`, `'medium'`, `'tricky'`, `'tough'` or `'hard'`; `'tough'` returns the same puzzle as `'tricky'` for the same rng) -> `{level, puzzle, solution, givens}` (9x9 arrays, 0 = empty); `generateSolution(rng)`; `seededRng(seed)` for reproducible output; `countSolutions(grid, limit)`; `solvableBy(grid, 'naked'|'singles'|'pointing')` (`'pointing'`: singles, and when none is left a `findPointing` step, repeated until the grid is full or no step is left); `LEVELS` (`{min, max, technique, beyond}` per level: the givens band, the technique the puzzle must be solvable by and the one it must not be)
   - `isValidSolution`, `findConflicts`, `clashCells(grid)` (flat indices 9 * r + c, ascending, of the cells to outline: the `findConflicts` cells), `fixedMessage(before, after)` (the "No numbers break the rules now..." text when `before` has a clash and `after` has none, else `''`; the page lets `completionFor` override it), `namedClash(grid)` -> `null` when no rule is broken, else `{phrase, extra}` (the named clash: `phrase` is "row R1, column C1 and row R2, column C2 both hold E in the same U", `extra` is the "Other numbers break the rules too..." sentence when more than two cells clash, else `''`; used by `hintFor` and `creditEntry`), `verify`, `sanitizeDigit`, `buildGrid(puzzle, values)` (grid passed to verify; notes excluded)
   - keyboard: `nextCell(puzzle, r, c, 'up'|'down'|'left'|'right')` -> `[r, c]` of the next editable cell (givens skipped, no wrap) or `null`
