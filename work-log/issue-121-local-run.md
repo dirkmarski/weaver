@@ -18,6 +18,16 @@ Issue: https://github.com/weaver-agents/weaver/issues/121 . Branch: `issue-121-l
 - Part B: README View now states the command, Node 22+ with nothing to install, and http://localhost:8000; full node --test 224 pass, 0 skipped.
 
 ## Reviewer
+- Reviewer: Claude Sonnet 5.5 (claude-sonnet-5-5), session c62cf25c-8b8e-4cda-905a-5ce306a4299f. Head reviewed: 53616d2. Verdict: changes needed (one should-fix, rest nits); no ADR departure.
+- Suite: `node --test spec-implementation/specs.test.js` 16 tests, 16 pass, 0 skipped.
+- Findings:
+  1. should: orphan server on helper SIGTERM (reproduced: `--crawl` helper sent SIGTERM left `node tools/serve.js` listening on 8000). Fix: in the helper add SIGTERM/SIGINT handlers that `child.kill()` then exit; add `AbortSignal.timeout(5000)` to `fetch` so the helper ends before the 30 s kill.
+  2. nit: package-facts import regex is line-anchored and static only; `await import('lodash')` in ui.js survives (mutant). Either extend the regex or accept (the crawl still catches missing relative modules).
+  3. nit: README address on the new line is unguarded (`localhost:3000` there survives) because the older code line already holds the address; AC2 still met.
+  4. nit: step "it says the command needs Node 22 or newer" matches the text anywhere in the section (a negated sentence would pass).
+  5. nit: port 8000 fixed; a second concurrent run or a running dev server fails the scenario with a clear message (out of scope per issue).
+- Mutants: 12 run (README x3, package.json, serve.js x4, index.html x2, ui.js x3); survivors: README address, dynamic import.
+- Not checked: browser rendering, fresh clone, pixel parity (tester).
 
 ## Tester
 
