@@ -1,6 +1,6 @@
 # Product: what weaver is today
 
-A dependency-free static page (open `index.html`, no build) that generates a fresh sudoku at run time, with exactly one solution, and teaches solving techniques. Strategy (`governance/context/product-strategy.md`): educate the user, teach techniques progressively, reward learning and applying skills; solving is secondary.
+A dependency-free static page (no build; served, e.g. `node tools/serve.js`, since `file://` cannot run its ES modules) that generates a fresh sudoku at run time, with exactly one solution, and teaches solving techniques. Strategy (`governance/context/product-strategy.md`): educate the user, teach techniques progressively, reward learning and applying skills; solving is secondary.
 Authoritative behaviour spec: `README.md`.
 
 ## Features

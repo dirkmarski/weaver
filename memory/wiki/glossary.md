@@ -44,8 +44,10 @@
 - **Gate**: a check before work moves on (issue gate, lead check, PM acceptance).
 - **Iteration branch**: `iteration-N`, held the work logs up to it17; since it18 logs travel on the issue branches and the close uses `iteration-N-close`.
 - **Scratchpad**: session-specific shared folder for temporary files; not in the repo.
-- **Wiki / WIP / work log / session**: the memory tiers (`governance/memory-architecture.md`).
+- **Wiki / WIP / work log / session**: the memory tiers (`governance/context/memory-architecture.md`).
 - **Spec / scenario / step**: a Gherkin `.feature` file in `specs/` (PM-only), its scenarios (one test each, per Examples row) and their lines, each matched by exactly one step definition in `spec-implementation/steps/` (ATDD, #110).
-- **Driver**: code in `spec-implementation/drivers/` that acts on the game and reports what it says, with no assertions; the only code that loads `sudoku.js`.
+- **ADR**: architecture decision record in `governance/context/decisions/`; binding while "In force", never edited by agents. ADR 001: ES modules, one per concern.
+- **Interface module**: `ui.js`, the only module that touches the page (ADR 001); all others are logic modules.
+- **Driver**: code in `spec-implementation/drivers/` that acts on the game and reports what it says, with no assertions; the only spec code that imports product modules.
 - **Red run**: the new scenarios failing on their assertions on the issue branch before product work (red first).
 - **Test summary report**: the PR section the PM verifies at acceptance: red and green runs, spec and suite counts, ratio, `spec-implementation/` size, mutants.
