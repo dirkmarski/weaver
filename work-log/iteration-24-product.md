@@ -7,6 +7,7 @@ PM scratch: `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/c62cf25c-8b8e-4cda
 - 2026-10-29: scoping done. main e5028f3, no open issues/PRs at start. New governance since the it23 close: ADR 002 (local run with one command, In force).
 - Issues raised, in delivery order: #121 (ADR 002 local run, spec on `issue-121-local-run` 794ebf7), #122 (own reward marks, spec on `issue-122-reward-marks` 774b91c). Next: lead delivers #121, then #122; PM accepts each.
 - 2026-10-29: #121 ACCEPTED (PR #123, verified head c0dd056, code 34948a3). PM ran specs 16/16, `node --test` 224/224; README View read as a player, `node tools/serve.js` served `/`, `/ui.js`, `/style.css`, `/generation.js` 200 with correct types, port free after stop (Node v24.21.0). ACs 1-6 met per PR test report. Next: #122.
+- 2026-10-29: #122 ACCEPTED (PR #124, verified head 531ee2b, code 365c800; later commits work-log/memory only). PM ran specs 21/21, `node --test` 230/230; serve.js served `/`, ui.js, hintmarks.js, rewards.js, style.css 200, port free after stop. AC1-6 met per PR report plus spot checks (DOM only in ui.js, style.css unchanged, README reward marks text). AC7 personas (branch screenshots `test-122/png/`, 4 states x 2 sizes): a M4.25 L4.5 C3.5; b M4.5 L4.0 C3.5; c M4.0 L3.5 C3.25; avg M 4.25, L 4.00, C 3.42; want 3/3; contradictions 0/12. Comment: PR #124 issuecomment-6487347966. Iteration 24 product work done.
 
 ## Direction
 - ADR 002 first: it applies to every change. Fresh-clone check of main (`node tools/serve.js`; `/`, `/ui.js`, `/style.css`, `/generation.js` 200): it runs, but the README View section omits the Node version (only under Testing) and nothing guards the rule.
@@ -25,15 +26,17 @@ PM scratch: `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/c62cf25c-8b8e-4cda
 - D5 (#121 acceptance): the View command line keeps its pre-existing `# then visit http://localhost:8000` comment. Kept: it names the same address, and AC2 forbids other README changes; removing it is not worth an issue.
 - D6 (#121 acceptance): reviewer nits accepted, no scope change: a second README address line would survive the spec (the code-block line already holds the address); fixed port 8000 stays (port option is out of scope, backlog watch).
 - D7 (#122 Q1): scenario 5 passed red vacuously; added a precondition (amber area + key line of scenario 1) after its Given so it proves the clear and fails red. AC1 unchanged. Commit 9beabb2. FYI accepted: entered cell tinted when in a named unit; gate moves into product in part B.
+- D8 (#122 acceptance): accept; C below R3 (3.42 vs 3.67) is not a criterion; its causes (small struck badge on phones, two amber shades) are already backlog item 2.
 - Assumption A1: the key text reuses the Hint's "struck grey D = this step rules D out there" for consistency, although personas found the double "=" slightly awkward.
 
 ## Concerns
 - C1 (open, Dirk): GitHub Pages still not enabled; ADR 002 covers the local run only, so all evidence stays simulated.
+- C3: the acceptance personas found the key wordy 3/3 ("the areas named in the message", "crossed-out D = D can't go here") and the "column" unclear with two amber columns 2/3. Added to backlog item 2.
 - C2: two amber shades (the tint over the board's box shading) were noticed 3/3; it is the Hint's existing look. Backlog.
 
 ## Backlog (PM, after it24 scoping)
 1. In it24: #121 (ADR 002), #122 (own reward marks).
-2. Reward/hint marks follow-ups (it24 R1-R3): one even amber shade over the box shading (3/3); larger struck badge on phones (3/3); show why the entered cell gets its digit (blocking digits, naked "only digit left"; b, c); tell the claim line from the hidden unit apart (c); marks for singles rewards.
+2. Reward/hint marks follow-ups (it24 R1-R3): one even amber shade over the box shading (3/3); larger struck badge on phones (3/3); show why the entered cell gets its digit (blocking digits, naked "only digit left"; b, c); tell the claim line from the hidden unit apart (c; acceptance 2/3); shorter key wording (acceptance 3/3); show why the last digit is left in the naked form (acceptance b, c); marks for singles rewards.
 3. Shorter box names in all texts (unchanged from it23 item 2).
 4. Hidden-form rewards and hint step 3 say why the unit's other cells are out (it23 item 3; layout limit D10).
 5. Claiming follow-ups (it23 item 4, unchanged).
