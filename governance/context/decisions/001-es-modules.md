@@ -1,4 +1,4 @@
-Status: In force
+Status: Superseded by 003 - do not apply
 Date: 29 October 2026
 
 # ADR 001: ES modules, one per concern

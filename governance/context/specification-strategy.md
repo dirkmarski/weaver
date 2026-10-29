@@ -10,4 +10,5 @@ Strict rules:
  - the specifications are executed - they are not translated.
  - a step with no implementation behind it is a failure.
  - the system uses a red first, then green approach: i.e. any new spec item needs to be defined and failing before development begins.
+ - a scenario that already passes before development (for example one that checks something stays, goes away or is already met) only counts as red once it has been shown to fail under a mutant at the red run.
 
