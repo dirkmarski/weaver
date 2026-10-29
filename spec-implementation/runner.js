@@ -1,9 +1,8 @@
-'use strict';
 // The ATDD runner: feature discovery, Examples expansion, step resolution and
 // execution. Used by specs.test.js and by runner.test.js (the runner self-check).
-const fs = require('node:fs');
-const path = require('node:path');
-const { parse } = require('./gherkin');
+import fs from 'node:fs';
+import path from 'node:path';
+import { parse } from './gherkin.js';
 
 function features(dir) {
   return fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))
@@ -80,4 +79,4 @@ function register(test, defs, root) {
   });
 }
 
-module.exports = { expand, execute, register };
+export { expand, execute, register };

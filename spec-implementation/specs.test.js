@@ -1,14 +1,12 @@
-'use strict';
 // Runs every specs/**/*.feature straight from the file: one test per scenario
 // and per Examples row. Steps live in steps/, each file exports (define) => {}.
-const test = require('node:test');
-const fs = require('node:fs');
-const path = require('node:path');
-const { register } = require('./runner');
+import test from 'node:test';
+import fs from 'node:fs';
+import path from 'node:path';
+import { register } from './runner.js';
 
 const defs = [];
 const define = (re, fn) => defs.push({ re, fn });
-fs.readdirSync(path.join(__dirname, 'steps')).filter((f) => f.endsWith('.js')).sort()
-  .forEach((f) => require('./steps/' + f)(define));
+for (const f of fs.readdirSync(path.join(import.meta.dirname, 'steps')).filter((f) => f.endsWith('.js')).sort()) (await import('./steps/' + f)).default(define);
 
-register(test, defs, path.join(__dirname, '..'));
+register(test, defs, path.join(import.meta.dirname, '..'));

@@ -1,4 +1,3 @@
-'use strict';
 // Test fixture only: a known-valid completed sudoku and its 30-given puzzle.
 const SOLUTION = [
   [5, 3, 4, 6, 7, 8, 9, 1, 2],
@@ -24,4 +23,4 @@ const PUZZLE = [
   [0, 0, 0, 0, 8, 0, 0, 7, 9]
 ];
 
-module.exports = { SOLUTION, PUZZLE };
+export { SOLUTION, PUZZLE };

@@ -1,12 +1,11 @@
-'use strict';
-const test = require('node:test');
-const assert = require('node:assert');
-const {
+import test from 'node:test';
+import assert from 'node:assert';
+import {
   isValidSolution, findConflicts, verify, sanitizeDigit, applyEntry, noteDigits, buildGrid, nextCell, findNakedSingle, findHiddenSingle,
   preferredTechnique, hintFor, hintApplied, classifyEntry, emptyTally, creditEntry, completionFor, tallyLines, TECHNIQUE_DEFINITIONS, generatePuzzle, solvableBy,
   seededRng, findPointing, findClaiming, hintMarks, hintKey, ringLink, ringRules, statusClass, clashCells, fixedMessage
-} = require('../sudoku.js');
-const { SOLUTION, PUZZLE } = require('./fixture.js');
+} from '../sudoku.js';
+import { SOLUTION, PUZZLE } from './fixture.js';
 
 const clone = () => SOLUTION.map((r) => r.slice());
 

@@ -1,12 +1,11 @@
-'use strict';
 // Self-check of the ATDD runner (not a spec scenario): inline features, throwaway steps.
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const { parse } = require('./gherkin');
-const fs = require('node:fs');
-const os = require('node:os');
-const path = require('node:path');
-const { expand, execute, register } = require('./runner');
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { parse } from './gherkin.js';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { expand, execute, register } from './runner.js';
 
 const hits = [];
 const defs = [
