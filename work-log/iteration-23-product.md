@@ -35,3 +35,10 @@ PM: claude-opus-5-5, session daff0a10-2135-459c-80b7-137f621f7088. Started 2026-
 1. it23: #116, #117 (ADR 001; no new feature before both merge).
 2. it24 candidate: highlight on the grid the cells a reward or hint names (wiki backlog item 1). Persona A/B first, then the spec.
 3. Then `memory/wiki/backlog.md` items 2-10 unchanged.
+
+## Acceptance #116 (PR #118)
+- 2026-10-29, PM claude-opus-5-5. Verdict: accepted on c3fefb8. Not merged (lead). Comment: https://github.com/dirkmarski/weaver/pull/118#issuecomment-6484805986
+- Own run in a detached worktree at c3fefb8: `node --test` 210/210, 0 skipped, 4.8 s; specs 14/14; `specs/` unchanged vs 99417f1. Greps: no IIFE wrapper, `module.exports`, `require` or `window.Sudoku` in product; only `ui.js` touches `document`/`window`; `sudoku.js` imports nothing; `package.json` = `{"type":"module"}`.
+- AC1-AC7 all pass. AC5: lead's c3fefb8 shots, 6/6 pairs byte-identical (cmp), 0 console errors in 12 captures. I viewed 2 shots (hint3 360, entry 1280) and found them correct. AC6: 1527 / 2408 (1.577x).
+- Note: `tests/modules.test.js` reads product source as text. I accept this under AC3 because it is a static structure check (the AC2 guard), not code extraction.
+- Carried to #117: re-indent, guard discovery limited to root `*.js`. ADR 001 is not complete until #117 merges (D1).
