@@ -11,5 +11,7 @@ Lead: Claude Opus 5.5 (claude-opus-5-5), session c62cf25c-8b8e-4cda-905a-5ce306a
 ## #122
 - 2026-10-29 gate ok (open, PM author); main 96aee52 merged into the branch (fbf1dce); baseline 224 pass + 5 undefined new scenarios; ratio 1.586x (2431/1533).
 
+- Part A be27e6a; PM Q1 (D7) spec 9beabb2 made scenario 5 red; lead red run 5/5 on assertions. Part B a67c5dc, a2a6f64. Review 63d077e approve (2 should, 2 nit); test f4b5385 pass. Rework r1 365c800, lead re-check (paired mutant, tester scripts re-run).
+
 ## Memory notes for the closing lead
 - spec-implementation now has a process-level driver (`drivers/local-run.js`, `--crawl` helper since steps are synchronous); it owns port 8000 during the spec run, so a dev server on 127.0.0.1:8000 makes `node --test` fail (clear message).
