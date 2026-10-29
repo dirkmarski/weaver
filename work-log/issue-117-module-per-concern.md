@@ -23,6 +23,13 @@ Issue: https://github.com/dirkmarski/weaver/issues/117. Branch: `issue-117-modul
 - Results: node --test 221/221, 0 skipped, 4.3 s; specs 14/14. Lines: product js 1337, tests/ 2439, spec-implementation/ 317; with html/css (1537) tests/ is 1.587x.
 - Deviations: the guard IIFE edit above (beyond the filename edit allowed); the comment that preceded `cellPlace` went with it, so `sharedUnits` has none.
 
+### Rework 1
+- PM Q2: `texts.js` (29 lines: `boxName`, `andList`, `struckCells`, `aDigit`, bodies unchanged); hints.js 142 lines exports `preferredTechnique`, `hintFor`, `hintApplied`; rewards.js, hintmarks.js import from texts.js.
+- PM Q1: `tools/serve.js` (30 lines, Node built-ins, `serve(port)`, root from script location, guard `ROOT + path.sep`); tests/page.test.js uses it instead of its inline server (one server); README View line replaced.
+- Guard: statement-level IIFE opener at any indentation plus EOF close; mutants f1 and f2 both fail, clean suite passes.
+- Banners dropped (techniques, rewards, generation, entry, board; board header names the flat index); README Modules labels de-doubled, texts.js line added.
+- parity.py ignores `// ----` banner lines: 64 identical, 2 changed, 1 removed. `node --test` 222/222, 0 skipped.
+
 ## Reviewer
 - Model Sonnet 5.5, session daff0a10-2135-459c-80b7-137f621f7088, head 52cd648 (code da7d554), base bfd7b54. Verdict: APPROVE with minors (no blocker, no major).
 - Evidence: `node --test` 221/221, 0 skipped, 4.4 s; specs/ untouched; parity.py re-run 64/66 identical, 2 differ only cellPlace->cellName, cellPlace removed, ui.js identical after dedent. parity.py is sound for bodies: it compares full declaration text, so an edited body prints DIFF (it flagged the 2 expected ones); it covers sudoku.js up to line 892 and the ui.js body, not the new export/import lines (checked by hand, deadcheck.py: no unused import, no unused export except the `solvableByGrid as solvableBy` alias, a false positive).
