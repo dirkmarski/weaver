@@ -7,6 +7,8 @@ The folder must be served: the page loads its code as ES modules, which a browse
 
     node tools/serve.js   # then visit http://localhost:8000
 
+This needs Node 22 or newer and nothing to install; the page is then at `http://localhost:8000`.
+
 ## How to play
 - On load, pick **Easy**, **Medium**, **Tricky**, **Tough** or **Hard**. The chosen level is shown above the grid, with **New puzzle** next to it; **Verify**, **Hint** and **Notes** are below the grid. **New puzzle** clears the grid and returns to the difficulty prompt.
 - Bold dark numbers are givens and cannot be changed.
