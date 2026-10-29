@@ -103,3 +103,6 @@ Read: process.md "Test strategy applied", lessons.md "Testing" and "Tooling", th
 - Counts: product 1534 (board 69, validation 68, clashes 32, entry 47, techniques 150, texts 29, hints 142, hintmarks 87, rewards 136, completion 20, generation 154, ui 400, index.html 46, style.css 153, package.json 1); tools/ 32 (outside product and tests); tests/ 2431 (1.585x); spec-implementation/ 317. specs/ unchanged vs bfd7b54.
 - Accepted survivors: `!function(){}()` wrapper form (pre-existing gap), serve.js traversal guard (unreachable over HTTP, kept as defence), bind address / decodeURIComponent untested (nits). 77 product lines > 120 chars, all pre-existing (none new).
 - ADR 001: compliant. ES modules, no build; ui.js the only page module, imported by nothing; logic modules one concern each per README `## Modules`, acyclic, no re-export; tests/driver import from owners; tools/serve.js is not product code.
+
+## Lead: acceptance and merge
+- 2026-10-29: PM accepted on d1de93a (PR #119 comment 6485420045, log 7dbc42d). Merged with a merge commit at the branch head; commits after d1de93a are work-log only. ADR 001 complete with this merge.
