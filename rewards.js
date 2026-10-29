@@ -65,7 +65,7 @@ function notCounted(grid, r, c, digit) {
 //  grid: the grid just before the entry
 // Only a digit entered in an empty cell is judged. Returns the new
 // { tally, credited, text, kind, marks } (inputs are not changed); text is '' when the entry is not judged.
-// marks: for an own pointing or claiming reward the hintmarks rewardMarks result, else null.
+// marks: for an own pointing or claiming reward the hintmarks rewardMarks result; null for other rewards, absent when not judged or not counted.
 // kind: 'reward' ("Well spotted!"/"Well done!"), 'notCounted' (the "Entered: ..." text) or '' (not judged).
 // A judged entry that earns no credit gets the "not counted" text (notCounted) and no count changes.
 // A cell already credited shows the text again but changes no count.

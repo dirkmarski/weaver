@@ -15,6 +15,9 @@ Issue: https://github.com/weaver-agents/weaver/issues/122 . Branch: `issue-122-r
 ## Developer
 - Part A (Sonnet 5.5, session c62cf25c): steps `steps/reward-marks.js` and driver `marksFor` in `drivers/game.js` for own-step-marks.feature.
 - Driver calls the absent `hintmarks.rewardMarks(step, r, c)`; absent = no marks. 4 of 5 scenarios fail on the amber assertion; scenario 5 passes vacuously until part B.
+- Part B: `hintmarks.rewardMarks`, `creditEntry` returns `marks` (gate in the product; driver only reads it), `ui.js showRewardMarks` with the Hint classes and key in `#link`; fixed `cellOf` in the steps (string concatenation, `m[2]` not a number). Specs 21/21 pass.
+- Tests: page test r1 (seed 1 Tricky, hidden form), one unit assertion line for the gate. README paragraph "Marks on the board". Layout identical to main at 360x740 and 1280x900; longest key 155 chars, #link scrollHeight = clientHeight = 64.
+- Ratio: tests/ 2431 -> 2470, product 1533 -> 1564, 1.579 (cap 2502).
 
 ## Reviewer
 
