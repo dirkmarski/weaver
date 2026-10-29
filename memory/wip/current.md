@@ -1,6 +1,6 @@
 # WIP: current
 
-Last updated: 2026-10-29, iteration 23 close (curator, session daff0a10-2135-459c-80b7-137f621f7088)
+Last updated: 2026-10-29, iteration 23 close (curator, reviewed by the closing lead; session daff0a10-2135-459c-80b7-137f621f7088)
 
 ## Active run
 - Iteration 23 closed: ADR 001 delivered by #116 (PR #118, main bfd7b54) and #117 (PR #119, main 52f8c6a); 222 tests pass, specs 14/14, screenshots pixel-identical. Wiki refreshed to the it23 state (architecture.md rewritten for the 12 modules).
@@ -9,7 +9,7 @@ Last updated: 2026-10-29, iteration 23 close (curator, session daff0a10-2135-459
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| it23 close | curator done | merge `iteration-23-close` (wiki/WIP) | closing lead |
+| it23 close | done: curator wiki/WIP reviewed and merged by the closing lead | none | closing lead |
 | it24 | not started | PM scoping | PM |
 
 ## Starting the next run
