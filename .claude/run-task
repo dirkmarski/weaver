@@ -92,6 +92,14 @@ GH_TOKEN="$(security find-generic-password -s weaver-agents-token -w 2>/dev/null
 [ -n "$GH_TOKEN" ] || die "keychain item 'weaver-agents-token' is empty"
 export GH_TOKEN
 
+# 4b. An empty gh config of the team's own: gh then sees only GH_TOKEN, never Dirk's
+#     keyring login (which `gh auth status` would otherwise list to the agents).
+gh_dir="${WEAVER_GH_CONFIG_DIR:-$HOME/.config/gh-weaver-team}"
+mkdir -p "$gh_dir" && chmod 700 "$gh_dir" || die "cannot create $gh_dir"
+[ ! -e "$gh_dir/hosts.yml" ] || die "$gh_dir/hosts.yml exists - the team's gh config must hold no login"
+export GH_CONFIG_DIR="$gh_dir"
+! gh auth status 2>&1 | grep -q "(keyring)" || die "gh still sees a keyring login - not launching"
+
 # 5. The team's git identity: into the team clone's config for the session-start
 #    snapshot, and exported for everything else. Source: launch-settings.json.
 for key in user.name user.email; do
