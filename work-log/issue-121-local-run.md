@@ -30,6 +30,13 @@ Issue: https://github.com/weaver-agents/weaver/issues/121 . Branch: `issue-121-l
 - Not checked: browser rendering, fresh clone, pixel parity (tester).
 
 ## Tester
+- Tester: Claude Sonnet 5.5 (claude-sonnet-5-5), session c62cf25c-8b8e-4cda-905a-5ce306a4299f. Head 179f480. Verdict: pass.
+- AC4: fresh clone of origin branch (179f480, no node_modules, package.json no dependencies), `node tools/serve.js` from the clone root, `http://localhost:8000` in headless Chrome, 5 fresh-profile loads: 13 files all 200, 0 failed requests, 0 console errors, 81 cells after choosing a level; port 8000 free afterwards. Node v24.21.0.
+- AC5: main e5028f3 vs branch, level Tricky seed 1, states hint3 and entry, 360x740 and 1280x900, 2 shots per side per size: 4 pairs byte-identical, 0 differing pixels, 0 console errors.
+- AC3/AC6: `node --test` 224 tests, 224 pass, 0 fail, 0 skipped, 4.24 s; specs 16/16 (0.19 s). `tests/` unchanged vs main (empty diff), 2431 lines / product 1533 = 1.586x (cap 1.6x). `spec-implementation/` 433 lines (main 317, +116).
+- Cleanup: nothing listens on 8000 after the spec run. With a 127.0.0.1:8000 listener held, the spec fails in about 140 ms: "the command exited with code 1 before it listened (port 8000 is already in use; stop what uses it)".
+- Findings: 1. With a 0.0.0.0:8000 listener held, the spec passes (the server binds 127.0.0.1:8000 beside it): not a defect, the busy-port message appears only for a clash on 127.0.0.1. 2. The README command line includes a trailing comment; run without the comment.
+- Not tested: Windows/Linux, Node 22.x (only 24.21.0), browsers other than Chrome, a busy port with IPv6 listener, the 30 s driver timeout orphan path.
 
 ## Lead review
 
