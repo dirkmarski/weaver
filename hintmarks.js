@@ -46,6 +46,22 @@ function hintMarks(hint, grid) {
   };
 }
 
+// The marks an own pointing or claiming step (a classifyEntry result with `form`, and `unit` in the hidden form) puts on the
+// board after the entry at (r, c): flat indices { area, confined, removed, digit, key }. Area = the box, the line and the hidden-form
+// unit (the entered cell included); removed = the cells of that unit that lose the digit, never the entered cell.
+function rewardMarks(step, r, c) {
+  var p = r * 9 + c, d = step.pointDigit, claiming = step.technique === 'claiming', area = [];
+  var units = [step.box * 3 + 2, step.index * 3 + (step.line === 'row' ? 0 : 1)];
+  if (step.form === 'hidden') units.push(CELL_UNITS[p][UNIT_NAMES.indexOf(step.unit)]);
+  units.forEach(function (u) { UNITS[u].forEach(function (q) { if (area.indexOf(q) < 0) area.push(q); }); });
+  var removed = step.removed.filter(function (q) { return units.length > 2 && UNITS[units[2]].indexOf(q) >= 0; });
+  return {
+    area: area, confined: step.confined, removed: removed, digit: d,
+    key: 'Key: amber = the box, rows and columns the message names; dashed purple = the only places for ' + d + ' in the '
+      + (claiming ? step.line : 'box') + (removed.length ? '; struck grey ' + d + ' = this step rules ' + d + ' out there' : '') + '.'
+  };
+}
+
 // The key line under a hidden single's or pointing step's explanation; hatchedCount the hatched cells showing.
 // Pointing names its dashed and struck marks, and the hatching only when a cell is hatched; a hidden single always has some.
 // For a pointing step, `stage` (1-3, default 3) is the number of revealed steps: 1 names only the dashed marks, 2 adds the struck.
@@ -84,4 +100,4 @@ function ringRules(q, hatched, d) {
 }
 function sharedUnits(p, q) { return UNIT_NAMES.filter(function (n, k) { return CELL_UNITS[q][k] === CELL_UNITS[p][k]; }); }
 
-export { hintMarks, hintKey, ringLink, ringRules };
+export { hintMarks, rewardMarks, hintKey, ringLink, ringRules };

@@ -10,6 +10,8 @@ function start(rows) {
   return { grid, tally: emptyTally(), credited: {}, shown: null, linesBefore: null };
 }
 
+const NO_MARKS = { area: [], confined: [], removed: [], key: '' };
+
 // The player enters a digit with no hint showing; row and column are 1-based.
 function enter(game, row, column, digit) {
   const r = row - 1, c = column - 1;
@@ -18,6 +20,7 @@ function enter(game, row, column, digit) {
   game.grid[r][c] = digit;
   game.tally = res.tally;
   game.credited = res.credited;
+  game.marks = res.marks || NO_MARKS;
   game.shown = { text: res.text, kind: res.kind, cssClass: statusClass(res.kind) };
 }
 
@@ -32,4 +35,6 @@ function hintTwice(game, level) {
 const lines = (game) => tallyLines(game.tally).slice(1);
 const linesBeforeLastEntry = (game) => game.linesBefore.slice(1);
 
-export { start, enter, hintTwice, lines, linesBeforeLastEntry };
+const marks = (game) => game.marks;
+
+export { marks, start, enter, hintTwice, lines, linesBeforeLastEntry };

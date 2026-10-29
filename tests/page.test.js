@@ -5,9 +5,9 @@ import assert from 'node:assert';
 import { clashCells } from '../clashes.js';
 import { nextCell } from '../entry.js';
 import { generatePuzzle, seededRng } from '../generation.js';
-import { hintKey, hintMarks, ringRules } from '../hintmarks.js';
+import { hintKey, hintMarks, ringRules, rewardMarks } from '../hintmarks.js';
 import { hintFor } from '../hints.js';
-import { TECHNIQUE_DEFINITIONS } from '../rewards.js';
+import { TECHNIQUE_DEFINITIONS, classifyEntry } from '../rewards.js';
 import { findHiddenSingle, findNakedSingle, findPointing } from '../techniques.js';
 import { findChrome, launch } from './chrome.js';
 import { serve } from '../tools/serve.js';
@@ -691,5 +691,44 @@ describe('page (headless Chrome)', () => {
     s = await read();
     assert.strictEqual(s.status, 'No mistakes so far. ' + empties(puzzle).length + ' empty cells left.');
     assert.strictEqual(s.cls, 'ok');
+  });
+  // #122: Hint-free play on a seed (singles typed) up to an entry that is an own pointing reward with struck cells (hidden form); `at` = [cell, digit] of that entry.
+  const reward = pick('tricky', (p, sol) => {
+    const grid = p.map((row) => row.slice()), typed = [];
+    for (let s; (s = findNakedSingle(grid) || findHiddenSingle(grid)); ) {
+      grid[s.r][s.c] = sol[s.r][s.c];
+      typed.push([s.r * 9 + s.c, String(sol[s.r][s.c])]);
+    }
+    for (const q of empties(grid)) {
+      const step = classifyEntry(grid, Math.floor(q / 9), q % 9, sol[Math.floor(q / 9)][q % 9]);
+      if (step && step.technique === 'pointing' && rewardMarks(step, Math.floor(q / 9), q % 9).removed.length) return { typed, at: [q, String(sol[Math.floor(q / 9)][q % 9])], marks: rewardMarks(step, Math.floor(q / 9), q % 9), other: empties(grid).find((x) => x !== q) };
+    }
+    return null;
+  });
+  it('r1. an own pointing reward marks the cells it names with the Hint classes and the key; it survives focus, a click and notes, and goes with a value change, Verify, Hint, New puzzle and a level choice', async () => {
+    const { typed, at, marks, other } = reward.extra;
+    const show = async () => { await open('tricky', reward.seed); await keys(typed); noHint(await read()); await keys([at]); return read(); }; // the singles before it leave the reserve empty
+    const sorted = (a) => [...a].sort((x, y) => x - y);
+    const data = (s) => [s.area, s.confined, s.removed, s.dattr, s.reserve, s.invite, s.hatched, s.digit, s.target];
+    let s = await show();
+    assert.ok(s.status.startsWith('Well spotted! You applied pointing on your own'));
+    const shown = data(s);
+    assert.deepStrictEqual(shown, [sorted(marks.area), sorted(marks.confined), sorted(marks.removed), sorted([...marks.confined, ...marks.removed]), marks.key, '', [], [], []]);
+    assert.ok(marks.removed.length);
+    assert.strictEqual(marks.key, 'Key: amber = the box, rows and columns the message names; dashed purple = the only places for 9 in the box; struck grey 9 = this step rules 9 out there.'); // seed 2: entry 9 at r4c8
+    assert.deepStrictEqual(await page.eval('[54, 27].map(function (q) { return document.querySelectorAll("#sudoku td")[q].getAttribute("data-d"); })'), ['9', '9']); // a confined and a removed cell
+    for (const act of [() => focusAt(other), () => page.eval('document.body.click()'), async () => { await click('#notes'); await keys([[other, '3']]); }]) {
+      await act();
+      assert.deepStrictEqual(data(await read()), shown);
+    }
+    for (const act of [() => keys([[at[0], 'Backspace']]), () => keys([[other, '1']]), () => click('#verify'), () => click('#hint'), () => click('#new-puzzle')]) {
+      s = await show();
+      await act();
+      s = await read();
+      if (s.target.length) assert.ok(s.area.length && !s.reserve.includes('amber'), 'Hint shows its own marks');
+      else noHint(s);
+    }
+    await click('[data-level=tricky]'); // a level choice after New puzzle
+    noHint(await read());
   });
 });

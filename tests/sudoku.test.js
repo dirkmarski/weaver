@@ -1056,10 +1056,12 @@ test('classifyEntry pointing: chained steps, a wrong digit, a conflict, a filled
   assert.strictEqual(classifyEntry(WALL_ROW, 0, 4, 4), null); // 4 is already in row 1
 });
 
+const hinted0 = (g) => creditEntry(T0, {}, hintFor(g, 1), g, 2, 2, '7');
 test('creditEntry pointing: re-entry shows the text again and changes no count; other counts unchanged', () => {
   const first = creditEntry(T0, {}, null, SEED1_WALL, 2, 2, '7');
   const again = creditEntry(first.tally, first.credited, null, SEED1_WALL, 2, 2, '7');
   assert.deepStrictEqual([again.text, again.tally, again.kind], [first.text, first.tally, 'reward']);
+  assert.deepStrictEqual([again.marks, hinted0(SEED1_WALL).marks, !creditEntry(T0, {}, null, SEED1_WALL, 2, 2, '1').marks], [first.marks, null, true]); // re-entry marks again; hint-credited and not counted: none
   const hinted = creditEntry(first.tally, first.credited, hintFor(SEED1_WALL, 1), SEED1_WALL, 2, 2, '7');
   assert.deepStrictEqual([hinted.text, hinted.tally], ['Well done! You applied pointing: row 3, column 3 is 7.', first.tally]);
   assert.deepStrictEqual(preferredTechnique(first.tally, 'tricky'), preferredTechnique(T0, 'tricky')); // pointing does not steer Hint
