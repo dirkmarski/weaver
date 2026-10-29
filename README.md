@@ -117,16 +117,16 @@ Later UI work adds its page checks to `tests/page.test.js`. Chrome and its tempo
 ## Modules
 One module per concern (ADR 001), all at the repo root, each importing only what it uses; imports run one way (no cycles) and nothing imports `ui.js`:
 - `board.js`: units, peers, candidate masks, cell naming
-- `validation.js`: `isValidSolution`, `findConflicts`, `verify`, `buildGrid`
-- `clashes.js`: `namedClash`, `clashCells`, `fixedMessage`
-- `entry.js`: `sanitizeDigit`, `applyEntry`, `noteDigits`, `nextCell`
+- `validation.js`: checking a grid and reporting conflicts
+- `clashes.js`: naming the clash of an entered digit
+- `entry.js`: typing and noting digits in a cell
 - `techniques.js`: finding naked and hidden singles, pointing and claiming steps
 - `texts.js`: naming of cells, boxes and lists in player messages
-- `hints.js`: `preferredTechnique`, `hintFor`, `hintApplied` and the hint texts
-- `hintmarks.js`: `hintMarks`, `hintKey`, `ringLink`, `ringRules`
-- `rewards.js`: `classifyEntry`, `creditEntry`, the tally, `TECHNIQUE_DEFINITIONS`, `statusClass`
-- `completion.js`: `completionFor`
-- `generation.js`: `LEVELS`, the generators, `solvableBy`, `countSolutions`, `seededRng`
+- `hints.js`: choosing a hint and its texts
+- `hintmarks.js`: the cells, key line and links a hint marks
+- `rewards.js`: recognising and crediting the learner's own steps
+- `completion.js`: the end-of-puzzle message
+- `generation.js`: making puzzles by level
 - `ui.js`: the page (DOM, events), the only module that touches it
 
 Tests and the spec driver import each function from the module that owns it; there is no module that re-exports the others.

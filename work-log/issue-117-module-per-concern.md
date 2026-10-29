@@ -30,6 +30,11 @@ Issue: https://github.com/dirkmarski/weaver/issues/117. Branch: `issue-117-modul
 - Banners dropped (techniques, rewards, generation, entry, board; board header names the flat index); README Modules labels de-doubled, texts.js line added.
 - parity.py ignores `// ----` banner lines: 64 identical, 2 changed, 1 removed. `node --test` 222/222, 0 skipped.
 
+### Rework 2
+- tools/serve.js (now 32 lines): URL decoded once, a null byte gives 404 (server stays up), the query is split off before the `/` test.
+- README Modules: eight function-list lines reworded into concern lines, guard format kept.
+- curl: `/%00` 404 (twice, server alive), `/?x=1` 200, `/index.html` 200. `node --test` 222/222, 0 skipped.
+
 ## Reviewer
 - Model Sonnet 5.5, session daff0a10-2135-459c-80b7-137f621f7088, head 52cd648 (code da7d554), base bfd7b54. Verdict: APPROVE with minors (no blocker, no major).
 - Evidence: `node --test` 221/221, 0 skipped, 4.4 s; specs/ untouched; parity.py re-run 64/66 identical, 2 differ only cellPlace->cellName, cellPlace removed, ui.js identical after dedent. parity.py is sound for bodies: it compares full declaration text, so an edited body prints DIFF (it flagged the 2 expected ones); it covers sudoku.js up to line 892 and the ui.js body, not the new export/import lines (checked by hand, deadcheck.py: no unused import, no unused export except the `solvableByGrid as solvableBy` alias, a false positive).

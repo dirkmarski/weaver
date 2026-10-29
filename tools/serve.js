@@ -12,7 +12,9 @@ export function serve(port) {
   const server = http.createServer((req, res) => {
     let file;
     try {
-      file = path.join(ROOT, req.url === '/' ? 'index.html' : path.normalize(decodeURIComponent(req.url.split('?')[0])));
+      const url = decodeURIComponent(req.url.split('?')[0]);
+      if (url.includes('\0')) throw new Error('null byte');
+      file = path.join(ROOT, url === '/' ? 'index.html' : path.normalize(url));
     } catch {
       return res.writeHead(404).end();
     }
