@@ -40,5 +40,8 @@ Issue: https://github.com/weaver-agents/weaver/issues/121 . Branch: `issue-121-l
 - Not tested: Windows/Linux, Node 22.x (only 24.21.0), browsers other than Chrome, a busy port with IPv6 listener, the 30 s driver timeout orphan path.
 
 ## Lead review
+- Read the full diff (spec-implementation 2 files, README +2 lines). Review r1 (179f480): changes needed, finding 1 should (orphan server on helper SIGTERM; reproduced by the reviewer), 2-5 nits. Test r1 (1c02053): pass (fresh clone 5/5 loads, 13 files 200, 0 failed requests, 0 console errors; 4 pixel pairs identical; 224/224; ratio 1.586x).
+- Rework r1 (34948a3): finding 1 fixed (SIGTERM/SIGINT handlers kill the server, fetch 5 s timeout; developer before/after lsof proof); finding 2 fixed (dynamic `import()` seen). Nits accepted: 3 (README address guarded by the code-block line already; AC2 met), 4 (step as strict as its text), 5 (fixed port 8000, out of scope). Tester findings accepted: 0.0.0.0 listener coexists with the 127.0.0.1 bind (no clash, fetch reaches our server); trailing `# then visit` comment in the View command line is pre-existing text (AC2: no other README change) -> PM watch.
+- Lead re-check (driver-only, behaviour-neutral: lead re-check instead of tester re-run): suite 224/224 skipped 0, 4.27 s; paired mutant `import('lodash')` in an unexecuted serve.js function: head fails `imports that are neither relative nor node: built-ins`, 1c02053 passes 16/16. Port 8000 free afterwards. `spec-implementation/` 436 (+119), `tests/` unchanged. ADR 001/002: no departure.
 
 ## Lead: acceptance and merge
