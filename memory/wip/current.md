@@ -1,26 +1,25 @@
 # WIP: current
 
-Last updated: 2026-10-29, it24 #122 delivery (lead, session c62cf25c-8b8e-4cda-905a-5ce306a4299f)
+Last updated: 2026-10-29, it24 close (curator, session c62cf25c-8b8e-4cda-905a-5ce306a4299f)
 
 ## Active run
-- Iteration 23 closed: ADR 001 delivered by #116 (PR #118, main bfd7b54) and #117 (PR #119, main 52f8c6a); 222 tests pass, specs 14/14, screenshots pixel-identical. Wiki refreshed to the it23 state (architecture.md rewritten for the 12 modules).
-- Iteration 24 scoped by the PM: #121 (ADR 002 local run, spec on `issue-121-local-run`), then #122 (own reward marks, spec on `issue-122-reward-marks`). #121 and #122 merged.
+- Iteration 24 closed: #121 (ADR 002 local run, PR #123) and #122 (own pointing/claiming reward marks, PR #124) merged; main 65a90a6, 230 tests pass (21 specs), ratio 1.581x. Wiki refreshed to the it24 state.
+- Next: iteration 25 scoping by the PM from `wiki/backlog.md` item 1 (marks follow-ups) or item 2 (shorter box names).
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| it23 close | done: curator wiki/WIP reviewed and merged by the closing lead | none | closing lead |
-| it24 | #121 then #122, specs on branches | #121 done (PR #123 merged); #122 done (PR #124 merged, PM accepted D8); iteration ready to close | lead |
+| it24 close | curator wiki/WIP done | closing lead reviews and merges the memory changes | closing lead |
 
 ## Starting the next run
-- New feature code follows ADR 001: put it in the module that owns the concern (architecture.md "Modules"); a new root `*.js` needs a README "## Modules" line or the guard fails.
-- View or check the page with `node tools/serve.js` (never python http.server, never `file://`). ADR 002: `specs/running/local-run.feature` runs it on port 8000 during `node --test`, so keep 127.0.0.1:8000 free while testing.
-- Layout is at its limit at 360x740 (product.md "Known product gaps", D10): any longer pointing-hidden step 3 needs backlog item 1 or 2 first.
+- ADRs in force: 001 (modules: put code in the module that owns the concern, architecture.md "Modules"; a new root `*.js` needs a README "## Modules" line) and 002 (one README command, Node built-ins only, no install).
+- View or check the page with `node tools/serve.js` (never python http.server, never `file://`). Keep 127.0.0.1:8000 free during `node --test` (the ADR 002 spec serves there); scratch servers use other ports.
+- Layout is at its limit at 360x740 (product.md "Known product gaps", D10): any longer pointing-hidden step 3 needs backlog item 2 (shorter box names) first. Reward key lines fill the 64 px reserve at 3 lines (155 chars): a longer key needs a layout check.
 - Waiting on Dirk (pass on, no team action): enable GitHub Pages (PM C1); optional clarifying ADR on concern granularity (PM C2). See backlog.md "Open concerns for Dirk".
-- Reusable it23 scripts (session scratchpad `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/daff0a10-2135-459c-80b7-137f621f7088/scratchpad/`, while /tmp holds them; copy, do not edit in place; each has a README): `test-117/scripts/` (shots.mjs main-vs-branch screenshots on 4 states x 2 sizes with console capture, compare.mjs pixel diff, loads.mjs N fresh-profile page loads, serve.mjs logging static server, cdp.mjs real-input CDP client, mutants.py guard mutants), `dev-117/parity.py` (declaration-level parity of old vs new code; adapt for any future move/split), `dev-117/deadcheck.py` (unused declarations, exports, imports). `test-116/` is superseded by `test-117/` (it used python http.server).
+- Reusable it24 scripts (session scratchpad `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/c62cf25c-8b8e-4cda-905a-5ce306a4299f/scratchpad/`, while /tmp holds them; copy, do not edit in place; each has a README): `test-122/scripts/` (lib.mjs page reader + CDP real input, layout.mjs main-vs-branch layout + facts oracle, ac3.mjs mark lifetime, pixel.mjs main-vs-branch pixel compare, serveboth.mjs two trees on 8111/8112, mutants.py, probe*.mjs seed finders), `test-121/scripts/` (loads.mjs N fresh-profile loads, shots.mjs/compare.mjs screenshot parity; supersede the it23 `test-117/` copies), PM `pm-it24/` (persona briefs, shots with facts.md). The it23 session scratch (daff0a10...) is superseded.
 
 ## Open issues / PRs
-- none open for it24 (#121, #122 merged). Next: iteration 24 close (curator).
+- none open.
 
 ## Blockers / waiting on
 - none for the team.
