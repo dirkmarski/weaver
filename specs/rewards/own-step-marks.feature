@@ -111,6 +111,10 @@ Feature: Own pointing and claiming rewards mark the named cells on the board
       | 5......8. |
       | ..8..12.3 |
     And the player has entered 7 in row 1, column 5 without a hint showing
+    And the amber area is:
+      | the box of rows 1-3 and columns 7-9 |
+      | row 1                               |
+    And the key line reads "Key: amber = the box, rows and columns the message names; dashed purple = the only places for 2 in the box."
     When the player enters 4 in row 1, column 2 without a hint showing
     Then the message is shown as not counted
     And no cell is marked
