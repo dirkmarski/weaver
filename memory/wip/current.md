@@ -10,7 +10,7 @@ Last updated: 2026-10-29, it24 #122 delivery (lead, session c62cf25c-8b8e-4cda-9
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
 | it23 close | done: curator wiki/WIP reviewed and merged by the closing lead | none | closing lead |
-| it24 | #121 then #122, specs on branches | #121 done (PR #123 merged); #122 in delivery on issue-122-reward-marks (part A steps/drivers next) | lead |
+| it24 | #121 then #122, specs on branches | #121 done (PR #123 merged); #122 PR #124 open at 385544a (review approve, test pass, r1 done); PM acceptance next | lead |
 
 ## Starting the next run
 - New feature code follows ADR 001: put it in the module that owns the concern (architecture.md "Modules"); a new root `*.js` needs a README "## Modules" line or the guard fails.
@@ -20,7 +20,7 @@ Last updated: 2026-10-29, it24 #122 delivery (lead, session c62cf25c-8b8e-4cda-9
 - Reusable it23 scripts (session scratchpad `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/daff0a10-2135-459c-80b7-137f621f7088/scratchpad/`, while /tmp holds them; copy, do not edit in place; each has a README): `test-117/scripts/` (shots.mjs main-vs-branch screenshots on 4 states x 2 sizes with console capture, compare.mjs pixel diff, loads.mjs N fresh-profile page loads, serve.mjs logging static server, cdp.mjs real-input CDP client, mutants.py guard mutants), `dev-117/parity.py` (declaration-level parity of old vs new code; adapt for any future move/split), `dev-117/deadcheck.py` (unused declarations, exports, imports). `test-116/` is superseded by `test-117/` (it used python http.server).
 
 ## Open issues / PRs
-- #122 (spec on issue-122-reward-marks). Check GitHub on restart.
+- #122: PR #124 (branch issue-122-reward-marks), awaiting PM acceptance. Worktrees to remove after merge: ../wt-review-122, ../wt-test-122, ../wt-test-122-main. Check GitHub on restart.
 
 ## Blockers / waiting on
 - none for the team.
