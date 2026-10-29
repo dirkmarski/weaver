@@ -11,6 +11,14 @@ Issue: https://github.com/dirkmarski/weaver/issues/117. Branch: `issue-117-modul
 - Decision (lead, assumption for PM check): `cellPlace` in sudoku.js is a byte-identical duplicate of `cellName`; part B may keep one and drop the other (listed in the PR as dead code), the only allowed body edit besides imports/exports/indent.
 
 ## Developer
+- Claude Sonnet 5.5, session daff0a10-2135-459c-80b7-137f621f7088. Part B commit da7d554 (split) plus this log commit.
+- Split sudoku.js (removed) into 10 modules, PM map unchanged: board 71, validation 68, clashes 32, entry 48, techniques 152, hints 167, hintmarks 87, rewards 137, completion 20, generation 155; ui.js 400 (imports only).
+- Moved, not rewritten: declarations dedented by 2 (also ui.js); exports are one `export { ... }` block per module. Parity: `dev-117/parity.py` 64 of 66 declarations identical, 2 differ only by `cellPlace` -> `cellName` (ringLink, ringRules), `cellPlace` removed.
+- Shared helpers exported by the module that owns them: board (units, masks, spotsFor, firstHolder, cellName), hints (boxName, andList, struckCells, aDigit), techniques (claimingSteps, pointingSteps, singleAfterStep), clashes (namedClash). Private: firstTarget, isSingle, pointingHint, claimingHint, pointingClause, sharedUnits, notCounted, FIXED_TEXT, search, shuffle, defaultRng, TIME_CAP_MS.
+- Dead code: only `cellPlace` (duplicate of `cellName`); no other unused declaration, export or import (`dev-117/deadcheck.py`).
+- Tests: only imports change (named imports; `S.x` call sites rewritten to `x` where S spanned modules; generator.test.js keeps `S` for generation.js). The seeding import points to generation.js. Guard: `board.js` in the file check, and the IIFE-wrapper test now flags a closing `})();` only at the end of the file (it matched the legitimate `var UNITS = (function () {...})();` initialisers at column 0 once dedented).
+- Results: node --test 221/221, 0 skipped, 4.3 s; specs 14/14. Lines: product js 1337, tests/ 2439, spec-implementation/ 317; with html/css (1537) tests/ is 1.587x.
+- Deviations: the guard IIFE edit above (beyond the filename edit allowed); the comment that preceded `cellPlace` went with it, so `sharedUnits` has none.
 
 ## Reviewer
 
