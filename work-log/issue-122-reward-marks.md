@@ -51,6 +51,17 @@ Issue: https://github.com/weaver-agents/weaver/issues/122 . Branch: `issue-122-r
 
 ## Tester
 
+- Model Claude Sonnet 5.5 (claude-sonnet-5-5), session c62cf25c-8b8e-4cda-905a-5ce306a4299f. Head tested: 63d077e (main 96aee52 for comparison). Scratch and README: lead scratchpad `test-122/`.
+- Verdict: pass.
+- Findings:
+  1. AC4: the four round-3 states at 360x740 and 1280x900: button row top 517.73 / 729.80 and `#status` top 568.52 / 780.58 equal on main and branch; `#link` scrollHeight = clientHeight = 64 for all (longest key, claiming column with struck clause, 155 characters, 3 lines at 360).
+  2. Independent oracle (facts.md parse, computed styles): tinted, dashed, visible badge and struck sets, badge digit (`data-d` and `::after` content), key text ("box, rows and columns") match all four states at both sizes; the entered cell is tinted with no other mark; `data-d` only on badge cells; no rings, hatching, target or links; reward text unchanged.
+  3. AC3 (real CDP mouse/key/touch): kept after click outside the grid, arrow focus move, click on another cell, Notes button, a real note entry, N key, Tab (entered cell loses focus); gone after overwrite, Backspace, Delete, new entry, Verify, Hint (state identical to main's Hint marks), New puzzle and level choice. Touch at 360: tap cell, Notes, outside keep; Verify clears. Hint-credited pointing reward ("Well done!", Tricky seed 1) and a singles reward (Tricky seed 2) show no marks and an empty reserve.
+  4. AC5: pixel-identical main vs branch (0 differing pixels, byte-identical) for a Hint pointing explanation (all steps) and a singles reward at 360 and 1280; 0 console errors everywhere.
+  5. Observation (not a defect): retyping the same digit into the entered cell is no value change, so the marks stay.
+  6. Mutants (ui.js, reverted): 8 of 9 killed (data-d digit, key not cleared, focus clears, notes clears, key not shown, hint-target on entered cell, hint-credited gate dropped; data-d on area cells killed after adding a `data-d only on badge cells` check). m3 (drop `[data-d]` from the clearResults selector) survives: the confined and removed cells are always inside the amber area, so `.hint-area` removes them; equivalent for reward marks.
+- Not tested: devices other than headless Chrome (no Safari/Firefox); real phone keyboards; Hint-credited claiming; marks across an in-game level change (the picker is only reachable through New puzzle); `node --test` (developer/lead ran it).
+
 ## Lead review
 
 ## Lead: acceptance and merge
