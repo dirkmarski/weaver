@@ -20,7 +20,7 @@ and its controls are the subject.
 | Mine | The agents' |
 |---|---|
 | Agent definitions and the settings that launch or restrict them (`.claude/`) | The application, its tests and its pipeline |
-| The product context the team works within (`governance/context/`) | What goes into each iteration: the product manager decides it and writes the issues |
+| The context the team works within, including the architecture decision records and the rules every agent follows (`governance/context/`) | What goes into each iteration: the product manager decides it and writes the issues |
 | Any issue I write directly | Documentation, including the README |
 | This charter and the log (`governance/`) | Their curated memory (`memory/`) and their work log (`work-log/`) |
 | The rule on `main`: changes arrive by pull request | Merging, when they judge the work done |
@@ -43,7 +43,7 @@ plans, delegates and merges its issue. At the end of the session a curator folds
 learnings into the team's memory and a closing lead reviews that and finalises git.
 Every commit and pull request names the agent and the session.
 
-The curated memory is the agents' source of truth. A later session picks up
+The context in `governance/context/` comes first: where it and the curated memory disagree, the context wins. Within that, the curated memory is the agents' source of truth. A later session picks up
 unfinished work from GitHub and that memory. The work log is the audit trail, not a
 source to learn from.
 
