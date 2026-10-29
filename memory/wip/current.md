@@ -1,24 +1,26 @@
 # WIP: current
 
-Last updated: 2026-10-28, iteration 22 close (curator, session d2424c00-a6fb-45e6-86ab-53111ee2576f)
+Last updated: 2026-10-29, iteration 23 close (curator, session daff0a10-2135-459c-80b7-137f621f7088)
 
 ## Active run
-- Iteration 22 closed: #110 (PR #112), #108 (PR #113), #111 (PR #114) merged; main cc3f269, 207 tests pass. Wiki refreshed to the it22 state.
-- Next: iteration 23 scoping by the PM from `memory/wiki/backlog.md` (item 1: highlight the named cells on the grid).
+- Iteration 23 closed: ADR 001 delivered by #116 (PR #118, main bfd7b54) and #117 (PR #119, main 52f8c6a); 222 tests pass, specs 14/14, screenshots pixel-identical. Wiki refreshed to the it23 state (architecture.md rewritten for the 12 modules).
+- Next: iteration 24 scoping by the PM from `memory/wiki/backlog.md` item 1 (highlight the cells a reward or hint names; persona A/B first, then the spec).
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| it22 close | done | wiki/WIP merged via `iteration-22-close` (closing lead) | lead |
-| it23 | not started | PM scoping | PM |
+| it23 close | curator done | merge `iteration-23-close` (wiki/WIP) | closing lead |
+| it24 | not started | PM scoping | PM |
 
 ## Starting the next run
-- Method and rules: process.md "Per-issue flow" (red first) and "Test strategy applied" (ATDD, ratio); runner facts: architecture.md "ATDD".
+- New feature code follows ADR 001: put it in the module that owns the concern (architecture.md "Modules"); a new root `*.js` needs a README "## Modules" line or the guard fails.
+- View or check the page with `node tools/serve.js` (never python http.server, never `file://`).
 - Layout is at its limit at 360x740 (product.md "Known product gaps", D10): any longer pointing-hidden step 3 needs backlog item 1 or 2 first.
-- Reusable it22 scripts (session scratchpad `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/d2424c00-a6fb-45e6-86ab-53111ee2576f/scratchpad/`, if /tmp still holds them; copy, do not edit in place): `test-110/` (errcase.sh 32 runner error cases, mutate.py, oracle.js), `test-108/` (README covers r1/; lib.js 5 positions, oracle.js, layout.js, mutate.py; the 5th-position pre-fill order matters: tally 2 if r1c5 is entered first), `111/test/` (pos.js layout, texts.js, oracle.js, mutate.py), PM `pm-it22/` (spike.js, check.js spec-example check, layout/; no README). The other folders have a README.
+- Waiting on Dirk (pass on, no team action): enable GitHub Pages (PM C1); optional clarifying ADR on concern granularity (PM C2). See backlog.md "Open concerns for Dirk".
+- Reusable it23 scripts (session scratchpad `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/daff0a10-2135-459c-80b7-137f621f7088/scratchpad/`, while /tmp holds them; copy, do not edit in place; each has a README): `test-117/scripts/` (shots.mjs main-vs-branch screenshots on 4 states x 2 sizes with console capture, compare.mjs pixel diff, loads.mjs N fresh-profile page loads, serve.mjs logging static server, cdp.mjs real-input CDP client, mutants.py guard mutants), `dev-117/parity.py` (declaration-level parity of old vs new code; adapt for any future move/split), `dev-117/deadcheck.py` (unused declarations, exports, imports). `test-116/` is superseded by `test-117/` (it used python http.server).
 
 ## Open issues / PRs
 - none open (check GitHub on restart).
 
 ## Blockers / waiting on
-- none
+- none for the team.

@@ -1,6 +1,6 @@
 # Memory
 
-Implements `governance/memory-architecture.md`. The curator manages this directory at iteration closes; the lead keeps WIP current in between.
+Implements `governance/context/memory-architecture.md` (governance context wins over memory on conflict). The curator manages this directory at iteration closes; the lead keeps WIP current in between.
 
 | Tier | Where | Purpose | Rule of thumb |
 |---|---|---|---|
