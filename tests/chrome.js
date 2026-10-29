@@ -1,10 +1,9 @@
-'use strict';
 // Test helper only: finds Chrome, starts one headless instance and talks to it over the DevTools
 // protocol using Node built-ins (child_process, fs, fetch, the global WebSocket). No packages.
-const fs = require('node:fs');
-const os = require('node:os');
-const path = require('node:path');
-const { spawn } = require('node:child_process');
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { spawn } from 'node:child_process';
 
 const DEFAULTS = [
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
@@ -85,7 +84,7 @@ async function launch(chromePath) {
     });
     // Evaluates an expression in the page; returns its JSON-able value, throws on a page error.
     const evaluate = async (expression) => {
-      const r = await send('Runtime.evaluate', { expression, returnByValue: true });
+      const r = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
       if (r.exceptionDetails) throw new Error('page error: ' + (r.exceptionDetails.exception || {}).description);
       return r.result.value;
     };
@@ -97,4 +96,4 @@ async function launch(chromePath) {
   }
 }
 
-module.exports = { findChrome, launch };
+export { findChrome, launch };

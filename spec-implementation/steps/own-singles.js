@@ -1,9 +1,8 @@
-'use strict';
 // Domain steps for specs/rewards/own-singles.feature. All assertions live here.
-const assert = require('node:assert/strict');
-const game = require('../drivers/game');
+import assert from 'node:assert/strict';
+import * as game from '../drivers/game.js';
 
-module.exports = (define) => {
+export default (define) => {
   define(/^this puzzle, where "\." is an empty cell:$/, (w, rows) => {
     w.game = game.start(rows.map((row) => row[0]));
   });

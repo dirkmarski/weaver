@@ -1,9 +1,8 @@
-'use strict';
 // Domain steps for specs/hints/*.feature. All assertions live here.
-const assert = require('node:assert/strict');
-const game = require('../drivers/game');
+import assert from 'node:assert/strict';
+import * as game from '../drivers/game.js';
 
-module.exports = (define) => {
+export default (define) => {
   define(/^the level is (Tricky)$/, (w, level) => { w.level = level.toLowerCase(); });
   define(/^the player asks for a hint twice$/, (w) => game.hintTwice(w.game, w.level));
   define(/^the explanation's last line reads "(.*)"$/, (w, text) => {

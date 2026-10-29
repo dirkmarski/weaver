@@ -1,7 +1,7 @@
-'use strict';
-const test = require('node:test');
-const assert = require('node:assert');
-const S = require('../sudoku.js');
+import test from 'node:test';
+import assert from 'node:assert';
+import { PUZZLE } from './fixture.js';
+import * as S from '../sudoku.js';
 
 const LEVELS = ['easy', 'medium', 'tricky', 'tough', 'hard'];
 const flat = (g) => g.flat();
@@ -114,13 +114,11 @@ test('normal generation is not capped', () => {
 });
 
 test('solvableBy: fixture puzzle needs only singles; an empty grid needs more', () => {
-  const { PUZZLE } = require('./fixture.js');
   assert.ok(S.solvableBy(PUZZLE, 'singles'));
   assert.strictEqual(S.solvableBy(PUZZLE.map((r) => r.map(() => 0)), 'singles'), false);
 });
 
 test('countSolutions: empty grid has at least 2, fixture puzzle exactly 1', () => {
-  const { PUZZLE } = require('./fixture.js');
   assert.strictEqual(S.countSolutions(PUZZLE.map((r) => r.map(() => 0)), 2), 2);
   assert.strictEqual(S.countSolutions(PUZZLE, 2), 1);
 });

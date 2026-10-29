@@ -3,7 +3,7 @@
 A dependency-free static page that generates a fresh sudoku on demand. When the page loads you choose a difficulty (Easy, Medium, Tricky, Tough or Hard); only then is a puzzle generated and shown in a 9x9 grid with the 3x3 boxes shaded in two alternating light colours (blue and cream, checkerboard style). Below 560 px viewport width the cells are square and fit the width of the screen; from 560 px up they are 56 px. Puzzles are generated at run time (never taken from a stored bank) and always have exactly one solution.
 
 ## View
-Open `index.html` in a browser, or serve the folder:
+The folder must be served: the page loads its code as ES modules, which a browser does not run from a `file://` address, so opening `index.html` from disk no longer works.
 
     python3 -m http.server   # then visit http://localhost:8000
 
@@ -90,13 +90,13 @@ Each puzzle is a random complete grid with cells removed in random order; a cell
 Generation typically takes a few milliseconds (Tricky and Tough: tens of milliseconds, up to a few hundred). An internal time cap (1000 ms) guarantees click-to-render stays well under 2 seconds; if it were ever hit, the best valid unique puzzle found so far (fewest givens) is returned and the result has `capped: true` (it could then have more givens than the band or be easier than the level). `generatePuzzle` results also report `attempts`.
 
 ## Test
-Requires Node 18+ (22+ for the page tests; no packages needed):
+Requires Node 22+ (no packages needed):
 
     node --test            # (on newer Node versions, observed on Node 24, "node --test tests/" is treated as a path and fails)
 
 The tests are targeted: hand-built grids for the behaviour rules (golden path, edge cases, error conditions) and at most 10 seeded generated puzzles per level for the generator properties. The whole run takes about 2 seconds with Chrome (about 0.6 seconds without it, when the page tests are skipped).
 
-The page tests (`tests/page.test.js`) load the real `index.html` in one headless Chrome, with `Math.random` replaced by `seededRng`, press keys and click buttons, and check the DOM (status text and class, tally lines, cell classes). They need Node 22+ (global `WebSocket`) and Google Chrome or Chromium, and use only Node built-ins (no packages). Chrome is looked up in `CHROME_PATH`, then in the usual macOS and Linux locations. Without Chrome the page tests are reported as skipped, with the reason; the other tests still run. To force the skip, set `WEAVER_NO_CHROME=1`; with `CHROME_PATH` set to a missing file they are skipped too, with no other lookup:
+The page tests (`tests/page.test.js`) load the real `index.html` in one headless Chrome, served over http from a local server the tests start and stop (random free port), with `Math.random` replaced by `seededRng` (taken from the `sudoku.js` module), press keys and click buttons, and check the DOM (status text and class, tally lines, cell classes). They need Node 22+ (global `WebSocket`) and Google Chrome or Chromium, and use only Node built-ins (no packages). Chrome is looked up in `CHROME_PATH`, then in the usual macOS and Linux locations. Without Chrome the page tests are reported as skipped, with the reason; the other tests still run. To force the skip, set `WEAVER_NO_CHROME=1`; with `CHROME_PATH` set to a missing file they are skipped too, with no other lookup:
 
     CHROME_PATH=/path/to/chrome node --test
     WEAVER_NO_CHROME=1 node --test     # page tests skipped, unit tests only
@@ -116,7 +116,9 @@ Later UI work adds its page checks to `tests/page.test.js`. Chrome and its tempo
 
 ## Files
 - `index.html`, `style.css` - page and styling (`td.clash`: the orange clash outline; `#link`: the reserved space under the grid, holding the key line (a pointing or hidden-single explanation) or, while a hatched cell or ring is selected, the link sentence, cleared with the hint; `#key`: the invitation line under the status message and the Next step button (scrolled into view when it first appears); and `td.hint-linked`: the solid-purple partner rings of the focused hatched cell, or the selected ring; `td.hint-ruled`: the hatched cells the selected ring rules out)
-- `sudoku.js` - pure logic, exported for Node (and as `window.Sudoku`), plus the browser UI:
+- `ui.js` - the interface module (ADR 001): the only code that touches the page (`render()`: DOM, events); loaded by `index.html` with `<script type="module">`. `package.json` holds only `"type": "module"`, so all `.js` files are ES modules (tests and `spec-implementation/` use `import`).
+- `tests/modules.test.js` - ADR 001 guard: every `*.js` at the repo root is an ES module without wrapper or globals; only `ui.js` references the page; no other module imports it
+- `sudoku.js` - pure logic, an ES module imported by `ui.js` and by Node:
   - `generatePuzzle(level, {rng, maxMs})` (level `'easy'`, `'medium'`, `'tricky'`, `'tough'` or `'hard'`; `'tough'` returns the same puzzle as `'tricky'` for the same rng) -> `{level, puzzle, solution, givens}` (9x9 arrays, 0 = empty); `generateSolution(rng)`; `seededRng(seed)` for reproducible output; `countSolutions(grid, limit)`; `solvableBy(grid, 'naked'|'singles'|'pointing')` (`'pointing'`: singles, and when none is left a `findPointing` step, repeated until the grid is full or no step is left); `LEVELS` (`{min, max, technique, beyond}` per level: the givens band, the technique the puzzle must be solvable by and the one it must not be)
   - `isValidSolution`, `findConflicts`, `clashCells(grid)` (flat indices 9 * r + c, ascending, of the cells to outline: the `findConflicts` cells), `fixedMessage(before, after)` (the "No numbers break the rules now..." text when `before` has a clash and `after` has none, else `''`; the page lets `completionFor` override it), `namedClash(grid)` -> `null` when no rule is broken, else `{phrase, extra}` (the named clash: `phrase` is "row R1, column C1 and row R2, column C2 both hold E in the same U", `extra` is the "Other numbers break the rules too..." sentence when more than two cells clash, else `''`; used by `hintFor` and `creditEntry`), `verify`, `sanitizeDigit`, `buildGrid(puzzle, values)` (grid passed to verify; notes excluded)
   - keyboard: `nextCell(puzzle, r, c, 'up'|'down'|'left'|'right')` -> `[r, c]` of the next editable cell (givens skipped, no wrap) or `null`

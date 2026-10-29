@@ -1,4 +1,3 @@
-'use strict';
 // Minimal dependency-free Gherkin parser. parse(text, file) -> feature, or
 // throws an Error whose message starts with "file:line:".
 const STEP = /^(Given|When|Then|And|But)\s+(.*)$/;
@@ -73,4 +72,4 @@ function parse(text, file) {
   return f;
 }
 
-module.exports = { parse };
+export { parse };

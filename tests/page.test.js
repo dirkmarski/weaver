@@ -1,32 +1,37 @@
-'use strict';
 // Page tests: drive the real index.html in one headless Chrome (see tests/chrome.js) and read the DOM back.
 // Skipped, with a reason, when Chrome is not found (CHROME_PATH) or WEAVER_NO_CHROME=1.
-const { describe, it: base, before, after } = require('node:test');
-const assert = require('node:assert');
-const fs = require('node:fs');
-const path = require('node:path');
-const { pathToFileURL } = require('node:url');
-const S = require('../sudoku.js');
-const { findChrome, launch } = require('./chrome.js');
+import { describe, it as base, before, after } from 'node:test';
+import assert from 'node:assert';
+import fs from 'node:fs';
+import http from 'node:http';
+import path from 'node:path';
+import * as S from '../sudoku.js';
+import { findChrome, launch } from './chrome.js';
 
-const ROOT = path.join(__dirname, '..');
+const ROOT = path.join(import.meta.dirname, '..');
 const found = findChrome(process.env);
 
-// mulberry32 taken from the product source, so the page's Math.random is exactly seededRng(n).
-function seedScript() {
-  const m = fs.readFileSync(path.join(ROOT, 'sudoku.js'), 'utf8').match(/function seededRng\([\s\S]*?\n  \}/);
-  if (!m) throw new Error('tests/page.test.js: seededRng not found in sudoku.js (its layout changed); update the extraction');
-  return '(function () { ' + m[0] + '; window.__seed = function (n) { Math.random = seededRng(n); }; window.__seed(1); })();';
-}
+// The page is served over http (a module script does not run from file://): the repo folder on a random free port.
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' };
+const server = http.createServer((req, res) => {
+  const file = path.join(ROOT, req.url === '/' ? 'index.html' : path.normalize(req.url.split('?')[0]));
+  fs.readFile(file, (err, body) => {
+    if (err || !file.startsWith(ROOT)) return res.writeHead(404).end();
+    res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'text/plain' }).end(body);
+  });
+});
+// Math.random becomes seededRng(n), taken through the product module the page itself loads.
+const seedScript = "window.__seed = async function (n) { Math.random = (await import('/sudoku.js')).seededRng(n); };";
 
 let page;
 before(async () => {
   if (found.skip) return;
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   page = await launch(found.path);
   await page.send('Emulation.setFocusEmulationEnabled', { enabled: true }); // headless Chrome fires no focus events otherwise
-  await page.send('Page.addScriptToEvaluateOnNewDocument', { source: seedScript() });
+  await page.send('Page.addScriptToEvaluateOnNewDocument', { source: seedScript });
 });
-after(() => page && page.close());
+after(async () => { if (page) await page.close(); server.close(); });
 
 const J = JSON.stringify;
 const game = (level, seed) => S.generatePuzzle(level, { rng: S.seededRng(seed) });
@@ -44,15 +49,15 @@ const empties = (puzzle) => puzzle.flatMap((row, r) => row.map((v, c) => (v ? -1
 // Fresh page, seeded, level chosen with a real click.
 async function open(level, seed) {
   await page.eval('window.__stale = true');
-  const nav = await page.send('Page.navigate', { url: pathToFileURL(path.join(ROOT, 'index.html')).href });
+  const nav = await page.send('Page.navigate', { url: 'http://127.0.0.1:' + server.address().port + '/' });
   if (nav.errorText) throw new Error('page did not load: ' + nav.errorText);
   let loaded = false;
   for (let i = 0; i < 200 && !loaded; i++) {
-    loaded = await page.eval('!window.__stale && !!window.Sudoku');
+    loaded = await page.eval('!window.__stale && document.readyState === "complete"');
     if (!loaded) await new Promise((r) => setTimeout(r, 10));
   }
   if (!loaded) throw new Error('page did not load');
-  await page.eval('window.__seed(' + seed + ')');
+  await page.eval('window.__seed(' + seed + ')'); // awaits the module import
   if (level) await click('[data-level=' + level + ']');
 }
 const click = (sel) => page.eval('document.querySelector(' + J(sel) + ').click()');

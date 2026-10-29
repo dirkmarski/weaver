@@ -1,7 +1,6 @@
-'use strict';
 // Protocol driver for the game logic: the only code that loads sudoku.js.
 // It performs actions and reports what the game says. It checks nothing.
-const Sudoku = require('../../sudoku.js');
+import * as Sudoku from '../../sudoku.js';
 
 // rows: 9 strings of 9 characters, "." = empty.
 function start(rows) {
@@ -32,4 +31,4 @@ function hintTwice(game, level) {
 const lines = (game) => Sudoku.tallyLines(game.tally).slice(1);
 const linesBeforeLastEntry = (game) => game.linesBefore.slice(1);
 
-module.exports = { start, enter, hintTwice, lines, linesBeforeLastEntry };
+export { start, enter, hintTwice, lines, linesBeforeLastEntry };
