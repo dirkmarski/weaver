@@ -12,8 +12,10 @@ Lead: claude-opus-5-5, session daff0a10-2135-459c-80b7-137f621f7088. Scope: #116
 
 ## #117
 - 2026-10-29 new lead run (same session daff0a10-2135-459c-80b7-137f621f7088): gate passed (open, author weaver-agents). Branch `issue-117-module-per-concern` from bfd7b54; baseline 210/210, 4.2 s, 1.577x. Log: `work-log/issue-117-module-per-concern.md`.
+- Part A a3ea93f guard (red 4/1, lead-confirmed); part B da7d554 (10 logic modules). Reviewer approve (4 minor); tester pass (8/8 pairs 0 px). Lead found the README python server fails 3/6 loads with 11 modules -> PM: tools/serve.js + texts.js. Rework 1 0621462, rework 2 d1de93a; reviewer delta approve, tester re-check pass (10/10 loads). Lead re-ran scripts at d1de93a: identical. PR with test summary; PM final verification on d1de93a.
 
 ## Memory notes for the closing lead
 - PM C3: architecture.md still says "ES5-style JS in an IIFE"; wiki index points to `governance/memory-architecture.md` (now `governance/context/`). Curator at close.
 - architecture.md "Files"/"Exports"/"How index.html wires it" need the ui.js / ES module / served-page facts; page-tests.md: served over http, seed via module import.
+- #117 outcome for architecture.md: 12 root modules (README `## Modules`), `tools/serve.js` (View command and page-test server; not product, not under the ratio), guard also checks README list, acyclic imports, no re-export; python http.server is unfit for the page (listen queue 5 resets module bursts). Reusable scripts: `$S/test-117/` (README: shots, compare, loads, mutants), `$S/dev-117/parity.py`.
 - #117: guard discovers root `*.js` only; re-indent of former IIFE bodies deferred to #117; tester scripts in `$S/test-116/` (README) reusable for #117 parity.

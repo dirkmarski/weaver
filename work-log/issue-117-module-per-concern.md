@@ -12,6 +12,8 @@ Issue: https://github.com/dirkmarski/weaver/issues/117. Branch: `issue-117-modul
 - Part B da7d554 (+ log 01babbc), lead spot check: 19 files; parity.py (dev-117) 64/66 identical, ringLink/ringRules differ only cellPlace->cellName, cellPlace removed, ui.js identical after dedent; `node --test` 221/221, 0 skipped, 4.4 s; product 1537, tests/ 2439 (1.587x); tests diff: 9 assert lines changed, all `S.x`->`x` or guard edits, none removed. Guard IIFE-close regex now end-of-file only (board.js initialisers) - reviewer to mutant. Lines >120: 77, all pre-existing (old 86).
 - Reviewer 810dbf4 (ff): approve, 4 minor + 2 nit; f2 guard mutant survived (finding 4). Tester 2b87313 (ff): pass, 8/8 pairs 0 px, 0 console errors, mutants a/b/c killed, 13 files 200.
 - Defect found from the tester's caveat (lead repro, `$S/lead-117/repro/`): README View says `python3 -m http.server`; with it (Python 3.14, macOS) the branch page fails to start 3/6 loads (ERR_CONNECTION_RESET on hints.js/hintmarks.js, ui.js never runs); main 6/6. Cause: listen queue 5 vs Chrome's parallel module requests; with `request_queue_size=64` branch 8/8. Player-facing regression on the documented path; to PM for a decision (README View change), with reviewer finding 1 (hint-text helpers in hints.js).
+- PM decisions dde802e: Q1 = `tools/serve.js` + README View `node tools/serve.js` (accept: 10/10 clean loads); Q2 = shared text helpers to `texts.js`; cellPlace removal agreed.
+- Rework 1 0621462 (texts.js, tools/serve.js reused by page.test.js, guard IIFE regex any-indent opener, banners, README); reviewer delta aee80c0: approve, serve.js `%00` crash + `/?x=1` 404 + README concern wording -> rework 2 d1de93a. Tester re-check 787a470: pass.
 
 ## Developer
 - Claude Sonnet 5.5, session daff0a10-2135-459c-80b7-137f621f7088. Part B commit da7d554 (split) plus this log commit.
@@ -96,3 +98,8 @@ Read: process.md "Test strategy applied", lessons.md "Testing" and "Tooling", th
 
 
 ## Lead review
+- 2026-10-29, lead claude-opus-5-5. Code head d1de93a (log-only commits after it).
+- Re-ran at d1de93a: `node --test` 222/222, 0 skipped, 4.2 s; specs 14/14; tester shots.mjs + compare.mjs (start 11:29:27, pngs 11:30:3x): 8/8 pairs ALL IDENTICAL, console 0 errors; loads.mjs via README command `node tools/serve.js`: 10/10 loads, 13 files 200, 0 errors, 81 cells. Looked at branch-hint3-360x740.png: correct.
+- Counts: product 1534 (board 69, validation 68, clashes 32, entry 47, techniques 150, texts 29, hints 142, hintmarks 87, rewards 136, completion 20, generation 154, ui 400, index.html 46, style.css 153, package.json 1); tools/ 32 (outside product and tests); tests/ 2431 (1.585x); spec-implementation/ 317. specs/ unchanged vs bfd7b54.
+- Accepted survivors: `!function(){}()` wrapper form (pre-existing gap), serve.js traversal guard (unreachable over HTTP, kept as defence), bind address / decodeURIComponent untested (nits). 77 product lines > 120 chars, all pre-existing (none new).
+- ADR 001: compliant. ES modules, no build; ui.js the only page module, imported by nothing; logic modules one concern each per README `## Modules`, acyclic, no re-export; tests/driver import from owners; tools/serve.js is not product code.
