@@ -10,6 +10,8 @@ Issue: https://github.com/weaver-agents/weaver/issues/122 . Branch: `issue-122-r
 - Port 8000 must be free during `node --test` (ADR 002 spec).
 
 ## Developer
+- Part A (Sonnet 5.5, session c62cf25c): steps `steps/reward-marks.js` and driver `marksFor` in `drivers/game.js` for own-step-marks.feature.
+- Driver calls the absent `hintmarks.rewardMarks(step, r, c)`; absent = no marks. 4 of 5 scenarios fail on the amber assertion; scenario 5 passes vacuously until part B.
 
 ## Reviewer
 
