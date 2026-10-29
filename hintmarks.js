@@ -1,6 +1,6 @@
 // Hint marks: the cells a hint marks, the key line, the ring and hatch links.
 import { cellName, UNIT_NAMES, UNITS, CELL_UNITS } from './board.js';
-import { aDigit } from './hints.js';
+import { aDigit } from './texts.js';
 
 // The cells a showing hint marks, as flat indices, for a hintFor result of kind nudge/explain:
 // { area: the tinted cells (not the target), target,

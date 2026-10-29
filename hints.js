@@ -2,6 +2,7 @@
 import { UNITS } from './board.js';
 import { findConflicts, verify } from './validation.js';
 import { namedClash } from './clashes.js';
+import { boxName, struckCells, aDigit } from './texts.js';
 import { findNakedSingle, findHiddenSingle, findPointing, findClaiming } from './techniques.js';
 
 // Which technique Hint should teach next: the one applied less so far (own and
@@ -13,32 +14,9 @@ function preferredTechnique(tally, level) {
   return level === 'easy' ? 'naked' : 'hidden';
 }
 
-// "the box of rows R1-R2 and columns C1-C2" for box b (0-8).
-// dash: the character between the range numbers ('-' by default; the own pointing and claiming rewards pass U+2011).
-function boxName(b, dash) {
-  var r = 3 * Math.floor(b / 3), c = 3 * (b % 3), h = dash || '-';
-  return 'the box of rows ' + (r + 1) + h + (r + 3) + ' and columns ' + (c + 1) + h + (c + 3);
-}
-
 // "the box of ..., the digit D fits only in row L" for a pointing step.
 function pointingClause(s) {
   return boxName(s.box) + ', the digit ' + s.pointDigit + ' fits only in ' + s.line + ' ' + (s.index + 1);
-}
-
-// "1, 2 and 3" for a list of numbers.
-function andList(n) { return n.length > 1 ? n.slice(0, -1).join(', ') + ' and ' + n[n.length - 1] : String(n[0]); }
-
-// The struck cells (flat indices, ascending) by name: "row R, column C"; in one row "row N, columns A, B and C"; in one
-// column "column N, rows A and B"; else grouped per row, joined by "; ".
-function struckCells(removed) {
-  var rows = [], cols = [];
-  removed.forEach(function (q) { if (rows.indexOf(Math.floor(q / 9)) < 0) rows.push(Math.floor(q / 9)); if (cols.indexOf(q % 9) < 0) cols.push(q % 9); });
-  function nums(a) { return a.map(function (x) { return x + 1; }); }
-  if (cols.length === 1 && rows.length > 1) return 'column ' + (cols[0] + 1) + ', rows ' + andList(nums(rows));
-  return rows.map(function (r) {
-    var c = nums(removed.filter(function (q) { return Math.floor(q / 9) === r; }).map(function (q) { return q % 9; }));
-    return 'row ' + (r + 1) + ', column' + (c.length > 1 ? 's ' : ' ') + andList(c);
-  }).join('; ');
 }
 
 // The hintFor result for a pointing step (see findPointing).
@@ -161,7 +139,4 @@ function hintApplied(hint, value) {
   return 'Well done! You applied a ' + hint.technique + ' single: row ' + (hint.r + 1) + ', column ' + (hint.c + 1) + ' is ' + value + '.';
 }
 
-// 'an 8' or 'a D'.
-function aDigit(d) { return (d === 8 ? 'an ' : 'a ') + d; }
-
-export { preferredTechnique, boxName, andList, struckCells, hintFor, hintApplied, aDigit };
+export { preferredTechnique, hintFor, hintApplied };

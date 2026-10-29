@@ -2,9 +2,6 @@
 // Skipped, with a reason, when Chrome is not found (CHROME_PATH) or WEAVER_NO_CHROME=1.
 import { describe, it as base, before, after } from 'node:test';
 import assert from 'node:assert';
-import fs from 'node:fs';
-import http from 'node:http';
-import path from 'node:path';
 import { clashCells } from '../clashes.js';
 import { nextCell } from '../entry.js';
 import { generatePuzzle, seededRng } from '../generation.js';
@@ -13,31 +10,25 @@ import { hintFor } from '../hints.js';
 import { TECHNIQUE_DEFINITIONS } from '../rewards.js';
 import { findHiddenSingle, findNakedSingle, findPointing } from '../techniques.js';
 import { findChrome, launch } from './chrome.js';
+import { serve } from '../tools/serve.js';
 
-const ROOT = path.join(import.meta.dirname, '..');
 const found = findChrome(process.env);
 
-// The page is served over http (a module script does not run from file://): the repo folder on a random free port.
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' };
-const server = http.createServer((req, res) => {
-  const file = path.join(ROOT, req.url === '/' ? 'index.html' : path.normalize(req.url.split('?')[0]));
-  fs.readFile(file, (err, body) => {
-    if (err || !file.startsWith(ROOT)) return res.writeHead(404).end();
-    res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'text/plain' }).end(body);
-  });
-});
+// The page is served over http (a module script does not run from file://): tools/serve.js on a random free port.
+let server;
 // Math.random becomes seededRng(n), taken through the product module the page itself loads.
 const seedScript = "window.__seed = async function (n) { Math.random = (await import('/generation.js')).seededRng(n); };";
 
 let page;
 before(async () => {
   if (found.skip) return;
-  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  server = serve(0);
+  await new Promise((resolve) => server.once('listening', resolve));
   page = await launch(found.path);
   await page.send('Emulation.setFocusEmulationEnabled', { enabled: true }); // headless Chrome fires no focus events otherwise
   await page.send('Page.addScriptToEvaluateOnNewDocument', { source: seedScript });
 });
-after(async () => { if (page) await page.close(); server.close(); });
+after(async () => { if (page) await page.close(); if (server) server.close(); });
 
 const J = JSON.stringify;
 const game = (level, seed) => generatePuzzle(level, { rng: seededRng(seed) });

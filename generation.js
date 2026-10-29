@@ -2,7 +2,6 @@
 import { UNITS, toFlat, toGrid, usedMask, bitCount, spotsFor } from './board.js';
 import { findPointing } from './techniques.js';
 
-// ---- Generator -------------------------------------------------------
 // Internally a grid is a flat array of 81 digits (0 = empty).
 
 var LEVELS = {

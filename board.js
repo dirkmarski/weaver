@@ -1,4 +1,4 @@
-// Board primitives: units, peers, candidate masks, cell naming.
+// Board primitives: units, peers, candidate masks, cell naming (flat cell index p = 9 * row + column).
 
 // Where `digit` already sits among the peers of cell p (flat index): { unit: 0|1|2 (row, column, box), q }
 // for the first of the cell's row, column, box that holds it in a cell other than p, q being the first
@@ -12,8 +12,6 @@ function firstHolder(cells, p, digit) {
 }
 
 function cellName(p) { return 'row ' + (Math.floor(p / 9) + 1) + ', column ' + (p % 9 + 1); }
-
-// ---- Units and peers (flat cell index p = 9 * row + column) ----
 
 var UNIT_NAMES = ['row', 'column', 'box']; // UNITS[3 * i + k] is unit i of kind UNIT_NAMES[k]
 var UNITS = (function () {

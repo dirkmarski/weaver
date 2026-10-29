@@ -5,7 +5,7 @@ A dependency-free static page that generates a fresh sudoku on demand. When the 
 ## View
 The folder must be served: the page loads its code as ES modules, which a browser does not run from a `file://` address, so opening `index.html` from disk no longer works.
 
-    python3 -m http.server   # then visit http://localhost:8000
+    node tools/serve.js   # then visit http://localhost:8000
 
 ## How to play
 - On load, pick **Easy**, **Medium**, **Tricky**, **Tough** or **Hard**. The chosen level is shown above the grid, with **New puzzle** next to it; **Verify**, **Hint** and **Notes** are below the grid. **New puzzle** clears the grid and returns to the difficulty prompt.
@@ -116,23 +116,25 @@ Later UI work adds its page checks to `tests/page.test.js`. Chrome and its tempo
 
 ## Modules
 One module per concern (ADR 001), all at the repo root, each importing only what it uses; imports run one way (no cycles) and nothing imports `ui.js`:
-- `board.js`: board primitives: units, peers, candidate masks, cell naming
-- `validation.js`: validation: `isValidSolution`, `findConflicts`, `verify`, `buildGrid`
-- `clashes.js`: clashes: `namedClash`, `clashCells`, `fixedMessage`
-- `entry.js`: entry: `sanitizeDigit`, `applyEntry`, `noteDigits`, `nextCell`
-- `techniques.js`: techniques: finding naked and hidden singles, pointing and claiming steps
-- `hints.js`: hints: `preferredTechnique`, `hintFor`, `hintApplied` and the hint texts
-- `hintmarks.js`: hint marks: `hintMarks`, `hintKey`, `ringLink`, `ringRules`
-- `rewards.js`: rewards: `classifyEntry`, `creditEntry`, the tally, `TECHNIQUE_DEFINITIONS`, `statusClass`
-- `completion.js`: completion: `completionFor`
-- `generation.js`: generation: `LEVELS`, the generators, `solvableBy`, `countSolutions`, `seededRng`
-- `ui.js`: interface: the page (DOM, events), the only module that touches it
+- `board.js`: units, peers, candidate masks, cell naming
+- `validation.js`: `isValidSolution`, `findConflicts`, `verify`, `buildGrid`
+- `clashes.js`: `namedClash`, `clashCells`, `fixedMessage`
+- `entry.js`: `sanitizeDigit`, `applyEntry`, `noteDigits`, `nextCell`
+- `techniques.js`: finding naked and hidden singles, pointing and claiming steps
+- `texts.js`: naming of cells, boxes and lists in player messages
+- `hints.js`: `preferredTechnique`, `hintFor`, `hintApplied` and the hint texts
+- `hintmarks.js`: `hintMarks`, `hintKey`, `ringLink`, `ringRules`
+- `rewards.js`: `classifyEntry`, `creditEntry`, the tally, `TECHNIQUE_DEFINITIONS`, `statusClass`
+- `completion.js`: `completionFor`
+- `generation.js`: `LEVELS`, the generators, `solvableBy`, `countSolutions`, `seededRng`
+- `ui.js`: the page (DOM, events), the only module that touches it
 
 Tests and the spec driver import each function from the module that owns it; there is no module that re-exports the others.
 
 ## Files
 - `index.html`, `style.css` - page and styling (`td.clash`: the orange clash outline; `#link`: the reserved space under the grid, holding the key line (a pointing or hidden-single explanation) or, while a hatched cell or ring is selected, the link sentence, cleared with the hint; `#key`: the invitation line under the status message and the Next step button (scrolled into view when it first appears); and `td.hint-linked`: the solid-purple partner rings of the focused hatched cell, or the selected ring; `td.hint-ruled`: the hatched cells the selected ring rules out)
 - `ui.js` - the interface module (ADR 001): the only code that touches the page (`render()`: DOM, events); loaded by `index.html` with `<script type="module">`. `package.json` holds only `"type": "module"`, so all `.js` files are ES modules (tests and `spec-implementation/` use `import`).
+- `tools/serve.js` - static server of the repo folder (Node built-ins only; `node tools/serve.js` listens on 127.0.0.1:8000); `tests/page.test.js` reuses it on a free port. Not product: the guard lists only root `*.js`.
 - `tests/modules.test.js` - ADR 001 guard: every `*.js` at the repo root is an ES module without wrapper or globals; only `ui.js` references the page; no other module imports it
 - Logic modules (see Modules), ES modules imported by `ui.js` and by Node; their functions:
   - `generatePuzzle(level, {rng, maxMs})` (level `'easy'`, `'medium'`, `'tricky'`, `'tough'` or `'hard'`; `'tough'` returns the same puzzle as `'tricky'` for the same rng) -> `{level, puzzle, solution, givens}` (9x9 arrays, 0 = empty); `generateSolution(rng)`; `seededRng(seed)` for reproducible output; `countSolutions(grid, limit)`; `solvableBy(grid, 'naked'|'singles'|'pointing')` (`'pointing'`: singles, and when none is left a `findPointing` step, repeated until the grid is full or no step is left); `LEVELS` (`{min, max, technique, beyond}` per level: the givens band, the technique the puzzle must be solvable by and the one it must not be)

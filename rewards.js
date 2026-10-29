@@ -4,9 +4,8 @@ import { firstHolder, cellName, UNIT_NAMES, UNITS, CELL_UNITS, toFlat, usedMask,
 import { claimingSteps, pointingSteps, singleAfterStep } from './techniques.js';
 import { namedClash } from './clashes.js';
 import { sanitizeDigit } from './entry.js';
-import { boxName, andList, struckCells, hintApplied } from './hints.js';
-
-// ---- Rewards: recognising naked and hidden singles the learner enters ----
+import { hintApplied } from './hints.js';
+import { boxName, andList, struckCells } from './texts.js';
 
 // Which technique makes `digit` in the empty cell (r, c) of `grid` (the grid
 // just before the entry, 0 = empty) a single? Returns { technique: 'naked' },

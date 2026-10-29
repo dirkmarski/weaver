@@ -7,7 +7,6 @@ function sanitizeDigit(text) {
   return typeof text === 'string' && /^[1-9]$/.test(text) ? text : null;
 }
 
-// ---- Pencil-mark notes ----
 // A cell is { value: '' | '1'-'9', notes: bitmask } where bit d is set when
 // digit d is noted (bits 1-9).
 

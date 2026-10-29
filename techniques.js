@@ -1,8 +1,6 @@
 // Techniques: finding naked and hidden singles, pointing and claiming steps.
 import { UNIT_NAMES, UNITS, CELL_UNITS, toFlat, usedMask, bitCount, spotsFor } from './board.js';
 
-// ---- Hints: naked and hidden singles ----
-
 // First empty cell (reading order) whose row, column and box already hold 8
 // different digits, so exactly one digit fits. Returns { r, c, digit, seen }
 // (0-based r/c, seen = those 8 digits ascending) or null.
