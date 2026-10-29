@@ -6,6 +6,7 @@ PM scratch: `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/c62cf25c-8b8e-4cda
 ## Status
 - 2026-10-29: scoping done. main e5028f3, no open issues/PRs at start. New governance since the it23 close: ADR 002 (local run with one command, In force).
 - Issues raised, in delivery order: #121 (ADR 002 local run, spec on `issue-121-local-run` 794ebf7), #122 (own reward marks, spec on `issue-122-reward-marks` 774b91c). Next: lead delivers #121, then #122; PM accepts each.
+- 2026-10-29: #121 ACCEPTED (PR #123, verified head c0dd056, code 34948a3). PM ran specs 16/16, `node --test` 224/224; README View read as a player, `node tools/serve.js` served `/`, `/ui.js`, `/style.css`, `/generation.js` 200 with correct types, port free after stop (Node v24.21.0). ACs 1-6 met per PR test report. Next: #122.
 
 ## Direction
 - ADR 002 first: it applies to every change. Fresh-clone check of main (`node tools/serve.js`; `/`, `/ui.js`, `/style.css`, `/generation.js` 200): it runs, but the README View section omits the Node version (only under Testing) and nothing guards the rule.
@@ -21,6 +22,8 @@ PM scratch: `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/c62cf25c-8b8e-4cda
 - D2: #121 scenario 2 pins a rule main already meets, so it cannot be red first; its red proof is mutant runs (AC1). Guard lives in the spec (spec-implementation is outside the ratio cap; `tests/` headroom is about 21 lines and #122 needs it).
 - D3: #122 acceptance targets set below the R3 spike (M >= 3.75, L >= 3.5, want >= 2/3), as the lessons ask for margin.
 - D4: pointing and claiming in one issue: same marks, the key differs by one word.
+- D5 (#121 acceptance): the View command line keeps its pre-existing `# then visit http://localhost:8000` comment. Kept: it names the same address, and AC2 forbids other README changes; removing it is not worth an issue.
+- D6 (#121 acceptance): reviewer nits accepted, no scope change: a second README address line would survive the spec (the code-block line already holds the address); fixed port 8000 stays (port option is out of scope, backlog watch).
 - Assumption A1: the key text reuses the Hint's "struck grey D = this step rules D out there" for consistency, although personas found the double "=" slightly awkward.
 
 ## Concerns
