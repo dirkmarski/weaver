@@ -7,6 +7,8 @@ Issue: https://github.com/dirkmarski/weaver/issues/117. Branch: `issue-117-modul
 - Baseline bfd7b54: 210/210, 0 skipped, 4.2 s; product 1527 (sudoku.js 929, ui.js 398, index.html 46, style.css 153, package.json 1), `tests/` 2408 (1.577x, cap 2443), `spec-implementation/` 316.
 - Plan: developer part A = extend the guard (`tests/modules.test.js`): README module list = the root product `*.js` files, one concern line each; import graph acyclic; no re-export (`export ... from`). Red on the current code (README has no module list); own commit; lead confirms red. Part B = split `sudoku.js` per concern at the repo root (guard discovery unchanged), moved not rewritten, re-indent former IIFE bodies, dead code removed, tests change imports only, README. Then reviewer, tester (screenshots main vs branch, console, guard mutants on a new module), lead check, PR with test summary report, PM final verification.
 - No spec (PM D2); `specs/` untouched; the 14 scenarios are the regression gate.
+- Part A a3ea93f (developer, Sonnet 5.5): guard +16 lines (README `## Modules` list = root `*.js`; acyclic imports; no `export ... from`). Red confirmed by the lead: `node --test tests/modules.test.js` 4 pass, 1 fail (test 4, README list [] vs [sudoku.js, ui.js]).
+- Decision (lead, assumption for PM check): `cellPlace` in sudoku.js is a byte-identical duplicate of `cellName`; part B may keep one and drop the other (listed in the PR as dead code), the only allowed body edit besides imports/exports/indent.
 
 ## Developer
 
