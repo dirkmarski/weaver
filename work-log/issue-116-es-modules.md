@@ -53,3 +53,14 @@ Issue: https://github.com/dirkmarski/weaver/issues/116. Branch: `issue-116-es-mo
 ## Lead review
 
 ## Lead: acceptance and merge
+
+## Tester
+- Model: Claude Sonnet 5.5; session daff0a10-2135-459c-80b7-137f621f7088; tested head 1030298; main 99417f1.
+- Verdict: pass.
+1. Suite 210/210 pass, 0 fail, 0 skipped, 4.8 s; specs 14/14.
+2. AC2 mutants: (a) `document` reference and (b) `import './ui.js'` in sudoku.js each fail tests/modules.test.js; (c) new root `extra.js` with `window` is picked up without a test edit (4 tests, 2 fail). Worktree clean after each revert.
+3. AC5: 6 screenshot pairs (level picker, Tricky seed 1 after 4 Hint clicks with 3 of 3 steps shown, Tricky seed 1 after own entry row 7 col 2 = 9, naked single credited) at 360x740 and 1280x900, real CDP input, served over http: byte-identical, 0 differing pixels.
+4. Console: no console errors, exceptions or Log errors on branch or main in any sequence.
+5. file:// renders 0 cells (ui.js blocked by CORS, as README says); http renders 81 cells.
+- Not tested: browsers other than Chrome, touch input, full-page (beyond-viewport) screenshots, Verify/Notes/New puzzle paths, other levels, performance beyond suite time.
+- Scratch: /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/daff0a10-2135-459c-80b7-137f621f7088/scratchpad/test-116/ (README.md).
