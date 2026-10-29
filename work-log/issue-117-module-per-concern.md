@@ -62,6 +62,14 @@ AC map: AC1 ok with findings 1-3 (each module matches its line; no re-export; te
 Formatting: former IIFE 2-space offset gone; lines >120: 77 in total, none new by count (old 86 per lead). README claims about sudoku.js replaced.
 Not checked: screenshots/console (tester), PR text, page behaviour beyond the suite, per-line count of long lines by file.
 
+### Rework 1 delta
+- Model Sonnet 5.5, delta 810dbf4..fde0f85. Verdict: APPROVE with minors. `node --test` 222/222, 0 skipped; tests/ 2431, product 1534 (+ tools/serve.js 30, not product), spec-implementation 317; tests/product 1.585.
+- Findings 2-5 resolved: banners gone, board.js heading reworded, IIFE guard now kills f1, f2, f2b (close indented), arrow IIFE; `var X = (function(){...})();` (col 0 or indented close) passes; README labels no longer doubled. texts.js is one concern; hints.js keeps selection and hint texts; imports minimal; no cycle. parity.py: 64 identical, 2 cellPlace->cellName, 1 removed, ui.js identical; dropping `// ----` lines is sound (comment-only filter).
+- ADR 001: tools/serve.js is outside the root `*.js` set and imports nothing of the product; no impact.
+- serve.js, minor 1: `%00` in the URL throws synchronously in `fs.readFile` (serve.js:19) and crashes the process; wrap in the try or use `path` check first. minor 2: `/?x=1` gives 404 (the `/` test is on the raw url); use the split path. minor 3: the traversal guard (serve.js:20) is unreachable over HTTP (Node rejects a non-`/` request target and `path.normalize` on a `/`-led path cannot climb), so mutant "guard removed" is equivalent/unkillable; keep as defence, no test needed.
+- Mutants: no `.js` MIME killed (24 failures, Chrome tests); 127.0.0.1 -> 0.0.0.0 survives (no test; nit); decodeURIComponent removed survives (no test; nit).
+- README: View line exact. Modules lines for validation, clashes, entry, hints, hintmarks, rewards, completion, generation are function lists, not concerns; suggested: validation "checking a grid and reporting conflicts"; clashes "naming the clash of an entered digit"; entry "typing and noting digits in a cell"; hints "choosing a hint and its texts"; hintmarks "the cells, key line and links a hint marks"; rewards "recognising and crediting the learner's own steps"; completion "the end-of-puzzle message"; generation "making puzzles by level".
+
 ## Tester
 - Model Sonnet 5.5, session daff0a10-2135-459c-80b7-137f621f7088, head 810dbf4 (main bfd7b54). Verdict: PASS, no defects.
 1. `node --test`: 221 tests, 221 pass, 0 fail, 0 skipped, 4.3 s. Specs alone: 14/14, 0 skipped.
