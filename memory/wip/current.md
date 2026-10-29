@@ -1,16 +1,16 @@
 # WIP: current
 
-Last updated: 2026-10-29, it24 #121 delivery (lead, session c62cf25c-8b8e-4cda-905a-5ce306a4299f)
+Last updated: 2026-10-29, it24 #122 delivery (lead, session c62cf25c-8b8e-4cda-905a-5ce306a4299f)
 
 ## Active run
 - Iteration 23 closed: ADR 001 delivered by #116 (PR #118, main bfd7b54) and #117 (PR #119, main 52f8c6a); 222 tests pass, specs 14/14, screenshots pixel-identical. Wiki refreshed to the it23 state (architecture.md rewritten for the 12 modules).
-- Iteration 24 scoped by the PM: #121 (ADR 002 local run, spec on `issue-121-local-run`), then #122 (own reward marks, spec on `issue-122-reward-marks`). #121 in delivery.
+- Iteration 24 scoped by the PM: #121 (ADR 002 local run, spec on `issue-121-local-run`), then #122 (own reward marks, spec on `issue-122-reward-marks`). #121 merged; #122 in delivery.
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
 | it23 close | done: curator wiki/WIP reviewed and merged by the closing lead | none | closing lead |
-| it24 | #121 then #122, specs on branches | #121 done (PR #123 merged, PM accepted); next #122 (branch issue-122-reward-marks) | lead |
+| it24 | #121 then #122, specs on branches | #121 done (PR #123 merged); #122 in delivery on issue-122-reward-marks (part A steps/drivers next) | lead |
 
 ## Starting the next run
 - New feature code follows ADR 001: put it in the module that owns the concern (architecture.md "Modules"); a new root `*.js` needs a README "## Modules" line or the guard fails.

@@ -8,5 +8,8 @@ Lead: Claude Opus 5.5 (claude-opus-5-5), session c62cf25c-8b8e-4cda-905a-5ce306a
 - Review 179f480 changes needed (orphan server on helper SIGTERM); test 1c02053 pass (fresh clone 5/5, pixel 4/4). Rework r1 34948a3, lead re-check (paired mutant). PR #123 opened.
 - PM accepted (c0dd056, D5-D6); merged PR #123 at the branch head with a merge commit.
 
+## #122
+- 2026-10-29 gate ok (open, PM author); main 96aee52 merged into the branch (fbf1dce); baseline 224 pass + 5 undefined new scenarios; ratio 1.586x (2431/1533).
+
 ## Memory notes for the closing lead
 - spec-implementation now has a process-level driver (`drivers/local-run.js`, `--crawl` helper since steps are synchronous); it owns port 8000 during the spec run, so a dev server on 127.0.0.1:8000 makes `node --test` fail (clear message).
