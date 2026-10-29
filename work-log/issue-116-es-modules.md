@@ -57,6 +57,12 @@ Issue: https://github.com/dirkmarski/weaver/issues/116. Branch: `issue-116-es-mo
 ## Tester
 
 ## Lead review
+- 2026-10-29, lead claude-opus-5-5. Part A d805739: guard 0/2 pass (red, confirmed in a detached worktree). Code head c3fefb8 (rework 1 = reviewer findings 1, 2, 5, leading blank line; behaviour-neutral).
+- Checked: diff of old sudoku.js vs new sudoku.js+ui.js = only IIFE head/tail, `api` object -> export list, two wrapper lambdas -> named functions (`countSolutions`, `solvableByGrid as solvableBy`), top-level `render()`. No assertion removed in tests/ (only require/seed/readiness/navigation lines). README View/Test/page-test paragraphs per AC4.
+- Re-ran at c3fefb8: `node --test` 210/210, 0 skipped, 4.3 s; specs 14/14; tester mutants.py a/b/c all rc 1, clean after revert; shots.mjs + compare.mjs (fresh output 10:51 after 10:50 start): 6/6 pairs bytes-identical, 0 console errors; filecheck file:// 0 cells (CORS), http 81 cells. Looked at branch-hint3-360x740.png.
+- Counts: product 1527 (sudoku.js 929, ui.js 398, index.html 46, style.css 153, package.json 1), tests/ 2408 (1.577x, cap 2443), spec-implementation/ 316.
+- Deferred, not blocking: re-indent of former IIFE bodies (2-space offset) and the odd `statusClass,` line wrap in ui.js imports -> #117 (moves the code anyway; review with `git diff -w`). Guard covers root `*.js` only: #117 must keep modules at root or extend discovery. Survivors accepted: dynamic import of a built string; server traversal/404 (test harness); countSolutions default limit (pre-existing).
+- ADR 001: compliant for part 1 (ES modules, no build, one interface module, logic never imports it, tests load via modules). Not ADR-complete until #117 (one module per concern), as PM D1 states.
 
 ## Lead: acceptance and merge
 
