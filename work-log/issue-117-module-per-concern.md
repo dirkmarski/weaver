@@ -22,6 +22,36 @@ Issue: https://github.com/dirkmarski/weaver/issues/117. Branch: `issue-117-modul
 - Deviations: the guard IIFE edit above (beyond the filename edit allowed); the comment that preceded `cellPlace` went with it, so `sharedUnits` has none.
 
 ## Reviewer
+- Model Sonnet 5.5, session daff0a10-2135-459c-80b7-137f621f7088, head 52cd648 (code da7d554), base bfd7b54. Verdict: APPROVE with minors (no blocker, no major).
+- Evidence: `node --test` 221/221, 0 skipped, 4.4 s; specs/ untouched; parity.py re-run 64/66 identical, 2 differ only cellPlace->cellName, cellPlace removed, ui.js identical after dedent. parity.py is sound for bodies: it compares full declaration text, so an edited body prints DIFF (it flagged the 2 expected ones); it covers sudoku.js up to line 892 and the ui.js body, not the new export/import lines (checked by hand, deadcheck.py: no unused import, no unused export except the `solvableByGrid as solvableBy` alias, a false positive).
+Findings
+1. minor, hints.js:16-42,164-167 (used by rewards.js:7, hintmarks.js:3): `boxName`, `andList`, `struckCells`, `aDigit` are hint-text helpers exported from hints.js and consumed by two other modules, so hints.js is both "which hint" and the shared text library; rewards depends on hints only for them. One concern per module is arguable; they were one file before. Recommend: leave (README says "and the hint texts") or note in the PR as a PM decision; a `text.js` module is optional, not required by the AC.
+2. minor, techniques.js:4 "---- Hints: naked and hidden singles ----", rewards.js:9 "---- Rewards: ...", generation.js:5 "---- Generator ---", entry.js:10 "---- Pencil-mark notes ----", board.js:16 "---- Units and peers": leftover section banners from the single file; the techniques one names the wrong module. Recommend drop or reword (comments only).
+3. minor, board.js:3-14: `firstHolder` and `cellName` sit above the "Units and peers" banner, so the banner no longer heads the file; reorder or reword with finding 2.
+4. minor, tests/modules.test.js:22-23 (guard): the changed IIFE regex lost coverage. Mutant f2 (open indented, close `})();` at column 0, `export` after it) now survives; the old `^\}\s*\)\s*\(\s*\)` killed it. Cause: close pattern only at EOF. Recommend restoring the column-0 close alternative while still allowing `var X = (function () {...})();` (indented close). `!function(){}()` at EOF also survives (f3; pre-existing).
+5. nit, README.md Modules lines: label repeated ("- `validation.js`: validation: ..."), 10 of 11 lines. Reads as a doubled label; drop the second word or make it a sentence. The guard regex needs only `: \S`.
+6. nit, generation.js:153,155: `solvableByGrid as solvableBy` alias is the pre-existing export shape (moved, not new); fine.
+7. nit, rewards.js:3 imports 9 names from board.js: all used (deadcheck), only a long line (>120, pre-existing style).
+No cycle: board<-validation(none)<-clashes<-hints<-hintmarks/rewards<-ui; ui imported by none.
+Mutants (modules.test.js unless noted; each reverted, status clean)
+| id | file | change | result |
+| a | completion.js | `document.title` | killed |
+| b | completion.js | `import './ui.js'` | killed |
+| b2 | clashes.js | `import('./ui.js')` dynamic | killed |
+| c | validation.js | imports clashes.js (cycle) | killed |
+| d | completion.js | `export * from './board.js'` | killed |
+| d2 | completion.js | `export { cellName } from` | killed |
+| e | README.md | completion.js line removed | killed |
+| h | README.md | line for nonexistent ghost.js | killed |
+| g | extra.js | new root module, no README line | killed |
+| i | completion.js | `globalThis.x = 1` | killed |
+| f1 | completion.js | `(function () {` at col 0 + `})();` EOF | killed |
+| f2 | completion.js | indented open, close col 0, export after | SURVIVED (finding 4) |
+| f3 | completion.js | `!function () {` ... `}();` EOF | SURVIVED (pre-existing) |
+| m1-m2 | hints.js, board.js | `aDigit` 8->7; `cellName` row +1 removed (full suite) | killed |
+AC map: AC1 ok with findings 1-3 (each module matches its line; no re-export; tests, driver, ui import from owners); AC2 ok (acyclic, guard mutants killed; f2 note); AC3 ok (imports/exports minimal, cellPlace the only dead code removed); AC4 ok (bodies unchanged, tests change only imports, `S.x`->`x`, the page seed script path '/generation.js', one comment sudoku.js->ui.js, guard additions; specs/ untouched; 221/221, 0 skipped, 4.4 s); AC5: product 1537 (board 71, validation 68, clashes 32, entry 48, techniques 152, hints 167, hintmarks 87, rewards 137, completion 20, generation 155, ui 400, index.html 46, style.css 153, package.json 1), tests/ 2439, spec-implementation/ 316, ratio 1.587 <= 1.6. ADR 001: one concern per module (finding 1 aside), ES modules, only ui.js touches the page, no wrappers: ok.
+Formatting: former IIFE 2-space offset gone; lines >120: 77 in total, none new by count (old 86 per lead). README claims about sudoku.js replaced.
+Not checked: screenshots/console (tester), PR text, page behaviour beyond the suite, per-line count of long lines by file.
 
 ## Tester
 
