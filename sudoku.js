@@ -1,4 +1,3 @@
-
   function isValidSolution(grid) {
     if (!Array.isArray(grid) || grid.length !== 9) return false;
     for (var r = 0; r < 9; r++) {

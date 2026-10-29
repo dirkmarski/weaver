@@ -1,5 +1,8 @@
 import {
-  TECHNIQUE_DEFINITIONS, applyEntry, buildGrid, clashCells, completionFor, creditEntry, emptyTally, fixedMessage, generatePuzzle, hintFor, hintKey, hintMarks, nextCell, noteDigits, preferredTechnique, ringLink, ringRules, statusClass, tallyLines, verify
+  TECHNIQUE_DEFINITIONS, applyEntry, buildGrid, clashCells, completionFor, creditEntry, emptyTally, fixedMessage,
+  generatePuzzle, hintFor, hintKey, hintMarks, nextCell, noteDigits, preferredTechnique, ringLink, ringRules,
+  statusClass,
+  tallyLines, verify
 } from './sudoku.js';
 
   var ARROWS = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };

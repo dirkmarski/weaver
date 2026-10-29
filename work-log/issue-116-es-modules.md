@@ -16,6 +16,12 @@ Issue: https://github.com/dirkmarski/weaver/issues/116. Branch: `issue-116-es-mo
 - Lines: product 1525 (sudoku.js 930, ui.js 395, index.html 46, style.css 153, package.json 1); `tests/` 2408 (1.579x, cap 2440); `spec-implementation/` 315.
 - Deviation: none known.
 
+### Rework 1
+- README Test section: "Requires Node 22+ (no packages needed)", consistent with the page-test paragraph (`import.meta.dirname`, global `WebSocket`).
+- `tests/modules.test.js`: PAGE regex now also matches `self`, `navigator`, `history` (no new lines); mutant `self.x` in sudoku.js fails the guard.
+- Wrapped the `ui.js` import list (now 5 lines, <= 120 chars) and the step-loading line in `spec-implementation/specs.test.js` (extra `stepFiles` const).
+- Deleted the leading blank line of `sudoku.js`; former IIFE bodies not re-indented (#117).
+
 ## Reviewer
 - Model: Claude Sonnet 5.5. Session daff0a10-2135-459c-80b7-137f621f7088. Head reviewed: 07b4fb2 (base 2099232).
 - Verdict: approve (no blocker, no major). Two minor findings recommended before merge; nits optional.

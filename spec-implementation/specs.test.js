@@ -7,6 +7,7 @@ import { register } from './runner.js';
 
 const defs = [];
 const define = (re, fn) => defs.push({ re, fn });
-for (const f of fs.readdirSync(path.join(import.meta.dirname, 'steps')).filter((f) => f.endsWith('.js')).sort()) (await import('./steps/' + f)).default(define);
+const stepFiles = fs.readdirSync(path.join(import.meta.dirname, 'steps')).filter((f) => f.endsWith('.js')).sort();
+for (const f of stepFiles) (await import('./steps/' + f)).default(define);
 
 register(test, defs, path.join(import.meta.dirname, '..'));

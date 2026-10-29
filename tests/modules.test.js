@@ -9,7 +9,7 @@ const ROOT = path.join(import.meta.dirname, '..');
 const UI = 'ui.js';
 const files = fs.readdirSync(ROOT).filter((f) => f.endsWith('.js')).sort();
 const src = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
-const PAGE = /\b(document|window|globalThis|addEventListener|querySelector(All)?|getElementById|createElement|localStorage|location)\b/;
+const PAGE = /\b(document|window|globalThis|self|navigator|history|addEventListener|querySelector(All)?|getElementById|createElement|localStorage|location)\b/;
 const IMPORT = /\b(?:from|import)\s*\(?\s*['"]([^'"]+)['"]/g;
 
 test('modules: the product files are listed, with exactly one interface module', () => {
