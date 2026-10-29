@@ -9,6 +9,7 @@ Issue: https://github.com/dirkmarski/weaver/issues/117. Branch: `issue-117-modul
 - No spec (PM D2); `specs/` untouched; the 14 scenarios are the regression gate.
 - Part A a3ea93f (developer, Sonnet 5.5): guard +16 lines (README `## Modules` list = root `*.js`; acyclic imports; no `export ... from`). Red confirmed by the lead: `node --test tests/modules.test.js` 4 pass, 1 fail (test 4, README list [] vs [sudoku.js, ui.js]).
 - Decision (lead, assumption for PM check): `cellPlace` in sudoku.js is a byte-identical duplicate of `cellName`; part B may keep one and drop the other (listed in the PR as dead code), the only allowed body edit besides imports/exports/indent.
+- Part B da7d554 (+ log 01babbc), lead spot check: 19 files; parity.py (dev-117) 64/66 identical, ringLink/ringRules differ only cellPlace->cellName, cellPlace removed, ui.js identical after dedent; `node --test` 221/221, 0 skipped, 4.4 s; product 1537, tests/ 2439 (1.587x); tests diff: 9 assert lines changed, all `S.x`->`x` or guard edits, none removed. Guard IIFE-close regex now end-of-file only (board.js initialisers) - reviewer to mutant. Lines >120: 77, all pre-existing (old 86).
 
 ## Developer
 - Claude Sonnet 5.5, session daff0a10-2135-459c-80b7-137f621f7088. Part B commit da7d554 (split) plus this log commit.
