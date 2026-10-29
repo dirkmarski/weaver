@@ -42,3 +42,17 @@ PM: claude-opus-5-5, session daff0a10-2135-459c-80b7-137f621f7088. Started 2026-
 - AC1-AC7 all pass. AC5: lead's c3fefb8 shots, 6/6 pairs byte-identical (cmp), 0 console errors in 12 captures. I viewed 2 shots (hint3 360, entry 1280) and found them correct. AC6: 1527 / 2408 (1.577x).
 - Note: `tests/modules.test.js` reads product source as text. I accept this under AC3 because it is a static structure check (the AC2 guard), not code extraction.
 - Carried to #117: re-indent, guard discovery limited to root `*.js`. ADR 001 is not complete until #117 merges (D1).
+
+## #117 decisions (2026-10-29, PM claude-opus-5-5, before rework)
+- Q1 (README View path flaky after the split, lead repro 3/6 failed loads with `python3 -m http.server`): option B. Add `tools/serve.js` (Node built-ins only, static files from the repo root, outside the root `*.js` product set and the guard). README View command becomes `node tools/serve.js   # then visit http://localhost:8000`. Reason: a short command that works; Node is already the team's runtime (tests), no package dependency; the python one-liner is too long and fragile for a player. Accepted as an in-scope fix of a regression the split caused, logged as a Change log line on #117. Acceptance: tester loads the branch page via the README command 10/10 in Chrome with no failed module request and no console error; a level choice starts a puzzle each time. If tests already have a served-page helper, reuse it rather than duplicate. The `tools/` lines are reported separately (not product, not `tests/`).
+- Q2 (reviewer finding 1): move the shared text helpers `boxName`, `andList`, `struckCells`, `aDigit` into `texts.js`, concern "naming of cells, boxes and lists in player messages". hints.js keeps `preferredTechnique`, `hintFor`, `hintApplied` and the hint texts. Reason: rewards.js and hintmarks.js must not import hint text plumbing from hints.js; AC1 needs each module to match its one line. Bodies unchanged.
+- Lead assumption on `cellPlace` (byte-identical duplicate of `cellName`, one dropped): agreed, it is dead code under AC3.
+- Out of scope stays: no other wording change in README or the page.
+
+## Acceptance #117 (PR #119)
+- 2026-10-29, PM claude-opus-5-5. Verdict: accepted on d1de93a (97c9b10 adds only work-log changes). Not merged (lead). Comment: https://github.com/dirkmarski/weaver/pull/119#issuecomment-6485420045
+- Own run in a detached worktree at d1de93a: `node --test` 222/222, 0 skipped, 4.9 s; specs 14/14; `specs/` unchanged vs bfd7b54.
+- AC1-AC6 pass. Imports per module match the README concerns. There is no re-export and nothing imports ui.js. In my export audit every export has a user outside its own module. Changed test assertions are renames or guard checks only. AC4: I re-ran compare.mjs on the lead's 11:30 shots: 8/8 pairs identical, 0 console errors. AC5: 1534 / 2431 (1.585x); `tools/` 32 is counted separately.
+- Q1: README command `node tools/serve.js` + loads.mjs: 10/10 clean (13/13 files 200, 0 errors, 81 cells). Q2: texts.js as specified.
+- Assumption: the README edits that replace `sudoku.js` with the new module names are facts that follow from the split, not out-of-scope wording changes.
+- With #117 merged, ADR 001 is complete (D1). For the curator: memory architecture notes still describe the IIFE/one-file layout (C3).

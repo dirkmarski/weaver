@@ -1,0 +1,108 @@
+# #117 One module per concern for the logic (ADR 001, part 2)
+
+Issue: https://github.com/dirkmarski/weaver/issues/117. Branch: `issue-117-module-per-concern`.
+
+## Lead
+- Gate: open, author weaver-agents (PM), label enhancement, 2026-10-29. Session daff0a10-2135-459c-80b7-137f621f7088 (new lead run in the same session; #116 merged as PR #118, main bfd7b54).
+- Baseline bfd7b54: 210/210, 0 skipped, 4.2 s; product 1527 (sudoku.js 929, ui.js 398, index.html 46, style.css 153, package.json 1), `tests/` 2408 (1.577x, cap 2443), `spec-implementation/` 316.
+- Plan: developer part A = extend the guard (`tests/modules.test.js`): README module list = the root product `*.js` files, one concern line each; import graph acyclic; no re-export (`export ... from`). Red on the current code (README has no module list); own commit; lead confirms red. Part B = split `sudoku.js` per concern at the repo root (guard discovery unchanged), moved not rewritten, re-indent former IIFE bodies, dead code removed, tests change imports only, README. Then reviewer, tester (screenshots main vs branch, console, guard mutants on a new module), lead check, PR with test summary report, PM final verification.
+- No spec (PM D2); `specs/` untouched; the 14 scenarios are the regression gate.
+- Part A a3ea93f (developer, Sonnet 5.5): guard +16 lines (README `## Modules` list = root `*.js`; acyclic imports; no `export ... from`). Red confirmed by the lead: `node --test tests/modules.test.js` 4 pass, 1 fail (test 4, README list [] vs [sudoku.js, ui.js]).
+- Decision (lead, assumption for PM check): `cellPlace` in sudoku.js is a byte-identical duplicate of `cellName`; part B may keep one and drop the other (listed in the PR as dead code), the only allowed body edit besides imports/exports/indent.
+- Part B da7d554 (+ log 01babbc), lead spot check: 19 files; parity.py (dev-117) 64/66 identical, ringLink/ringRules differ only cellPlace->cellName, cellPlace removed, ui.js identical after dedent; `node --test` 221/221, 0 skipped, 4.4 s; product 1537, tests/ 2439 (1.587x); tests diff: 9 assert lines changed, all `S.x`->`x` or guard edits, none removed. Guard IIFE-close regex now end-of-file only (board.js initialisers) - reviewer to mutant. Lines >120: 77, all pre-existing (old 86).
+- Reviewer 810dbf4 (ff): approve, 4 minor + 2 nit; f2 guard mutant survived (finding 4). Tester 2b87313 (ff): pass, 8/8 pairs 0 px, 0 console errors, mutants a/b/c killed, 13 files 200.
+- Defect found from the tester's caveat (lead repro, `$S/lead-117/repro/`): README View says `python3 -m http.server`; with it (Python 3.14, macOS) the branch page fails to start 3/6 loads (ERR_CONNECTION_RESET on hints.js/hintmarks.js, ui.js never runs); main 6/6. Cause: listen queue 5 vs Chrome's parallel module requests; with `request_queue_size=64` branch 8/8. Player-facing regression on the documented path; to PM for a decision (README View change), with reviewer finding 1 (hint-text helpers in hints.js).
+- PM decisions dde802e: Q1 = `tools/serve.js` + README View `node tools/serve.js` (accept: 10/10 clean loads); Q2 = shared text helpers to `texts.js`; cellPlace removal agreed.
+- Rework 1 0621462 (texts.js, tools/serve.js reused by page.test.js, guard IIFE regex any-indent opener, banners, README); reviewer delta aee80c0: approve, serve.js `%00` crash + `/?x=1` 404 + README concern wording -> rework 2 d1de93a. Tester re-check 787a470: pass.
+
+## Developer
+- Claude Sonnet 5.5, session daff0a10-2135-459c-80b7-137f621f7088. Part B commit da7d554 (split) plus this log commit.
+- Split sudoku.js (removed) into 10 modules, PM map unchanged: board 71, validation 68, clashes 32, entry 48, techniques 152, hints 167, hintmarks 87, rewards 137, completion 20, generation 155; ui.js 400 (imports only).
+- Moved, not rewritten: declarations dedented by 2 (also ui.js); exports are one `export { ... }` block per module. Parity: `dev-117/parity.py` 64 of 66 declarations identical, 2 differ only by `cellPlace` -> `cellName` (ringLink, ringRules), `cellPlace` removed.
+- Shared helpers exported by the module that owns them: board (units, masks, spotsFor, firstHolder, cellName), hints (boxName, andList, struckCells, aDigit), techniques (claimingSteps, pointingSteps, singleAfterStep), clashes (namedClash). Private: firstTarget, isSingle, pointingHint, claimingHint, pointingClause, sharedUnits, notCounted, FIXED_TEXT, search, shuffle, defaultRng, TIME_CAP_MS.
+- Dead code: only `cellPlace` (duplicate of `cellName`); no other unused declaration, export or import (`dev-117/deadcheck.py`).
+- Tests: only imports change (named imports; `S.x` call sites rewritten to `x` where S spanned modules; generator.test.js keeps `S` for generation.js). The seeding import points to generation.js. Guard: `board.js` in the file check, and the IIFE-wrapper test now flags a closing `})();` only at the end of the file (it matched the legitimate `var UNITS = (function () {...})();` initialisers at column 0 once dedented).
+- Results: node --test 221/221, 0 skipped, 4.3 s; specs 14/14. Lines: product js 1337, tests/ 2439, spec-implementation/ 317; with html/css (1537) tests/ is 1.587x.
+- Deviations: the guard IIFE edit above (beyond the filename edit allowed); the comment that preceded `cellPlace` went with it, so `sharedUnits` has none.
+
+### Rework 1
+- PM Q2: `texts.js` (29 lines: `boxName`, `andList`, `struckCells`, `aDigit`, bodies unchanged); hints.js 142 lines exports `preferredTechnique`, `hintFor`, `hintApplied`; rewards.js, hintmarks.js import from texts.js.
+- PM Q1: `tools/serve.js` (30 lines, Node built-ins, `serve(port)`, root from script location, guard `ROOT + path.sep`); tests/page.test.js uses it instead of its inline server (one server); README View line replaced.
+- Guard: statement-level IIFE opener at any indentation plus EOF close; mutants f1 and f2 both fail, clean suite passes.
+- Banners dropped (techniques, rewards, generation, entry, board; board header names the flat index); README Modules labels de-doubled, texts.js line added.
+- parity.py ignores `// ----` banner lines: 64 identical, 2 changed, 1 removed. `node --test` 222/222, 0 skipped.
+
+### Rework 2
+- tools/serve.js (now 32 lines): URL decoded once, a null byte gives 404 (server stays up), the query is split off before the `/` test.
+- README Modules: eight function-list lines reworded into concern lines, guard format kept.
+- curl: `/%00` 404 (twice, server alive), `/?x=1` 200, `/index.html` 200. `node --test` 222/222, 0 skipped.
+
+## Reviewer
+- Model Sonnet 5.5, session daff0a10-2135-459c-80b7-137f621f7088, head 52cd648 (code da7d554), base bfd7b54. Verdict: APPROVE with minors (no blocker, no major).
+- Evidence: `node --test` 221/221, 0 skipped, 4.4 s; specs/ untouched; parity.py re-run 64/66 identical, 2 differ only cellPlace->cellName, cellPlace removed, ui.js identical after dedent. parity.py is sound for bodies: it compares full declaration text, so an edited body prints DIFF (it flagged the 2 expected ones); it covers sudoku.js up to line 892 and the ui.js body, not the new export/import lines (checked by hand, deadcheck.py: no unused import, no unused export except the `solvableByGrid as solvableBy` alias, a false positive).
+Findings
+1. minor, hints.js:16-42,164-167 (used by rewards.js:7, hintmarks.js:3): `boxName`, `andList`, `struckCells`, `aDigit` are hint-text helpers exported from hints.js and consumed by two other modules, so hints.js is both "which hint" and the shared text library; rewards depends on hints only for them. One concern per module is arguable; they were one file before. Recommend: leave (README says "and the hint texts") or note in the PR as a PM decision; a `text.js` module is optional, not required by the AC.
+2. minor, techniques.js:4 "---- Hints: naked and hidden singles ----", rewards.js:9 "---- Rewards: ...", generation.js:5 "---- Generator ---", entry.js:10 "---- Pencil-mark notes ----", board.js:16 "---- Units and peers": leftover section banners from the single file; the techniques one names the wrong module. Recommend drop or reword (comments only).
+3. minor, board.js:3-14: `firstHolder` and `cellName` sit above the "Units and peers" banner, so the banner no longer heads the file; reorder or reword with finding 2.
+4. minor, tests/modules.test.js:22-23 (guard): the changed IIFE regex lost coverage. Mutant f2 (open indented, close `})();` at column 0, `export` after it) now survives; the old `^\}\s*\)\s*\(\s*\)` killed it. Cause: close pattern only at EOF. Recommend restoring the column-0 close alternative while still allowing `var X = (function () {...})();` (indented close). `!function(){}()` at EOF also survives (f3; pre-existing).
+5. nit, README.md Modules lines: label repeated ("- `validation.js`: validation: ..."), 10 of 11 lines. Reads as a doubled label; drop the second word or make it a sentence. The guard regex needs only `: \S`.
+6. nit, generation.js:153,155: `solvableByGrid as solvableBy` alias is the pre-existing export shape (moved, not new); fine.
+7. nit, rewards.js:3 imports 9 names from board.js: all used (deadcheck), only a long line (>120, pre-existing style).
+No cycle: board<-validation(none)<-clashes<-hints<-hintmarks/rewards<-ui; ui imported by none.
+Mutants (modules.test.js unless noted; each reverted, status clean)
+| id | file | change | result |
+| a | completion.js | `document.title` | killed |
+| b | completion.js | `import './ui.js'` | killed |
+| b2 | clashes.js | `import('./ui.js')` dynamic | killed |
+| c | validation.js | imports clashes.js (cycle) | killed |
+| d | completion.js | `export * from './board.js'` | killed |
+| d2 | completion.js | `export { cellName } from` | killed |
+| e | README.md | completion.js line removed | killed |
+| h | README.md | line for nonexistent ghost.js | killed |
+| g | extra.js | new root module, no README line | killed |
+| i | completion.js | `globalThis.x = 1` | killed |
+| f1 | completion.js | `(function () {` at col 0 + `})();` EOF | killed |
+| f2 | completion.js | indented open, close col 0, export after | SURVIVED (finding 4) |
+| f3 | completion.js | `!function () {` ... `}();` EOF | SURVIVED (pre-existing) |
+| m1-m2 | hints.js, board.js | `aDigit` 8->7; `cellName` row +1 removed (full suite) | killed |
+AC map: AC1 ok with findings 1-3 (each module matches its line; no re-export; tests, driver, ui import from owners); AC2 ok (acyclic, guard mutants killed; f2 note); AC3 ok (imports/exports minimal, cellPlace the only dead code removed); AC4 ok (bodies unchanged, tests change only imports, `S.x`->`x`, the page seed script path '/generation.js', one comment sudoku.js->ui.js, guard additions; specs/ untouched; 221/221, 0 skipped, 4.4 s); AC5: product 1537 (board 71, validation 68, clashes 32, entry 48, techniques 152, hints 167, hintmarks 87, rewards 137, completion 20, generation 155, ui 400, index.html 46, style.css 153, package.json 1), tests/ 2439, spec-implementation/ 316, ratio 1.587 <= 1.6. ADR 001: one concern per module (finding 1 aside), ES modules, only ui.js touches the page, no wrappers: ok.
+Formatting: former IIFE 2-space offset gone; lines >120: 77 in total, none new by count (old 86 per lead). README claims about sudoku.js replaced.
+Not checked: screenshots/console (tester), PR text, page behaviour beyond the suite, per-line count of long lines by file.
+
+### Rework 1 delta
+- Model Sonnet 5.5, delta 810dbf4..fde0f85. Verdict: APPROVE with minors. `node --test` 222/222, 0 skipped; tests/ 2431, product 1534 (+ tools/serve.js 30, not product), spec-implementation 317; tests/product 1.585.
+- Findings 2-5 resolved: banners gone, board.js heading reworded, IIFE guard now kills f1, f2, f2b (close indented), arrow IIFE; `var X = (function(){...})();` (col 0 or indented close) passes; README labels no longer doubled. texts.js is one concern; hints.js keeps selection and hint texts; imports minimal; no cycle. parity.py: 64 identical, 2 cellPlace->cellName, 1 removed, ui.js identical; dropping `// ----` lines is sound (comment-only filter).
+- ADR 001: tools/serve.js is outside the root `*.js` set and imports nothing of the product; no impact.
+- serve.js, minor 1: `%00` in the URL throws synchronously in `fs.readFile` (serve.js:19) and crashes the process; wrap in the try or use `path` check first. minor 2: `/?x=1` gives 404 (the `/` test is on the raw url); use the split path. minor 3: the traversal guard (serve.js:20) is unreachable over HTTP (Node rejects a non-`/` request target and `path.normalize` on a `/`-led path cannot climb), so mutant "guard removed" is equivalent/unkillable; keep as defence, no test needed.
+- Mutants: no `.js` MIME killed (24 failures, Chrome tests); 127.0.0.1 -> 0.0.0.0 survives (no test; nit); decodeURIComponent removed survives (no test; nit).
+- README: View line exact. Modules lines for validation, clashes, entry, hints, hintmarks, rewards, completion, generation are function lists, not concerns; suggested: validation "checking a grid and reporting conflicts"; clashes "naming the clash of an entered digit"; entry "typing and noting digits in a cell"; hints "choosing a hint and its texts"; hintmarks "the cells, key line and links a hint marks"; rewards "recognising and crediting the learner's own steps"; completion "the end-of-puzzle message"; generation "making puzzles by level".
+
+## Tester
+- Model Sonnet 5.5, session daff0a10-2135-459c-80b7-137f621f7088, head 810dbf4 (main bfd7b54). Verdict: PASS, no defects.
+1. `node --test`: 221 tests, 221 pass, 0 fail, 0 skipped, 4.3 s. Specs alone: 14/14, 0 skipped.
+2. AC4: main vs branch over http, real CDP input, seed 1, states picker, hint3, entry, verify (clash by a given, Notes On, notes 3 and 7, Verify clicked; exercises clashes, entry, validation, completion, hintmarks) at 360x740 and 1280x900: 8 pairs byte-identical, 0 differing pixels; page text/status/tally/scroll height equal. Console errors/exceptions 0 on all 16 runs.
+3. AC2 mutants on completion.js (and a new root module), all reverted, git status clean: (a) `typeof document` appended: rc 1, 2 fail; (b) `import './ui.js'`: rc 1, killed by "imports ui.js" and "import cycle completion.js -> ui.js -> completion.js"; (c) new root extra.js with `window`: rc 1, 15 tests, 3 fail, no test edit. Baseline rc 0.
+4. Network: all 13 files (index.html, style.css, 11 modules) served 200, 0 non-200 in the server log. file:// 0 cells (CORS block of ui.js), http 81 cells.
+Note: python http.server dropped module bursts (ERR_CONNECTION_RESET, test-server backlog 5, not product); runs use scripts/serve.mjs.
+Not tested: other browsers, touch input, real-device phone, mutants beyond the AC2 guard, visual states beyond the four.
+Scratch: /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/daff0a10-2135-459c-80b7-137f621f7088/scratchpad/test-117/ (README.md)
+Read: process.md "Test strategy applied", lessons.md "Testing" and "Tooling", this log "Lead", #116 tester README.
+
+### Re-check d1de93a
+- Suite: node --test 222 tests, 222 pass, 0 fail, 0 skipped, 4.2 s; spec tests 14/14.
+- Screenshots main vs branch (served by tools/serve.js), 4 states x 2 sizes: all 8 pairs 0 differing px; console errors 0 on all 16 runs.
+- PM Q1 acceptance: `node tools/serve.js` in the branch worktree, 10 fresh-profile cache-disabled Chrome loads: each 13 resources all 200, 0 errors, 81 cells after choosing Tricky.
+- serve.js: /%00 404 and server keeps serving; /?x=1 200 page; /missing.js 404; /ui.js?v=2 200; bad %-escape 404.
+- Guard mutants on texts.js (a document ref, b import ui.js, c extra root module): each fails (rc 1), clean after revert.
+- Not tested: old python server contrast, other browsers.
+
+
+## Lead review
+- 2026-10-29, lead claude-opus-5-5. Code head d1de93a (log-only commits after it).
+- Re-ran at d1de93a: `node --test` 222/222, 0 skipped, 4.2 s; specs 14/14; tester shots.mjs + compare.mjs (start 11:29:27, pngs 11:30:3x): 8/8 pairs ALL IDENTICAL, console 0 errors; loads.mjs via README command `node tools/serve.js`: 10/10 loads, 13 files 200, 0 errors, 81 cells. Looked at branch-hint3-360x740.png: correct.
+- Counts: product 1534 (board 69, validation 68, clashes 32, entry 47, techniques 150, texts 29, hints 142, hintmarks 87, rewards 136, completion 20, generation 154, ui 400, index.html 46, style.css 153, package.json 1); tools/ 32 (outside product and tests); tests/ 2431 (1.585x); spec-implementation/ 317. specs/ unchanged vs bfd7b54.
+- Accepted survivors: `!function(){}()` wrapper form (pre-existing gap), serve.js traversal guard (unreachable over HTTP, kept as defence), bind address / decodeURIComponent untested (nits). 77 product lines > 120 chars, all pre-existing (none new).
+- ADR 001: compliant. ES modules, no build; ui.js the only page module, imported by nothing; logic modules one concern each per README `## Modules`, acyclic, no re-export; tests/driver import from owners; tools/serve.js is not product code.
+
+## Lead: acceptance and merge
+- 2026-10-29: PM accepted on d1de93a (PR #119 comment 6485420045, log 7dbc42d). Merged with a merge commit at the branch head; commits after d1de93a are work-log only. ADR 001 complete with this merge.

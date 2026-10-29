@@ -13,7 +13,7 @@ const PAGE = /\b(document|window|globalThis|self|navigator|history|addEventListe
 const IMPORT = /\b(?:from|import)\s*\(?\s*['"]([^'"]+)['"]/g;
 
 test('modules: the product files are listed, with exactly one interface module', () => {
-  assert.ok(files.includes(UI) && files.includes('sudoku.js'), files.join());
+  assert.ok(files.includes(UI) && files.includes('board.js'), files.join());
   assert.deepStrictEqual(files.filter((f) => PAGE.test(src(f))), [UI]);
 });
 
@@ -22,7 +22,10 @@ for (const f of files) {
     const s = src(f);
     assert.ok(/^export\s/m.test(s) || f === UI, f + ' has no export');
     assert.ok(!/module\.exports|\btypeof module\b|\brequire\(/.test(s), f + ' is CommonJS');
-    assert.ok(!/^;?\(\s*(async\s*)?(function\b|\(\s*\)\s*=>)|^\}\s*\)\s*\(\s*\)/m.test(s), f + ' has an IIFE wrapper (at column 0)');
+    // A wrapper is a statement-level IIFE (opened at any indentation) or one closed at the end of the file; an
+    // initialiser such as `var X = (function () {...})();` is allowed.
+    assert.ok(!/^\s*;?\(\s*(async\s*)?(function\b|\(\s*\)\s*=>)/m.test(s) && !/\}\s*\)\s*\(\s*\)\s*;?\s*$/.test(s),
+      f + ' has an IIFE wrapper');
     assert.ok(!/\b(window|globalThis)\s*\.\s*\w+\s*=[^=]/.test(s), f + ' sets a global');
     if (f !== UI) {
       assert.ok(!PAGE.test(s), f + ' touches the page');
@@ -30,3 +33,19 @@ for (const f of files) {
     }
   });
 }
+
+test('modules: README "## Modules" lists exactly the product files, one concern each', () => {
+  const sec = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8').split(/^## Modules\s*$/m)[1] ?? '';
+  const listed = [...sec.split(/^## /m)[0].matchAll(/^- `([^`]+\.js)`: \S.*$/gm)].map((m) => m[1]).sort();
+  assert.deepStrictEqual(listed, files);
+});
+
+test('modules: imports between product modules are acyclic and nothing re-exports', () => {
+  const deps = (f) => [...src(f).matchAll(IMPORT)].map((m) => path.basename(m[1])).filter((d) => files.includes(d));
+  const visit = (f, stack) => {
+    assert.ok(!stack.includes(f), 'import cycle: ' + [...stack, f].join(' -> '));
+    deps(f).forEach((d) => visit(d, [...stack, f]));
+  };
+  files.forEach((f) => visit(f, []));
+  files.forEach((f) => assert.ok(!/^\s*export\s+(\*|\{[^}]*\})\s*(as\s+\w+\s*)?from\b/m.test(src(f)), f + ' re-exports'));
+});

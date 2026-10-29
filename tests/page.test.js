@@ -2,39 +2,36 @@
 // Skipped, with a reason, when Chrome is not found (CHROME_PATH) or WEAVER_NO_CHROME=1.
 import { describe, it as base, before, after } from 'node:test';
 import assert from 'node:assert';
-import fs from 'node:fs';
-import http from 'node:http';
-import path from 'node:path';
-import * as S from '../sudoku.js';
+import { clashCells } from '../clashes.js';
+import { nextCell } from '../entry.js';
+import { generatePuzzle, seededRng } from '../generation.js';
+import { hintKey, hintMarks, ringRules } from '../hintmarks.js';
+import { hintFor } from '../hints.js';
+import { TECHNIQUE_DEFINITIONS } from '../rewards.js';
+import { findHiddenSingle, findNakedSingle, findPointing } from '../techniques.js';
 import { findChrome, launch } from './chrome.js';
+import { serve } from '../tools/serve.js';
 
-const ROOT = path.join(import.meta.dirname, '..');
 const found = findChrome(process.env);
 
-// The page is served over http (a module script does not run from file://): the repo folder on a random free port.
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' };
-const server = http.createServer((req, res) => {
-  const file = path.join(ROOT, req.url === '/' ? 'index.html' : path.normalize(req.url.split('?')[0]));
-  fs.readFile(file, (err, body) => {
-    if (err || !file.startsWith(ROOT)) return res.writeHead(404).end();
-    res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'text/plain' }).end(body);
-  });
-});
+// The page is served over http (a module script does not run from file://): tools/serve.js on a random free port.
+let server;
 // Math.random becomes seededRng(n), taken through the product module the page itself loads.
-const seedScript = "window.__seed = async function (n) { Math.random = (await import('/sudoku.js')).seededRng(n); };";
+const seedScript = "window.__seed = async function (n) { Math.random = (await import('/generation.js')).seededRng(n); };";
 
 let page;
 before(async () => {
   if (found.skip) return;
-  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  server = serve(0);
+  await new Promise((resolve) => server.once('listening', resolve));
   page = await launch(found.path);
   await page.send('Emulation.setFocusEmulationEnabled', { enabled: true }); // headless Chrome fires no focus events otherwise
   await page.send('Page.addScriptToEvaluateOnNewDocument', { source: seedScript });
 });
-after(async () => { if (page) await page.close(); server.close(); });
+after(async () => { if (page) await page.close(); if (server) server.close(); });
 
 const J = JSON.stringify;
-const game = (level, seed) => S.generatePuzzle(level, { rng: S.seededRng(seed) });
+const game = (level, seed) => generatePuzzle(level, { rng: seededRng(seed) });
 // First seed (from 1) whose puzzle satisfies pred(puzzle, solution).
 function pick(level, pred) {
   for (let seed = 1; seed < 200; seed++) {
@@ -103,7 +100,7 @@ describe('page (headless Chrome)', () => {
         if (!p[r][k] || p[r][k] === sol[r][c]) continue;
         const grid = p.map((row) => row.slice());
         grid[r][c] = p[r][k];
-        if (S.clashCells(grid).length === 2) return { pos, digit: p[r][k], given: r * 9 + k }; // exactly this pair clashes
+        if (clashCells(grid).length === 2) return { pos, digit: p[r][k], given: r * 9 + k }; // exactly this pair clashes
       }
     }
     return null;
@@ -112,12 +109,12 @@ describe('page (headless Chrome)', () => {
   // The singles played on the page, so that the next hint is a pointing step (optionally one whose hatched count satisfies `ok`).
   const pointingState = (ok) => pick('tricky', (p, sol) => {
     const grid = p.map((row) => row.slice()), typed = [];
-    for (let s; (s = S.findNakedSingle(grid) || S.findHiddenSingle(grid)); ) {
+    for (let s; (s = findNakedSingle(grid) || findHiddenSingle(grid)); ) {
       grid[s.r][s.c] = sol[s.r][s.c];
       typed.push([s.r * 9 + s.c, String(sol[s.r][s.c])]);
     }
-    const step = S.findPointing(grid);
-    return step && ok(S.hintMarks(S.hintFor(grid, 2), grid).hatched.length) ? { typed, grid, step } : null;
+    const step = findPointing(grid);
+    return step && ok(hintMarks(hintFor(grid, 2), grid).hatched.length) ? { typed, grid, step } : null;
   });
   const pointing = pointingState(() => true);
   const noRings = pointingState((n) => n === 0);
@@ -135,7 +132,7 @@ describe('page (headless Chrome)', () => {
     await click('[data-level=tricky]');
     s = await read();
     assert.deepStrictEqual([s.picker, s.game, s.tallyShown, s.level, s.tally], [false, true, true, 'Difficulty: Tricky', TALLY0]);
-    assert.strictEqual(await page.eval('document.getElementById("definition-claiming").textContent'), S.TECHNIQUE_DEFINITIONS.claiming); // the fourth line and its definition show from 0
+    assert.strictEqual(await page.eval('document.getElementById("definition-claiming").textContent'), TECHNIQUE_DEFINITIONS.claiming); // the fourth line and its definition show from 0
     await click('#hint');
     await click('#new-puzzle');
     s = await read();
@@ -151,7 +148,7 @@ describe('page (headless Chrome)', () => {
   });
 
   it('b. an own naked single is green and the tally goes up by 1', async () => {
-    const { seed, extra } = pick('tricky', (p) => S.findNakedSingle(p));
+    const { seed, extra } = pick('tricky', (p) => findNakedSingle(p));
     await open('tricky', seed);
     await keys([[extra.r * 9 + extra.c, String(extra.digit)]]);
     const s = await read();
@@ -161,7 +158,7 @@ describe('page (headless Chrome)', () => {
   });
 
   it('b. an own hidden single is green and the tally goes up by 1', async () => {
-    const { seed, extra } = pick('medium', (p) => S.findHiddenSingle(p, { notNaked: true }));
+    const { seed, extra } = pick('medium', (p) => findHiddenSingle(p, { notNaked: true }));
     await open('medium', seed);
     await keys([[extra.r * 9 + extra.c, String(extra.digit)]]);
     const s = await read();
@@ -224,10 +221,10 @@ describe('page (headless Chrome)', () => {
     assert.deepStrictEqual([s.confined, s.removed, s.dattr, s.key], [[], [], [], '']);
     await hints(3);
     s = await read();
-    const marks = S.hintMarks(S.hintFor(grid, 2), grid);
+    const marks = hintMarks(hintFor(grid, 2), grid);
     assert.deepStrictEqual([s.target, s.confined, s.removed], [[target], step.confined, step.removed]);
     assert.deepStrictEqual([s.digit, s.hatched], [marks.digits, marks.hatched]);
-    assert.strictEqual(s.key, S.hintKey(S.hintFor(grid, 2), marks.hatched.length)); // the key line (kept by the notes change below)
+    assert.strictEqual(s.key, hintKey(hintFor(grid, 2), marks.hatched.length)); // the key line (kept by the notes change below)
     assert.deepStrictEqual(s.dattr, step.confined.concat(step.removed).sort((x, y) => x - y));
     assert.ok(s.dvals.every((d) => d === String(step.pointDigit)));
     const other = empties(g.puzzle).filter((p) => !typed.some((t) => t[0] === p) && p !== target)[0];
@@ -317,7 +314,7 @@ describe('page (headless Chrome)', () => {
   it('f5. claiming is the fallback on the page (Hard seed 57 naked, seed 184 hidden): staged marks, key, Next step, focus, hinted entry counted', async () => {
     for (const [seed, target, confined, removed, hatched, d] of CLAIMING) {
       const grid = game('hard', seed).puzzle.map((row) => row.slice()), typed = [];
-      for (let h; (h = S.hintFor(grid, 2, 'naked', 'hard')).technique !== 'claiming'; grid[h.r][h.c] = h.digit) typed.push([h.r * 9 + h.c, String(h.digit)]);
+      for (let h; (h = hintFor(grid, 2, 'naked', 'hard')).technique !== 'claiming'; grid[h.r][h.c] = h.digit) typed.push([h.r * 9 + h.c, String(h.digit)]);
       await open('hard', seed);
       await keys(typed);
       await hints(2);
@@ -330,7 +327,7 @@ describe('page (headless Chrome)', () => {
       await hints(1);
       s = await read();
       assert.deepStrictEqual([s.hatched, s.active, s.key.includes('; hatched = a purple ring'), await nextStep()], [hatched, String(target), true, null]);
-      await keys([[target, String(S.hintFor(grid, 2).digit)]]);
+      await keys([[target, String(hintFor(grid, 2).digit)]]);
       s = await read();
       assert.deepStrictEqual([s.status.startsWith('Well done! You applied claiming: '), s.tally[3], s.target], [true, 'Claiming: 0 on your own, 1 with a hint', []]);
     }
@@ -525,7 +522,7 @@ describe('page (headless Chrome)', () => {
       await click('#hint');
       s = await read();
       if (s.hatched.length && s.digit.some((p) => !s.given[p])) break;
-      const step = S.findNakedSingle(grid) || S.findHiddenSingle(grid);
+      const step = findNakedSingle(grid) || findHiddenSingle(grid);
       grid[step.r][step.c] = sol[step.r][step.c];
       await keys([[step.r * 9 + step.c, String(sol[step.r][step.c])]]);
     }
@@ -534,7 +531,7 @@ describe('page (headless Chrome)', () => {
     await focusAt(ring);
     s = await read();
     const d = +(await page.eval('document.querySelector(\'input[data-pos="' + ring + '"]\').value'));
-    assert.deepStrictEqual([s.linked, s.ruled, s.link], [[ring], S.ringRules(ring, s.hatched, d).cells, S.ringRules(ring, s.hatched, d).text]);
+    assert.deepStrictEqual([s.linked, s.ruled, s.link], [[ring], ringRules(ring, s.hatched, d).cells, ringRules(ring, s.hatched, d).text]);
     assert.ok(s.ruled.length >= 1);
   });
 
@@ -546,14 +543,14 @@ describe('page (headless Chrome)', () => {
     await click('#hint');
     await click('#verify');
     noHint(await read());
-    const p = pick('tricky', (pz) => S.findHiddenSingle(pz) && !S.findPointing(pz, { useful: true })); // Tricky teaches a useful pointing step first
+    const p = pick('tricky', (pz) => findHiddenSingle(pz) && !findPointing(pz, { useful: true })); // Tricky teaches a useful pointing step first
     await open('tricky', p.seed);
     await click('#hint');
     await click('#hint');
     let s = await read();
     assert.ok(s.status.startsWith('Hidden single'), s.status);
     assert.strictEqual(await nextStep(), null);
-    const n = pick('easy', (pz) => S.findNakedSingle(pz));
+    const n = pick('easy', (pz) => findNakedSingle(pz));
     await open('easy', n.seed);
     await click('#hint');
     await click('#hint');
@@ -667,7 +664,7 @@ describe('page (headless Chrome)', () => {
     let jump = null, edge = null;
     for (const p of empties(puzzle)) {
       for (const [k, d] of Object.entries(dirs)) {
-        const n = S.nextCell(puzzle, Math.floor(p / 9), p % 9, d);
+        const n = nextCell(puzzle, Math.floor(p / 9), p % 9, d);
         if (!jump && n && Math.abs(n[0] * 9 + n[1] - p) > (d === 'left' || d === 'right' ? 1 : 9)) jump = { p, k, to: n[0] * 9 + n[1] };
         if (!edge && !n) edge = { p, k };
       }
