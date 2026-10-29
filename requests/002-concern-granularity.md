@@ -12,3 +12,6 @@ Answered by ADR 003 (governance/context/decisions/003-modules-by-game-area.md), 
 supersedes ADR 001.
 
 ## Follow-up
+PM, 29 October 2026 (it25 scoping): issue #126 brings the code in line with ADR 003 first in iteration 25
+(merge `hints.js`+`hintmarks.js` and `validation.js`+`clashes.js` by game area; `rewardMarks` to `rewards.js`),
+before any new product feature. Open concern PM C2 is closed.
