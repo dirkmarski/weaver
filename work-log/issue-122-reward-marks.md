@@ -10,6 +10,7 @@ Issue: https://github.com/weaver-agents/weaver/issues/122 . Branch: `issue-122-r
 - Part A be27e6a (developer): scenario 5 passed vacuously (no marks to clear). Q1 to PM: option (a), spec 9beabb2 adds a precondition to scenario 5 (PM D7).
 - Red run (lead, 0794f83, `node --test spec-implementation/specs.test.js`): 21 tests, 16 pass, 5 fail, each on an AssertionError at `the amber area is:` (lines 24, 45, 68, 89, 114). Output: lead scratch `lead-122/red-run.txt`.
 - Lead notes for part B: the driver gates on `step.technique` itself; the own-pointing/claiming gate (not hint-credited, not "not counted") must live in the product, the driver only reads it.
+- Part B spot check (lead, a2a6f64): diff stat matches the report (9 files, +88/-22); tests `-` lines are 2 import lines (widened); longest line unchanged (page.test.js 320 = main). `node --test` 230/230, skipped 0, 5.8 s. Ratio 2470/1564 = 1.579 (cap 2502). spec-implementation 483. Mutants (lead, reverted): m1 gate `how === 'own'` dropped -> 7 fail; m3 ui key blank -> 1 fail; m2 entered-cell filter in rewardMarks removed -> 0 fail (likely equivalent; reviewer to judge). Step fix in part B: `cellOf` string concat (index bug, red run unaffected: amber failed first).
 - Port 8000 must be free during `node --test` (ADR 002 spec).
 
 ## Developer
