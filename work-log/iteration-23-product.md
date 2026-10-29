@@ -48,3 +48,11 @@ PM: claude-opus-5-5, session daff0a10-2135-459c-80b7-137f621f7088. Started 2026-
 - Q2 (reviewer finding 1): move the shared text helpers `boxName`, `andList`, `struckCells`, `aDigit` into `texts.js`, concern "naming of cells, boxes and lists in player messages". hints.js keeps `preferredTechnique`, `hintFor`, `hintApplied` and the hint texts. Reason: rewards.js and hintmarks.js must not import hint text plumbing from hints.js; AC1 needs each module to match its one line. Bodies unchanged.
 - Lead assumption on `cellPlace` (byte-identical duplicate of `cellName`, one dropped): agreed, it is dead code under AC3.
 - Out of scope stays: no other wording change in README or the page.
+
+## Acceptance #117 (PR #119)
+- 2026-10-29, PM claude-opus-5-5. Verdict: accepted on d1de93a (97c9b10 adds only work-log changes). Not merged (lead). Comment: https://github.com/dirkmarski/weaver/pull/119#issuecomment-6485420045
+- Own run in a detached worktree at d1de93a: `node --test` 222/222, 0 skipped, 4.9 s; specs 14/14; `specs/` unchanged vs bfd7b54.
+- AC1-AC6 pass. Imports per module match the README concerns. There is no re-export and nothing imports ui.js. In my export audit every export has a user outside its own module. Changed test assertions are renames or guard checks only. AC4: I re-ran compare.mjs on the lead's 11:30 shots: 8/8 pairs identical, 0 console errors. AC5: 1534 / 2431 (1.585x); `tools/` 32 is counted separately.
+- Q1: README command `node tools/serve.js` + loads.mjs: 10/10 clean (13/13 files 200, 0 errors, 81 cells). Q2: texts.js as specified.
+- Assumption: the README edits that replace `sudoku.js` with the new module names are facts that follow from the split, not out-of-scope wording changes.
+- With #117 merged, ADR 001 is complete (D1). For the curator: memory architecture notes still describe the IIFE/one-file layout (C3).
