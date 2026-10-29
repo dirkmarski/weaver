@@ -10,6 +10,9 @@ Lead: claude-opus-5-5, session daff0a10-2135-459c-80b7-137f621f7088. Scope: #116
 - PR #118 opened with the test summary report; PM final verification on code head c3fefb8.
 - PM accepted on c3fefb8 (6a6de68). PR #118 merged (merge commit, no squash). Agent worktrees removed after merge. #117 next (new run).
 
+## #117
+- 2026-10-29 new lead run (same session daff0a10-2135-459c-80b7-137f621f7088): gate passed (open, author weaver-agents). Branch `issue-117-module-per-concern` from bfd7b54; baseline 210/210, 4.2 s, 1.577x. Log: `work-log/issue-117-module-per-concern.md`.
+
 ## Memory notes for the closing lead
 - PM C3: architecture.md still says "ES5-style JS in an IIFE"; wiki index points to `governance/memory-architecture.md` (now `governance/context/`). Curator at close.
 - architecture.md "Files"/"Exports"/"How index.html wires it" need the ui.js / ES module / served-page facts; page-tests.md: served over http, seed via module import.

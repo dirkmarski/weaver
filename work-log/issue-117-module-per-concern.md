@@ -1,0 +1,17 @@
+# #117 One module per concern for the logic (ADR 001, part 2)
+
+Issue: https://github.com/dirkmarski/weaver/issues/117. Branch: `issue-117-module-per-concern`.
+
+## Lead
+- Gate: open, author weaver-agents (PM), label enhancement, 2026-10-29. Session daff0a10-2135-459c-80b7-137f621f7088 (new lead run in the same session; #116 merged as PR #118, main bfd7b54).
+- Baseline bfd7b54: 210/210, 0 skipped, 4.2 s; product 1527 (sudoku.js 929, ui.js 398, index.html 46, style.css 153, package.json 1), `tests/` 2408 (1.577x, cap 2443), `spec-implementation/` 316.
+- Plan: developer part A = extend the guard (`tests/modules.test.js`): README module list = the root product `*.js` files, one concern line each; import graph acyclic; no re-export (`export ... from`). Red on the current code (README has no module list); own commit; lead confirms red. Part B = split `sudoku.js` per concern at the repo root (guard discovery unchanged), moved not rewritten, re-indent former IIFE bodies, dead code removed, tests change imports only, README. Then reviewer, tester (screenshots main vs branch, console, guard mutants on a new module), lead check, PR with test summary report, PM final verification.
+- No spec (PM D2); `specs/` untouched; the 14 scenarios are the regression gate.
+
+## Developer
+
+## Reviewer
+
+## Tester
+
+## Lead review
