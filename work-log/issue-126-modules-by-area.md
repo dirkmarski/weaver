@@ -39,3 +39,5 @@ Issue: https://github.com/dirkmarski/weaver/issues/126. Branch: `issue-126-modul
 - ADR check: 003 native ES modules, no build; `ui.js` the only page module; no logic import of `ui.js`; acyclic; guard mutants (6) killed. ADR 002 unchanged (`node tools/serve.js`). Verdict: ready for PR.
 
 ## Lead: acceptance and merge
+- PR #130 opened at ab65482 (body updated via REST; `gh pr edit` lacks read:org scope). PM accepted head 7f449d7 (code 3c7f44a), AC1-7 pass with own re-runs (parity, pixel 6/6, loads 10/10): PR comment 6567823264, issue comment 6567823543; PM log 532b31f on `it25-pm-scoping` (PR #129). Merge at the branch head with a merge commit; commits after 7f449d7 are work-log/memory only.
+- Memory notes for the closing lead: wiki index snapshot line and "Developer: ADR 001" read line still cite ADR 001 / 12 modules; backlog.md lines 41 and 69 (ADR 001 guard, PM C2) are answered by ADR 003 (PM-owned page); lessons.md line 68 cites ADR 001. Suite is 228 (guard test per module). Ratio headroom now about 15 lines (2469/2484).
