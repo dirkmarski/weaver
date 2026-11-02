@@ -14,6 +14,14 @@ Issue: https://github.com/dirkmarski/weaver/issues/126. Branch: `issue-126-modul
 - Claude (developer agent), session 226c8fac-a151-4b1c-af1a-02f108c103b5. Part A c324b7d, part B 3c7f44a. Parity script and output: scratchpad `dev-126/` (parity.mjs, README.md, parity.out). Comment-only edits outside moved headers: rewards.js header and line 66 ("the rewardMarks result").
 
 ## Reviewer
+- Claude Sonnet 5.5 (reviewer agent), session 226c8fac-a151-4b1c-af1a-02f108c103b5. Head reviewed 7e64546 (diff 68829d7..7e64546). Verdict: approve.
+- Findings:
+  1. nit: `hints.js` (before the moved block, ~line 141) and `rewards.js` (before `rewardMarks`) have two blank lines where the files use one. Cosmetic, no action needed.
+  2. nit: README "## Files" `tests/sudoku.test.js` line says "validation/verify/..." as a topic word, not a file name; no stale `validation.js`, `clashes.js` or `hintmarks.js` anywhere outside work-log/ and memory/ (grep clean).
+  3. info: the guard checks README names = root `*.js` only; "player words" and the "used by" claims are not machine-checked. Checked by hand against the imports: board used by checking, hints, rewards, techniques, generation; techniques by hints, rewards, generation; texts by hints, rewards. All correct. Graph acyclic (checking -> board; hints -> checking; rewards -> hints, checking).
+- Restructure check: besides the developer's parity script, a multiset of every non-comment, non-import/export line over all root `*.js` is identical on main and branch (1027 lines, same md5). Comment diff is only the six module headers and one `rewardMarks` comment. Exports: no new names; `namedClash` is now exported from checking.js, as before from clashes.js. tests/ diff is import lines and 2 guard wording lines; spec-implementation/ and specs/ untouched. Suite 228/228, 0 skipped.
+- Mutants (worktree only, reverted; `node --test tests/modules.test.js`): hints.js imports ui.js KILLED; `document.` in checking.js KILLED; checking.js -> hints.js cycle KILLED; `export { hintFor } from` in rewards.js KILLED; README texts.js line renamed KILLED; `window.` in board.js KILLED. Each diff was non-empty.
+- Not checked: screenshots/pixel parity (tester), 10 fresh loads (tester), specs run, ratio beyond lead's figures, wiki architecture.md update (lead at merge).
 
 ## Tester
 
