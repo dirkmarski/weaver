@@ -24,6 +24,14 @@ Issue: https://github.com/dirkmarski/weaver/issues/126. Branch: `issue-126-modul
 - Not checked: screenshots/pixel parity (tester), 10 fresh loads (tester), specs run, ratio beyond lead's figures, wiki architecture.md update (lead at merge).
 
 ## Tester
+- Model Claude Sonnet 5.5, session 226c8fac-a151-4b1c-af1a-02f108c103b5. Head tested f55452a (detached worktree). Verdict: PASS.
+1. `node --test`: 228 tests, 228 pass, 0 fail, 0 skipped (5.8 s). Specs `node --test spec-implementation/specs.test.js`: 21/21, 0 skipped.
+2. Pixel parity main 68829d7 vs branch, real CDP mouse/key input, Tricky seeds, caret hidden by an injected style on both sides: a (Hint stage 3, seed 1) 360x740 and 1280x900 diff 0/0; b (own pointing reward with marks, seed 2) 0/0; c (Verify with red clash, seed 1) 0/0. 6/6 pairs identical, 0 console errors per load. State checks on the page: a 8 hint-marked cells, b 3 marked cells, c 1 conflict input and status class fail.
+3. Fresh loads of the README View server on the branch (serve(port) of tools/serve.js): 10/10 fresh-profile loads, 0 failed requests, 0 console errors, level picker shown and Easy board of 81 cells rendered.
+4. Sizes: product 1553, tests/ 2469 (1.590x, cap 1.6x), spec-implementation/ 483. Matches the lead's figures.
+5. Mutants (worktree only, reverted): `rewardMarks` key text "amber" -> "ambar" in rewards.js: state b differs (520 px at 360, 1839 px at 1280), a and c 0. `hintKey` text "dashed" -> "dashee" in hints.js: state a differs (1615, 2977 px), b and c 0. Both detected, each only in its own state.
+- Not tested: audio or other browsers; touch input; states beyond the three (claiming hints, Notes, completion); behaviour on Hard or other seeds; the PR text.
+- Scratch: /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/226c8fac-a151-4b1c-af1a-02f108c103b5/scratchpad/test-126/ (README.md lists the scripts and pass lines).
 
 ## Lead review
 
