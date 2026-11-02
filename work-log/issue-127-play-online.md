@@ -12,6 +12,11 @@ Issue: https://github.com/dirkmarski/weaver/issues/127. Branch: `issue-127-play-
 Model Sonnet 5.5, session 226c8fac-a151-4b1c-af1a-02f108c103b5. README View now opens with the online address, then keeps the local-run text. No code, spec or step changes. Full suite 229/229 pass; specs 22/22 expected pass (see report).
 
 ## Reviewer
+Model Sonnet 5.5 (claude-sonnet-5-5), session 226c8fac-a151-4b1c-af1a-02f108c103b5. Head reviewed f00e189. Verdict: approve.
+1. (nit) The sentence "opening `index.html` from disk no longer works" is kept from the old text; "no longer" now reads slightly oddly beside the new first sentence but is unchanged and correct. No action.
+2. (info) Diff is README "View" only (plus log files); no js, spec or step change; no new root `*.js` (ADR 003); one command, Node built-ins only, Node 22 or newer and `http://localhost:8000` kept (ADR 002). `specs/running/local-run.feature` has no diff vs main.
+Tests: `node --test` 229 total, 229 pass, 0 fail, 0 skipped; specs file 22/22.
+Not checked: the live site (AC4, PM), the rendering of the README on GitHub, mutants (tester).
 
 ## Tester
 
