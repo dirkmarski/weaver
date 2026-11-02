@@ -1,14 +1,14 @@
 # WIP: current
 
-Last updated: 2026-11-02, iteration 26 closed by the curator (#135 merged via PR #137; main 095e47c).
+Last updated: 2026-11-02, iteration 27 lead (#139 accepted, PR #141).
 
 ## Active run
-- None. Next: iteration 27 PM scoping from `memory/wiki/backlog.md` (item 1: own pointing/claiming reward texts, hidden form, say why; item 2: C5 name one digit once).
+- Iteration 27: #139 (own hidden-form rewards say why) accepted by the PM and merged via PR #141. Next: iteration 27 close (curator), using the lead log's "Memory notes for the closing lead".
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| none | - | it27 scoping | PM |
+| #139 | merged (PR #141) | it27 close | curator |
 
 ## Starting the next run
 - ADRs in force: 003 (modules by game area plus shared helpers, architecture.md "Modules"; a new root `*.js` needs a README "## Modules" line) and 002 (one README command, Node built-ins only, no install). 001 is superseded.

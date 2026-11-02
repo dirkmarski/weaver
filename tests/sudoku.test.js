@@ -1240,7 +1240,7 @@ test('issue 56 pins P(1), P(3), P(4), P(8), P(10): rings, key line and the box-c
   assert.ok(!first.text.includes('no other empty cells') && first.text.includes('fits only in column 5, so it cannot go anywhere else in column 5.'));
   assert.strictEqual(hintApplied(h, '7'), 'Well done! You applied pointing: row 4, column 5 is 7.');
   assert.strictEqual(creditEntry(emptyTally(), {}, null, WALL_COL, 3, 0, '8').text,
-    'Well spotted! You applied pointing on your own: in the top‑left box, the digit 8 fits only in column 3, rows 2 and 3, so 8 cannot go in row 4, column 3. That leaves row 4, column 1 as the only cell in row 4 where 8 fits.');
+    'Well spotted! You applied pointing on your own: in the top‑left box, the digit 8 fits only in column 3, rows 2 and 3, so 8 cannot go in row 4, column 3. That leaves row 4, column 1 as the only cell in row 4 where 8 fits, since column 8 already has an 8.');
 });
 
 test('issue 56 pins H(2), H(3): hidden single rings drop the digits that rule out nothing (r9c8 stays: redundant rings are kept)', () => {
@@ -1395,7 +1395,7 @@ test('creditEntry own claiming: Tough seeds 3 and 12 claiming, seed 1 pointing; 
   const pz = (n) => generatePuzzle('tough', { rng: seededRng(n) }).puzzle;
   const a = creditEntry(T0, {}, null, pz(3), 4, 3, '6'), b = creditEntry(T0, {}, null, pz(12), 1, 2, '5');
   assert.strictEqual(a.text, 'Well spotted! You applied claiming on your own: in column 6, the digit 6 fits only in rows 7 and 9, '
-    + 'inside the bottom‑middle box, so 6 cannot go in row 9, column 4. That leaves row 5, column 4 as the only cell in column 4 where 6 fits.');
+    + 'inside the bottom‑middle box, so 6 cannot go in row 9, column 4. That leaves row 5, column 4 as the only cell in column 4 where 6 fits, since rows 1, 3, 6 and 8 already have a 6.');
   assert.strictEqual(b.text, 'Well spotted! You applied claiming on your own: in column 1, the digit 2 fits only in rows 2 and 3, inside the top‑left box, so 2 cannot go in row 2, column 3. That leaves 5 as the only digit there.');
   assert.deepStrictEqual([a.tally.claiming, a.kind, a.credited], [{ own: 1, hint: 0 }, 'reward', { 39: true }]);
   const again = creditEntry(a.tally, a.credited, null, pz(3), 4, 3, '6'); // re-entry after clearing

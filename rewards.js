@@ -3,7 +3,7 @@ import { findConflicts, namedClash } from './checking.js';
 import { firstHolder, cellName, UNIT_NAMES, UNITS, CELL_UNITS, toFlat, usedMask, bitCount, spotsFor } from './board.js';
 import { claimingSteps, pointingSteps, singleAfterStep } from './techniques.js';
 import { sanitizeDigit } from './entry.js';
-import { hintApplied } from './hints.js';
+import { hintApplied, holdersPhrase } from './hints.js';
 import { boxName, andList, struckCells } from './texts.js';
 
 // Which technique makes `digit` in the empty cell (r, c) of `grid` (the grid
@@ -97,7 +97,9 @@ function creditEntry(tally, credited, hint, grid, r, c, value) {
         var kind = UNIT_NAMES.indexOf(res.unit), mine = UNITS[CELL_UNITS[r * 9 + c][kind]];
         var cellUnit = { row: 'row ' + (r + 1), column: 'column ' + (c + 1), box: boxName(3 * Math.floor(r / 3) + Math.floor(c / 3)) }[res.unit];
         text += struckCells(res.removed.filter(function (q) { return mine.indexOf(q) >= 0; }))
-          + '. That leaves row ' + (r + 1) + ', column ' + (c + 1) + ' as the only cell in ' + cellUnit + ' where ' + digit + ' fits.';
+          + '. That leaves row ' + (r + 1) + ', column ' + (c + 1) + ' as the only cell in ' + cellUnit + ' where ' + digit + ' fits';
+        var why = holdersPhrase({ r: r, c: c, unit: res.unit, pointDigit: d, removed: res.removed }, grid);
+        text += (why ? ', since ' + why : '') + '.';
       }
     } else {
       var unit = technique === 'hidden' ? ' in its ' + res.unit : '';

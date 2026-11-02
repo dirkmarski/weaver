@@ -292,7 +292,7 @@ describe('page (headless Chrome)', () => {
     await keys([[39, '6']]); // r5c4 = 6 typed on your own: claiming (#104)
     s = await read();
     assert.deepStrictEqual([s.status, s.cls, s.tally[3]], ['Well spotted! You applied claiming on your own: in column 6, the digit 6 fits only in rows 7 and 9, '
-      + 'inside the bottom‑middle box, so 6 cannot go in row 9, column 4. That leaves row 5, column 4 as the only cell in column 4 where 6 fits.', 'ok', 'Claiming: 1 on your own, 0 with a hint']);
+      + 'inside the bottom‑middle box, so 6 cannot go in row 9, column 4. That leaves row 5, column 4 as the only cell in column 4 where 6 fits, since rows 1, 3, 6 and 8 already have a 6.', 'ok', 'Claiming: 1 on your own, 0 with a hint']);
     await keys([[39, 'Backspace']]);
     await hints(4);
     s = await read();
