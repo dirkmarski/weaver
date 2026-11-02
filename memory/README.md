@@ -10,7 +10,7 @@ Implements `governance/context/memory-architecture.md` (governance context wins 
 | Session | the agent's context | Working memory of one run | Anything worth keeping goes to WIP (in flight) or the wiki (durable) before the session ends. |
 
 ## Who updates what
-- Curator: closes each iteration: folds the session learnings into the wiki, refreshes the backlog snapshot, prunes, resets `wip/current.md` and reviews agents' read lists against `wiki/index.md` (tightening the index where agents over-read).
+- Curator: closes each iteration: folds the session learnings into the wiki, refreshes the backlog snapshot, prunes, resets `wip/current.md` and reviews agents' read lists against `wiki/index.md` (tightening the index where agents over-read); closes requests in `requests/` once their Follow-up is on main and folds the outcome into the wiki.
 - Lead: keeps the wiki correct during an iteration; keeps `wip/current.md` up to date at every hand-off; records learnings as "Memory notes for the closing lead" in its log for the curator (or folds them in itself on a single-issue run).
 - Other agents: read the wiki pages relevant to their task. They propose wiki changes in their reply to the lead and do not edit the wiki directly. They keep their own work-log entries.
 - PM: owns the product backlog content; `wiki/backlog.md` is the curator's snapshot of it.
