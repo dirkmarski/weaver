@@ -39,5 +39,10 @@ Suite 237/237 pass, spec-implementation 28/28; ratio 2489/1581 = 1.574 (cap 2529
 Not tested: personas (PM), other seeds beyond the 13, other viewports, Safari/Firefox, keyboard-only walk, unreachable census cases (U with no struck cell; three unit groups), the reviewer's two gaps (left to rework).
 
 ## Lead review
+- Red run (lead, worktree at part A 9010bb5): 236 tests, 226 pass, 10 fail, all ERR_ASSERTION (8 outline rows + 2 whole-explanation scenarios); no undefined/ambiguous step.
+- Review c311891 request changes: F1 multi-box list unpinned, F2 row/column sort unpinned, F3 354-char page test line; F4 unreachable guards: no action (they mirror the issue rule "never U itself"); F5 export of `hiddenStep3` accepted (ADR 003: direct export from the owner module; no `hintFor` grid reached rows+columns in ~400k grids).
+- Test 3dcc042 pass: AC4 13 cases all gates (360x740 max 10 lines, min grid top 5.8, reserve <= 738.5; 375x812 max 810.6 Tough 14 h17/h18 = PM C2; 1280 lines = main); oracle 7/7; mutants 8/8; C4 not reproduced (specs file exits in ~0.23 s, branch and main; lead re-timed 0.25 s).
+- Rework b274709 (tests only; product identical to the tester head c311891, so layout evidence stands). Lead re-check: 237/237, 0 skipped, 6.1 s; mutants " boxes"->" box" and row/column sort removed each fail 1; longest lines page.test 320, sudoku.test 255, hints.js 248 (= main). Ratio 2495/1581 = 1.578x (cap 2529); spec-implementation 483 (+0, regex only).
+- ADR 003 and 002: compliant (hints module only; imports board, texts within the allowed set; no new file; Node built-ins). Wiki: product.md hidden step 3, architecture.md exports/sizes updated.
 
 ## Lead: acceptance and merge
