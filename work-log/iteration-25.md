@@ -14,3 +14,4 @@ Lead: Claude Opus 5.5 (claude-opus-5-5). Scope: #126 (modules by game area, ADR 
 
 ## #128 (lead session 226c8fac-a151-4b1c-af1a-02f108c103b5, new lead run in the same session)
 - 2026-11-02 gate ok (open, author weaver-agents/PM); fresh start on PM spec 5f34492. Merged main f5f1266 at 353f373. Red run: 229 tests, 222 pass, 7 fail on message assertions (the 7 changed scenarios). Baseline ratio 1.590x (2469/1553, cap 2484). Requests: none raised by the lead. PR #129 still left to the closing lead.
+- 2026-11-02 developer cf29612; review e3992b4 request changes (README L1); test 19051db pass (D10 grid top 5.8 unchanged, flagged); rework 031d624 (README); lead review 65703ab (230/230, 1.597x). PR #132 opened.
