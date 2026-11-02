@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import { completionFor } from '../completion.js';
 import { sanitizeDigit, applyEntry, noteDigits, nextCell } from '../entry.js';
 import { generatePuzzle, solvableBy, seededRng } from '../generation.js';
-import { preferredTechnique, hintFor, hintApplied, hintMarks, hintKey, ringLink, ringRules } from '../hints.js';
+import { hiddenStep3, preferredTechnique, hintFor, hintApplied, hintMarks, hintKey, ringLink, ringRules } from '../hints.js';
 import { classifyEntry, emptyTally, creditEntry, tallyLines, TECHNIQUE_DEFINITIONS, statusClass } from '../rewards.js';
 import { findNakedSingle, findHiddenSingle, findPointing, findClaiming } from '../techniques.js';
 import { isValidSolution, findConflicts, verify, buildGrid, clashCells, fixedMessage } from '../checking.js';
@@ -1409,4 +1409,15 @@ test('boxName: nine position names, hyphen always U+2011', () => {
     'the middle\u2011right box', 'the bottom\u2011left box', 'the bottom\u2011middle box', 'the bottom\u2011right box']);
   assert.strictEqual(boxName(0).charCodeAt(7), 0x2011);
   assert.ok(names.every(n => !n.includes('-')));
+});
+
+test('hidden step 3 lists the holders as the box, then rows, then columns', () => {
+  const text = (g) => hintFor(grid81(g), 2, '', 'tough').text.split('\n')[3];
+  assert.strictEqual(text('590000000200605900600900500050400700030000006409830002006090017314708295975002000'),
+    '3. In column 6, step 2 crossed out one cell; the top‑middle box and rows 3, 5 and 7 already have a 6. So 6 must go in row 4, column 6.');
+  assert.strictEqual(text('040300100000908000900050802001200004000600209000175080000840065000090308008060920'),
+    '3. In row 3, step 2 crossed out one cell; the top‑right box and columns 3 and 4 already have a 1. So 1 must go in row 3, column 2.');
+  const g = grid81('090600030002005000050008091000003080070500300230007400689074503703000000000300078'); // WALL_BOX, r7c4 emptied and a 5 put in row 7
+  assert.strictEqual(hiddenStep3({ unit: 'box', r: 7, c: 4, pointDigit: 5, removed: [76] }, g),
+    '3. In the bottom‑middle box, step 2 crossed out one cell; row 7 and columns 4 and 6 already have a 5. So 5 must go in row 8, column 5.');
 });

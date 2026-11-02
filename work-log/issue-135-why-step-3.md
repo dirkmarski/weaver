@@ -14,6 +14,8 @@ Issue: https://github.com/dirkmarski/weaver/issues/135 . Branch: `issue-135-why-
 - Part B: `hints.js` new internal `hiddenStep3(s, grid)` used by pointingHint and claimingHint (hidden form); old step-3 assertions adapted in place in `tests/sudoku.test.js` (5 edits) and `tests/page.test.js` (3 edits); README Pointing and Claiming step 3 texts only.
 - Green: 236 pass, 0 fail, 0 skipped, about 5.5 s. tests 2478 lines / product 1581 = 1.567x (cap 2529); spec-implementation 483.
 - Mutants killed (full suite): has/have, n = all struck cells, fallback branch, first-holder order (box before row/column), box group dropped. Survives: swapping the row and column group order (no spec or test has rows and columns together in one step 3; none found in seeds 1-400 first hints or a 60-step walk of 60 seeds).
+- Gap closed (second pass): one test 'hidden step 3 lists the holders as the box, then rows, then columns' in `tests/sudoku.test.js`: two hintFor grids (box+rows, box+columns, level tough) and one crafted rows+columns case via `hiddenStep3`, now exported from `hints.js` (box, row and column holders cannot all appear in one step: the unit's own kind is excluded, and no hintFor grid with box unit and both found by search).
+- Mutants: rows/columns swap and box-last both now fail the new test (1 fail each). Green: 237 pass, 0 fail, about 6.8 s; tests 2489 / product 1581 = 1.574x (cap 2529).
 
 ## Reviewer
 

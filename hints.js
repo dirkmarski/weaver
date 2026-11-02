@@ -250,4 +250,4 @@ function ringRules(q, hatched, d) {
 }
 function sharedUnits(p, q) { return UNIT_NAMES.filter(function (n, k) { return CELL_UNITS[q][k] === CELL_UNITS[p][k]; }); }
 
-export { preferredTechnique, hintFor, hintApplied, hintMarks, hintKey, ringLink, ringRules };
+export { hiddenStep3, preferredTechnique, hintFor, hintApplied, hintMarks, hintKey, ringLink, ringRules };
