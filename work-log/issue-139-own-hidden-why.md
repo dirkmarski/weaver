@@ -40,3 +40,4 @@ Scratch: /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/512d8df6-bdf0-4d6d-980
 - AC 1-6 met (AC 7 is the PM's). ADR 002/003 compliant (no new module, no new deps; hints -> rewards import already listed).
 
 ## Lead: acceptance and merge
+- PR #141. PM accepted at e276a2d (code head b95608e), comment 6571698245 by weaver-agents. Personas WHY 4.83 / LEARN 3.92 / READ 3.00 (main 3/3/4); all AC 7 gates met, READ exactly on gate. PM log 52d2e46. Merge with a merge commit at the head after the lead log commit; diff from the accepted head is work-log/ and memory/ only.
