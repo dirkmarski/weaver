@@ -1,10 +1,8 @@
 import { applyEntry, nextCell, noteDigits } from './entry.js';
-import { buildGrid, verify } from './validation.js';
-import { clashCells, fixedMessage } from './clashes.js';
+import { buildGrid, verify, clashCells, fixedMessage } from './checking.js';
 import { completionFor } from './completion.js';
 import { generatePuzzle } from './generation.js';
-import { hintFor, preferredTechnique } from './hints.js';
-import { hintKey, hintMarks, ringLink, ringRules } from './hintmarks.js';
+import { hintFor, preferredTechnique, hintKey, hintMarks, ringLink, ringRules } from './hints.js';
 import { TECHNIQUE_DEFINITIONS, creditEntry, emptyTally, statusClass, tallyLines } from './rewards.js';
 
 var ARROWS = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };

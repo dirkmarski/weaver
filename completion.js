@@ -1,5 +1,5 @@
 // Completion: what to announce once the grid is full.
-import { findConflicts } from './validation.js';
+import { findConflicts } from './checking.js';
 
 // Decides what to announce once a value change has been made.
 // grid: givens plus entered values (0 = empty); tally: as from creditEntry,

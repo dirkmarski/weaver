@@ -2,12 +2,11 @@
 // Skipped, with a reason, when Chrome is not found (CHROME_PATH) or WEAVER_NO_CHROME=1.
 import { describe, it as base, before, after } from 'node:test';
 import assert from 'node:assert';
-import { clashCells } from '../clashes.js';
+import { clashCells } from '../checking.js';
 import { nextCell } from '../entry.js';
 import { generatePuzzle, seededRng } from '../generation.js';
-import { hintKey, hintMarks, ringRules, rewardMarks } from '../hintmarks.js';
-import { hintFor } from '../hints.js';
-import { TECHNIQUE_DEFINITIONS, classifyEntry } from '../rewards.js';
+import { hintFor, hintKey, hintMarks, ringRules } from '../hints.js';
+import { TECHNIQUE_DEFINITIONS, classifyEntry, rewardMarks } from '../rewards.js';
 import { findHiddenSingle, findNakedSingle, findPointing } from '../techniques.js';
 import { findChrome, launch } from './chrome.js';
 import { serve } from '../tools/serve.js';
