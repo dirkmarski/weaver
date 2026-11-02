@@ -27,5 +27,7 @@ Not checked: the live site (AC4, PM), the rendering of the README on GitHub, mut
 - Not tested: live site content (Hint on Tricky), rendering of the README on GitHub. Scratch: scratchpad/test-127.
 
 ## Lead review
+- 2026-11-02 head 2dd45e0 (code head f00e189). Diff 466e57e..HEAD: README.md 1 line (View first sentence), work-log only otherwise; no js/spec/step change; no assertion removed. Green: `node --test` 229/229, 0 skipped; specs 22/22, 0 skipped. Lead re-ran tester mutant b (address moved to "How to play") at 12:52, after the tester outputs (12:51): play-online fails, 21/22. ADR 002 (one command, built-ins, Node 22, localhost) and ADR 003 (no new root js) hold. Ratio unchanged (no product or test code).
+- Findings accepted as is: reviewer nit "no longer works" (kept wording, correct); tester mutant e (address moved later in View survives: the step is a substring check, so "first" in AC3 rests on review and test reading, both confirmed). Developer entry says "22/22 expected"; the actual run was 22/22 (developer report, reviewer, tester, lead).
 
 ## Lead: acceptance and merge
