@@ -3,7 +3,7 @@
 A dependency-free static page that generates a fresh sudoku on demand. When the page loads you choose a difficulty (Easy, Medium, Tricky, Tough or Hard); only then is a puzzle generated and shown in a 9x9 grid with the 3x3 boxes shaded in two alternating light colours (blue and cream, checkerboard style). Below 560 px viewport width the cells are square and fit the width of the screen; from 560 px up they are 56 px. Puzzles are generated at run time (never taken from a stored bank) and always have exactly one solution.
 
 ## View
-The folder must be served: the page loads its code as ES modules, which a browser does not run from a `file://` address, so opening `index.html` from disk no longer works.
+Play online at https://dirkmarski.github.io/weaver/. To run it from your own copy, serve the folder: the page loads its code as ES modules, which a browser does not run from a `file://` address, so opening `index.html` from disk no longer works.
 
     node tools/serve.js   # then visit http://localhost:8000
 

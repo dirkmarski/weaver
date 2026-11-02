@@ -9,6 +9,7 @@ Issue: https://github.com/dirkmarski/weaver/issues/127. Branch: `issue-127-play-
 - Note: the step is a substring check, so "names the address first" (AC3) is checked by review/test, not by the spec.
 
 ## Developer
+Model Sonnet 5.5, session 226c8fac-a151-4b1c-af1a-02f108c103b5. README View now opens with the online address, then keeps the local-run text. No code, spec or step changes. Full suite 229/229 pass; specs 22/22 expected pass (see report).
 
 ## Reviewer
 
