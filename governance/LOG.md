@@ -2,6 +2,16 @@
 
 ## Entries (newest first)
 
+### Answers need a way back down to the team
+- **Seen:** 2026-11-02
+- **Means:** A decision made outside the team does not reach it unless there is a route back in, and without one the team acts on its own stale view. In iteration 24 the director reported GitHub Pages as "still not enabled" from its own memory, after the site had gone live. With requests/ in place, iteration 25 read every answer, the raising roles wrote their follow-ups, all five requests were closed and the "waiting on" item left memory. No agent edited an answer.
+- **Response:** Added the requests/ channel, with Responses binding like governance context.
+
+### Interrupted work resumes from GitHub
+- **Seen:** 2026-11-02
+- **Means:** An outage stopped iteration 25 after scoping. The clean rerun was told nothing about it: it picked up the open issues and the specs already on their branches, merged the unmerged scoping branch at the close, and delivered all three issues. State that lives on GitHub survived the failed session. See [State needs to live outside the claude session](#state-needs-to-live-outside-the-claude-session).
+- **Response:** None.
+
 ### A one-off action propagates when the work log is the input
 - **Seen:** 2026-10-23
 - **Means:** It is essential to manage the source of truth for an agent. In iteration 19 the director told the curator to commit, so it ran the git close. In iteration 20, with no such instruction, the curator looked up its own close in the iteration 19 work log and did it again. The second issue lead skipped memory entirely and took its process from the previous issue's work log.
