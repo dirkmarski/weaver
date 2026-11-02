@@ -11,6 +11,11 @@ https://github.com/dirkmarski/weaver/issues/139 - branch `issue-139-own-hidden-w
 
 ## Developer
 
+- Model: Claude Sonnet 5.5; session 512d8df6-bdf0-4d6d-9806-20017be40830. Commit 5b9e9cd (code, tests, README).
+- Summary: extracted the holders/boxes-rows-columns/has-have logic from `hiddenStep3` into exported `holdersPhrase(s, grid)` in hints.js (returns "<units> already has/have a D" or ''); `hiddenStep3` and the own hidden-form reward in rewards.js both call it. Reward ends ", since <phrase>." or stays as before when ''. README Pointing and Claiming updated. Three test strings adapted (tests/sudoku.test.js x2, tests/page.test.js x1); no test added or removed; tests/ 2495 lines.
+- Mutants (all killed): ", since" -> ", because" (10 fail); always "have" (6 fail); always append since (2 fail).
+- Claims: 242/242 pass, skipped 0; no assertion removed.
+
 ## Reviewer
 
 ## Tester
