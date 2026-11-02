@@ -7,6 +7,7 @@ import { preferredTechnique, hintFor, hintApplied, hintMarks, hintKey, ringLink,
 import { classifyEntry, emptyTally, creditEntry, tallyLines, TECHNIQUE_DEFINITIONS, statusClass } from '../rewards.js';
 import { findNakedSingle, findHiddenSingle, findPointing, findClaiming } from '../techniques.js';
 import { isValidSolution, findConflicts, verify, buildGrid, clashCells, fixedMessage } from '../checking.js';
+import { boxName } from '../texts.js';
 import { SOLUTION, PUZZLE } from './fixture.js';
 
 const clone = () => SOLUTION.map((r) => r.slice());
@@ -874,7 +875,7 @@ const WALL_ROW = rows9('000100402', '840002001', '521040030', '000469205', '9650
 const WALL_COL = rows9('425386179', '390217004', '170594230', '030941607', '917600480', '064000913', '781400000', '000020700', '000000000'); // seed 8
 const WALL_BOX = rows9('090600030', '002005000', '050008091', '000003080', '070500300', '230007400', '689174003', '703000000', '000300078'); // seed 139
 const WALL_UNIT_COL = rows9('700009060', '304800002', '009007500', '003920100', '007081620', '102070000', '900002080', '030708006', '070193000'); // seed 5: hidden form, unit column, target r9c3
-const BOX_INTRO = 'In the box of rows 1-3 and columns 1-3, the digit ';
+const BOX_INTRO = 'In the top‑left box, the digit ';
 
 test('pointing, row line, naked form: finder, nudge, explain on the same cell, no mutation', () => {
   const snap = JSON.stringify(WALL_ROW);
@@ -885,7 +886,7 @@ test('pointing, row line, naked form: finder, nudge, explain on the same cell, n
   assert.strictEqual(one.technique, 'pointing');
   assert.strictEqual(one.text, 'Hint: try pointing. ' + BOX_INTRO + '3 fits only in row 1, so it cannot go anywhere else in row 1. '
     + 'That means 3 cannot go in row 1, column 5, and only one other digit fits there now. Click Hint again to see why.');
-  assert.strictEqual(two.text, 'Pointing: row 1, column 5 must be 7.\n1. In the box of rows 1-3 and columns 1-3, the digit 3 fits only in row 1.\n'
+  assert.strictEqual(two.text, 'Pointing: row 1, column 5 must be 7.\n1. In the top‑left box, the digit 3 fits only in row 1.\n'
     + '2. So 3 cannot go in row 1 outside that box: not in row 1, columns 5 and 6 (struck).\n'
     + '3. Row 1, column 5 has every digit except 3 and 7 in its row, column and box, so it could only take 3 or 7. With 3 ruled out, it must be 7.');
   assert.deepStrictEqual([two.r, two.c, two.digit, two.form], [one.r, one.c, one.digit, one.form]);
@@ -898,7 +899,7 @@ test('pointing, column line, hidden form: the earlier digit 6 step in the same b
   assert.strictEqual(hintFor(WALL_COL, 1).text, 'Hint: try pointing. ' + BOX_INTRO + '8 fits only in column 3, so it cannot go anywhere else in column 3. '
     + 'Then look at row 4: 8 now has only one place left there. Click Hint again to see why.');
   const two = hintFor(WALL_COL, 2);
-  assert.strictEqual(two.text, 'Pointing: row 4, column 1 must be 8.\n1. In the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3 (the box has no other empty cells).\n' // issue 56: every empty box cell is confined
+  assert.strictEqual(two.text, 'Pointing: row 4, column 1 must be 8.\n1. In the top‑left box, the digit 8 fits only in column 3 (the box has no other empty cells).\n' // issue 56: every empty box cell is confined
     + '2. So 8 cannot go in column 3 outside that box: not in row 4, column 3 (struck).\n3. That leaves row 4, column 1 as the only cell in row 4 where 8 fits, so it must be 8.');
   assert.deepStrictEqual([two.r, two.c, two.digit, two.unit], [3, 0, 8, 'row']);
   assert.ok(hintFor(WALL_UNIT_COL, 1).text.includes(' Then look at column 3: 6 now has only one place left there.')); // column unit names the column, not the row
@@ -907,8 +908,8 @@ test('pointing, column line, hidden form: the earlier digit 6 step in the same b
 test('pointing, hidden form: the unit is the box when box, row and column all qualify (row line, box 7)', () => {
   assert.deepStrictEqual(findPointing(WALL_BOX),
     { r: 7, c: 4, digit: 5, form: 'hidden', unit: 'box', box: 6, line: 'row', index: 8, pointDigit: 5, confined: [72, 74], removed: [76, 78] });
-  assert.ok(hintFor(WALL_BOX, 1).text.includes(' Then look at the box of rows 7-9 and columns 4-6: 5 now has'));
-  assert.ok(hintFor(WALL_BOX, 2).text.endsWith('That leaves row 8, column 5 as the only cell in the box of rows 7-9 and columns 4-6 where 5 fits, so it must be 5.'));
+  assert.ok(hintFor(WALL_BOX, 1).text.includes(' Then look at the bottom‑middle box: 5 now has'));
+  assert.ok(hintFor(WALL_BOX, 2).text.endsWith('That leaves row 8, column 5 as the only cell in the bottom‑middle box where 5 fits, so it must be 5.'));
 });
 
 test('pointing: singles keep priority, conflicts stay unchanged, a box with one spot is no step', () => {
@@ -933,7 +934,7 @@ test('issue 60: on Tricky a useful pointing step comes before singles; seeds 1, 
   const pz = (level, seed) => generatePuzzle(level, { rng: seededRng(seed) }).puzzle;
   const show = (h) => [h.technique, h.r, h.c, h.digit, h.form || h.unit];
   const [s1, s2, s5] = [1, 2, 5].map((n) => pz('tricky', n));
-  // seed 1: the hidden single r1c9 = 1 is passed over for pointing (box of rows 1-3, columns 7-9, digit 2 in row 1, naked, r1c5 = 7)
+  // seed 1: the hidden single r1c9 = 1 is passed over for pointing (the top‑right box, digit 2 in row 1, naked, r1c5 = 7)
   assert.deepStrictEqual(show(hintFor(s1, 1, 'hidden')), ['hidden', 0, 8, 1, 'row']);
   assert.deepStrictEqual(findPointing(s1, { useful: true }), findPointing(s1));
   const nudge = hintFor(s1, 1, 'hidden', 'tricky'), explain = hintFor(s1, 2, 'hidden', 'tricky');
@@ -1009,8 +1010,8 @@ test('pointing counted with a hint (first and second click), naked form and hidd
 
 test('pointing on your own: the exact texts on the seed 1 and seed 3 walls; row and column wording', () => {
   const s1 = creditEntry(T0, {}, null, SEED1_WALL, 2, 2, '7'), s3 = creditEntry(T0, {}, null, SEED3_WALL, 4, 4, '1');
-  assert.strictEqual(s1.text, 'Well spotted! You applied pointing on your own: in the box of rows 7‑9 and columns 1‑3, the digit 1 fits only in column 3, rows 7 and 8, so 1 cannot go in row 3, column 3. That leaves 7 as the only digit there.');
-  assert.strictEqual(s3.text, 'Well spotted! You applied pointing on your own: in the box of rows 7‑9 and columns 1‑3, the digit 1 fits only in row 9, '
+  assert.strictEqual(s1.text, 'Well spotted! You applied pointing on your own: in the bottom‑left box, the digit 1 fits only in column 3, rows 7 and 8, so 1 cannot go in row 3, column 3. That leaves 7 as the only digit there.');
+  assert.strictEqual(s3.text, 'Well spotted! You applied pointing on your own: in the bottom‑left box, the digit 1 fits only in row 9, '
     + 'columns 1 and 2, so 1 cannot go in row 9, column 5. That leaves row 5, column 5 as the only cell in column 5 where 1 fits.');
   for (const res of [s1, s3]) {
     assert.deepStrictEqual([res.tally.pointing, res.tally.naked, res.tally.hidden, res.kind], [{ own: 1, hint: 0 }, T0.naked, T0.hidden, 'reward']);
@@ -1023,7 +1024,7 @@ test('classifyEntry pointing: both forms; any pointing step counts, not only the
   assert.deepStrictEqual(classifyEntry(WALL_ROW, 0, 4, 7), { technique: 'pointing', box: 0, line: 'row', index: 0, pointDigit: 3, form: 'naked', confined: [0, 1], removed: [4, 5] }); // naked form
   assert.deepStrictEqual(classifyEntry(WALL_COL, 3, 0, 8), { technique: 'pointing', box: 0, line: 'column', index: 2, pointDigit: 8, form: 'hidden', unit: 'row', confined: [11, 20], removed: [29] }); // hidden form
   assert.strictEqual(findPointing(WALL_COL).box, 0);
-  // row 8, column 1 is 6 through a step in the box of rows 4-6 and columns 1-3, a later step than the one findPointing returns
+  // row 8, column 1 is 6 through a step in the middle‑left box, a later step than the one findPointing returns
   assert.deepStrictEqual(classifyEntry(WALL_COL, 7, 0, 6), { technique: 'pointing', box: 3, line: 'column', index: 0, pointDigit: 5, form: 'naked', confined: [27, 45], removed: [63, 72] });
   // the entered cell and the entered digit must both match the step
   assert.strictEqual(classifyEntry(WALL_COL, 7, 0, 5), null);
@@ -1228,18 +1229,18 @@ test('issue 56 pins P(1), P(3), P(4), P(8), P(10): rings, key line and the box-c
   pin(3, cells([2, 3], [7, 8]), false);
   pin(10, cells([6, 6], [7, 7], [8, 1], [9, 4]), false);
   const p4 = pin(4, [], true), p8 = pin(8, cells([5, 8]), true);
-  assert.strictEqual(p4.h.text, 'Pointing: row 4, column 5 must be 7.\n1. In the box of rows 7-9 and columns 4-6, the digit 9 fits only in column 5 (the box has no other empty cells).\n'
+  assert.strictEqual(p4.h.text, 'Pointing: row 4, column 5 must be 7.\n1. In the bottom‑middle box, the digit 9 fits only in column 5 (the box has no other empty cells).\n'
     + '2. So 9 cannot go in column 5 outside that box: not in column 5, rows 4, 5 and 6 (struck).\n'
     + '3. Row 4, column 5 has every digit except 9 and 7 in its row, column and box, so it could only take 9 or 7. With 9 ruled out, it must be 7.');
   assert.deepStrictEqual(p4.m.confined.concat(p4.m.removed), cells([8, 5], [9, 5], [4, 5], [5, 5], [6, 5]));
-  assert.strictEqual(p8.h.text, 'Pointing: row 4, column 1 must be 8.\n1. In the box of rows 1-3 and columns 1-3, the digit 8 fits only in column 3 (the box has no other empty cells).\n'
+  assert.strictEqual(p8.h.text, 'Pointing: row 4, column 1 must be 8.\n1. In the top‑left box, the digit 8 fits only in column 3 (the box has no other empty cells).\n'
     + '2. So 8 cannot go in column 3 outside that box: not in row 4, column 3 (struck).\n3. That leaves row 4, column 1 as the only cell in row 4 where 8 fits, so it must be 8.');
   // first click, "Well done!" and own-pointing ("Well spotted!") texts carry no parenthesis, box case or not
   const { g, h } = pointingState(4), first = hintFor(g, 1, 'hidden');
   assert.ok(!first.text.includes('no other empty cells') && first.text.includes('fits only in column 5, so it cannot go anywhere else in column 5.'));
   assert.strictEqual(hintApplied(h, '7'), 'Well done! You applied pointing: row 4, column 5 is 7.');
   assert.strictEqual(creditEntry(emptyTally(), {}, null, WALL_COL, 3, 0, '8').text,
-    'Well spotted! You applied pointing on your own: in the box of rows 1‑3 and columns 1‑3, the digit 8 fits only in column 3, rows 2 and 3, so 8 cannot go in row 4, column 3. That leaves row 4, column 1 as the only cell in row 4 where 8 fits.');
+    'Well spotted! You applied pointing on your own: in the top‑left box, the digit 8 fits only in column 3, rows 2 and 3, so 8 cannot go in row 4, column 3. That leaves row 4, column 1 as the only cell in row 4 where 8 fits.');
 });
 
 test('issue 56 pins H(2), H(3): hidden single rings drop the digits that rule out nothing (r9c8 stays: redundant rings are kept)', () => {
@@ -1342,7 +1343,7 @@ test('hintFor: claiming is the fallback on every level, after singles and pointi
 });
 
 test('hintFor claiming: nudge and explanation texts, naked and hidden, row and column lines, struck cells, box-case suffix', () => {
-  const box = (l, c) => 'the box of rows ' + l + ' and columns ' + c;
+  const box = (l, c) => ({ '1-34-6': 'the top‑middle box', '4-67-9': 'the middle‑right box', '4-64-6': 'the centre box', '7-94-6': 'the bottom‑middle box' })[l + c];
   const nudge = (line, d, b, tail) => 'Hint: try claiming. In ' + line + ', the digit ' + d + ' fits only in ' + b + ', so it cannot go anywhere else in that box. ' + tail + ' Click Hint again to see why.';
   const both = (g, n, e) => { assert.strictEqual(hintFor(g, 1).text, n); assert.strictEqual(hintFor(g, 2).text, e.join('\n')); };
   const naked = (rc, d, x) => '3. ' + rc + ' has every digit except ' + d + ' and ' + x + ' in its row, column and box, so it could only take ' + d + ' or ' + x + '. With ' + d + ' ruled out, it must be ' + x + '.';
@@ -1394,10 +1395,18 @@ test('creditEntry own claiming: Tough seeds 3 and 12 claiming, seed 1 pointing; 
   const pz = (n) => generatePuzzle('tough', { rng: seededRng(n) }).puzzle;
   const a = creditEntry(T0, {}, null, pz(3), 4, 3, '6'), b = creditEntry(T0, {}, null, pz(12), 1, 2, '5');
   assert.strictEqual(a.text, 'Well spotted! You applied claiming on your own: in column 6, the digit 6 fits only in rows 7 and 9, '
-    + 'inside the box of rows 7‑9 and columns 4‑6, so 6 cannot go in row 9, column 4. That leaves row 5, column 4 as the only cell in column 4 where 6 fits.');
-  assert.strictEqual(b.text, 'Well spotted! You applied claiming on your own: in column 1, the digit 2 fits only in rows 2 and 3, inside the box of rows 1‑3 and columns 1‑3, so 2 cannot go in row 2, column 3. That leaves 5 as the only digit there.');
+    + 'inside the bottom‑middle box, so 6 cannot go in row 9, column 4. That leaves row 5, column 4 as the only cell in column 4 where 6 fits.');
+  assert.strictEqual(b.text, 'Well spotted! You applied claiming on your own: in column 1, the digit 2 fits only in rows 2 and 3, inside the top‑left box, so 2 cannot go in row 2, column 3. That leaves 5 as the only digit there.');
   assert.deepStrictEqual([a.tally.claiming, a.kind, a.credited], [{ own: 1, hint: 0 }, 'reward', { 39: true }]);
   const again = creditEntry(a.tally, a.credited, null, pz(3), 4, 3, '6'); // re-entry after clearing
   assert.deepStrictEqual([again.text, again.tally], [a.text, a.tally]);
   assert.deepStrictEqual(creditEntry(a.tally, a.credited, hintFor(pz(3), 1, 'hidden', 'tough'), pz(3), 4, 3, '6').tally, a.tally);
+});
+
+test('boxName: nine position names, hyphen always U+2011', () => {
+  const names = [0, 1, 2, 3, 4, 5, 6, 7, 8].map(boxName);
+  assert.deepStrictEqual(names, ['the top\u2011left box', 'the top\u2011middle box', 'the top\u2011right box', 'the middle\u2011left box', 'the centre box',
+    'the middle\u2011right box', 'the bottom\u2011left box', 'the bottom\u2011middle box', 'the bottom\u2011right box']);
+  assert.strictEqual(boxName(0).charCodeAt(7), 0x2011);
+  assert.ok(names.every(n => !n.includes('-')));
 });

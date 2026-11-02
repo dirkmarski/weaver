@@ -13,7 +13,7 @@ function preferredTechnique(tally, level) {
   return level === 'easy' ? 'naked' : 'hidden';
 }
 
-// "the box of ..., the digit D fits only in row L" for a pointing step.
+// "the top‑left box, the digit D fits only in row L" for a pointing step.
 function pointingClause(s) {
   return boxName(s.box) + ', the digit ' + s.pointDigit + ' fits only in ' + s.line + ' ' + (s.index + 1);
 }

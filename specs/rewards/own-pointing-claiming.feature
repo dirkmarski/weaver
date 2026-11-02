@@ -1,4 +1,4 @@
-@issue-108
+@issue-108 @issue-128
 Feature: Own pointing and claiming rewards state every step
   As a learner who applied pointing or claiming by myself,
   I want the reward to say what the step rules out and what that leaves,
@@ -24,7 +24,7 @@ Feature: Own pointing and claiming rewards state every step
       | ..8..12.3 |
     And no technique has been applied yet in this puzzle
     When the player enters 7 in row 1, column 5 without a hint showing
-    Then the message reads "Well spotted! You applied pointing on your own: in the box of rows 1‑3 and columns 7‑9, the digit 2 fits only in row 1, columns 8 and 9, so 2 cannot go in row 1, column 5. That leaves 7 as the only digit there."
+    Then the message reads "Well spotted! You applied pointing on your own: in the top‑right box, the digit 2 fits only in row 1, columns 8 and 9, so 2 cannot go in row 1, column 5. That leaves 7 as the only digit there."
     And the message is shown as a reward
     And the "Pointing" line reads "Pointing: 1 on your own, 0 with a hint"
 
@@ -41,7 +41,7 @@ Feature: Own pointing and claiming rewards state every step
       | .7.1..... |
     And no technique has been applied yet in this puzzle
     When the player enters 6 in row 3, column 5 without a hint showing
-    Then the message reads "Well spotted! You applied claiming on your own: in column 6, the digit 1 fits only in rows 1 and 2, inside the box of rows 1‑3 and columns 4‑6, so 1 cannot go in row 3, column 5. That leaves 6 as the only digit there."
+    Then the message reads "Well spotted! You applied claiming on your own: in column 6, the digit 1 fits only in rows 1 and 2, inside the top‑middle box, so 1 cannot go in row 3, column 5. That leaves 6 as the only digit there."
     And the message is shown as a reward
     And the "Claiming" line reads "Claiming: 1 on your own, 0 with a hint"
 
@@ -58,7 +58,7 @@ Feature: Own pointing and claiming rewards state every step
       | ...7.4... |
     And no technique has been applied yet in this puzzle
     When the player enters 5 in row 4, column 3 without a hint showing
-    Then the message reads "Well spotted! You applied pointing on your own: in the box of rows 1‑3 and columns 1‑3, the digit 5 fits only in column 2, rows 1 and 3, so 5 cannot go in row 4, column 2. That leaves row 4, column 3 as the only cell in the box of rows 4‑6 and columns 1‑3 where 5 fits."
+    Then the message reads "Well spotted! You applied pointing on your own: in the top‑left box, the digit 5 fits only in column 2, rows 1 and 3, so 5 cannot go in row 4, column 2. That leaves row 4, column 3 as the only cell in the middle‑left box where 5 fits."
     And the message is shown as a reward
     And the "Pointing" line reads "Pointing: 1 on your own, 0 with a hint"
 
@@ -75,7 +75,7 @@ Feature: Own pointing and claiming rewards state every step
       | .7.1..... |
     And no technique has been applied yet in this puzzle
     When the player enters 2 in row 7, column 2 without a hint showing
-    Then the message reads "Well spotted! You applied claiming on your own: in row 9, the digit 2 fits only in columns 7, 8 and 9, inside the box of rows 7‑9 and columns 7‑9, so 2 cannot go in row 7, columns 8 and 9. That leaves row 7, column 2 as the only cell in row 7 where 2 fits."
+    Then the message reads "Well spotted! You applied claiming on your own: in row 9, the digit 2 fits only in columns 7, 8 and 9, inside the bottom‑right box, so 2 cannot go in row 7, columns 8 and 9. That leaves row 7, column 2 as the only cell in row 7 where 2 fits."
     And the message is shown as a reward
     And the "Claiming" line reads "Claiming: 1 on your own, 0 with a hint"
 
@@ -92,6 +92,6 @@ Feature: Own pointing and claiming rewards state every step
       | ..8..12.3 |
     And no technique has been applied yet in this puzzle
     When the player enters 5 in row 2, column 8 without a hint showing
-    Then the message reads "Well spotted! You applied pointing on your own: in the box of rows 7‑9 and columns 4‑6, the digit 5 fits only in row 9, columns 4 and 5, so 5 cannot go in row 9, column 8. That leaves row 2, column 8 as the only cell in column 8 where 5 fits."
+    Then the message reads "Well spotted! You applied pointing on your own: in the bottom‑middle box, the digit 5 fits only in row 9, columns 4 and 5, so 5 cannot go in row 9, column 8. That leaves row 2, column 8 as the only cell in column 8 where 5 fits."
     And the message is shown as a reward
     And the "Pointing" line reads "Pointing: 1 on your own, 0 with a hint"
