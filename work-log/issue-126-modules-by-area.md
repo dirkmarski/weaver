@@ -34,5 +34,8 @@ Issue: https://github.com/dirkmarski/weaver/issues/126. Branch: `issue-126-modul
 - Scratch: /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/226c8fac-a151-4b1c-af1a-02f108c103b5/scratchpad/test-126/ (README.md lists the scripts and pass lines).
 
 ## Lead review
+- Head bce68dc (code = 3c7f44a). Reviewer approve (2 nits: double blank lines before the moved blocks in hints.js/rewards.js; README "validation/verify" topic word, not a file name; left as is, no behaviour impact). Reviewer's independent check: non-comment, non-import/export lines of all root `*.js` sorted, main vs branch, same md5 (1027 lines), covering the parity script's blind spots (bare top-level statements).
+- Tester pass; lead re-ran the tester scripts at 12:42 (fresh output timestamps): `diff.mjs` PASS 6/6 pairs 0 px, 0 console errors (states a/b/c, 360x740 and 1280x900, main 68829d7 vs branch); `loads.mjs` on the main tree (branch) 10/10, problems=0, responses=120. Tester mutants (hintKey, rewardMarks key text) each changed only their own state.
+- ADR check: 003 native ES modules, no build; `ui.js` the only page module; no logic import of `ui.js`; acyclic; guard mutants (6) killed. ADR 002 unchanged (`node tools/serve.js`). Verdict: ready for PR.
 
 ## Lead: acceptance and merge
