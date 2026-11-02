@@ -46,3 +46,4 @@ Not tested: personas (PM), other seeds beyond the 13, other viewports, Safari/Fi
 - ADR 003 and 002: compliant (hints module only; imports board, texts within the allowed set; no new file; Node built-ins). Wiki: product.md hidden step 3, architecture.md exports/sizes updated.
 
 ## Lead: acceptance and merge
+- 2026-11-02 PM accepted code head b274709 (PR #137 comment; PM log db9b937): AC6 personas "step 3 says why" 4.56 vs 1.67, "I learn something" 4.00 vs 2.33 (gate met with no margin), preferred 9/9. New PM concern C5 (a digit named twice when one ring covers both units) to the backlog. `git diff --stat b274709..head` touches only work-log/ and memory/. Merging PR #137 with a merge commit at the branch head.
