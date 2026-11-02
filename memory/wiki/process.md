@@ -1,7 +1,7 @@
 # Process: how the team works
 
 Charter: `governance/CHARTER.md`. The agents build the site; Dirk (human) owns agent definitions (`.claude/`), product context (`governance/context/`, incl. ADRs in `decisions/`) and the charter, and steers only through those. No human writes, alters or reviews code.
-- ADRs (`governance/context/decisions/`, status In force) are binding; agents never edit them. A departure is a failure; if one looks wrong, only the lead, PM or curator stops and recommends (rules.md). Briefs for code work name the ADRs in force (ADR 001: architecture.md "Modules"; ADR 002: README View command, Node built-ins only, no install; keep 127.0.0.1:8000 free during `node --test`).
+- ADRs (`governance/context/decisions/`, status In force) are binding; agents never edit them. A departure is a failure; if one looks wrong, only the lead, PM or curator stops and recommends (rules.md). Briefs for code work name the ADRs in force (ADR 003: architecture.md "Modules"; ADR 002: README View command, Node built-ins only, no install; keep 127.0.0.1:8000 free during `node --test`).
 
 ## Run types
 - "Deliver the next iteration": the PM decides the scope and writes the issues, the lead delivers them, the PM accepts.

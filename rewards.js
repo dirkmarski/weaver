@@ -1,11 +1,9 @@
-// Rewards: classifying and crediting entries, the tally and its definitions, the status class.
-import { findConflicts } from './validation.js';
+// Rewards: classifying and crediting entries, the tally and its definitions, the status class, the reward marks.
+import { findConflicts, namedClash } from './checking.js';
 import { firstHolder, cellName, UNIT_NAMES, UNITS, CELL_UNITS, toFlat, usedMask, bitCount, spotsFor } from './board.js';
 import { claimingSteps, pointingSteps, singleAfterStep } from './techniques.js';
-import { namedClash } from './clashes.js';
 import { sanitizeDigit } from './entry.js';
 import { hintApplied } from './hints.js';
-import { rewardMarks } from './hintmarks.js';
 import { boxName, andList, struckCells } from './texts.js';
 
 // Which technique makes `digit` in the empty cell (r, c) of `grid` (the grid
@@ -65,7 +63,7 @@ function notCounted(grid, r, c, digit) {
 //  grid: the grid just before the entry
 // Only a digit entered in an empty cell is judged. Returns the new
 // { tally, credited, text, kind, marks } (inputs are not changed); text is '' when the entry is not judged.
-// marks: for an own pointing or claiming reward the hintmarks rewardMarks result; null for other rewards, absent when not judged or not counted.
+// marks: for an own pointing or claiming reward the rewardMarks result; null for other rewards, absent when not judged or not counted.
 // kind: 'reward' ("Well spotted!"/"Well done!"), 'notCounted' (the "Entered: ..." text) or '' (not judged).
 // A judged entry that earns no credit gets the "not counted" text (notCounted) and no count changes.
 // A cell already credited shows the text again but changes no count.
@@ -135,4 +133,21 @@ function tallyLines(tally) {
     'Claiming: ' + tally.claiming.own + ' on your own, ' + tally.claiming.hint + ' with a hint'];
 }
 
-export { classifyEntry, emptyTally, creditEntry, statusClass, TECHNIQUE_DEFINITIONS, tallyLines };
+
+// The marks an own pointing or claiming step (a classifyEntry result with `form`, and `unit` in the hidden form) puts on the
+// board after the entry at (r, c): flat indices { area, confined, removed, digit, key }. Area = the box, the line and the hidden-form
+// unit (the entered cell included); removed = the cells of that unit that lose the digit, never the entered cell.
+function rewardMarks(step, r, c) {
+  var p = r * 9 + c, d = step.pointDigit, claiming = step.technique === 'claiming', area = [];
+  var units = [step.box * 3 + 2, step.index * 3 + (step.line === 'row' ? 0 : 1)];
+  if (step.form === 'hidden') units.push(CELL_UNITS[p][UNIT_NAMES.indexOf(step.unit)]);
+  units.forEach(function (u) { UNITS[u].forEach(function (q) { if (area.indexOf(q) < 0) area.push(q); }); });
+  var removed = step.removed.filter(function (q) { return units.length > 2 && UNITS[units[2]].indexOf(q) >= 0; });
+  return {
+    area: area, confined: step.confined, removed: removed, digit: d,
+    key: 'Key: amber = the box, rows and columns the message names; dashed purple = the only places for ' + d + ' in the '
+      + (claiming ? step.line : 'box') + (removed.length ? '; struck grey ' + d + ' = this step rules ' + d + ' out there' : '') + '.'
+  };
+}
+
+export { classifyEntry, emptyTally, creditEntry, statusClass, TECHNIQUE_DEFINITIONS, tallyLines, rewardMarks };

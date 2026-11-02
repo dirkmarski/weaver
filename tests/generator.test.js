@@ -4,7 +4,7 @@ import { PUZZLE } from './fixture.js';
 import * as S from '../generation.js';
 import { hintFor, preferredTechnique } from '../hints.js';
 import { emptyTally } from '../rewards.js';
-import { findConflicts, isValidSolution } from '../validation.js';
+import { findConflicts, isValidSolution } from '../checking.js';
 
 const LEVELS = ['easy', 'medium', 'tricky', 'tough', 'hard'];
 const flat = (g) => g.flat();
