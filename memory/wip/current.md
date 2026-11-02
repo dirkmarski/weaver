@@ -1,28 +1,27 @@
 # WIP: current
 
-Last updated: 2026-11-02, #128 merged (lead, session 226c8fac-a151-4b1c-af1a-02f108c103b5)
+Last updated: 2026-11-02, it25 close (curator, session 226c8fac-a151-4b1c-af1a-02f108c103b5)
 
 ## Active run
-- Iteration 25 (lead session 226c8fac-a151-4b1c-af1a-02f108c103b5): #126 (modules by game area, ADR 003) merged via PR #130; 10 root modules, 228 tests (21 specs), ratio 1.590x (2469/1553, cap 2484). #127 (README names https://dirkmarski.github.io/weaver/) merged via PR #131, README only, 229 tests (22 specs); PM AC4 live-site check pending after merge. #128 (box names by position, U+2011, one `boxName` form) merged via PR #132; 230 tests, ratio 1.597x (2478/1552, cap 2483, 5 lines headroom); PM D8-D10 (AC6 round 1 read 3.72, blind round 2 4.0, D9; D10 grid top 5.8 unchanged). Next: iteration 25 close. PR #129 (PM scoping log + request 001/002 follow-ups + #126 acceptance) open for the closing lead.
+- Iteration 25 delivered: #126 (ADR 003, 10 modules, PR #130), #127 (README View names https://dirkmarski.github.io/weaver/, PR #131; PM AC4 live-site check passed), #128 (box names by position, U+2011, PR #132; PM D9/D10). main 91fdf71, 230 tests (22 specs), ratio 1.597x. Wiki refreshed to the it25 state on branch `iteration-25-close`.
+- Next: iteration 26 scoping by the PM from `wiki/backlog.md` item 1 (why the unit's other cells are out) together with item 2 (message density); the 360x740 room must be solved first.
 
 ## Streams
 | Stream | Status | Next step | Owner |
 |---|---|---|---|
-| #126 | merged (PR #130) | none | - |
-| #127 | merged (PR #131) | PM AC4 live-site check | PM |
-| #128 | merged (PR #132) | none | - |
-| PR #129 | open (PM log, incl. #128 acceptance 00255e0) | merge at iteration close; backlog from it (item 2a new) | closing lead |
+| PR #129 (`it25-pm-scoping`: PM log, #126-#128 acceptances, request 001/002 Follow-ups) | open | merge first | closing lead |
+| it25 close (`iteration-25-close`: wiki, WIP, requests 003-005 closed) | pushed, no PR yet | open PR, merge after #129; then set requests 001 and 002 to `Status: Closed` | closing lead |
 
 ## Starting the next run
-- ADRs in force: 003 (supersedes 001; modules by game area plus shared helpers, architecture.md "Modules"; a new root `*.js` needs a README "## Modules" line) and 002 (one README command, Node built-ins only, no install).
-- View or check the page with `node tools/serve.js` (never python http.server, never `file://`). Keep 127.0.0.1:8000 free during `node --test` (the ADR 002 spec serves there); scratch servers use other ports.
-- Layout is at its limit at 360x740 (product.md "Known product gaps", D10): box names are now short (#128) but the D10 case is still 10 lines, grid top 5.8 px: any longer pointing-hidden step 3 must solve room first. Reward key lines fill the 64 px reserve at 3 lines (155 chars): a longer key needs a layout check.
-- Waiting on Dirk (pass on, no team action): GitHub Pages is live (request 001, README names it since #127); optional clarifying ADR on concern granularity (PM C2). See backlog.md "Open concerns for Dirk".
-- Reusable it25 scripts (scratchpad `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/226c8fac-a151-4b1c-af1a-02f108c103b5/scratchpad/`, each with a README): `test-126/` (shots.mjs/diff.mjs main-vs-branch pixel parity on 3 states, loads.mjs N fresh loads), `dev-126/parity.mjs` (declaration parity between two trees). The it24 scripts below are gone (/tmp cleared).
-- Former it24 scripts (session scratchpad `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/c62cf25c-8b8e-4cda-905a-5ce306a4299f/scratchpad/`, while /tmp holds them; copy, do not edit in place; each has a README): `test-122/scripts/` (lib.mjs page reader + CDP real input, layout.mjs main-vs-branch layout + facts oracle, ac3.mjs mark lifetime, pixel.mjs main-vs-branch pixel compare, serveboth.mjs two trees on 8111/8112, mutants.py, probe*.mjs seed finders), `test-121/scripts/` (loads.mjs N fresh-profile loads, shots.mjs/compare.mjs screenshot parity; supersede the it23 `test-117/` copies), PM `pm-it24/` (persona briefs, shots with facts.md). The it23 session scratch (daff0a10...) is superseded.
+- ADRs in force: 003 (modules by game area plus shared helpers, architecture.md "Modules"; a new root `*.js` needs a README "## Modules" line) and 002 (one README command, Node built-ins only, no install). 001 is superseded.
+- Check `requests/` for Answered items your role raised (index.md "Requests").
+- View or check the page with `node tools/serve.js` (never python http.server, never `file://`) or the live site. Keep 127.0.0.1:8000 free during `node --test`; scratch servers use other ports.
+- Layout is at its limit at 360x740 (product.md "Known product gaps", D10): the D10 case is 10 lines, grid top 5.8 px; #128 saved no line there. Reward key lines fill the 64 px reserve at 3 lines (155 chars).
+- Ratio headroom is about 5 lines: plan listed removals or spec pins at scoping.
+- Reusable it25 scripts (scratchpad `/tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/226c8fac-a151-4b1c-af1a-02f108c103b5/scratchpad/`, while /tmp holds them; copy, do not edit in place; each folder has a README): `test-128/` (states.mjs/layout.mjs main-vs-branch layout at 360x740 and 1280x900 incl. the D10 box case, report.py, codepoints.py; facts.md), `test-126/` (shots.mjs/diff.mjs pixel parity, loads.mjs N fresh loads), `dev-126/parity.mjs` (declaration parity; pair with a sorted-line md5, lessons "Scoping and spec"), `test-127/mutate.py` (README mutants), PM `pm-128/` (persona briefs 1 and 2, blind main-vs-branch shots).
 
 ## Open issues / PRs
-- #128 closed with PR #132; #127 closed with PR #131; PR #129 open (also holds the PM #127 acceptance, 65773da).
+- PR #129 open. No open issues for the team.
 
 ## Blockers / waiting on
-- none for the team.
+- none for the team. For Dirk: backlog.md "Open concerns for Dirk".

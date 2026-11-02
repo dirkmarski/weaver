@@ -23,6 +23,7 @@
 - **Credited**: a cell already counted in the tally this puzzle; counted once per cell.
 - **Not counted**: neutral "Entered: ... not counted" message for a judged entry that earns no reward.
 - **Nudge / explain**: first and second Hint click.
+- **Box name**: a box is named by its position in all player texts (#128): top‑left, top‑middle, top‑right, middle‑left, centre, middle‑right, bottom‑left, bottom‑middle, bottom‑right, with U+2011 so a name never breaks; "the P box" in product.md and README. Spec step tables in `own-step-marks.feature` keep range notation (PM D3).
 - **Named clash**: the one clashing pair (P, Q) and unit U named in the not-counted text and in Hint during a clash (`namedClash`, #50).
 - **Clash outline**: the dashed orange `td.clash` mark on every clashing cell while the clash lasts; the only live mark (#51).
 - **Fixed message**: "No numbers break the rules now. New entries are counted again.", shown when a value change ends the last clash (#51).
