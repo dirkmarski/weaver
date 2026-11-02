@@ -1,7 +1,7 @@
 // Hints: which technique to teach, the hint for a grid, the hint texts, and the cells, key line and links a hint marks.
-import { cellName, UNIT_NAMES, UNITS, CELL_UNITS } from './board.js';
+import { cellName, UNIT_NAMES, UNITS, CELL_UNITS, toFlat } from './board.js';
 import { findConflicts, verify, namedClash } from './checking.js';
-import { boxName, struckCells, aDigit } from './texts.js';
+import { boxName, andList, struckCells, aDigit } from './texts.js';
 import { findNakedSingle, findHiddenSingle, findPointing, findClaiming } from './techniques.js';
 
 // Which technique Hint should teach next: the one applied less so far (own and
@@ -16,6 +16,35 @@ function preferredTechnique(tally, level) {
 // "the top‑left box, the digit D fits only in row L" for a pointing step.
 function pointingClause(s) {
   return boxName(s.box) + ', the digit ' + s.pointDigit + ' fits only in ' + s.line + ' ' + (s.index + 1);
+}
+
+// Step 3 of the hidden form of pointing and claiming: why the other cells of the hidden unit are out. Struck cells
+// of the unit are counted; every other empty cell is assigned to the first of its row, column, box (not the unit's own
+// kind) that holds D; the units are listed boxes, rows, columns.
+function hiddenStep3(s, grid) {
+  var d = s.pointDigit, flat = toFlat(grid), kU = UNIT_NAMES.indexOf(s.unit), p = s.r * 9 + s.c;
+  var cells = UNITS[CELL_UNITS[p][kU]], unitName = s.unit === 'box' ? boxName((CELL_UNITS[p][2] - 2) / 3) : s.unit + ' ' + ((s.unit === 'row' ? s.r : s.c) + 1);
+  var struck = cells.filter(function (q) { return s.removed.indexOf(q) >= 0; }).length;
+  var holders = [[], [], []]; // rows, columns, boxes (numbers from 1; box index from 0)
+  cells.forEach(function (q) {
+    if (q === p || flat[q] !== 0 || s.removed.indexOf(q) >= 0) return;
+    for (var k = 0; k < 3; k++) {
+      var u = CELL_UNITS[q][k];
+      if (k !== kU && UNITS[u].some(function (x) { return flat[x] === d; })) { if (holders[k].indexOf(u) < 0) holders[k].push(u); break; }
+    }
+  });
+  var tail = ' So ' + d + ' must go in ' + cellName(p) + '.', head = '3. In ' + unitName + ', step 2 crossed out ';
+  var named = [], count = holders[0].length + holders[1].length + holders[2].length;
+  if (count === 0) return head + (struck === 1 ? 'the other empty cell' : 'every other empty cell') + '.' + tail;
+  var boxes = holders[2].map(function (u) { return (u - 2) / 3; }).sort(function (a, b) { return a - b; });
+  if (boxes.length === 1) named.push(boxName(boxes[0]));
+  else if (boxes.length) named.push('the ' + andList(boxes.map(function (b) { return boxName(b).slice(4, -4); })) + ' boxes');
+  [[0, 'row'], [1, 'column']].forEach(function (g) {
+    var n = holders[g[0]].map(function (u) { return (u - g[0]) / 3 + 1; }).sort(function (a, b) { return a - b; });
+    if (n.length) named.push(g[1] + (n.length > 1 ? 's ' : ' ') + andList(n));
+  });
+  var words = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
+  return head + words[struck] + ' cell' + (struck === 1 ? '' : 's') + '; ' + named.join(' and ') + (count === 1 ? ' already has ' : ' already have ') + aDigit(d) + '.' + tail;
 }
 
 // The hintFor result for a pointing step (see findPointing).
@@ -35,7 +64,7 @@ function pointingHint(s, step, grid) {
     text += '2. So ' + d + ' cannot go in ' + line + ' outside that box: not in ' + struckCells(s.removed) + ' (struck).\n';
     text += s.form === 'naked'
       ? '3. Row ' + (s.r + 1) + ', column ' + (s.c + 1) + ' has every digit except ' + d + ' and ' + s.digit + ' in its row, column and box, so it could only take ' + d + ' or ' + s.digit + '. With ' + d + ' ruled out, it must be ' + s.digit + '.'
-      : '3. That leaves ' + rc + ' as the only cell in ' + unitName + ' where ' + d + ' fits, so it must be ' + d + '.';
+      : hiddenStep3(s, grid);
   } else {
     var tail;
     if (s.form === 'naked') {
@@ -61,7 +90,7 @@ function claimingHint(s, step, grid) {
       + '2. So ' + d + ' cannot go anywhere else in that box: not in ' + struckCells(s.removed) + ' (struck).\n';
     text += s.form === 'naked'
       ? '3. ' + rc.charAt(0).toUpperCase() + rc.slice(1) + ' has every digit except ' + d + ' and ' + s.digit + ' in its row, column and box, so it could only take ' + d + ' or ' + s.digit + '. With ' + d + ' ruled out, it must be ' + s.digit + '.'
-      : '3. That leaves ' + rc + ' as the only cell in ' + s.unit + ' ' + ((s.unit === 'row' ? s.r : s.c) + 1) + ' where ' + d + ' fits, so it must be ' + d + '.';
+      : hiddenStep3(s, grid);
   } else {
     text = 'Hint: try claiming. In ' + line + ', the digit ' + d + ' fits only in ' + box + ', so it cannot go anywhere else in that box. ';
     text += s.form === 'naked'

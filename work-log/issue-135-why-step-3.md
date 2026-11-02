@@ -9,6 +9,11 @@ Issue: https://github.com/dirkmarski/weaver/issues/135 . Branch: `issue-135-why-
 - PM concerns to watch: C1 step 3 counts struck cells inside U only (step 2 lists all; numbers may differ, by spec); C2 375x812 fit is tight (AC4 hard gate); C3 "(struck)" vs "crossed out" (out of scope, by spec); undefined Tough step (extend existing step).
 
 ## Developer
+- Claude Sonnet 5.5, session 8dc2d34a-b5fc-44f3-9327-5bb6bd0c4608.
+- Part A 9010bb5: level step accepts `(Tricky|Tough)`. Red run: 236 tests, 226 pass, 10 fail, 0 skipped; all 10 fail on ERR_ASSERTION (no undefined or ambiguous step).
+- Part B: `hints.js` new internal `hiddenStep3(s, grid)` used by pointingHint and claimingHint (hidden form); old step-3 assertions adapted in place in `tests/sudoku.test.js` (5 edits) and `tests/page.test.js` (3 edits); README Pointing and Claiming step 3 texts only.
+- Green: 236 pass, 0 fail, 0 skipped, about 5.5 s. tests 2478 lines / product 1581 = 1.567x (cap 2529); spec-implementation 483.
+- Mutants killed (full suite): has/have, n = all struck cells, fallback branch, first-holder order (box before row/column), box group dropped. Survives: swapping the row and column group order (no spec or test has rows and columns together in one step 3; none found in seeds 1-400 first hints or a 60-step walk of 60 seeds).
 
 ## Reviewer
 
