@@ -1,10 +1,9 @@
 // Texts: naming of cells, boxes and lists in player messages.
 
-// "the box of rows R1-R2 and columns C1-C2" for box b (0-8).
-// dash: the character between the range numbers ('-' by default; the own pointing and claiming rewards pass U+2011).
-function boxName(b, dash) {
-  var r = 3 * Math.floor(b / 3), c = 3 * (b % 3), h = dash || '-';
-  return 'the box of rows ' + (r + 1) + h + (r + 3) + ' and columns ' + (c + 1) + h + (c + 3);
+// "the top\u2011left box" ... "the centre box" ... "the bottom\u2011right box" for box b (0-8); the hyphen is always U+2011, so a name never breaks across lines.
+function boxName(b) {
+  var NAMES = [['top\u2011left', 'top\u2011middle', 'top\u2011right'], ['middle\u2011left', 'centre', 'middle\u2011right'], ['bottom\u2011left', 'bottom\u2011middle', 'bottom\u2011right']];
+  return 'the ' + NAMES[Math.floor(b / 3)][b % 3] + ' box';
 }
 
 // "1, 2 and 3" for a list of numbers.

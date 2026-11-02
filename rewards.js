@@ -83,19 +83,19 @@ function creditEntry(tally, credited, hint, grid, r, c, value) {
     how = 'own';
     var where = 'row ' + (r + 1) + ', column ' + (c + 1) + ' is ' + digit + '.';
     if (technique === 'pointing' || technique === 'claiming') {
-      var NB = '\u2011', d = res.pointDigit, clause;
-      if (technique === 'pointing') clause = boxName(res.box, NB) + ', the digit ' + d + ' fits only in ' + struckCells(res.confined);
+      var d = res.pointDigit, clause;
+      if (technique === 'pointing') clause = boxName(res.box) + ', the digit ' + d + ' fits only in ' + struckCells(res.confined);
       else {
         var along = res.confined.map(function (q) { return (res.line === 'row' ? q % 9 : Math.floor(q / 9)) + 1; });
         clause = res.line + ' ' + (res.index + 1) + ', the digit ' + d + ' fits only in ' + (res.line === 'row' ? 'columns ' : 'rows ')
-          + andList(along) + ', inside ' + boxName(res.box, NB);
+          + andList(along) + ', inside ' + boxName(res.box);
       }
       text = 'Well spotted! You applied ' + technique + ' on your own: in ' + clause + ', so ' + d + ' cannot go in ';
       if (res.form === 'naked') {
         text += 'row ' + (r + 1) + ', column ' + (c + 1) + '. That leaves ' + digit + ' as the only digit there.';
       } else {
         var kind = UNIT_NAMES.indexOf(res.unit), mine = UNITS[CELL_UNITS[r * 9 + c][kind]];
-        var cellUnit = { row: 'row ' + (r + 1), column: 'column ' + (c + 1), box: boxName(3 * Math.floor(r / 3) + Math.floor(c / 3), NB) }[res.unit];
+        var cellUnit = { row: 'row ' + (r + 1), column: 'column ' + (c + 1), box: boxName(3 * Math.floor(r / 3) + Math.floor(c / 3)) }[res.unit];
         text += struckCells(res.removed.filter(function (q) { return mine.indexOf(q) >= 0; }))
           + '. That leaves row ' + (r + 1) + ', column ' + (c + 1) + ' as the only cell in ' + cellUnit + ' where ' + digit + ' fits.';
       }
