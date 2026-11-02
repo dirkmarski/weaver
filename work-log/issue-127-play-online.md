@@ -19,6 +19,12 @@ Tests: `node --test` 229 total, 229 pass, 0 fail, 0 skipped; specs file 22/22.
 Not checked: the live site (AC4, PM), the rendering of the README on GitHub, mutants (tester).
 
 ## Tester
+- 2026-11-02 (tester, Sonnet 5.5, session 226c8fac-a151-4b1c-af1a-02f108c103b5), head f00e189 (tree 5526818). Verdict: PASS.
+- Runs: `node --test` 229 tests, 229 pass, 0 fail, 0 skipped; specs run 22, 22 pass, 0 fail, 0 skipped (play-online and local-run both pass).
+- README mutants (specs run): a address removed, killed; b address moved to "How to play", killed; c1 http instead of https, killed; c2 no /weaver/, killed; c3 no trailing slash, killed; d1 command line removed, killed (local-run); d2 Node/localhost sentence removed, killed; d3 "Node 22 or newer" -> "Node", killed; d4 localhost address removed, killed. README restored after each.
+- Findings: 1. (info) Mutant e, address moved to the end of the View section, survives: the step is a substring check within the section, so "first" (AC3) rests on reading; read: the address opens the View section, then the local-run text, command `node tools/serve.js`, "Node 22 or newer", `http://localhost:8000` kept.
+- Serve check: `node tools/serve.js`, GET http://localhost:8000/ gave 200, stopped, port free. Live site (information): `curl -sI https://dirkmarski.github.io/weaver/` HTTP/2 200 (may serve old main; PM AC4 after merge).
+- Not tested: live site content (Hint on Tricky), rendering of the README on GitHub. Scratch: scratchpad/test-127.
 
 ## Lead review
 
