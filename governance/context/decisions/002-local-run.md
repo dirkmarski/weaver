@@ -5,7 +5,7 @@ Date: 29 October 2026
 
 ## Decision
 - From a fresh clone, the product runs locally with one documented command that needs
-  only Node and its built-in modules: no install step and no third-party packages.
+  only Node and its built-in modules: no install step and no third-party packages. Calling local services (such as Ollama) is in line with this decision.
 - The README states that command, the Node version it needs and the address to open.
 
 ## Scope
