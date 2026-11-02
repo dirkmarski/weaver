@@ -18,24 +18,22 @@ function pointingClause(s) {
   return boxName(s.box) + ', the digit ' + s.pointDigit + ' fits only in ' + s.line + ' ' + (s.index + 1);
 }
 
-// Step 3 of the hidden form of pointing and claiming: why the other cells of the hidden unit are out. Struck cells
-// of the unit are counted; every other empty cell is assigned to the first of its row, column, box (not the unit's own
-// kind) that holds D; the units are listed boxes, rows, columns.
-function hiddenStep3(s, grid) {
+// Why the other cells of a hidden unit are out: every other empty cell of the unit (not the target, not struck) is
+// assigned to the first of its row, column, box (not the unit's own kind) that holds D; the units are listed boxes,
+// rows, columns. s = { r, c, unit, pointDigit, removed }. Returns "<units> already has/have a D", or '' when no cell
+// is left to explain (shared by Hint step 3 and the own reward).
+function holdersPhrase(s, grid) {
   var d = s.pointDigit, flat = toFlat(grid), kU = UNIT_NAMES.indexOf(s.unit), p = s.r * 9 + s.c;
-  var cells = UNITS[CELL_UNITS[p][kU]], unitName = s.unit === 'box' ? boxName((CELL_UNITS[p][2] - 2) / 3) : s.unit + ' ' + ((s.unit === 'row' ? s.r : s.c) + 1);
-  var struck = cells.filter(function (q) { return s.removed.indexOf(q) >= 0; }).length;
   var holders = [[], [], []]; // rows, columns, boxes (numbers from 1; box index from 0)
-  cells.forEach(function (q) {
+  UNITS[CELL_UNITS[p][kU]].forEach(function (q) {
     if (q === p || flat[q] !== 0 || s.removed.indexOf(q) >= 0) return;
     for (var k = 0; k < 3; k++) {
       var u = CELL_UNITS[q][k];
       if (k !== kU && UNITS[u].some(function (x) { return flat[x] === d; })) { if (holders[k].indexOf(u) < 0) holders[k].push(u); break; }
     }
   });
-  var tail = ' So ' + d + ' must go in ' + cellName(p) + '.', head = '3. In ' + unitName + ', step 2 crossed out ';
   var named = [], count = holders[0].length + holders[1].length + holders[2].length;
-  if (count === 0) return head + (struck === 1 ? 'the other empty cell' : 'every other empty cell') + '.' + tail;
+  if (count === 0) return '';
   var boxes = holders[2].map(function (u) { return (u - 2) / 3; }).sort(function (a, b) { return a - b; });
   if (boxes.length === 1) named.push(boxName(boxes[0]));
   else if (boxes.length) named.push('the ' + andList(boxes.map(function (b) { return boxName(b).slice(4, -4); })) + ' boxes');
@@ -43,8 +41,20 @@ function hiddenStep3(s, grid) {
     var n = holders[g[0]].map(function (u) { return (u - g[0]) / 3 + 1; }).sort(function (a, b) { return a - b; });
     if (n.length) named.push(g[1] + (n.length > 1 ? 's ' : ' ') + andList(n));
   });
+  return named.join(' and ') + (count === 1 ? ' already has ' : ' already have ') + aDigit(d);
+}
+
+// Step 3 of the hidden form of pointing and claiming: why the other cells of the hidden unit are out. Struck cells
+// of the unit are counted; the rest are explained by holdersPhrase.
+function hiddenStep3(s, grid) {
+  var d = s.pointDigit, kU = UNIT_NAMES.indexOf(s.unit), p = s.r * 9 + s.c;
+  var cells = UNITS[CELL_UNITS[p][kU]], unitName = s.unit === 'box' ? boxName((CELL_UNITS[p][2] - 2) / 3) : s.unit + ' ' + ((s.unit === 'row' ? s.r : s.c) + 1);
+  var struck = cells.filter(function (q) { return s.removed.indexOf(q) >= 0; }).length;
+  var why = holdersPhrase(s, grid);
+  var tail = ' So ' + d + ' must go in ' + cellName(p) + '.', head = '3. In ' + unitName + ', step 2 crossed out ';
+  if (!why) return head + (struck === 1 ? 'the other empty cell' : 'every other empty cell') + '.' + tail;
   var words = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
-  return head + words[struck] + ' cell' + (struck === 1 ? '' : 's') + '; ' + named.join(' and ') + (count === 1 ? ' already has ' : ' already have ') + aDigit(d) + '.' + tail;
+  return head + words[struck] + ' cell' + (struck === 1 ? '' : 's') + '; ' + why + '.' + tail;
 }
 
 // The hintFor result for a pointing step (see findPointing).
@@ -250,4 +260,4 @@ function ringRules(q, hatched, d) {
 }
 function sharedUnits(p, q) { return UNIT_NAMES.filter(function (n, k) { return CELL_UNITS[q][k] === CELL_UNITS[p][k]; }); }
 
-export { hiddenStep3, preferredTechnique, hintFor, hintApplied, hintMarks, hintKey, ringLink, ringRules };
+export { holdersPhrase, hiddenStep3, preferredTechnique, hintFor, hintApplied, hintMarks, hintKey, ringLink, ringRules };
