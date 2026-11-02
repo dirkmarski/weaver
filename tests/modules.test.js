@@ -1,4 +1,4 @@
-// ADR 001 guard. Product modules = every *.js at the repo root (a new one is picked up by the listing).
+// ADR 003 guard. Product modules = every *.js at the repo root (a new one is picked up by the listing).
 // The interface module is ui.js: the only one that may touch the page. Logic modules never import it.
 import test from 'node:test';
 import assert from 'node:assert';
@@ -34,7 +34,7 @@ for (const f of files) {
   });
 }
 
-test('modules: README "## Modules" lists exactly the product files, one concern each', () => {
+test('modules: README "## Modules" lists exactly the product files, one area each', () => {
   const sec = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8').split(/^## Modules\s*$/m)[1] ?? '';
   const listed = [...sec.split(/^## /m)[0].matchAll(/^- `([^`]+\.js)`: \S.*$/gm)].map((m) => m[1]).sort();
   assert.deepStrictEqual(listed, files);

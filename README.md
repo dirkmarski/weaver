@@ -118,27 +118,25 @@ The runner checks itself in `spec-implementation/runner.test.js` (tests named `A
 Later UI work adds its page checks to `tests/page.test.js`. Chrome and its temporary profile are removed when the run ends, also after a failed test or on Ctrl-C / SIGTERM (not after `kill -9`).
 
 ## Modules
-One module per concern (ADR 001), all at the repo root, each importing only what it uses; imports run one way (no cycles) and nothing imports `ui.js`:
-- `board.js`: units, peers, candidate masks, cell naming
-- `validation.js`: checking a grid and reporting conflicts
-- `clashes.js`: naming the clash of an entered digit
-- `entry.js`: typing and noting digits in a cell
-- `techniques.js`: finding naked and hidden singles, pointing and claiming steps
-- `texts.js`: naming of cells, boxes and lists in player messages
-- `hints.js`: choosing a hint and its texts
-- `hintmarks.js`: the cells, key line and links a hint marks
-- `rewards.js`: recognising and crediting the learner's own steps
-- `completion.js`: the end-of-puzzle message
-- `generation.js`: making puzzles by level
-- `ui.js`: the page (DOM, events), the only module that touches it
+One module per area of the game (ADR 003), all at the repo root, each importing only what it uses; imports run one way (no cycles) and nothing imports `ui.js`. Each line gives the area a player would name, or a shared helper and the areas that use it:
+- `generation.js`: area: a new puzzle at a level
+- `entry.js`: area: entering digits and notes
+- `checking.js`: area: checking entries (Verify, conflicts, clash messages)
+- `hints.js`: area: Hint, with its marks, key line and links
+- `rewards.js`: area: rewards and the technique counts, with the reward marks
+- `completion.js`: area: finishing a puzzle
+- `ui.js`: area: the page (DOM, events), the only module that touches it
+- `board.js`: shared helper: grid geometry (units, peers, masks, cell naming), used by checking, hints, rewards, techniques, generation
+- `techniques.js`: shared helper: finding technique steps (naked and hidden singles, pointing, claiming), used by hints, rewards, generation
+- `texts.js`: shared helper: naming cells, boxes and lists in messages, used by hints, rewards
 
 Tests and the spec driver import each function from the module that owns it; there is no module that re-exports the others.
 
 ## Files
 - `index.html`, `style.css` - page and styling (`td.clash`: the orange clash outline; `#link`: the reserved space under the grid, holding the key line (a pointing or hidden-single explanation) or, while a hatched cell or ring is selected, the link sentence, cleared with the hint; `#key`: the invitation line under the status message and the Next step button (scrolled into view when it first appears); and `td.hint-linked`: the solid-purple partner rings of the focused hatched cell, or the selected ring; `td.hint-ruled`: the hatched cells the selected ring rules out)
-- `ui.js` - the interface module (ADR 001): the only code that touches the page (`render()`: DOM, events); loaded by `index.html` with `<script type="module">`. `package.json` holds only `"type": "module"`, so all `.js` files are ES modules (tests and `spec-implementation/` use `import`).
+- `ui.js` - the interface module (ADR 003): the only code that touches the page (`render()`: DOM, events); loaded by `index.html` with `<script type="module">`. `package.json` holds only `"type": "module"`, so all `.js` files are ES modules (tests and `spec-implementation/` use `import`).
 - `tools/serve.js` - static server of the repo folder (Node built-ins only; `node tools/serve.js` listens on 127.0.0.1:8000); `tests/page.test.js` reuses it on a free port. Not product: the guard lists only root `*.js`.
-- `tests/modules.test.js` - ADR 001 guard: every `*.js` at the repo root is an ES module without wrapper or globals; only `ui.js` references the page; no other module imports it
+- `tests/modules.test.js` - ADR 003 guard: every `*.js` at the repo root is an ES module without wrapper or globals; only `ui.js` references the page; no other module imports it
 - Logic modules (see Modules), ES modules imported by `ui.js` and by Node; their functions:
   - `generatePuzzle(level, {rng, maxMs})` (level `'easy'`, `'medium'`, `'tricky'`, `'tough'` or `'hard'`; `'tough'` returns the same puzzle as `'tricky'` for the same rng) -> `{level, puzzle, solution, givens}` (9x9 arrays, 0 = empty); `generateSolution(rng)`; `seededRng(seed)` for reproducible output; `countSolutions(grid, limit)`; `solvableBy(grid, 'naked'|'singles'|'pointing')` (`'pointing'`: singles, and when none is left a `findPointing` step, repeated until the grid is full or no step is left); `LEVELS` (`{min, max, technique, beyond}` per level: the givens band, the technique the puzzle must be solvable by and the one it must not be)
   - `isValidSolution`, `findConflicts`, `clashCells(grid)` (flat indices 9 * r + c, ascending, of the cells to outline: the `findConflicts` cells), `fixedMessage(before, after)` (the "No numbers break the rules now..." text when `before` has a clash and `after` has none, else `''`; the page lets `completionFor` override it), `namedClash(grid)` -> `null` when no rule is broken, else `{phrase, extra}` (the named clash: `phrase` is "row R1, column C1 and row R2, column C2 both hold E in the same U", `extra` is the "Other numbers break the rules too..." sentence when more than two cells clash, else `''`; used by `hintFor` and `creditEntry`), `verify`, `sanitizeDigit`, `buildGrid(puzzle, values)` (grid passed to verify; notes excluded)
