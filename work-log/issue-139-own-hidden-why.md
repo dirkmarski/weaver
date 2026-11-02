@@ -24,6 +24,14 @@ https://github.com/dirkmarski/weaver/issues/139 - branch `issue-139-own-hidden-w
 Not checked: layout/page behaviour (tester), specs/ run beyond node --test, a reachable-state difference for finding 1.
 
 ## Tester
+- Model Claude Sonnet 5.5, session 512d8df6-bdf0-4d6d-9806-20017be40830. Head tested b95608e (main 21338ba for comparison). Verdict: PASS, no defects; one thin-slack note.
+1. AC 5 layout (real page, mobile emulation before load, real CDP input; 4 cases x 3 viewports, branch vs main): all gates hold. Tricky 54 r8c3 at 360x740: 8 lines, #status bottom 736.5 (main 694.5; limit 737, 0.5 px to the gate, 3.5 px to the 740 viewport); 375x812: 751.6 (<= 760). Tricky 8 r4c1 and Tricky 24 r6c7 also hit 8 lines / 736.5 at 360x740 (not only Tricky 54); Tricky 14 r6c9: 7 lines, 715.5. Grid top 79.8, buttons 47-552.5, scrollY 0 identical to main in every case; 1280x900 2 lines and no overflow in all; 0 console errors; no split box names; shown text equals expected in all 24 runs.
+2. Oracle (own holder rule, no hints.js): 195 cases (174 with reason, 21 without), 0 mismatches; 21 no-reason texts identical to main; part before ", since" byte-identical to main in all 195; 780 hintFor calls deep-equal branch vs main; Hint step 3 for the same step contains the oracle phrase in 88 of 88 reason cases.
+3. Mutants (perl, node --test, restored): (a) ", since " join -> " since " KILLED (10 fail); (b) has/have always "have" KILLED (6); (c) always append since KILLED (2); (d) boxes after rows KILLED (9); (e) break removed KILLED (3). Fail counts are node's, including enclosing suites.
+4. Suite: node --test 242 tests, 242 pass, 0 fail, 0 skipped.
+5. Note (low): the 360x740 fit rests on 0.5 px of the AC (737) and 3.5 px of the viewport; any further wording growth at 8 lines will push the message below the fold at 360x740 (already the known tally gap). Reviewer finding 1 (removed: [] mutant) not re-run.
+Not tested: personas/PM acceptance (AC 7), touch input, other viewports, Tough/Easy levels on the page, Safari/Firefox, unit-test line counts (AC 2 caps, reviewer/lead).
+Scratch: /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/512d8df6-bdf0-4d6d-9806-20017be40830/scratchpad/test-139/ (README.md).
 
 ## Lead review
 
