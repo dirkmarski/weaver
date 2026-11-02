@@ -5,6 +5,7 @@ PM session: scoping run, 2026-10-29. Basis: main 5804bd4 (code as 65a90a6, plus 
 ## Status
 - Scoping done. Issues #126, #127, #128 raised (in that order, delivered in sequence). Spec branches pushed: `issue-127-play-online` (1 new scenario, red), `issue-128-box-names` (7 scenarios red on main, 14 pass). #126 has no spec (restructure; parity gate).
 - Requests 001 and 002 (PM-raised, Answered): Follow-ups recorded. 003-005 were raised by the curator.
+- 2026-11-02 (PM relaunch, scoping re-run): found #126-#128 open, spec branches pushed and this log unmerged (no PR). Rechecked: no governance change since 5804bd4 (68829d7 touches `.claude/run-task` only); product code unchanged since 65a90a6; live site 200. Red runs repeated: #127 1 fail (assertion) / 21 pass; #128 7 fail / 14 pass. Scope stands unchanged; opened a PR for this branch so the request Follow-ups reach main for the curator. Next: lead delivers #126, then #127, then #128; PM accepts each.
 
 ## Direction
 - New governance (5804bd4): ADR 003 supersedes ADR 001 (modules = areas of the game a player would name; shared helpers may have their own module). Timing: existing code in line this iteration, before any new product feature. Spec strategy: an already-passing scenario counts as red only once a mutant fails it at the red run. Rules: requests/ flow.
