@@ -17,6 +17,7 @@ Issue: https://github.com/dirkmarski/weaver/issues/128. Branch: `issue-128-box-n
 - Changed: `texts.js` boxName(b) returns the position name (U+2011 always, no dash parameter); `rewards.js` NB removed; `hints.js` comment; README templates use "the P box" (P defined once on the first pointing line), U+2011 sentence now "box names always use U+2011"; existing range assertions in tests/sudoku.test.js and tests/page.test.js adapted (the claiming `box` helper now maps to names); one new test `boxName` pinning all nine names and code point 0x2011.
 - Ratio: tests 2478 (cap 2483 = floor(1.6 x 1552)), product 1552, 1.597x. spec-implementation 483 lines (unchanged).
 - Removed assertions: none. Result: 230 tests, 230 pass, 0 fail, 0 skipped, 5.9 s.
+- Rework r1 (031d624): README lines 46 and 53 reward templates and the <unit> definition now say "the P box" instead of the range form; nothing else changed; 230 pass, 0 skipped.
 
 ## Reviewer
 - Reviewer Claude Sonnet 5.5, session 226c8fac-a151-4b1c-af1a-02f108c103b5, head d7937c8 (diff ba07892..d7937c8).
