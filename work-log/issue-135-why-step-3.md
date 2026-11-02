@@ -27,6 +27,14 @@ Issue: https://github.com/dirkmarski/weaver/issues/135 . Branch: `issue-135-why-
 Suite 237/237 pass, spec-implementation 28/28; ratio 2489/1581 = 1.574 (cap 2529); hints.js longest line 248 (= main). Not checked: page layout (tester).
 
 ## Tester
+- Model Claude Sonnet 5.5, session 8dc2d34a-b5fc-44f3-9327-5bb6bd0c4608, tested head c311891 (main origin/main 0b916fe for comparison). Verdict: PASS (AC4, AC5 and the oracle hold; no product defect found). Scripts: scratch `test-135/README.md`.
+1. AC4 layout, 13 cases x 360x740 / 375x812 / 1280x900, real page, mobile emulation before load, real CDP input: all gates hold. 360x740: max 10 lines (main 10), min grid top 5.8 px (the #111 D10 case and three others; main also 5.8), reserve (#link) and invitation (#key) bottoms <= 738.5 (main 738.5). 375x812: max reserve bottom 810.6 (Tough 14 h17 and h18; main 793.6), margin 1.4 px as the PM spike said; every other case <= 793.6. 1280x900: lines equal main in all 13 (6-7). No horizontal overflow or clipping, 0 split box names, 0 console errors. Every step 3 is the hidden-form new sentence.
+2. The branch adds up to 2 lines at 360 (7->9, 8->10) but the grid top stays >= 5.8 px and the reserve never exceeds main's worst (738.5); at 375x812 the branch reserve is 17-18 px lower than main in 12 of 13 cases (equal in Tricky 4 h4), still <= 810.6.
+3. Oracle (7 cases, independent holders/order/count/has-have/names from the page board): all equal the page text. The unit kind, D, struck and hatched marks are read from the page (marks include the step-1 box's hatched cells, filtered to U).
+4. Mutants (hints.js, reverted): group order reversed, has/have by group count, struck = all removed, fallback always "the other empty cell", fallback never, holder order box-first, filled cells not skipped, duplicate holders kept: all 8 killed by `node --test`. The fallback wording mutant is killed by a spec only (1 failure).
+5. C4: `node --test spec-implementation/specs.test.js` did not hang: 3 runs each on branch and main, summary and exit both at about 0.23 s (28 and 22 tests, 0 fail); plain `node --test` 5.3-5.7 s, exits with the summary (branch 237, main 230 tests); no process left on 8000 or elsewhere; with 8000 busy it fails in 0.2 s with the documented message. Not reproduced; a hang would come from the caller (a harness waiting on a pipe or Chrome from another job), not the runner.
+6. `node --test` on the branch: 237 pass, 0 fail, 0 skipped, 6.5 s.
+Not tested: personas (PM), other seeds beyond the 13, other viewports, Safari/Firefox, keyboard-only walk, unreachable census cases (U with no struck cell; three unit groups), the reviewer's two gaps (left to rework).
 
 ## Lead review
 
