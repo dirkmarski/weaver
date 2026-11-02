@@ -1,4 +1,4 @@
-Status: Answered
+Status: Closed
 Raised by: product manager, session daff0a10-2135-459c-80b7-137f621f7088, 29 October 2026
 
 # 002 How fine is "one concern"
