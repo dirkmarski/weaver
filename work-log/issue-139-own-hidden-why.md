@@ -34,5 +34,9 @@ Not tested: personas/PM acceptance (AC 7), touch input, other viewports, Tough/E
 Scratch: /tmp/wvr/claude-502/-Users-dirk-Code-weaver-team/512d8df6-bdf0-4d6d-9806-20017be40830/scratchpad/test-139/ (README.md).
 
 ## Lead review
+- Lead spot check after developer (decd707): diff matches the claimed file list; product 1593 (developer's 1393 omitted index.html/style.css/package.json), tests/ 2495 (1.566x, cap 2529), spec-implementation/ 483; longest lines unchanged (rewards.js 160, hints.js 248); README word-diff touches only the two hidden-form reward texts. Suite 242/242. Re-ran mutant (c) (always append since): 2 fail (no-reason spec + seed 1/3 walls unit test), killed.
+- Reviewer finding 1 (`removed: []` at rewards.js:101 survives): ruled equivalent, no rework. Removed cells come from `spotsFor(..., d)` (techniques.js:97 and pointing alike), i.e. cells where D still fits, so none of their units holds D and holdersPhrase never assigns them a holder; the filter only skips work. Finding 2 (nit, recomputed unit cells) accepted as is.
+- Tester PASS at b95608e. Lead re-ran `oracle.mjs` (17:33, PASS 174/21/195, hint calls unchanged) and `table.mjs` (PASS all AC5 gates) while wt-test-139 existed; looked at t54-r8c3-branch-360.png (8 lines, fully visible, board/buttons in place). Thin 360x740 fit (736.5 of 737) noted for the PM; message length is backlog item 3.
+- AC 1-6 met (AC 7 is the PM's). ADR 002/003 compliant (no new module, no new deps; hints -> rewards import already listed).
 
 ## Lead: acceptance and merge
