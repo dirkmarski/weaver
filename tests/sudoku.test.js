@@ -1420,4 +1420,9 @@ test('hidden step 3 lists the holders as the box, then rows, then columns', () =
   const g = grid81('090600030002005000050008091000003080070500300230007400689074503703000000000300078'); // WALL_BOX, r7c4 emptied and a 5 put in row 7
   assert.strictEqual(hiddenStep3({ unit: 'box', r: 7, c: 4, pointDigit: 5, removed: [76] }, g),
     '3. In the bottom‑middle box, step 2 crossed out one cell; row 7 and columns 4 and 6 already have a 5. So 5 must go in row 8, column 5.');
+  const put = (cells) => { const f = Array(81).fill(0); cells.forEach(([q, v]) => { f[q] = v; }); return Array.from({ length: 9 }, (_, r) => f.slice(r * 9, r * 9 + 9)); };
+  assert.strictEqual(hiddenStep3({ unit: 'row', r: 0, c: 0, pointDigit: 5, removed: [3, 6] }, put([[13, 5], [16, 5], [4, 1], [7, 1]])), // 5s in the top-middle and top-right boxes only; their other row cells filled
+    '3. In row 1, step 2 crossed out two cells; the top‑middle and top‑right boxes already have a 5. So 5 must go in row 1, column 1.');
+  assert.strictEqual(hiddenStep3({ unit: 'box', r: 0, c: 0, pointDigit: 5, removed: [1, 2, 9] }, put([[47, 5], [54, 5]])), // columns met as 3, then 1
+    '3. In the top‑left box, step 2 crossed out three cells; columns 1 and 3 already have a 5. So 5 must go in row 1, column 1.');
 });

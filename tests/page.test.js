@@ -296,7 +296,8 @@ describe('page (headless Chrome)', () => {
     await keys([[39, 'Backspace']]);
     await hints(4);
     s = await read();
-    assert.deepStrictEqual([s.target, s.removed, s.status.includes('not in row 7, column 5; row 9, columns 4 and 5 (struck).'), s.status.split('\n')[3], await statusSize()], [[39], [58, 75, 76], true, '3. In column 4, step 2 crossed out one cell; rows 1, 3, 6 and 8 already have a 6. So 6 must go in row 5, column 4.', '17.6px']); // 1.1 rem at >= 560 px
+    assert.deepStrictEqual([s.target, s.removed, s.status.includes('not in row 7, column 5; row 9, columns 4 and 5 (struck).'), s.status.split('\n')[3], await statusSize()], [[39], [58, 75, 76], true,
+      '3. In column 4, step 2 crossed out one cell; rows 1, 3, 6 and 8 already have a 6. So 6 must go in row 5, column 4.', '17.6px']); // 1.1 rem at >= 560 px
     try { // 360x740: seed 4 reaches claiming after three hinted entries; its long step 2 still leaves the Next step button in view
       await page.send('Emulation.setDeviceMetricsOverride', { width: 360, height: 740, deviceScaleFactor: 1, mobile: true });
       await open('tough', 4);

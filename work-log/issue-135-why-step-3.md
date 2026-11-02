@@ -16,6 +16,8 @@ Issue: https://github.com/dirkmarski/weaver/issues/135 . Branch: `issue-135-why-
 - Mutants killed (full suite): has/have, n = all struck cells, fallback branch, first-holder order (box before row/column), box group dropped. Survives: swapping the row and column group order (no spec or test has rows and columns together in one step 3; none found in seeds 1-400 first hints or a 60-step walk of 60 seeds).
 - Gap closed (second pass): one test 'hidden step 3 lists the holders as the box, then rows, then columns' in `tests/sudoku.test.js`: two hintFor grids (box+rows, box+columns, level tough) and one crafted rows+columns case via `hiddenStep3`, now exported from `hints.js` (box, row and column holders cannot all appear in one step: the unit's own kind is excluded, and no hintFor grid with box unit and both found by search).
 - Mutants: rows/columns swap and box-last both now fail the new test (1 fail each). Green: 237 pass, 0 fail, about 6.8 s; tests 2489 / product 1581 = 1.574x (cap 2529).
+- Rework (review F1-F3): added two `hiddenStep3` cases to the same test (row unit with holders in two boxes: 'the top‑middle and top‑right boxes'; box unit with columns met as 3 then 1: 'columns 1 and 3'), and split the page.test.js line (320 chars max). F4 no action.
+- Mutants: ' boxes' -> ' box' and removing the row/column numeric sort each fail 1 test; hints.js unchanged. 237 pass, 0 fail; tests 2495 / product 1581 = 1.578x (cap 2529).
 
 ## Reviewer
 - Model Claude Sonnet 5.5, session 8dc2d34a-b5fc-44f3-9327-5bb6bd0c4608, head b8c54f1. Verdict: request changes (no blocker; two should-fix test gaps).
