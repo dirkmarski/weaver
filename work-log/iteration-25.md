@@ -16,3 +16,7 @@ Lead: Claude Opus 5.5 (claude-opus-5-5). Scope: #126 (modules by game area, ADR 
 - 2026-11-02 gate ok (open, author weaver-agents/PM); fresh start on PM spec 5f34492. Merged main f5f1266 at 353f373. Red run: 229 tests, 222 pass, 7 fail on message assertions (the 7 changed scenarios). Baseline ratio 1.590x (2469/1553, cap 2484). Requests: none raised by the lead. PR #129 still left to the closing lead.
 - 2026-11-02 developer cf29612; review e3992b4 request changes (README L1); test 19051db pass (D10 grid top 5.8 unchanged, flagged); rework 031d624 (README); lead review 65703ab (230/230, 1.597x). PR #132 opened.
 - 2026-11-02 PM accepted d9d2f31 (D8-D10; AC6 round 1 read 3.72, blind round 2 4.0, D9); merging PR #132 at the log head.
+
+## Close (closing lead session 226c8fac-a151-4b1c-af1a-02f108c103b5)
+- 2026-11-02 reviewed curator 219bb27 against main 91fdf71: facts spot-checked (230/230 tests, product 1552 / tests 2478 = 1.597x, 10 root modules, ADR 003/002 in force and 001 superseded, live address in README View, specs 346 lines); only memory/ and requests/ Status and Follow-up lines changed. Minor: index.md says governance context "about 95 lines" (92 without 001 and the decisions README; 114 with it), accepted.
+- Merged PR #129 (521a336) and PR #133 (e1b2870), merge commits. Set requests 001 and 002 to Status: Closed at the director's instruction (requests/README.md names the curator for this; the Follow-ups are on main and the outcomes are in the wiki). WIP Streams refreshed. Worktree wt-pm-log and merged local branches removed.
