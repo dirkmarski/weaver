@@ -1,6 +1,6 @@
 # Iteration 27: product log (PM)
 
-Session 512d8df6-bdf0-4d6d-9806-20017be40830, 2 November 2026. Status: scoped; #139 ready for the lead (spec on branch `issue-139-own-hidden-why`).
+Session 512d8df6-bdf0-4d6d-9806-20017be40830, 2 November 2026. Status: #139 accepted (PR #141, head e276a2d; code head b95608e).
 
 ## Direction
 - Requests: none Answered for the PM (001-005 Closed). Raised 006 (production LLM trial, PR #140).
@@ -27,9 +27,27 @@ Session 512d8df6-bdf0-4d6d-9806-20017be40830, 2 November 2026. Status: scoped; #
 ## Issues
 1. #139 Own pointing/claiming reward, hidden form: say why the unit's other cells are out (order 1, only item).
 
-## Backlog (PM, after it27 scoping)
-1. #139 (in flight).
-2. C5: name one D once when it covers several units (Hint step 3 and, after #139, own rewards). Raised 2/3 at #135 and 1/3 at it27.
-3. Message density (unchanged list; now with the it27 READ drop on long rewards and the tally pushed down, 3/3).
-4-11. As in `memory/wiki/backlog.md` items 4-11.
-12. LLM "Ask about this hint": waits on request 006. Local 7B trust 2.2/5 (it27).
+## Acceptance #139 (PR #141, head e276a2d)
+- Decision: accepted. Code head b95608e; e276a2d adds log-only commits.
+- Specs: `node --test` on e276a2d: 242/242 pass, 0 skipped; port 8000 free before and after. The PR test summary covers the red run (7 failing on assertion, plus 1 under the no-reason mutant), green run, 5 killed mutants (and 1 equivalent mutant, argued), sizes (tests 1.566x, cap 2529), the 4-case layout table and the oracle (195 census rewards, 0 mismatches). AC 1-6 are met as reported.
+- AC 7: blind personas on the tester's real 375x812 shots, 4 cases, branch vs main. The A/B letters were reshuffled per case (this fixes the it27 spike weakness). Mapping: `$SCRATCH/pm-139-accept/mapping.txt`. Scores (WHY/LEARN/READ):
+  - a: branch 5.00/4.00/3.00, main 3/3/4.
+  - b: branch 4.75/3.75/3.00, main 3/3/4.
+  - c: branch 4.75/4.00/3.00, main 3/3/4.
+  - Average: branch 4.83/3.92/3.00 vs main 3.00/3.00/4.00.
+  - Gates: WHY >= 4.0 and +1.0 (+1.83): pass. LEARN >= 3.83: pass. READ >= 3.0: met exactly.
+  - Preference: branch 11 of 12 (b chose main on case 4 because of the redundant reason).
+- Claims checked by the PM against the screenshots: t54 (top-left box and rows 2, 4, 6, 7 have a 7), t14 (columns 7 and 8 have a 4) and t8 (r5c8 is both the box's 8 and column 8's 8) all hold. The personas' own checks agree (3/3, none false).
+- Persona findings:
+  - C5 redundancy on case 4, "the middle-right box and column 8" (one 8): 3/3. Item 2 is confirmed.
+  - Length and density push "Techniques applied" down: 3/3.
+  - "rows 2, 4, 6 and 7 already have a 7" is hard to parse: a.
+  - Row 2 is redundant with the top-left box: b.
+- C2: READ is exactly at the gate and drops 1.0 from main. The reason is right, but the length cost is real. Item 3 rises to joint top with item 2.
+- C3: at 360x740, 3 of 4 cases reach 8 lines, with `#status` bottom at 736.5 against the 737 gate (0.5 px). Any change that lengthens a message needs a 360x740 check. Backlog note added to item 3.
+
+## Backlog (PM, after #139 acceptance)
+1. C5: name one D once when it covers several units (Hint step 3 and own rewards). Found 3/3 at the #139 acceptance; it also shortens messages.
+2. Message density: long rewards (READ 4.00 -> 3.00 at #139), the tally below the fold, "rows 2, 4, 6 and 7 ... a 7" parse. Note: 360x740 has 0.5 px left (8 lines on 3 of 4 checked cases); any longer text needs a layout check or a density fix first.
+3-10. As in `memory/wiki/backlog.md` items 4-11.
+11. LLM "Ask about this hint": waits on request 006. Local 7B trust 2.2/5 (it27).
