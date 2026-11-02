@@ -18,6 +18,13 @@ Issue: https://github.com/dirkmarski/weaver/issues/135 . Branch: `issue-135-why-
 - Mutants: rows/columns swap and box-last both now fail the new test (1 fail each). Green: 237 pass, 0 fail, about 6.8 s; tests 2489 / product 1581 = 1.574x (cap 2529).
 
 ## Reviewer
+- Model Claude Sonnet 5.5, session 8dc2d34a-b5fc-44f3-9327-5bb6bd0c4608, head b8c54f1. Verdict: request changes (no blocker; two should-fix test gaps).
+1. should fix: the multi-box list branch ("the A and B boxes") is pinned by no test or spec; mutant ' boxes' -> ' box' survives (hints.js:43). Add one case.
+2. should fix: sort of column numbers for a box unit is unpinned (encounter order can be non-ascending in a box); mutant removing both numeric sorts (hints.js:44-46) survives. Add a hiddenStep3 case with columns met in descending order.
+3. nit: tests/page.test.js:299 is now 354 characters (main's file max 320); split the array over lines.
+4. nit: `k !== kU` and `|| s.removed.indexOf(q) >= 0` in the holder loop and the box-list sort are unreachable guards (U holds no D; struck cells have no holder); mutants survive as equivalent. Spec text says "never U itself", so keeping is defensible.
+5. nit: exporting hiddenStep3 for one test: no ADR 003 breach (no re-export, owner module); memory architecture Exports lists hints.js exports without it; curator to note.
+Suite 237/237 pass, spec-implementation 28/28; ratio 2489/1581 = 1.574 (cap 2529); hints.js longest line 248 (= main). Not checked: page layout (tester).
 
 ## Tester
 
