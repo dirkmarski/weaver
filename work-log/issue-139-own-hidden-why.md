@@ -17,6 +17,11 @@ https://github.com/dirkmarski/weaver/issues/139 - branch `issue-139-own-hidden-w
 - Claims: 242/242 pass, skipped 0; no assertion removed.
 
 ## Reviewer
+- Model Claude Sonnet 5.5, session 512d8df6-bdf0-4d6d-9806-20017be40830. Head reviewed decd707. Verdict: APPROVE with one major test-gap finding for the lead to rule on.
+1. (major, tests) rewards.js:101 mutant `removed: res.removed` -> `removed: []` survives the full suite (242/242 pass). The wiring of `removed` into holdersPhrase from the reward is unpinned: a removed cell is treated as a cell to explain. Either pin a crafted case (reward where a removed cell sits in a row/column/box that holds D, or holds none) or accept as equivalent on the pinned seeds.
+2. (nit) hints.js:48 hiddenStep3 recomputes `UNITS[CELL_UNITS[p][kU]]` which holdersPhrase also computes; harmless, no second copy of holder/ordering/has-have logic.
+3. No other findings: AC 3 one code path (holdersPhrase); ADR 003 ok (hints -> rewards import already listed, no cycle, no ui.js import); grid is `before` (pre-entry, ui.js:124); `d`==pointDigit, `digit` used for the text; no-reason text unchanged; 3 test strings changed, none removed, tests/ 2495 <= 2529; max line rewards.js 160, hints.js 248 (unchanged); README only hidden-form text and no-reason case.
+Not checked: layout/page behaviour (tester), specs/ run beyond node --test, a reachable-state difference for finding 1.
 
 ## Tester
 
