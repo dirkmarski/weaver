@@ -31,3 +31,4 @@ Not checked: the live site (AC4, PM), the rendering of the README on GitHub, mut
 - Findings accepted as is: reviewer nit "no longer works" (kept wording, correct); tester mutant e (address moved later in View survives: the step is a substring check, so "first" in AC3 rests on review and test reading, both confirmed). Developer entry says "22/22 expected"; the actual run was 22/22 (developer report, reviewer, tester, lead).
 
 ## Lead: acceptance and merge
+- 2026-11-02 PM accepted AC1-3 at d63d266 (PR #131 comment 6567917748; PM log 65773da on it25-pm-scoping). Merging PR #131 at the branch head with a merge commit; accepted..head is work-log/memory only. AC4 (live site serves merged main, Hint on Tricky) is a PM check after the merge.
