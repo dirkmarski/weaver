@@ -296,7 +296,8 @@ describe('page (headless Chrome)', () => {
     await keys([[39, 'Backspace']]);
     await hints(4);
     s = await read();
-    assert.deepStrictEqual([s.target, s.removed, s.status.includes('not in row 7, column 5; row 9, columns 4 and 5 (struck).'), s.status.includes('the only cell in column 4 where 6 fits'), await statusSize()], [[39], [58, 75, 76], true, true, '17.6px']); // 1.1 rem at >= 560 px
+    assert.deepStrictEqual([s.target, s.removed, s.status.includes('not in row 7, column 5; row 9, columns 4 and 5 (struck).'), s.status.split('\n')[3], await statusSize()], [[39], [58, 75, 76], true,
+      '3. In column 4, step 2 crossed out one cell; rows 1, 3, 6 and 8 already have a 6. So 6 must go in row 5, column 4.', '17.6px']); // 1.1 rem at >= 560 px
     try { // 360x740: seed 4 reaches claiming after three hinted entries; its long step 2 still leaves the Next step button in view
       await page.send('Emulation.setDeviceMetricsOverride', { width: 360, height: 740, deviceScaleFactor: 1, mobile: true });
       await open('tough', 4);
@@ -353,7 +354,7 @@ describe('page (headless Chrome)', () => {
       assert.strictEqual(await nextStep(), 'Next step (3 of 3)|BUTTON');
       await click('#hint');
       const s = await read();
-      assert.strictEqual(s.status.split('\n')[3], '3. That leaves row 4, column 1 as the only cell in row 4 where 8 fits, so it must be 8.');
+      assert.strictEqual(s.status.split('\n')[3], '3. In row 4, step 2 crossed out one cell; the middle‑right box and column 8 already have an 8. So 8 must go in row 4, column 1.');
       assert.strictEqual(await nextStep(), null);
       assert.deepStrictEqual(await tops(), still); // and not at the last step either
       await click('#hint'); // once complete, a further click leaves the explanation as it is
@@ -396,7 +397,7 @@ describe('page (headless Chrome)', () => {
     await hints(4);
     let s = await read();
     assert.strictEqual(s.status, 'Pointing: row 4, column 1 must be 8.\n1. In the top‑left box, the digit 8 fits only in column 3.\n'
-      + '2. So 8 cannot go in column 3 outside that box: not in column 3, rows 4 and 6 (struck).\n3. That leaves row 4, column 1 as the only cell in row 4 where 8 fits, so it must be 8.');
+      + '2. So 8 cannot go in column 3 outside that box: not in column 3, rows 4 and 6 (struck).\n3. In row 4, step 2 crossed out one cell; the middle‑right box and column 8 already have an 8. So 8 must go in row 4, column 1.');
     assert.deepStrictEqual(s.hatched, all([1, 3], [2, 2], [4, 8], [4, 9]));
     assert.strictEqual(s.key, 'Key: dashed purple = the only places for 8 in the box; struck grey 8 = this step rules 8 out there; hatched = a purple ring rules 8 out there (an 8 already in the same row, column or box).');
     const bg = await page.eval('getComputedStyle(document.querySelectorAll("#sudoku td")[2]).backgroundImage'); // r1c3, hatched
