@@ -1,14 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert';
-import { clashCells, fixedMessage } from '../clashes.js';
 import { completionFor } from '../completion.js';
 import { sanitizeDigit, applyEntry, noteDigits, nextCell } from '../entry.js';
 import { generatePuzzle, solvableBy, seededRng } from '../generation.js';
-import { hintMarks, hintKey, ringLink, ringRules } from '../hintmarks.js';
-import { preferredTechnique, hintFor, hintApplied } from '../hints.js';
+import { preferredTechnique, hintFor, hintApplied, hintMarks, hintKey, ringLink, ringRules } from '../hints.js';
 import { classifyEntry, emptyTally, creditEntry, tallyLines, TECHNIQUE_DEFINITIONS, statusClass } from '../rewards.js';
 import { findNakedSingle, findHiddenSingle, findPointing, findClaiming } from '../techniques.js';
-import { isValidSolution, findConflicts, verify, buildGrid } from '../validation.js';
+import { isValidSolution, findConflicts, verify, buildGrid, clashCells, fixedMessage } from '../checking.js';
 import { SOLUTION, PUZZLE } from './fixture.js';
 
 const clone = () => SOLUTION.map((r) => r.slice());
