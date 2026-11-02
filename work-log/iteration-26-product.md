@@ -5,6 +5,7 @@ PM session 8dc2d34a-b5fc-44f3-9327-5bb6bd0c4608: scoping run, 2026-11-02. Basis:
 ## Status
 - 2026-11-02 scoping started. Requests: none Answered for the PM (001-005 all Closed). No open GitHub issues.
 - 2026-11-02 scoping done. Issue #135 raised (single issue this iteration). Spec branch `issue-135-why-step-3` pushed (6186ae6, off main 7c537e5): red 10/10 (9 on assertions, 1 on the undefined step "the level is Tough"). No requests raised.
+- 2026-11-02 acceptance of #135: ACCEPTED at b274709 (see "Acceptance #135").
 
 ## Direction
 - New governance (7c537e5): `technology-options.md` offers a local Ollama service (installed models only, no setup changes). Assumption A1: not used in the product this iteration: the product is a static page on GitHub Pages, so players cannot reach a local service, and ADR 002 asks for Node built-ins only. Kept as a team-tooling option (e.g. a readability pre-check of message texts) if a need appears.
@@ -43,8 +44,23 @@ PM session 8dc2d34a-b5fc-44f3-9327-5bb6bd0c4608: scoping run, 2026-11-02. Basis:
 ## Issues (iteration 26, in order)
 1. #135 Hint step 3 says why the unit's other cells are out (hidden form, pointing and claiming). Spec branch `issue-135-why-step-3`.
 
-## Backlog (PM, after it26 scoping)
-1. Own pointing/claiming rewards, hidden form: say why the unit's other cells are out (reuse the #135 wording without step numbers; needs its own wording round; longest reward 6 lines, 45.5 px spare at 360x740). Next, after #135 feedback.
-2. Message density remainder: coordinates "row N, column M" slow readers (3/3 at #128); step 2 "(struck)" vs step 3 "crossed out" (C3); stage-3 phone view (title scrolls off).
-3-10. As `memory/wiki/backlog.md` items 3-10 (unchanged).
-Tech debt carried: `creditEntry` hint match for a row or column alone still untested (deferred again, D7 ratio).
+## Acceptance #135 (PM, 2026-11-02)
+Verdict: ACCEPTED, code head b274709 (branch head 52ac777 at check; b274709..52ac777 touches memory/wiki and work-log only). Requests: none Answered for the PM.
+- AC1: PR #137 red run (9010bb5): 10 fail on assertions, none undefined. PM run at 52ac777: specs 28/28 pass; spec file identical to the PM commit 6186ae6; only change in spec-implementation is the level regex `(Tricky|Tough)`.
+- AC2: PM run `node --test` 237/237 pass; ratio 1.578x (2495/1581, cap 2529); old expectations adapted in place, none removed; spec-implementation 483 lines.
+- AC3: README diff (word diff) touches only the hidden step-3 texts in "Pointing" and "Claiming"; rules as specified.
+- AC4: tester, 13 cases: 360x740 max 10 lines, grid top >= 5.8, reserve <= 738.5; 375x812 max 810.6 <= 812 (C2 closed); 1280x900 lines = main; 0 overflow, 0 console errors. Spot check of 3 shots: as described.
+- AC5: PR report: grouping, has/have, struck-inside-U count (C1), both fallbacks killed; 3 equivalent survivors accepted.
+- AC6: blind, 3 positions (Tricky 4 h4 box U, Tricky 8 h1 row U, Tough 24 h3 claiming n=2), branch vs main, X/Y randomised (key `pm-it26/accept-key.txt`). Scored by quoted text (user-a and user-c swapped X/Y labels in position 2; their quotes are unambiguous).
+  - "step 3 says why" branch: user-a 4.33, user-b 5.00, user-c 4.33 -> 4.56 (main 1.00/2.00/2.00 -> 1.67).
+  - "I learn something I can use" branch: 4.00/4.00/4.00 -> 4.00 (main 2.00/2.00/3.00 -> 2.33). Preferred branch 9/9.
+- C1: no persona tried to match the counts; user-a found the back-reference "step 2 crossed out" slightly awkward. C3 out of scope. C4 not reproduced (PM run exits in 0.2 s) -> closed.
+- New concern C5 (2/3): "the middle-right box and column 8 already have an 8" reads as two 8s when one ring covers both (assignment is row, column, box per hatched cell). True, but redundant -> backlog item 2.
+- "I learn" sits exactly at the 4.0 gate: the reason is now there, transfer is the next lever (backlog 1).
+
+## Backlog (PM, after it26 acceptance)
+1. Own pointing/claiming rewards, hidden form: say why the unit's other cells are out (reuse the #135 wording without step numbers; own wording round; longest reward 6 lines, 45.5 px spare at 360x740). Next.
+2. Step-3 unit naming: when one D covers several hatched cells via different units, name it once (C5); consider "already hold" phrasing that points to the ringed digits.
+3. Message density remainder: coordinates "row N, column M" (3/3 at #128); step 2 "(struck)" vs step 3 "crossed out" (C3); stage-3 phone view (title scrolls off); long key line (1/3 at it26).
+4-11. As `memory/wiki/backlog.md` items 3-10 (unchanged).
+Tech debt carried: `creditEntry` hint match for a row or column alone still untested.
